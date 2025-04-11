@@ -1,0 +1,125 @@
+/* 主题变量 */
+
+/* 亮色主题 (默认) */
+:root,
+html[data-theme="light"],
+body[data-theme="light"] {
+  /* 主色调 */
+  --primary-color: #4361ee;
+  --primary-light: #4cc9f0;
+  --primary-dark: #3a0ca3;
+  --primary-color-rgb: 67, 97, 238;
+
+  /* 中性色 */
+  --bg-color: #f8f9fa;
+  --bg-content: #ffffff;
+  --card-bg: #ffffff;
+  --border-color: #e9ecef;
+  --hover-bg: rgba(67, 97, 238, 0.05);
+  --active-bg: rgba(67, 97, 238, 0.1);
+
+  /* 文本颜色 */
+  --text-primary: #212529;
+  --text-secondary: #6c757d;
+  --text-muted: #adb5bd;
+  --text-light: #f8f9fa;
+
+  /* 功能色 */
+  --success: #2ecc71;
+  --success-light: #d4edda;
+  --warning: #f39c12;
+  --warning-light: #fff3cd;
+  --danger: #e74c3c;
+  --danger-light: #f8d7da;
+  --info: #3498db;
+  --info-light: #d1ecf1;
+
+  /* 阴影 */
+  --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.07);
+  --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
+  --shadow-inset: inset 0 1px 2px rgba(0, 0, 0, 0.05);
+
+  /* 表格样式 */
+  --table-header-bg: #f8f9fa;
+  --table-border-color: var(--border-color);
+  --table-hover-bg: var(--hover-bg);
+  --table-stripe-bg: #fafbfc;
+
+  /* Element Plus 组件变量覆盖 */
+  --el-color-primary: var(--primary-color);
+  --el-color-primary-light-3: var(--primary-light);
+  --el-color-primary-dark-2: var(--primary-dark);
+  --el-bg-color: var(--card-bg);
+  --el-text-color-primary: var(--text-primary);
+  --el-text-color-regular: var(--text-secondary);
+  --el-text-color-secondary: var(--text-secondary);
+  --el-border-color: var(--border-color);
+  --el-border-color-light: var(--border-color);
+  --el-fill-color-blank: var(--bg-color);
+  --el-fill-color-light: var(--hover-bg);
+  --el-fill-color: var(--bg-color);
+}
+
+/* 暗色主题 */
+html[data-theme="dark"],
+body[data-theme="dark"],
+[data-theme="dark"] {
+  /* 主色调 */
+  --primary-color: #4cc9f0;
+  --primary-light: #7bdff2;
+  --primary-dark: #3a0ca3;
+  --primary-color-rgb: 76, 201, 240;
+
+  /* 中性色 */
+  --bg-color: #121212;
+  --bg-content: #1e1e1e;
+  --card-bg: #2a2a2a;
+  --border-color: #333333;
+  --hover-bg: rgba(76, 201, 240, 0.1);
+  --active-bg: rgba(76, 201, 240, 0.15);
+
+  /* 文本颜色 */
+  --text-primary: #f8f9fa;
+  --text-secondary: #adb5bd;
+  --text-muted: #6c757d;
+  --text-light: #f8f9fa;
+
+  /* 功能色 */
+  --success: #2ecc71;
+  --success-light: rgba(46, 204, 113, 0.2);
+  --warning: #f39c12;
+  --warning-light: rgba(243, 156, 18, 0.2);
+  --danger: #e74c3c;
+  --danger-light: rgba(231, 76, 60, 0.2);
+  --info: #3498db;
+  --info-light: rgba(52, 152, 219, 0.2);
+
+  /* 阴影 */
+  --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.5);
+  --shadow-inset: inset 0 1px 2px rgba(0, 0, 0, 0.3);
+
+  /* 表格样式 */
+  --table-header-bg: #2a2a2a;
+  --table-border-color: var(--border-color);
+  --table-hover-bg: var(--hover-bg);
+  --table-stripe-bg: #252525;
+
+  /* Element Plus 组件变量覆盖 */
+  --el-color-primary: var(--primary-color);
+  --el-color-primary-light-3: var(--primary-light);
+  --el-color-primary-dark-2: var(--primary-dark);
+  --el-bg-color: var(--card-bg);
+  --el-text-color-primary: var(--text-primary);
+  --el-text-color-regular: var(--text-secondary);
+  --el-text-color-secondary: var(--text-secondary);
+  --el-border-color: var(--border-color);
+  --el-border-color-light: var(--border-color);
+  --el-fill-color-blank: var(--bg-color);
+  --el-fill-color-light: var(--hover-bg);
+  --el-fill-color: var(--bg-color);
+  --el-popup-bg-color: var(--card-bg);
+  --el-mask-color: rgba(0, 0, 0, 0.7);
+}
