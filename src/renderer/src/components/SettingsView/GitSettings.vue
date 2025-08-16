@@ -1,75 +1,103 @@
 <template>
-  <el-card class="settings-card">
-    <template #header>
+  <a-card class="settings-card">
+    <template #title>
       <div class="card-header">
         <span>Git 设置</span>
+        <BranchesOutlined />
       </div>
     </template>
-
     <div class="settings-section">
       <div class="setting-item">
         <div class="setting-label">
-          <el-icon><UserFilled /></el-icon>
+          <UserOutlined />
           <span>默认作者</span>
         </div>
         <div class="setting-control">
-          <el-input :model-value="settings.defaultAuthor" @update:modelValue="$emit('update:defaultAuthor', $event)" placeholder="输入默认作者名称" />
+          <a-input
+            :value="settings.defaultAuthor"
+            @change="(e) => $emit('update:defaultAuthor', e.target.value)"
+            placeholder="例如：John Doe"
+          />
         </div>
       </div>
 
       <div class="setting-item">
         <div class="setting-label">
-          <el-icon><Message /></el-icon>
+          <MailOutlined />
           <span>默认邮箱</span>
         </div>
         <div class="setting-control">
-          <el-input :model-value="settings.defaultEmail" @update:modelValue="$emit('update:defaultEmail', $event)" placeholder="输入默认邮箱地址" />
+          <a-input
+            :value="settings.defaultEmail"
+            @change="(e) => $emit('update:defaultEmail', e.target.value)"
+            placeholder="例如：johndoe@example.com"
+          />
         </div>
       </div>
 
       <div class="setting-item">
         <div class="setting-label">
-          <el-icon><FolderOpened /></el-icon>
-          <span>仓库扫描路径</span>
+          <FolderOpenOutlined />
+          <span>默认仓库路径</span>
         </div>
         <div class="setting-control">
-          <el-input :model-value="settings.repositoryPath" @update:modelValue="$emit('update:repositoryPath', $event)" placeholder="输入默认仓库扫描路径">
-            <template #append>
-              <el-button @click="$emit('selectDirectory')">
-                <el-icon><FolderAdd /></el-icon>
-              </el-button>
+          <a-input
+            :value="settings.repositoryPath"
+            @change="(e) => $emit('update:repositoryPath', e.target.value)"
+            placeholder="选择一个目录"
+          >
+            <template #addonAfter>
+              <a-button @click="$emit('selectDirectory')">
+                <FolderOutlined />
+              </a-button>
             </template>
-          </el-input>
+          </a-input>
         </div>
       </div>
 
       <div class="setting-item">
         <div class="setting-label">
-          <el-icon><RefreshRight /></el-icon>
-          <span>自动刷新时间间隔</span>
+          <SyncOutlined />
+          <span>自动刷新间隔</span>
         </div>
         <div class="setting-control">
-          <el-select :model-value="settings.refreshInterval" @update:modelValue="$emit('update:refreshInterval', $event)">
-            <el-option label="禁用" value="0" />
-            <el-option label="1分钟" value="60000" />
-            <el-option label="5分钟" value="300000" />
-            <el-option label="10分钟" value="600000" />
-            <el-option label="30分钟" value="1800000" />
-          </el-select>
+          <a-select
+            :value="settings.refreshInterval"
+            @change="(value) => $emit('update:refreshInterval', value)"
+            style="width: 120px"
+          >
+            <a-select-option value="60000">1 分钟</a-select-option>
+            <a-select-option value="300000">5 分钟</a-select-option>
+            <a-select-option value="600000">10 分钟</a-select-option>
+            <a-select-option value="0">从不</a-select-option>
+          </a-select>
         </div>
       </div>
     </div>
-  </el-card>
+  </a-card>
 </template>
 
 <script setup lang="ts">
-import { UserFilled, Message, FolderOpened, FolderAdd, RefreshRight } from '@element-plus/icons-vue';
+import {
+  BranchesOutlined,
+  UserOutlined,
+  MailOutlined,
+  FolderOpenOutlined,
+  FolderOutlined,
+  SyncOutlined
+} from '@ant-design/icons-vue'
 
 defineProps({
   settings: { type: Object, required: true }
-});
+})
 
-defineEmits(['update:defaultAuthor', 'update:defaultEmail', 'update:repositoryPath', 'update:refreshInterval', 'selectDirectory']);
+defineEmits([
+  'update:defaultAuthor',
+  'update:defaultEmail',
+  'update:repositoryPath',
+  'update:refreshInterval',
+  'selectDirectory'
+])
 </script>
 
 <style scoped>
@@ -101,11 +129,11 @@ defineEmits(['update:defaultAuthor', 'update:defaultEmail', 'update:repositoryPa
   display: flex;
   align-items: center;
   gap: 8px;
-  color: var(--color-text);
   font-weight: 500;
 }
 
 .setting-control {
   min-width: 200px;
+  justify-content: flex-end;
 }
 </style>

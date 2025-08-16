@@ -1,6 +1,6 @@
 <template>
   <div class="reports-container page-container">
-    <ReportsToolbar 
+    <ReportsToolbar
       :repositories="repositories"
       :selected-repo="selectedRepo"
       :date-range="dateRange"
@@ -11,7 +11,7 @@
 
     <a-tabs v-model:activeKey="activeTab" class="reports-tabs">
       <a-tab-pane key="commit-activity" tab="提交活动">
-        <CommitActivityReport 
+        <CommitActivityReport
           :loading="loading"
           :commit-stats="commitStats"
           :top-contributors="topContributors"
@@ -20,7 +20,7 @@
       </a-tab-pane>
 
       <a-tab-pane key="code-changes" tab="代码变更">
-        <CodeChangesReport 
+        <CodeChangesReport
           :loading="loading"
           :top-changed-files="topChangedFiles"
           @export-report="exportReport"
@@ -28,7 +28,7 @@
       </a-tab-pane>
 
       <a-tab-pane key="project-progress" tab="项目进度">
-        <ProjectProgressReport 
+        <ProjectProgressReport
           :loading="loading"
           :milestones="milestones"
           @export-report="exportReport"
@@ -40,13 +40,14 @@
 
 <script setup lang="ts">
 import { ref, reactive, watch, nextTick } from 'vue'
+import dayjs, { type Dayjs } from 'dayjs'
 import { message, Modal } from 'ant-design-vue' // Changed from ElMessage, ElMessageBox, ElLoading
 import ReportsToolbar from '@/components/ReportsView/ReportsToolbar.vue'
 import CommitActivityReport from '@/components/ReportsView/CommitActivityReport.vue'
 import CodeChangesReport from '@/components/ReportsView/CodeChangesReport.vue'
 import ProjectProgressReport from '@/components/ReportsView/ProjectProgressReport.vue'
 
-import repositoriesData from '@/mock/repositories.json'
+import repositoriesData from '@/mock/repositoriesData.json'
 import reportsCommitStatsData from '@/mock/reportsCommitStats.json'
 import reportsTopContributorsData from '@/mock/reportsTopContributors.json'
 import reportsTopChangedFilesData from '@/mock/reportsTopChangedFiles.json'
@@ -63,7 +64,10 @@ const milestones = ref(reportsMilestonesData)
 const selectedRepo = ref(1)
 const activeTab = ref('commit-activity')
 const loading = ref(false)
-const dateRange = ref([new Date(dayjs().subtract(30, 'day').format('YYYY-MM-DD')), new Date(dayjs().format('YYYY-MM-DD'))])
+const dateRange = ref<[Dayjs, Dayjs]>([
+  dayjs().subtract(30, 'day'),
+  dayjs()
+])
 
 // 生成报告预览
 const generatePreview = () => {
@@ -77,26 +81,26 @@ const generatePreview = () => {
 
 // 导出报告
 const exportReport = async (type: 'excel' | 'pdf') => {
-  const hide = message.loading(`正在导出${type === 'excel' ? 'Excel' : 'PDF'}文件...`, 0);
+  const hide = message.loading(`正在导出${type === 'excel' ? 'Excel' : 'PDF'}文件...`, 0)
 
   try {
     // Placeholder for actual export logic
-    await new Promise(resolve => setTimeout(resolve, 2000)); // Simulate export time
-    message.success(`报告已导出为${type === 'excel' ? 'Excel' : 'PDF'}文件`); // Changed from ElMessage
+    await new Promise((resolve) => setTimeout(resolve, 2000)) // Simulate export time
+    message.success(`报告已导出为${type === 'excel' ? 'Excel' : 'PDF'}文件`) // Changed from ElMessage
   } catch (error) {
-    console.error('导出失败:', error);
-    message.error(`导出${type === 'excel' ? 'Excel' : 'PDF'}文件失败`); // Changed from ElMessage
+    console.error('导出失败:', error)
+    message.error(`导出${type === 'excel' ? 'Excel' : 'PDF'}文件失败`) // Changed from ElMessage
   } finally {
-    hide();
+    hide()
   }
-};
+}
 
 // 监听标签页变化，触发预览生成
 watch(activeTab, (newValue) => {
   nextTick(() => {
-    generatePreview();
-  });
-});
+    generatePreview()
+  })
+})
 
 // 组件挂载后
 // onMounted(() => {

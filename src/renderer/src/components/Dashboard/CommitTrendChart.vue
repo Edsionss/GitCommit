@@ -15,8 +15,8 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue';
-import { Bar } from 'vue-chartjs';
+import { ref, computed } from 'vue'
+import { Bar } from 'vue-chartjs'
 import {
   Chart as ChartJS,
   Title,
@@ -25,10 +25,10 @@ import {
   BarElement,
   CategoryScale,
   LinearScale
-} from 'chart.js';
-import { Card } from 'ant-design-vue'; // Added Card import
+} from 'chart.js'
+import { Card } from 'ant-design-vue' // Added Card import
 
-ChartJS.register(Title, Tooltip, Legend, BarElement, CategoryScale, LinearScale);
+ChartJS.register(Title, Tooltip, Legend, BarElement, CategoryScale, LinearScale)
 
 const chartData = computed(() => ({
   labels: ['周一', '周二', '周三', '周四', '周五', '周六', '周日'],
@@ -39,14 +39,14 @@ const chartData = computed(() => ({
       data: [11, 22, 18, 29, 34, 14, 7]
     }
   ]
-}));
+}))
 
 const chartOptions = ref({
   responsive: true,
   maintainAspectRatio: false,
   plugins: {
     legend: {
-      display: false,
+      display: false
     }
   },
   scales: {
@@ -54,7 +54,7 @@ const chartOptions = ref({
       beginAtZero: true
     }
   }
-});
+})
 </script>
 
 <style scoped>

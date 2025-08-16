@@ -74,14 +74,30 @@
 </template>
 
 <script setup lang="ts">
-import { Calendar, User, Document, MoreFilled, View, DataAnalysis, Download, Setting, Delete } from '@element-plus/icons-vue';
+import {
+  Calendar,
+  User,
+  Document,
+  MoreFilled,
+  View,
+  DataAnalysis,
+  Download,
+  Setting,
+  Delete
+} from '@element-plus/icons-vue'
 
 defineProps({
   repositories: { type: Array, required: true },
   formatDate: { type: Function, required: true }
-});
+})
 
-defineEmits(['openRepo', 'analyzeRepo', 'exportRepoData', 'openSettingsDialog', 'confirmRemoveRepo']);
+defineEmits([
+  'openRepo',
+  'analyzeRepo',
+  'exportRepoData',
+  'openSettingsDialog',
+  'confirmRemoveRepo'
+])
 </script>
 
 <style scoped>

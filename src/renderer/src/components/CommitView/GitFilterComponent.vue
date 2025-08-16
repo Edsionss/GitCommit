@@ -1,10 +1,10 @@
 <template>
   <div class="filter-component">
-    <el-card class="filter-card">
-      <template #header>
+    <a-card class="filter-card">
+      <template #title>
         <div class="card-header">
           <span>Git提交记录筛选</span>
-          <el-button type="primary" @click="startScan" :loading="scanning"> 开始扫描 </el-button>
+          <a-button type="primary" @click="startScan" :loading="scanning"> 开始扫描 </a-button>
         </div>
       </template>
 
@@ -13,27 +13,23 @@
         <div class="filter-label-row">
           <div class="filter-label">Git仓库路径</div>
           <div class="input-with-button">
-            <el-input v-model="repoPath" placeholder="请输入Git仓库路径" clearable style="flex: 1">
-              <template #append>
-                <el-button @click="selectRepoPath">
-                  <el-icon><Folder /></el-icon>
-                </el-button>
+            <a-input-search v-model:value="repoPath" placeholder="请输入Git仓库路径" @search="selectRepoPath">
+              <template #enterButton>
+                <a-button>
+                  <FolderOutlined />
+                </a-button>
               </template>
-            </el-input>
+            </a-input-search>
           </div>
         </div>
         <div class="paths-options" v-if="savedRepoPaths.length > 0">
           <div class="paths-options-row">
             <div class="verify-git-toggle">
-              <el-switch
-                v-model="verifyGitRepo"
-                active-text="验证Git目录"
-                inactive-text="不验证目录"
-              />
+              <a-switch v-model:checked="verifyGitRepo" checked-children="验证Git目录" un-checked-children="不验证目录" />
             </div>
             <div class="saved-paths">
               <div class="saved-paths-label">历史路径:</div>
-              <el-tag
+              <a-tag
                 v-for="path in savedRepoPaths"
                 :key="path"
                 class="saved-path-tag"
@@ -42,7 +38,7 @@
                 @close="removeSavedPath(path, 'repo')"
               >
                 {{ getShortPath(path) }}
-              </el-tag>
+              </a-tag>
             </div>
           </div>
         </div>
@@ -52,64 +48,22 @@
         <div class="filter-label-row">
           <div class="filter-label">提交时间范围</div>
           <div class="quick-date-buttons">
-            <el-button-group>
-              <el-button
-                size="small"
-                :type="quickDateType === 'all' ? 'primary' : 'default'"
-                @click="selectQuickDate('all')"
-                >所有时间</el-button
-              >
-              <el-button
-                size="small"
-                :type="quickDateType === 'today' ? 'primary' : 'default'"
-                @click="selectQuickDate('today')"
-                >今天</el-button
-              >
-              <el-button
-                size="small"
-                :type="quickDateType === 'week' ? 'primary' : 'default'"
-                @click="selectQuickDate('week')"
-                >本周</el-button
-              >
-              <el-button
-                size="small"
-                :type="quickDateType === 'month' ? 'primary' : 'default'"
-                @click="selectQuickDate('month')"
-                >本月</el-button
-              >
-              <el-button
-                size="small"
-                :type="quickDateType === 'quarter' ? 'primary' : 'default'"
-                @click="selectQuickDate('quarter')"
-                >本季度</el-button
-              >
-              <el-button
-                size="small"
-                :type="quickDateType === 'year' ? 'primary' : 'default'"
-                @click="selectQuickDate('year')"
-                >本年</el-button
-              >
-              <el-button
-                size="small"
-                :type="quickDateType === 'custom' ? 'primary' : 'default'"
-                @click="selectQuickDate('custom')"
-                >自定义</el-button
-              >
-            </el-button-group>
+            <a-radio-group v-model:value="quickDateType" @change="selectQuickDate">
+              <a-radio-button value="all">所有时间</a-radio-button>
+              <a-radio-button value="today">今天</a-radio-button>
+              <a-radio-button value="week">本周</a-radio-button>
+              <a-radio-button value="month">本月</a-radio-button>
+              
+              <a-radio-button value="year">本年</a-radio-button>
+              <a-radio-button value="custom">自定义</a-radio-button>
+            </a-radio-group>
           </div>
         </div>
         <div class="filter-control">
-          <el-date-picker
-            v-model="dateRange"
-            type="daterange"
-            range-separator="至"
-            start-placeholder="开始日期"
-            end-placeholder="结束日期"
-            format="YYYY-MM-DD"
-            value-format="YYYY-MM-DD"
+          <a-range-picker
+            v-model:value="dateRange"
             style="width: 100%"
             :disabled="quickDateType !== 'custom'"
-            :shortcuts="dateShortcuts"
             @change="onDateRangeChange"
           />
         </div>
@@ -120,47 +74,40 @@
         <div class="filter-label-row">
           <div class="filter-label">提交作者</div>
           <div class="input-with-button">
-            <el-select
-              v-model="selectedAuthors"
-              multiple
-              filterable
-              allow-create
-              default-first-option
-              placeholder="选择或输入提交作者"
+            <a-select
+              v-model:value="selectedAuthors"
+              mode="tags"
               style="flex: 1"
+              placeholder="选择或输入提交作者"
+              :options="authorsList.map(author => ({ value: author }))"
             >
-              <el-option
-                v-for="author in authorsList"
-                :key="author"
-                :label="author"
-                :value="author"
-              />
-            </el-select>
-            <el-button @click="scanAuthors" :loading="scanningAuthors" style="margin-left: 8px">
-              <el-icon><Refresh /></el-icon> 扫描当前仓库作者
-            </el-button>
+            </a-select>
+            <a-button @click="scanAuthors" :loading="scanningAuthors" style="margin-left: 8px">
+              <template #icon><ReloadOutlined /></template>
+              扫描当前仓库作者
+            </a-button>
           </div>
         </div>
       </div>
-    </el-card>
+    </a-card>
 
     <!-- 高级筛选 -->
-    <el-collapse v-model="activeCollapse">
-      <el-collapse-item title="高级筛选" name="advanced">
+    <a-collapse v-model:activeKey="activeCollapse">
+      <a-collapse-panel key="advanced" header="高级筛选">
         <div class="advanced-filters">
           <div class="filter-item">
             <div class="filter-label">导出路径</div>
             <div class="filter-control">
-              <el-input v-model="exportPath" placeholder="请选择导出路径" clearable>
-                <template #append>
-                  <el-button @click="selectExportPath">
-                    <el-icon><Folder /></el-icon>
-                  </el-button>
+              <a-input-search v-model:value="exportPath" placeholder="请选择导出路径" @search="selectExportPath">
+                <template #enterButton>
+                  <a-button>
+                    <FolderOutlined />
+                  </a-button>
                 </template>
-              </el-input>
+              </a-input-search>
               <div class="saved-paths" v-if="savedExportPaths.length > 0">
                 <div class="saved-paths-label">历史路径:</div>
-                <el-tag
+                <a-tag
                   v-for="path in savedExportPaths"
                   :key="path"
                   class="saved-path-tag"
@@ -169,7 +116,7 @@
                   @close="removeSavedPath(path, 'export')"
                 >
                   {{ getShortPath(path) }}
-                </el-tag>
+                </a-tag>
               </div>
             </div>
           </div>
@@ -177,41 +124,42 @@
           <div class="filter-item">
             <div class="filter-label">导出字段选择</div>
             <div class="filter-control">
-              <el-checkbox-group v-model="exportFields">
-                <el-checkbox value="hash">提交哈希</el-checkbox>
-                <el-checkbox value="author">提交作者</el-checkbox>
-                <el-checkbox value="email">作者邮箱</el-checkbox>
-                <el-checkbox value="date">提交日期</el-checkbox>
-                <el-checkbox value="message">提交信息</el-checkbox>
-                <el-checkbox value="files">变更文件</el-checkbox>
-                <el-checkbox value="additions">新增行数</el-checkbox>
-                <el-checkbox value="deletions">删除行数</el-checkbox>
-              </el-checkbox-group>
+              <a-checkbox-group v-model:value="exportFields">
+                <a-checkbox value="hash">提交哈希</a-checkbox>
+                <a-checkbox value="author">提交作者</a-checkbox>
+                <a-checkbox value="email">作者邮箱</a-checkbox>
+                <a-checkbox value="date">提交日期</a-checkbox>
+                <a-checkbox value="message">提交信息</a-checkbox>
+                <a-checkbox value="files">变更文件</a-checkbox>
+                <a-checkbox value="additions">新增行数</a-checkbox>
+                <a-checkbox value="deletions">删除行数</a-checkbox>
+              </a-checkbox-group>
             </div>
           </div>
 
           <div class="filter-item">
             <div class="filter-label">导出格式</div>
             <div class="filter-control">
-              <el-radio-group v-model="exportFormat">
-                <el-radio value="csv">CSV</el-radio>
-                <el-radio value="json">JSON</el-radio>
-                <el-radio value="txt">TXT</el-radio>
-                <el-radio value="html">HTML</el-radio>
-                <el-radio value="md">Markdown</el-radio>
-              </el-radio-group>
+              <a-radio-group v-model:value="exportFormat">
+                <a-radio value="csv">CSV</a-radio>
+                <a-radio value="json">JSON</a-radio>
+                <a-radio value="txt">TXT</a-radio>
+                <a-radio value="html">HTML</a-radio>
+                <a-radio value="md">Markdown</a-radio>
+              </a-radio-group>
             </div>
           </div>
         </div>
-      </el-collapse-item>
-    </el-collapse>
+      </a-collapse-panel>
+    </a-collapse>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, defineEmits } from 'vue'
-import { ElMessage, ElMessageBox } from 'element-plus'
-import { Folder, Refresh } from '@element-plus/icons-vue'
+import { ref, onMounted, defineEmits } from 'vue'
+import { message, Modal } from 'ant-design-vue'
+import { FolderOutlined, ReloadOutlined } from '@ant-design/icons-vue'
+import dayjs from 'dayjs'
 
 const emit = defineEmits([
   'update:repoPath',
@@ -227,9 +175,9 @@ const emit = defineEmits([
 
 // 状态变量
 const repoPath = ref('')
-const dateRange = ref([])
+const dateRange = ref<[dayjs.Dayjs, dayjs.Dayjs] | null>(null)
 const quickDateType = ref('all')
-const selectedAuthors = ref([])
+const selectedAuthors = ref<string[]>([])
 const authorsList = ref<string[]>([])
 const activeCollapse = ref([''])
 const exportPath = ref('')
@@ -244,51 +192,13 @@ const scanningAuthors = ref(false)
 // 监听属性变化
 const emitUpdates = () => {
   emit('update:repoPath', repoPath.value)
-  emit('update:dateRange', dateRange.value)
+  emit('update:dateRange', dateRange.value ? [dateRange.value[0].format('YYYY-MM-DD'), dateRange.value[1].format('YYYY-MM-DD')] : null)
   emit('update:selectedAuthors', selectedAuthors.value)
   emit('update:exportPath', exportPath.value)
   emit('update:exportFields', exportFields.value)
   emit('update:exportFormat', exportFormat.value)
   emit('update:verifyGitRepo', verifyGitRepo.value)
 }
-
-// 日期快捷选项
-const dateShortcuts = [
-  {
-    text: '今天',
-    value: () => {
-      const today = new Date()
-      return [today, today]
-    }
-  },
-  {
-    text: '本周',
-    value: () => {
-      const end = new Date()
-      const start = new Date()
-      start.setTime(start.getTime() - 3600 * 1000 * 24 * 7)
-      return [start, end]
-    }
-  },
-  {
-    text: '本月',
-    value: () => {
-      const end = new Date()
-      const start = new Date()
-      start.setDate(1)
-      return [start, end]
-    }
-  },
-  {
-    text: '最近三个月',
-    value: () => {
-      const end = new Date()
-      const start = new Date()
-      start.setMonth(start.getMonth() - 3)
-      return [start, end]
-    }
-  }
-]
 
 onMounted(() => {
   // 模拟从本地存储加载保存的路径
@@ -303,60 +213,25 @@ onMounted(() => {
   }
 
   // 初始设置为"所有时间"
-  selectQuickDate('all')
+  selectQuickDate({ target: { value: 'all' } })
 })
 
 // 选择仓库路径
 const selectRepoPath = async () => {
   // 模拟选择文件夹
-  await ElMessageBox.prompt('请输入Git仓库路径', '选择仓库', {
-    confirmButtonText: '确认',
-    cancelButtonText: '取消',
-    inputValue: repoPath.value
-  })
-    .then(({ value }) => {
-      if (value) {
-        repoPath.value = value
-        savePathToHistory(value, 'repo')
-        emitUpdates()
-      }
-    })
-    .catch(() => {})
+  Modal.info({
+    title: '选择仓库',
+    content: '请在主进程中实现选择文件夹的功能',
+  });
 }
 
 // 选择导出路径
 const selectExportPath = async () => {
   // 模拟选择文件夹
-  await ElMessageBox.prompt('请输入导出路径', '选择导出路径', {
-    confirmButtonText: '确认',
-    cancelButtonText: '取消',
-    inputValue: exportPath.value
-  })
-    .then(({ value }) => {
-      if (value) {
-        exportPath.value = value
-        savePathToHistory(value, 'export')
-        emitUpdates()
-      }
-    })
-    .catch(() => {})
-}
-
-// 保存路径到历史记录
-const savePathToHistory = (path: string, type: 'repo' | 'export') => {
-  if (type === 'repo') {
-    if (!savedRepoPaths.value.includes(path)) {
-      savedRepoPaths.value.unshift(path)
-      savedRepoPaths.value = savedRepoPaths.value.slice(0, 5) // 保留最近的5条记录
-      localStorage.setItem('savedRepoPaths', JSON.stringify(savedRepoPaths.value))
-    }
-  } else {
-    if (!savedExportPaths.value.includes(path)) {
-      savedExportPaths.value.unshift(path)
-      savedExportPaths.value = savedExportPaths.value.slice(0, 5) // 保留最近的5条记录
-      localStorage.setItem('savedExportPaths', JSON.stringify(savedExportPaths.value))
-    }
-  }
+  Modal.info({
+    title: '选择导出路径',
+    content: '请在主进程中实现选择文件夹的功能',
+  });
 }
 
 // 从历史记录中移除路径
@@ -381,7 +256,7 @@ const getShortPath = (path: string) => {
 // 扫描作者
 const scanAuthors = () => {
   if (!repoPath.value) {
-    ElMessage.warning('请先选择Git仓库路径')
+    message.warning('请先选择Git仓库路径')
     return
   }
 
@@ -392,14 +267,14 @@ const scanAuthors = () => {
 // 开始扫描
 const startScan = () => {
   if (!repoPath.value) {
-    ElMessage.warning('请先选择Git仓库路径')
+    message.warning('请先选择Git仓库路径')
     return
   }
 
   scanning.value = true
   emit('scanCommits', {
     repoPath: repoPath.value,
-    dateRange: dateRange.value,
+    dateRange: dateRange.value ? [dateRange.value[0].format('YYYY-MM-DD'), dateRange.value[1].format('YYYY-MM-DD')] : null,
     selectedAuthors: selectedAuthors.value,
     verifyGitRepo: verifyGitRepo.value,
     exportPath: exportPath.value,
@@ -409,53 +284,28 @@ const startScan = () => {
 }
 
 // 选择快捷日期
-const selectQuickDate = (type: string) => {
+const selectQuickDate = (e: any) => {
+  const type = e.target.value
   quickDateType.value = type
-  const today = new Date()
+  const today = dayjs()
 
   switch (type) {
     case 'all':
-      // 所有时间：开始时间为空，结束时间为今天
-      dateRange.value = [null, today.toISOString().split('T')[0]]
+      dateRange.value = null
       break
-
     case 'today':
-      // 今天
-      dateRange.value = [today.toISOString().split('T')[0], today.toISOString().split('T')[0]]
+      dateRange.value = [today, today]
       break
-
     case 'week':
-      // 本周
-      const weekStart = new Date(today)
-      const day = today.getDay() || 7 // 获取当前是周几 (0-6)，周日是0，转换为周日是7
-      weekStart.setDate(today.getDate() - day + 1) // 设置为本周一
-      dateRange.value = [weekStart.toISOString().split('T')[0], today.toISOString().split('T')[0]]
+      dateRange.value = [today.startOf('week'), today]
       break
-
     case 'month':
-      // 本月
-      const monthStart = new Date(today.getFullYear(), today.getMonth(), 1)
-      dateRange.value = [monthStart.toISOString().split('T')[0], today.toISOString().split('T')[0]]
+      dateRange.value = [today.startOf('month'), today]
       break
-
-    case 'quarter':
-      // 本季度
-      const quarter = Math.floor(today.getMonth() / 3)
-      const quarterStart = new Date(today.getFullYear(), quarter * 3, 1)
-      dateRange.value = [
-        quarterStart.toISOString().split('T')[0],
-        today.toISOString().split('T')[0]
-      ]
-      break
-
     case 'year':
-      // 本年
-      const yearStart = new Date(today.getFullYear(), 0, 1)
-      dateRange.value = [yearStart.toISOString().split('T')[0], today.toISOString().split('T')[0]]
+      dateRange.value = [today.startOf('year'), today]
       break
-
     case 'custom':
-      // 自定义：保持当前选择，不做修改
       break
   }
 
@@ -465,7 +315,6 @@ const selectQuickDate = (type: string) => {
 // 当日期范围直接修改时
 const onDateRangeChange = () => {
   if (dateRange.value && dateRange.value.length === 2) {
-    // 如果用户通过日期选择器直接修改了日期，切换到自定义模式
     quickDateType.value = 'custom'
     emitUpdates()
   }

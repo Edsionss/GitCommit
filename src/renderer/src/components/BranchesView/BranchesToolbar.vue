@@ -2,12 +2,10 @@
   <div class="branches-header">
     <h2 class="page-title">分支管理</h2>
     <div class="branches-actions">
-      <a-select v-model:value="selectedRepo" placeholder="选择仓库" class="filter-item" show-search>
-        <a-select-option
-          v-for="repo in repositories"
-          :key="repo.id"
-          :value="repo.id"
-        >{{ repo.name }}</a-select-option>
+      <a-select v-model:value="internalSelectedRepo" placeholder="选择仓库" class="filter-item" show-search>
+        <a-select-option v-for="repo in repositories" :key="repo.id" :value="repo.id">{{
+          repo.name
+        }}</a-select-option>
       </a-select>
       <a-button type="primary" @click="$emit('refresh')">
         <template #icon><ReloadOutlined /></template>
@@ -22,22 +20,31 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch } from 'vue';
-import { Select, Button } from 'ant-design-vue';
-import { ReloadOutlined, PlusOutlined } from '@ant-design/icons-vue';
+import { ref, watch } from 'vue'
+import { ReloadOutlined, PlusOutlined } from '@ant-design/icons-vue'
+import type { PropType } from 'vue'
+
+interface Repository {
+  id: number;
+  name: string;
+}
 
 const props = defineProps({
-  repositories: { type: Array, required: true },
-  modelValue: { type: [String, Number], required: true }
-});
+  repositories: { type: Array as PropType<Repository[]>, required: true },
+  selectedRepo: { type: [String, Number], required: true }
+})
 
-const emit = defineEmits(['update:modelValue', 'refresh', 'create']);
+const emit = defineEmits(['update:selectedRepo', 'refresh', 'create'])
 
-const selectedRepo = ref(props.modelValue);
+const internalSelectedRepo = ref(props.selectedRepo)
 
-watch(selectedRepo, (newVal) => {
-  emit('update:modelValue', newVal);
-});
+watch(internalSelectedRepo, (newVal) => {
+  emit('update:selectedRepo', newVal)
+})
+
+watch(() => props.selectedRepo, (newVal) => {
+  internalSelectedRepo.value = newVal
+})
 </script>
 
 <style scoped>

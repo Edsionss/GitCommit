@@ -57,8 +57,8 @@
 </template>
 
 <script setup lang="ts">
-import { Card, Row, Col, Avatar, Progress } from 'ant-design-vue';
-import { ShareAltOutlined } from '@ant-design/icons-vue';
+import { ShareAltOutlined } from '@ant-design/icons-vue'
+import { useFormatters } from '@/composables/useFormatters'
 
 defineProps({
   topContributors: {
@@ -69,15 +69,13 @@ defineProps({
     type: Array,
     required: true
   },
-  formatDate: {
-    type: Function,
-    required: true
-  },
   getAvatarUrl: {
     type: Function,
     required: true
   }
-});
+})
+
+const { formatDate } = useFormatters()
 </script>
 
 <style scoped>

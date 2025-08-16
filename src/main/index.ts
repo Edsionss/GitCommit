@@ -272,7 +272,7 @@ ipcMain.handle('scan-git-repo', async (_, repoPath: string, options?: GitScanOpt
       // 添加提交
       commits.push({
         repository: path.basename(repoPath),
-      repoPath,
+        repoPath,
         commitId: commitInfo[0],
         shortHash: commitInfo[1],
         author: commitInfo[2],

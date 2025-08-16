@@ -1,16 +1,17 @@
 <template>
-  <el-card class="results-component" id="results-section">
-    <template #header>
+  <a-card class="results-component" id="results-section">
+    <template #title>
       <div class="card-header">
         <span>扫描结果 {{ commits.length > 0 ? `(${commits.length} 条记录)` : '(暂无数据)' }}</span>
         <div class="header-actions">
-          <el-radio-group v-model="viewMode" size="small">
-            <el-radio-button value="table">表格视图</el-radio-button>
-            <el-radio-button value="text">文本视图</el-radio-button>
-          </el-radio-group>
-          <el-button type="success" @click="exportResults" :disabled="commits.length === 0">
-            <el-icon><Download /></el-icon> 导出结果
-          </el-button>
+          <a-radio-group v-model:value="viewMode" size="small">
+            <a-radio-button value="table">表格视图</a-radio-button>
+            <a-radio-button value="text">文本视图</a-radio-button>
+          </a-radio-group>
+          <a-button type="primary" @click="exportResults" :disabled="commits.length === 0">
+            <template #icon><DownloadOutlined /></template>
+            导出结果
+          </a-button>
         </div>
       </div>
     </template>
@@ -18,55 +19,47 @@
     <!-- 表格视图 -->
     <div v-if="commits.length > 0">
       <div v-if="viewMode === 'table'" class="table-view">
-        <el-table :data="pagedCommits" border style="width: 100%">
-          <el-table-column prop="hash" label="提交哈希" width="100">
-            <template #default="scope">
-              {{ scope.row.hash.substring(0, 7) }}
+        <a-table :data-source="pagedCommits" :columns="columns" :pagination="false" bordered size="small">
+          <template #bodyCell="{ column, record }">
+            <template v-if="column.key === 'hash'">
+              {{ record.hash.substring(0, 7) }}
             </template>
-          </el-table-column>
-          <el-table-column prop="author" label="作者" width="120" />
-          <el-table-column prop="date" label="日期" width="180" sortable />
-          <el-table-column prop="message" label="提交信息" />
-          <el-table-column label="变更统计" width="120">
-            <template #default="scope">
-              <span class="additions">+{{ scope.row.additions }}</span>
-              <span class="deletions">-{{ scope.row.deletions }}</span>
+            <template v-else-if="column.key === 'changes'">
+              <span class="additions">+{{ record.additions }}</span>
+              <span class="deletions">-{{ record.deletions }}</span>
             </template>
-          </el-table-column>
-          <el-table-column label="操作" width="100">
-            <template #default="scope">
-              <el-button size="small" @click="viewCommitDetails(scope.row)"> 详情 </el-button>
+            <template v-else-if="column.key === 'action'">
+              <a-button size="small" @click="viewCommitDetails(record)"> 详情 </a-button>
             </template>
-          </el-table-column>
-        </el-table>
+          </template>
+        </a-table>
 
         <!-- 分页控件 -->
         <div class="pagination-container">
-          <el-pagination
-            v-model:current-page="currentPage"
-            v-model:page-size="pageSize"
+          <a-pagination
+            v-model:current="currentPage"
+            v-model:pageSize="pageSize"
             :page-sizes="[10, 20, 50, 100]"
-            layout="total, sizes, prev, pager, next, jumper"
+            show-size-changer
             :total="commits.length"
-            @size-change="handleSizeChange"
-            @current-change="handleCurrentChange"
+            @showSizeChange="handleSizeChange"
           />
         </div>
       </div>
 
       <!-- 文本视图 -->
       <div v-else-if="viewMode === 'text'" class="text-view">
-        <el-input type="textarea" :rows="15" v-model="textViewContent" readonly />
+        <a-textarea :rows="15" :value="textViewContent" readonly />
       </div>
     </div>
 
     <!-- 无数据提示 -->
     <div v-else class="no-data">
-      <el-empty description="暂无提交记录" />
+      <a-empty description="暂无提交记录" />
     </div>
 
     <!-- 提交详情对话框 -->
-    <el-dialog v-model="detailsDialogVisible" title="提交详情" width="70%">
+    <a-modal v-model:open="detailsDialogVisible" title="提交详情" width="70%">
       <div v-if="selectedCommit" class="commit-details">
         <div class="detail-item">
           <div class="detail-label">提交哈希:</div>
@@ -89,27 +82,26 @@
         <div class="detail-item files">
           <div class="detail-label">变更文件:</div>
           <div class="detail-value">
-            <el-table :data="selectedCommit.files" border>
-              <el-table-column prop="path" label="文件路径" />
-              <el-table-column prop="status" label="状态" width="100" />
-              <el-table-column label="变更" width="120">
-                <template #default="scope">
-                  <span class="additions">+{{ scope.row.additions }}</span>
-                  <span class="deletions">-{{ scope.row.deletions }}</span>
+            <a-table :data-source="selectedCommit.files" :columns="fileColumns" bordered size="small">
+              <template #bodyCell="{ column, record }">
+                <template v-if="column.key === 'changes'">
+                  <span class="additions">+{{ record.additions }}</span>
+                  <span class="deletions">-{{ record.deletions }}</span>
                 </template>
-              </el-table-column>
-            </el-table>
+              </template>
+            </a-table>
           </div>
         </div>
       </div>
-    </el-dialog>
-  </el-card>
+    </a-modal>
+  </a-card>
 </template>
 
 <script setup lang="ts">
 import { ref, computed, defineProps, defineEmits } from 'vue'
-import { ElMessage } from 'element-plus'
-import { Download } from '@element-plus/icons-vue'
+import { message } from 'ant-design-vue'
+import { DownloadOutlined } from '@ant-design/icons-vue'
+import type { PropType } from 'vue'
 
 // 接口定义
 interface CommitFile {
@@ -131,10 +123,10 @@ interface Commit {
 }
 
 // 接收父组件传入的属性
-const props = defineProps<{
-  commits: Commit[]
-  exportPath: string
-}>()
+const props = defineProps({
+  commits: { type: Array as PropType<Commit[]>, required: true },
+  exportPath: { type: String, required: true }
+})
 
 const emit = defineEmits(['exportResults'])
 
@@ -155,14 +147,9 @@ const pagedCommits = computed(() => {
 })
 
 // 处理每页显示数量变化
-const handleSizeChange = (newSize: number) => {
-  pageSize.value = newSize
+const handleSizeChange = (current: number, size: number) => {
+  pageSize.value = size
   currentPage.value = 1 // 重置到第一页
-}
-
-// 处理页码变化
-const handleCurrentChange = (newPage: number) => {
-  currentPage.value = newPage
 }
 
 // 文本视图内容
@@ -183,12 +170,12 @@ const viewCommitDetails = (commit: Commit) => {
 // 导出结果
 const exportResults = () => {
   if (props.commits.length === 0) {
-    ElMessage.warning('没有可导出的结果')
+    message.warning('没有可导出的结果')
     return
   }
 
   if (!props.exportPath) {
-    ElMessage.warning('请先在高级筛选中选择导出路径')
+    message.warning('请先在高级筛选中选择导出路径')
     return
   }
 
@@ -200,6 +187,22 @@ const resetPagination = () => {
   currentPage.value = 1
   pageSize.value = 10
 }
+
+const columns = ref([
+    { title: '提交哈希', dataIndex: 'hash', key: 'hash', width: 100 },
+    { title: '作者', dataIndex: 'author', key: 'author', width: 120 },
+    { title: '日期', dataIndex: 'date', key: 'date', width: 180, sorter: (a: Commit, b: Commit) => new Date(a.date).getTime() - new Date(b.date).getTime() },
+    { title: '提交信息', dataIndex: 'message', key: 'message' },
+    { title: '变更统计', key: 'changes', width: 120 },
+    { title: '操作', key: 'action', width: 100 },
+]);
+
+const fileColumns = ref([
+    { title: '文件路径', dataIndex: 'path', key: 'path' },
+    { title: '状态', dataIndex: 'status', key: 'status', width: 100 },
+    { title: '变更', dataIndex: 'changes', key: 'changes', width: 120 },
+]);
+
 
 // 暴露方法给父组件调用
 defineExpose({

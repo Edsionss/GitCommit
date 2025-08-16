@@ -22,12 +22,12 @@ body,
 }
 
 /* 流畅的过渡效果 */
-.el-main>* {
+.el-main > * {
   transition: opacity 0.15s ease-in-out;
 }
 
 /* 防止高度抖动 */
-.el-tabs--border-card>.el-tabs__content {
+.el-tabs--border-card > .el-tabs__content {
   min-height: calc(100vh - 120px);
 }
 
@@ -107,8 +107,6 @@ code {
     monospace;
   font-size: 85%;
 }
-
-
 
 .logo {
   -webkit-user-drag: none;
@@ -240,7 +238,6 @@ code {
 }
 
 @media (max-width: 350px) {
-
   .tip,
   .actions {
     display: none;

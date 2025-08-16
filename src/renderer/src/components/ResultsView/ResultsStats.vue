@@ -89,7 +89,12 @@
           </a-select>
         </a-form-item>
         <a-form-item label="显示前N项">
-          <a-input-number v-model:value="topLimit" :min="5" :max="20" @change="$emit('updateCharts')" />
+          <a-input-number
+            v-model:value="topLimit"
+            :min="5"
+            :max="20"
+            @change="$emit('updateCharts')"
+          />
         </a-form-item>
       </a-form>
     </div>
@@ -193,15 +198,49 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch, nextTick } from 'vue';
-import { Card, Row, Col, Form, FormItem, Select, SelectOption, InputNumber, Button, Tooltip } from 'ant-design-vue';
-import { FileTextOutlined, FolderOutlined, UserOutlined, FileOutlined, PlusOutlined, MinusOutlined, OperationOutlined, DownloadOutlined } from '@ant-design/icons-vue';
-import * as echarts from 'echarts';
-import { BarChart, LineChart, PieChart } from 'echarts/charts';
-import { TitleComponent, TooltipComponent, LegendComponent, GridComponent } from 'echarts/components';
-import { CanvasRenderer } from 'echarts/renderers';
+import { ref, watch, nextTick } from 'vue'
+import {
+  Card,
+  Row,
+  Col,
+  Form,
+  FormItem,
+  Select,
+  SelectOption,
+  InputNumber,
+  Button,
+  Tooltip
+} from 'ant-design-vue'
+import {
+  FileTextOutlined,
+  FolderOutlined,
+  UserOutlined,
+  FileOutlined,
+  PlusOutlined,
+  MinusOutlined,
+  OperationOutlined,
+  DownloadOutlined
+} from '@ant-design/icons-vue'
+import * as echarts from 'echarts'
+import { BarChart, LineChart, PieChart } from 'echarts/charts'
+import {
+  TitleComponent,
+  TooltipComponent,
+  LegendComponent,
+  GridComponent
+} from 'echarts/components'
+import { CanvasRenderer } from 'echarts/renderers'
 
-echarts.use([TitleComponent, TooltipComponent, LegendComponent, GridComponent, BarChart, LineChart, PieChart, CanvasRenderer]);
+echarts.use([
+  TitleComponent,
+  TooltipComponent,
+  LegendComponent,
+  GridComponent,
+  BarChart,
+  LineChart,
+  PieChart,
+  CanvasRenderer
+])
 
 const props = defineProps({
   stats: { type: Object, required: true },
@@ -211,57 +250,77 @@ const props = defineProps({
   updateCharts: { type: Function, required: true },
   toggleChartType: { type: Function, required: true },
   saveChart: { type: Function, required: true }
-});
+})
 
-const emit = defineEmits(['update:timeUnit', 'update:topLimit', 'updateCharts', 'toggleChartType', 'saveChart']);
+const emit = defineEmits([
+  'update:timeUnit',
+  'update:topLimit',
+  'updateCharts',
+  'toggleChartType',
+  'saveChart'
+])
 
-const timeUnit = ref(props.timeUnit);
-const topLimit = ref(props.topLimit);
+const timeUnit = ref(props.timeUnit)
+const topLimit = ref(props.topLimit)
 
-watch(timeUnit, (newVal) => emit('update:timeUnit', newVal));
-watch(topLimit, (newVal) => emit('update:topLimit', newVal));
+watch(timeUnit, (newVal) => emit('update:timeUnit', newVal))
+watch(topLimit, (newVal) => emit('update:topLimit', newVal))
 
 // ECharts refs
-const authorChartRef = ref<HTMLElement>();
-const dateChartRef = ref<HTMLElement>();
-const repoChartRef = ref<HTMLElement>();
-const hourChartRef = ref<HTMLElement>();
+const authorChartRef = ref<HTMLElement>()
+const dateChartRef = ref<HTMLElement>()
+const repoChartRef = ref<HTMLElement>()
+const hourChartRef = ref<HTMLElement>()
 
-let authorChart: echarts.ECharts | null = null;
-let dateChart: echarts.ECharts | null = null;
-let repoChart: echarts.ECharts | null = null;
-let hourChart: echarts.ECharts | null = null;
+let authorChart: echarts.ECharts | null = null
+let dateChart: echarts.ECharts | null = null
+let repoChart: echarts.ECharts | null = null
+let hourChart: echarts.ECharts | null = null
 
 const initCharts = () => {
   nextTick(() => {
-    if (authorChartRef.value) authorChart = echarts.init(authorChartRef.value);
-    if (dateChartRef.value) dateChart = echarts.init(dateChartRef.value);
-    if (repoChartRef.value) repoChart = echarts.init(repoChartRef.value);
-    if (hourChartRef.value) hourChart = echarts.init(hourChartRef.value);
-    props.updateCharts();
-  });
-};
+    if (authorChartRef.value) authorChart = echarts.init(authorChartRef.value)
+    if (dateChartRef.value) dateChart = echarts.init(dateChartRef.value)
+    if (repoChartRef.value) repoChart = echarts.init(repoChartRef.value)
+    if (hourChartRef.value) hourChart = echarts.init(hourChartRef.value)
+    props.updateCharts()
+  })
+}
 
 // Re-initialize charts on prop changes if necessary
-watch(() => props.stats, () => initCharts(), { deep: true });
-watch(() => props.timeUnit, () => initCharts());
-watch(() => props.topLimit, () => initCharts());
-watch(() => props.chartTypes, () => initCharts(), { deep: true });
+watch(
+  () => props.stats,
+  () => initCharts(),
+  { deep: true }
+)
+watch(
+  () => props.timeUnit,
+  () => initCharts()
+)
+watch(
+  () => props.topLimit,
+  () => initCharts()
+)
+watch(
+  () => props.chartTypes,
+  () => initCharts(),
+  { deep: true }
+)
 
 // Dispose charts on unmount
-import { onUnmounted } from 'vue';
+import { onUnmounted } from 'vue'
 onUnmounted(() => {
-  authorChart?.dispose();
-  dateChart?.dispose();
-  repoChart?.dispose();
-  hourChart?.dispose();
-});
+  authorChart?.dispose()
+  dateChart?.dispose()
+  repoChart?.dispose()
+  hourChart?.dispose()
+})
 
 // Initial chart setup
-import { onMounted } from 'vue';
+import { onMounted } from 'vue'
 onMounted(() => {
-  initCharts();
-});
+  initCharts()
+})
 </script>
 
 <style scoped>

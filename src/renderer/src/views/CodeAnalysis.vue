@@ -1,6 +1,6 @@
 <template>
   <div class="code-analysis-container">
-    <CodeAnalysisToolbar 
+    <CodeAnalysisToolbar
       :repositories="repositories"
       v-model="selectedRepo"
       @analyze="analyzeCode"
@@ -8,11 +8,7 @@
 
     <a-tabs v-model:activeKey="activeTab" class="analysis-tabs">
       <a-tab-pane key="quality" tab="代码质量">
-        <CodeQualityOverview 
-          :loading="loading"
-          :code-stats="codeStats"
-          :code-issues="codeIssues"
-        />
+        <CodeQualityOverview :loading="loading" :code-stats="codeStats" :code-issues="codeIssues" />
       </a-tab-pane>
 
       <a-tab-pane key="structure" tab="代码结构">
@@ -28,7 +24,7 @@ import { message } from 'ant-design-vue' // Changed from ElMessage
 import CodeAnalysisToolbar from '@/components/CodeAnalysisView/CodeAnalysisToolbar.vue'
 import CodeQualityOverview from '@/components/CodeAnalysisView/CodeQualityOverview.vue'
 import CodeStructureAnalysis from '@/components/CodeAnalysisView/CodeStructureAnalysis.vue'
-import { Tabs, TabPane, Row, Col } from 'ant-design-vue';
+import { Tabs, TabPane, Row, Col } from 'ant-design-vue'
 
 // 示例仓库数据
 const repositories = [

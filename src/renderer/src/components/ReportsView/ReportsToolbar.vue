@@ -1,53 +1,48 @@
 <template>
   <div class="reports-header">
     <div class="filter-container">
-      <el-select v-model="selectedRepo" placeholder="选择仓库" class="filter-item">
-        <el-option
+      <a-select
+        :value="selectedRepo"
+        @change="(value) => $emit('update:selectedRepo', value)"
+        placeholder="选择仓库"
+        class="filter-item"
+      >
+        <a-select-option
           v-for="repo in repositories"
           :key="repo.id"
-          :label="repo.name"
           :value="repo.id"
-        />
-      </el-select>
-      <el-date-picker
-        v-model="dateRange"
-        type="daterange"
-        range-separator="至"
-        start-placeholder="开始日期"
-        end-placeholder="结束日期"
+        >
+          {{ repo.name }}
+        </a-select-option>
+      </a-select>
+      <a-range-picker
+        :value="dateRange"
+        @change="(dates) => $emit('update:dateRange', dates)"
         class="filter-item"
       />
-      <el-button type="primary" @click="$emit('generatePreview')">
-        <el-icon class="mr-5"><RefreshRight /></el-icon>
+      <a-button type="primary" @click="$emit('generatePreview')">
+        <template #icon><SyncOutlined /></template>
         生成预览
-      </el-button>
+      </a-button>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, watch } from 'vue';
-import { RefreshRight } from '@element-plus/icons-vue';
-import dayjs from 'dayjs';
+import { ref, watch } from 'vue'
+import { SyncOutlined } from '@ant-design/icons-vue'
+import dayjs from 'dayjs'
 
 const props = defineProps({
   repositories: { type: Array, required: true },
   selectedRepo: { type: [String, Number], required: true },
   dateRange: { type: Array, required: true }
-});
+})
 
-const emit = defineEmits(['update:selectedRepo', 'update:dateRange', 'generatePreview']);
+const emit = defineEmits(['update:selectedRepo', 'update:dateRange', 'generatePreview'])
 
-const selectedRepo = ref(props.selectedRepo);
-const dateRange = ref(props.dateRange);
-
-watch(selectedRepo, (newVal) => {
-  emit('update:selectedRepo', newVal);
-});
-
-watch(dateRange, (newVal) => {
-  emit('update:dateRange', newVal);
-});
+// Ant Design's RangePicker works directly with v-model or :value/@change,
+// so local refs and watchers are not strictly necessary if the parent handles the state.
 </script>
 
 <style scoped>
@@ -67,10 +62,6 @@ watch(dateRange, (newVal) => {
 
 .filter-item {
   min-width: 180px;
-}
-
-.mr-5 {
-  margin-right: 5px;
 }
 
 @media (max-width: 768px) {

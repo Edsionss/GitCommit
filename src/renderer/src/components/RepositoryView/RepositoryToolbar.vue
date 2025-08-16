@@ -15,9 +15,9 @@
 </template>
 
 <script setup lang="ts">
-import { FolderAdd, Refresh } from '@element-plus/icons-vue';
+import { FolderAdd, Refresh } from '@element-plus/icons-vue'
 
-defineEmits(['addRepo', 'refreshRepos']);
+defineEmits(['addRepo', 'refreshRepos'])
 </script>
 
 <style scoped>

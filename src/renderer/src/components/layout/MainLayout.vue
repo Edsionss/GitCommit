@@ -1,5 +1,5 @@
 <template>
-  <div class="layout-container">
+  <div class="layout-container" :class="layoutClasses">
     <div class="sidebar">
       <TheSidebar />
     </div>
@@ -17,19 +17,43 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted } from 'vue'
+import { ref, onMounted, onUnmounted, computed } from 'vue'
 import TheSidebar from './TheSidebar.vue'
 import TheHeader from './TheHeader.vue'
 import { useTheme } from '../../composables/useTheme'
 
 const { currentTheme } = useTheme()
 
+const sidebarPosition = ref('left')
+
+const layoutClasses = computed(() => ({
+  'sidebar-right': sidebarPosition.value === 'right'
+}))
+
+const updateSidebarPosition = () => {
+  try {
+    const settings = JSON.parse(localStorage.getItem('appSettings') || '{}')
+    sidebarPosition.value = settings?.appearance?.sidebarPosition || 'left'
+  } catch (e) {
+    console.error('Failed to parse settings for sidebar position:', e)
+    sidebarPosition.value = 'left'
+  }
+}
+
 onMounted(() => {
-  // 确保主题应用到body上
+  // Ensure theme is applied to body
   const dataTheme = document.documentElement.getAttribute('data-theme')
   if (dataTheme) {
     document.body.setAttribute('data-theme', dataTheme)
   }
+
+  // Handle sidebar position
+  updateSidebarPosition()
+  window.addEventListener('storage', updateSidebarPosition)
+})
+
+onUnmounted(() => {
+  window.removeEventListener('storage', updateSidebarPosition)
 })
 </script>
 
@@ -39,11 +63,22 @@ onMounted(() => {
   width: 100%;
   height: 100vh;
   overflow: hidden;
+  flex-direction: row;
+}
+
+.layout-container.sidebar-right {
+  flex-direction: row-reverse;
 }
 
 .sidebar {
   height: 100%;
   z-index: 20;
+  border-right: 1px solid var(--color-border);
+}
+
+.layout-container.sidebar-right .sidebar {
+  border-right: none;
+  border-left: 1px solid var(--color-border);
 }
 
 .body {

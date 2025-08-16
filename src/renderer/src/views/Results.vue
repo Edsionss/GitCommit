@@ -9,7 +9,7 @@
       >
         <!-- 统计结果 -->
         <a-tab-pane key="stats" tab="统计结果">
-          <ResultsStats 
+          <ResultsStats
             :stats="stats"
             :time-unit="timeUnit"
             :top-limit="topLimit"
@@ -29,7 +29,7 @@
 
         <!-- 导出结果 -->
         <a-tab-pane key="export" tab="导出结果">
-          <ResultsExport 
+          <ResultsExport
             :export-form="exportForm"
             :exporting="exporting"
             @select-export-path="selectExportPath"
@@ -44,7 +44,7 @@
 <script setup lang="ts">
 import { ref, reactive, onMounted, onUnmounted, watch, nextTick } from 'vue'
 import { message, Modal } from 'ant-design-vue'
-import { Tabs, TabPane } from 'ant-design-vue';
+import { Tabs, TabPane } from 'ant-design-vue'
 
 import ResultsStats from '@/components/ResultsView/ResultsStats.vue'
 import ResultsDetails from '@/components/ResultsView/ResultsDetails.vue'
@@ -87,71 +87,70 @@ const handleResize = () => {
 // 更新图表 (Placeholder - actual chart update logic is in child components)
 const updateCharts = () => {
   // This function will be passed down to ResultsStats and will trigger its internal chart updates
-  console.log('Updating charts in ResultsStats');
+  console.log('Updating charts in ResultsStats')
 }
 
 // 切换图表类型 (Placeholder - actual logic is in child components)
 const toggleChartType = (chartName: string) => {
-  console.log(`Toggling chart type for ${chartName}`);
+  console.log(`Toggling chart type for ${chartName}`)
 }
 
 // 保存图表为图片 (Placeholder - actual logic is in child components)
 const saveChart = (chartName: string) => {
-  console.log(`Saving chart ${chartName}`);
+  console.log(`Saving chart ${chartName}`)
 }
 
 // 处理标签页切换
 const handleTabChange = (key: string) => {
-  activeTab.value = key;
+  activeTab.value = key
   // You might want to trigger data loading or chart updates based on the tab
   // For now, the child components handle their own data/chart initialization on mount
-};
+}
 
 // 选择导出路径 (Placeholder - actual logic is in child components)
 const selectExportPath = async () => {
-  console.log('Selecting export path');
+  console.log('Selecting export path')
   // Simulate selection
-  exportForm.path = 'C:/Users/Public/Documents/ExportedReports';
-  message.success('导出路径已选择');
+  exportForm.path = 'C:/Users/Public/Documents/ExportedReports'
+  message.success('导出路径已选择')
 }
 
 // 处理导出 (Placeholder - actual logic is in child components)
 const handleExport = async () => {
   if (!exportForm.path) {
-    message.warning('请选择导出路径');
-    return;
+    message.warning('请选择导出路径')
+    return
   }
 
   if (exportForm.content.length === 0) {
-    message.warning('请选择导出内容');
-    return;
+    message.warning('请选择导出内容')
+    return
   }
 
-  exporting.value = true;
-  const hide = message.loading('正在导出文件...', 0);
+  exporting.value = true
+  const hide = message.loading('正在导出文件...', 0)
 
   try {
     // Simulate export
-    await new Promise(resolve => setTimeout(resolve, 2000));
-    message.success('文件导出成功！');
+    await new Promise((resolve) => setTimeout(resolve, 2000))
+    message.success('文件导出成功！')
   } catch (error) {
-    console.error('导出失败:', error);
-    message.error('导出失败！');
+    console.error('导出失败:', error)
+    message.error('导出失败！')
   } finally {
-    exporting.value = false;
-    hide();
+    exporting.value = false
+    hide()
   }
-};
+}
 
 // 生命周期钩子
 onMounted(() => {
-  window.addEventListener('resize', handleResize);
-});
+  window.addEventListener('resize', handleResize)
+})
 
 onUnmounted(() => {
-  window.removeEventListener('resize', handleResize);
-});
-
+  window.removeEventListener('resize', handleResize)
+})
 </script>
 
 <style scoped>

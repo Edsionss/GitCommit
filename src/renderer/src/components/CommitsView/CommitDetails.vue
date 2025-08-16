@@ -103,9 +103,7 @@
                 <a-button size="small" :disabled="!canShowSideBySide">
                   <CaretDownOutlined /> 并排视图
                 </a-button>
-                <a-button size="small">
-                  <CaretUpOutlined /> 统一视图
-                </a-button>
+                <a-button size="small"> <CaretUpOutlined /> 统一视图 </a-button>
               </a-button-group>
             </div>
           </div>
@@ -121,65 +119,181 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue';
-import { Tabs, Tag, Input, Empty, ButtonGroup, Button } from 'ant-design-vue';
-import { CopyOutlined, SearchOutlined, PlusOutlined, EditOutlined, DeleteOutlined, RightOutlined, CaretDownOutlined, CaretUpOutlined } from '@ant-design/icons-vue';
+import { ref, computed } from 'vue'
+import {
+  CopyOutlined,
+  SearchOutlined,
+  PlusOutlined,
+  EditOutlined,
+  DeleteOutlined,
+  RightOutlined,
+  CaretDownOutlined,
+  CaretUpOutlined
+} from '@ant-design/icons-vue'
+import type { PropType } from 'vue'
+
+interface Commit {
+  title: string;
+  hash: string;
+  author: string;
+  authorEmail: string;
+  date: string;
+  branches: string[];
+  fullMessage: string;
+  parents: string[];
+  files: any[];
+  additions: number;
+  deletions: number;
+}
 
 const props = defineProps({
-  commit: { type: Object, default: null },
+  commit: { type: Object as PropType<Commit>, default: null },
   formatDate: { type: Function, required: true }
-});
+})
 
-defineEmits(['copy', 'loadCommit']);
+defineEmits(['copy', 'loadCommit'])
 
-const activeKey = ref('detail'); // Default active tab
-const fileFilter = ref('');
-const selectedFileIndex = ref(0);
+const activeKey = ref('detail') // Default active tab
+const fileFilter = ref('')
+const selectedFileIndex = ref(0)
 
 const filteredFiles = computed(() => {
-  if (!props.commit) return [];
-  if (!fileFilter.value) return props.commit.files;
-  return props.commit.files.filter(file => file.path.toLowerCase().includes(fileFilter.value.toLowerCase()));
-});
+  if (!props.commit) return []
+  if (!fileFilter.value) return props.commit.files
+  return props.commit.files.filter((file) =>
+    file.path.toLowerCase().includes(fileFilter.value.toLowerCase())
+  )
+})
 
 const selectedFile = computed(() => {
-  if (!props.commit || selectedFileIndex.value < 0) return null;
-  return filteredFiles.value[selectedFileIndex.value];
-});
+  if (!props.commit || selectedFileIndex.value < 0) return null
+  return filteredFiles.value[selectedFileIndex.value]
+})
 
 const canShowSideBySide = computed(() => {
-  return selectedFile.value && selectedFile.value.status !== 'deleted' && selectedFile.value.status !== 'added';
-});
+  return (
+    selectedFile.value &&
+    selectedFile.value.status !== 'deleted' &&
+    selectedFile.value.status !== 'added'
+  )
+})
 
 const selectFile = (index: number) => {
-  selectedFileIndex.value = index;
-};
+  selectedFileIndex.value = index
+}
 </script>
 
 <style scoped>
 /* Styles copied from CommitsView.vue */
-.commit-details { flex: 1; overflow-y: auto; padding: 16px; }
-.commit-detail-header { margin-bottom: 16px; }
-.commit-title { font-size: 1.2em; font-weight: 600;}
-.commit-meta { background-color: var(--color-background-soft); padding: 12px; border-radius: 4px; margin-bottom: 16px; }
-.meta-item { margin-bottom: 8px; }
-.meta-label { font-weight: var(--font-weight-medium); margin-right: 8px; }
-.commit-message { margin-bottom: 16px; }
-.commit-message pre { background-color: var(--color-background-soft); padding: 12px; border-radius: 4px; overflow-x: auto; white-space: pre-wrap; }
-.parent-hashes { display: flex; gap: 8px; flex-wrap: wrap; }
-.files-summary { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
-.changes-summary { margin-left: 12px; }
-.file-list { border: 1px solid var(--color-border); border-radius: 4px; max-height: 200px; overflow-y: auto; }
-.file-item { display: flex; align-items: center; padding: 8px 12px; border-bottom: 1px solid var(--color-border); cursor: pointer; }
-.file-item:hover { background-color: var(--color-background-soft); }
-.file-item.active { background-color: var(--color-background-mute); }
-.file-icon { margin-right: 8px; }
-.file-path { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.file-changes { display: flex; gap: 8px; }
-.additions { color: var(--color-success); }
-.deletions { color: var(--color-danger); }
-.diff-viewer { margin-top: 16px; border: 1px solid var(--color-border); border-radius: 4px; }
-.diff-header { display: flex; justify-content: space-between; align-items: center; padding: 8px 12px; background-color: var(--color-background-mute); border-bottom: 1px solid var(--color-border); }
-.diff-content { overflow-x: auto; }
-.diff-code { margin: 0; padding: 12px; font-family: monospace; font-size: var(--font-size-sm); line-height: 1.5; white-space: pre; }
+.commit-details {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px;
+}
+.commit-detail-header {
+  margin-bottom: 16px;
+}
+.commit-title {
+  font-size: 1.2em;
+  font-weight: 600;
+}
+.commit-meta {
+  background-color: var(--color-background-soft);
+  padding: 12px;
+  border-radius: 4px;
+  margin-bottom: 16px;
+}
+.meta-item {
+  margin-bottom: 8px;
+}
+.meta-label {
+  font-weight: var(--font-weight-medium);
+  margin-right: 8px;
+}
+.commit-message {
+  margin-bottom: 16px;
+}
+.commit-message pre {
+  background-color: var(--color-background-soft);
+  padding: 12px;
+  border-radius: 4px;
+  overflow-x: auto;
+  white-space: pre-wrap;
+}
+.parent-hashes {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.files-summary {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+.changes-summary {
+  margin-left: 12px;
+}
+.file-list {
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+  max-height: 200px;
+  overflow-y: auto;
+}
+.file-item {
+  display: flex;
+  align-items: center;
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--color-border);
+  cursor: pointer;
+}
+.file-item:hover {
+  background-color: var(--color-background-soft);
+}
+.file-item.active {
+  background-color: var(--color-background-mute);
+}
+.file-icon {
+  margin-right: 8px;
+}
+.file-path {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.file-changes {
+  display: flex;
+  gap: 8px;
+}
+.additions {
+  color: var(--color-success);
+}
+.deletions {
+  color: var(--color-danger);
+}
+.diff-viewer {
+  margin-top: 16px;
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+}
+.diff-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 12px;
+  background-color: var(--color-background-mute);
+  border-bottom: 1px solid var(--color-border);
+}
+.diff-content {
+  overflow-x: auto;
+}
+.diff-code {
+  margin: 0;
+  padding: 12px;
+  font-family: monospace;
+  font-size: var(--font-size-sm);
+  line-height: 1.5;
+  white-space: pre;
+}
 </style>

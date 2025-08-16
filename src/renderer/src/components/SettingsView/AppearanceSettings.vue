@@ -1,81 +1,94 @@
 <template>
-  <el-card class="settings-card">
-    <template #header>
+  <a-card class="settings-card">
+    <template #title>
       <div class="card-header">
-        <span>外观设置</span>
+        <span>外观</span>
+        <EyeOutlined />
       </div>
     </template>
-
     <div class="settings-section">
       <div class="setting-item">
         <div class="setting-label">
-          <el-icon><Brush /></el-icon>
-          <span>主题设置</span>
+          <SkinOutlined />
+          <span>主题模式</span>
         </div>
         <div class="setting-control">
-          <el-radio-group :model-value="settings.theme" @update:modelValue="$emit('update:theme', $event)">
-            <el-radio-button value="light">浅色</el-radio-button>
-            <el-radio-button value="dark">深色</el-radio-button>
-            <el-radio-button value="system">跟随系统</el-radio-button>
-          </el-radio-group>
+          <a-radio-group
+            :value="settings.theme"
+            @change="(e) => $emit('update:theme', e.target.value)"
+            button-style="solid"
+          >
+            <a-radio-button value="light">明亮</a-radio-button>
+            <a-radio-button value="dark">暗黑</a-radio-button>
+            <a-radio-button value="system">跟随系统</a-radio-button>
+          </a-radio-group>
         </div>
       </div>
 
       <div class="setting-item">
         <div class="setting-label">
-          <el-icon><Menu /></el-icon>
+          <LayoutOutlined />
           <span>侧边栏位置</span>
         </div>
         <div class="setting-control">
-          <el-radio-group :model-value="settings.sidebarPosition" @update:modelValue="$emit('update:sidebarPosition', $event)">
-            <el-radio-button value="left">左侧</el-radio-button>
-            <el-radio-button value="right">右侧</el-radio-button>
-          </el-radio-group>
+          <a-radio-group
+            :value="settings.sidebarPosition"
+            @change="(e) => $emit('update:sidebarPosition', e.target.value)"
+          >
+            <a-radio-button value="left">左侧</a-radio-button>
+            <a-radio-button value="right">右侧</a-radio-button>
+          </a-radio-group>
         </div>
       </div>
 
       <div class="setting-item">
         <div class="setting-label">
-          <el-icon><ZoomIn /></el-icon>
+          <ZoomInOutlined />
           <span>界面缩放</span>
         </div>
         <div class="setting-control">
-          <el-select :model-value="settings.zoom" @update:modelValue="$emit('update:zoom', $event)">
-            <el-option label="80%" value="0.8" />
-            <el-option label="90%" value="0.9" />
-            <el-option label="100%" value="1" />
-            <el-option label="110%" value="1.1" />
-            <el-option label="120%" value="1.2" />
-          </el-select>
+          <a-slider
+            :value="Number(settings.zoom)"
+            @change="(value) => $emit('update:zoom', String(value))"
+            :min="0.8"
+            :max="1.5"
+            :step="0.1"
+            style="width: 150px"
+          />
+          <span>{{ Math.round(Number(settings.zoom) * 100) }}%</span>
         </div>
       </div>
 
       <div class="setting-item">
         <div class="setting-label">
-          <el-icon><Operation /></el-icon>
-          <span>动画效果</span>
+          <PlaySquareOutlined />
+          <span>启用动画</span>
         </div>
         <div class="setting-control">
-          <el-switch
-            :model-value="settings.animations"
-            @update:modelValue="$emit('update:animations', $event)"
-            active-text="启用"
-            inactive-text="禁用"
+          <a-switch
+            :checked="settings.animations"
+            @change="(checked) => $emit('update:animations', checked)"
           />
         </div>
       </div>
     </div>
-  </el-card>
+  </a-card>
 </template>
 
 <script setup lang="ts">
-import { Brush, Menu, ZoomIn, Operation } from '@element-plus/icons-vue';
+import {
+  EyeOutlined,
+  SkinOutlined,
+  LayoutOutlined,
+  ZoomInOutlined,
+  PlaySquareOutlined
+} from '@ant-design/icons-vue'
 
 defineProps({
   settings: { type: Object, required: true }
-});
+})
 
-defineEmits(['update:theme', 'update:sidebarPosition', 'update:zoom', 'update:animations']);
+defineEmits(['update:theme', 'update:sidebarPosition', 'update:zoom', 'update:animations'])
 </script>
 
 <style scoped>
@@ -107,11 +120,14 @@ defineEmits(['update:theme', 'update:sidebarPosition', 'update:zoom', 'update:an
   display: flex;
   align-items: center;
   gap: 8px;
-  color: var(--color-text);
   font-weight: 500;
 }
 
 .setting-control {
+  display: flex;
+  align-items: center;
+  gap: 12px;
   min-width: 200px;
+  justify-content: flex-end;
 }
 </style>

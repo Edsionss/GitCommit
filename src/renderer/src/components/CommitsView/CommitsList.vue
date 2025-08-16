@@ -21,9 +21,7 @@
       </div>
 
       <div class="commit-stats">
-        <div class="commit-files">
-          <FileTextOutlined /> {{ commit.files.length }} 文件
-        </div>
+        <div class="commit-files"><FileTextOutlined /> {{ commit.files.length }} 文件</div>
         <div class="commit-changes">
           <span class="additions">+{{ commit.additions }}</span>
           <span class="deletions">-{{ commit.deletions }}</span>
@@ -39,12 +37,23 @@
 </template>
 
 <script setup lang="ts">
-import { Avatar, Empty, Button } from 'ant-design-vue';
-import { FileTextOutlined } from '@ant-design/icons-vue';
+import { FileTextOutlined } from '@ant-design/icons-vue'
+import type { PropType } from 'vue'
+
+interface Commit {
+  hash: string;
+  title: string;
+  authorEmail: string;
+  author: string;
+  date: string;
+  files: any[];
+  additions: number;
+  deletions: number;
+}
 
 defineProps({
   commits: {
-    type: Array,
+    type: Array as PropType<Commit[]>,
     required: true
   },
   selectedCommitIndex: {
@@ -59,9 +68,9 @@ defineProps({
     type: Function,
     required: true
   }
-});
+})
 
-defineEmits(['selectCommit', 'refresh']);
+defineEmits(['selectCommit', 'refresh'])
 </script>
 
 <style scoped>
@@ -86,7 +95,9 @@ defineEmits(['selectCommit', 'refresh']);
   background-color: var(--color-background-mute);
 }
 
-.commit-header, .commit-info, .commit-stats {
+.commit-header,
+.commit-info,
+.commit-stats {
   display: flex;
   justify-content: space-between;
   align-items: center;

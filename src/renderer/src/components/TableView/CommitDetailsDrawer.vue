@@ -1,67 +1,65 @@
 <template>
-  <el-drawer v-model="visible" title="提交详情" size="50%" direction="rtl" @close="$emit('update:visible', false)">
+  <a-drawer
+    v-model:open="visible"
+    title="提交详情"
+    width="50%"
+    placement="right"
+    @close="$emit('update:visible', false)"
+  >
     <div v-if="commit" class="commit-details">
-      <el-descriptions border column="1" :title="`提交 #${commit.shortHash}`">
-        <el-descriptions-item label="提交ID">
+      <a-descriptions bordered :column="1" :title="`提交 #${commit.shortHash}`">
+        <a-descriptions-item label="提交ID">
           <div class="copy-with-button">
             <span>{{ commit.commitId }}</span>
-            <el-button
-              link
-              type="primary"
-              size="small"
-              @click="$emit('copyToClipboard', commit.commitId)"
-            >
-              <el-icon><DocumentCopy /></el-icon>
-            </el-button>
+            <a-button type="link" size="small" @click="$emit('copyToClipboard', commit.commitId)">
+              <CopyOutlined />
+            </a-button>
           </div>
-        </el-descriptions-item>
-        <el-descriptions-item label="仓库">{{
-          commit.repository
-        }}</el-descriptions-item>
-        <el-descriptions-item label="作者">
+        </a-descriptions-item>
+        <a-descriptions-item label="仓库">{{ commit.repository }}</a-descriptions-item>
+        <a-descriptions-item label="作者">
           <div class="commit-author">
-            <el-avatar :size="24">
+            <a-avatar :size="24">
               {{ commit.author.substring(0, 1).toUpperCase() }}
-            </el-avatar>
+            </a-avatar>
             <span>{{ commit.author }}</span>
-            <span class="email" v-if="commit.email">
-              &lt;{{ commit.email }}&gt;
-            </span>
+            <span class="email" v-if="commit.email"> &lt;{{ commit.email }}&gt; </span>
           </div>
-        </el-descriptions-item>
-        <el-descriptions-item label="日期">
+        </a-descriptions-item>
+        <a-descriptions-item label="日期">
           {{ formatDate(commit.date) }}
-        </el-descriptions-item>
-        <el-descriptions-item label="提交消息">
+        </a-descriptions-item>
+        <a-descriptions-item label="提交消息">
           <div class="commit-message">
             <div v-if="hasTags(commit.message)" class="message-tags">
-              <el-tag
+              <a-tag
                 v-for="tag in extractTags(commit.message)"
                 :key="tag"
                 size="small"
                 class="message-tag"
               >
                 {{ tag }}
-              </el-tag>
+              </a-tag>
             </div>
             <p class="commit-title">{{ cleanMessage(commit.message) }}</p>
             <pre v-if="commit.body" class="commit-body">{{ commit.body }}</pre>
           </div>
-        </el-descriptions-item>
-        <el-descriptions-item label="文件变更">
+        </a-descriptions-item>
+        <a-descriptions-item label="文件变更">
           <div class="commit-stats">
-            <el-tag type="info">{{ commit.filesChanged }} 个文件</el-tag>
-            <el-tag type="success">+{{ commit.insertions }}</el-tag>
-            <el-tag type="danger">-{{ commit.deletions }}</el-tag>
+            <a-tag color="blue">{{ commit.filesChanged }} 个文件</a-tag>
+            <a-tag color="green">+{{ commit.insertions }}</a-tag>
+            <a-tag color="red">-{{ commit.deletions }}</a-tag>
           </div>
-        </el-descriptions-item>
-      </el-descriptions>
+        </a-descriptions-item>
+      </a-descriptions>
     </div>
-  </el-drawer>
+  </a-drawer>
 </template>
 
 <script setup lang="ts">
-import { DocumentCopy } from '@element-plus/icons-vue';
+import { Drawer, Descriptions, DescriptionsItem, Button, Avatar, Tag } from 'ant-design-vue'
+import { CopyOutlined } from '@ant-design/icons-vue'
 
 defineProps({
   visible: { type: Boolean, required: true },
@@ -71,9 +69,9 @@ defineProps({
   extractTags: { type: Function, required: true },
   cleanMessage: { type: Function, required: true },
   copyToClipboard: { type: Function, required: true }
-});
+})
 
-defineEmits(['update:visible', 'copyToClipboard']);
+defineEmits(['update:visible', 'copyToClipboard'])
 </script>
 
 <style scoped>

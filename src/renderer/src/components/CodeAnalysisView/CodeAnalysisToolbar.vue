@@ -2,38 +2,45 @@
   <div class="code-analysis-header">
     <h2 class="page-title">代码分析</h2>
     <div class="code-analysis-actions">
-      <el-select v-model="selectedRepo" placeholder="选择仓库" class="filter-item">
-        <el-option
-          v-for="repo in repositories"
-          :key="repo.id"
-          :label="repo.name"
-          :value="repo.id"
-        />
-      </el-select>
-      <el-button type="primary" @click="$emit('analyze')">
-        <el-icon class="mr-5"><DataAnalysis /></el-icon>
+      <a-select v-model:value="internalSelectedRepo" placeholder="选择仓库" class="filter-item" show-search>
+        <a-select-option v-for="repo in repositories" :key="repo.id" :value="repo.id">{{
+          repo.name
+        }}</a-select-option>
+      </a-select>
+      <a-button type="primary" @click="$emit('analyze')">
+        <template #icon><BarChartOutlined /></template>
         分析代码
-      </el-button>
+      </a-button>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, watch } from 'vue';
-import { DataAnalysis } from '@element-plus/icons-vue';
+import { ref, watch } from 'vue'
+import { BarChartOutlined } from '@ant-design/icons-vue'
+import type { PropType } from 'vue'
+
+interface Repository {
+  id: number;
+  name: string;
+}
 
 const props = defineProps({
-  repositories: { type: Array, required: true },
+  repositories: { type: Array as PropType<Repository[]>, required: true },
   modelValue: { type: [String, Number], required: true }
-});
+})
 
-const emit = defineEmits(['update:modelValue', 'analyze']);
+const emit = defineEmits(['update:modelValue', 'analyze'])
 
-const selectedRepo = ref(props.modelValue);
+const internalSelectedRepo = ref(props.modelValue)
 
-watch(selectedRepo, (newVal) => {
-  emit('update:modelValue', newVal);
-});
+watch(internalSelectedRepo, (newVal) => {
+  emit('update:modelValue', newVal)
+})
+
+watch(() => props.modelValue, (newVal) => {
+  internalSelectedRepo.value = newVal
+})
 </script>
 
 <style scoped>

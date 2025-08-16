@@ -2,8 +2,8 @@
 
 /* 亮色主题 (默认) */
 :root,
-html[data-theme="light"],
-body[data-theme="light"] {
+html[data-theme='light'],
+body[data-theme='light'] {
   /* 主色调 */
   --primary-color: #4361ee;
   --primary-light: #4cc9f0;
@@ -62,9 +62,9 @@ body[data-theme="light"] {
 }
 
 /* 暗色主题 */
-html[data-theme="dark"],
-body[data-theme="dark"],
-[data-theme="dark"] {
+html[data-theme='dark'],
+body[data-theme='dark'],
+[data-theme='dark'] {
   /* 主色调 */
   --primary-color: #4cc9f0;
   --primary-light: #7bdff2;

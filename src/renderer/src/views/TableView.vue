@@ -1,7 +1,7 @@
 <template>
   <div class="router-view-container">
     <div class="table-view">
-            <TableControlPanel 
+      <TableControlPanel
         v-model:searchQuery="searchQuery"
         v-model:searchField="searchField"
         :filters="filters"
@@ -15,7 +15,7 @@
         @handleCommand="handleCommand"
       />
 
-      <CommitTable 
+      <CommitTable
         :loading="loading"
         :paginated-data="paginatedData"
         :table-height="tableHeight"
@@ -42,94 +42,38 @@
       />
 
       <!-- 详情抽屉 -->
-      <el-drawer v-model="detailsVisible" title="提交详情" size="50%" direction="rtl">
-        <div v-if="selectedCommit" class="commit-details">
-          <el-descriptions border column="1" :title="`提交 #${selectedCommit.shortHash}`">
-            <el-descriptions-item label="提交ID">
-              <div class="copy-with-button">
-                <span>{{ selectedCommit.commitId }}</span>
-                <el-button
-                  link
-                  type="primary"
-                  size="small"
-                  @click="copyToClipboard(selectedCommit.commitId)"
-                >
-                  <el-icon><DocumentCopy /></el-icon>
-                </el-button>
-              </div>
-            </el-descriptions-item>
-            <el-descriptions-item label="仓库">{{
-              selectedCommit.repository
-            }}</el-descriptions-item>
-            <el-descriptions-item label="作者">
-              <div class="commit-author">
-                <el-avatar :size="24">
-                  {{ selectedCommit.author.substring(0, 1).toUpperCase() }}
-                </el-avatar>
-                <span>{{ selectedCommit.author }}</span>
-                <span class="email" v-if="selectedCommit.email">
-                  &lt;{{ selectedCommit.email }}&gt;
-                </span>
-              </div>
-            </el-descriptions-item>
-            <el-descriptions-item label="日期">
-              {{ formatDate(selectedCommit.date) }}
-            </el-descriptions-item>
-            <el-descriptions-item label="提交消息">
-              <div class="commit-message">
-                <div v-if="hasTags(selectedCommit.message)" class="message-tags">
-                  <el-tag
-                    v-for="tag in extractTags(selectedCommit.message)"
-                    :key="tag"
-                    size="small"
-                    class="message-tag"
-                  >
-                    {{ tag }}
-                  </el-tag>
-                </div>
-                <p class="commit-title">{{ cleanMessage(selectedCommit.message) }}</p>
-                <pre v-if="selectedCommit.body" class="commit-body">{{ selectedCommit.body }}</pre>
-              </div>
-            </el-descriptions-item>
-            <el-descriptions-item label="文件变更">
-              <div class="commit-stats">
-                <el-tag type="info">{{ selectedCommit.filesChanged }} 个文件</el-tag>
-                <el-tag type="success">+{{ selectedCommit.insertions }}</el-tag>
-                <el-tag type="danger">-{{ selectedCommit.deletions }}</el-tag>
-              </div>
-            </el-descriptions-item>
-          </el-descriptions>
-        </div>
-      </el-drawer>
+      <CommitDetailsDrawer
+        :visible="detailsVisible"
+        :commit="selectedCommit"
+        :format-date="formatDate"
+        :has-tags="hasTags"
+        :extract-tags="extractTags"
+        :clean-message="cleanMessage"
+        :copy-to-clipboard="copyToClipboard"
+        @update:visible="detailsVisible = $event"
+      />
 
-      <!-- 列选择对话框 -->
-      <el-dialog v-model="columnDialogVisible" title="选择显示列" width="400px">
-        <el-checkbox-group v-model="selectedColumns">
-          <div class="column-dialog-content">
-            <el-checkbox v-for="col in availableColumns" :key="col.value" :value="col.value">
-              {{ col.label }}
-            </el-checkbox>
-          </div>
-        </el-checkbox-group>
-        <template #footer>
-          <span class="dialog-footer">
-            <el-button @click="columnDialogVisible = false">取消</el-button>
-            <el-button type="primary" @click="applyColumnSelection">确认</el-button>
-          </span>
-        </template>
-      </el-dialog>
+      <ColumnSelectionDialog
+        :visible="columnDialogVisible"
+        :available-columns="availableColumns"
+        :selected-columns="selectedColumns"
+        @update:visible="columnDialogVisible = $event"
+        @applyColumnSelection="applyColumnSelection"
+      />
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch, reactive, onMounted, nextTick } from 'vue'
+import { ref, computed, watch, reactive, onMounted, nextTick, h } from 'vue'
 import { gitService } from '../services/GitService'
 import { useRouter } from 'vue-router'
-import { ElMessage, ElMessageBox } from 'element-plus'
+import { message, Modal, Input } from 'ant-design-vue'
 import dayjs from 'dayjs'
-import TableControlPanel from '@/components/TableView/TableControlPanel.vue';
-import CommitTable from '@/components/TableView/CommitTable.vue';
+import TableControlPanel from '@/components/TableView/TableControlPanel.vue'
+import CommitTable from '@/components/TableView/CommitTable.vue'
+import CommitDetailsDrawer from '@/components/TableView/CommitDetailsDrawer.vue'
+import ColumnSelectionDialog from '@/components/TableView/ColumnSelectionDialog.vue'
 
 interface Commit {
   repository: string
@@ -303,11 +247,11 @@ const loadCommits = () => {
       loading.value = false
     } catch (error) {
       console.error('解析提交数据失败:', error)
-      ElMessage.error('加载提交数据失败')
+      message.error('加载提交数据失败')
       loading.value = false
     }
   } else {
-    ElMessage.warning('没有找到提交数据，请先扫描仓库')
+    message.warning('没有找到提交数据，请先扫描仓库')
     loading.value = false
   }
 }
@@ -406,76 +350,92 @@ const copyToClipboard = (text: string) => {
   navigator.clipboard
     .writeText(text)
     .then(() => {
-      ElMessage.success('已复制到剪贴板')
+      message.success('已复制到剪贴板')
     })
     .catch(() => {
-      ElMessage.error('复制失败')
+      message.error('复制失败')
     })
 }
 
 // 方法: 导出数据
 const exportData = () => {
-  ElMessageBox.prompt('请输入文件名', '导出数据', {
-    confirmButtonText: '确认',
-    cancelButtonText: '取消',
-    inputValue: `git_commits_${dayjs().format('YYYYMMDD')}`
-  })
-    .then(({ value }) => {
-      if (!value) {
-        ElMessage.warning('请输入有效的文件名')
-        return
+  const defaultFileName = `git_commits_${dayjs().format('YYYYMMDD')}`
+  let fileName = defaultFileName
+  Modal.confirm({
+    title: '导出数据',
+    content: h('div', [
+      h('p', '请输入文件名:'),
+      h(Input, {
+        defaultValue: defaultFileName,
+        onChange: (e) => {
+          fileName = e.target.value
+        }
+      })
+    ]),
+    onOk() {
+      if (!fileName) {
+        message.warning('请输入有效的文件名')
+        return Promise.reject()
       }
-
       gitService
-        .exportData(filteredData.value, 'json', value)
+        .exportData(filteredData.value, 'json', fileName)
         .then((result) => {
           if (result) {
-            ElMessage.success(`数据已导出到: ${result}`)
+            message.success(`数据已导出到: ${result}`)
           }
         })
         .catch((error) => {
           console.error('导出失败:', error)
-          ElMessage.error('导出失败')
+          message.error('导出失败')
         })
-    })
-    .catch(() => {
+    },
+    onCancel() {
       // 用户取消
-    })
+    }
+  })
 }
 
 // 方法: 导出选中数据
 const exportSelected = () => {
   if (selectedRows.value.length === 0) {
-    ElMessage.warning('请先选择要导出的数据')
+    message.warning('请先选择要导出的数据')
     return
   }
 
-  ElMessageBox.prompt('请输入文件名', '导出选中数据', {
-    confirmButtonText: '确认',
-    cancelButtonText: '取消',
-    inputValue: `git_commits_selected_${dayjs().format('YYYYMMDD')}`
-  })
-    .then(({ value }) => {
-      if (!value) {
-        ElMessage.warning('请输入有效的文件名')
-        return
+  const defaultFileNameSelected = `git_commits_selected_${dayjs().format('YYYYMMDD')}`
+  let fileNameSelected = defaultFileNameSelected
+  Modal.confirm({
+    title: '导出选中数据',
+    content: h('div', [
+      h('p', '请输入文件名:'),
+      h(Input, {
+        defaultValue: defaultFileNameSelected,
+        onChange: (e) => {
+          fileNameSelected = e.target.value
+        }
+      })
+    ]),
+    onOk() {
+      if (!fileNameSelected) {
+        message.warning('请输入有效的文件名')
+        return Promise.reject()
       }
-
       gitService
-        .exportData(selectedRows.value, 'json', value)
+        .exportData(selectedRows.value, 'json', fileNameSelected)
         .then((result) => {
           if (result) {
-            ElMessage.success(`选中数据已导出到: ${result}`)
+            message.success(`选中数据已导出到: ${result}`)
           }
         })
         .catch((error) => {
           console.error('导出失败:', error)
-          ElMessage.error('导出失败')
+          message.error('导出失败')
         })
-    })
-    .catch(() => {
+    },
+    onCancel() {
       // 用户取消
-    })
+    }
+  })
 }
 
 // 方法: 处理选择变化
@@ -485,11 +445,6 @@ const handleSelectionChange = (rows: Commit[]) => {
 
 // 方法: 清除选择
 const clearSelection = () => {
-  // 调用el-table的clearSelection方法
-  const tableRef = document.querySelector('.el-table') as any
-  if (tableRef && tableRef.__vue__ && typeof tableRef.__vue__.clearSelection === 'function') {
-    tableRef.__vue__.clearSelection()
-  }
   selectedRows.value = []
 }
 
@@ -515,24 +470,24 @@ const handleCommand = (command: string) => {
       .exportData(filteredData.value, 'csv')
       .then((result) => {
         if (result) {
-          ElMessage.success(`数据已导出到: ${result}`)
+          message.success(`数据已导出到: ${result}`)
         }
       })
       .catch((error) => {
         console.error('导出失败:', error)
-        ElMessage.error('导出失败')
+        message.error('导出失败')
       })
   } else if (command === 'exportExcel') {
     gitService
       .exportData(filteredData.value, 'excel')
       .then((result) => {
         if (result) {
-          ElMessage.success(`数据已导出到: ${result}`)
+          message.success(`数据已导出到: ${result}`)
         }
       })
       .catch((error) => {
         console.error('导出失败:', error)
-        ElMessage.error('导出失败')
+        message.error('导出失败')
       })
   } else if (command === 'refresh') {
     loadCommits()
@@ -540,10 +495,11 @@ const handleCommand = (command: string) => {
 }
 
 // 方法: 应用列选择
-const applyColumnSelection = () => {
+const applyColumnSelection = (newSelectedColumns: string[]) => {
+  selectedColumns.value = newSelectedColumns
   // 更新列显示状态
   for (const key in columns) {
-    columns[key as keyof typeof columns] = selectedColumns.value.includes(key)
+    columns[key as keyof typeof columns] = newSelectedColumns.includes(key)
   }
 
   // 保存列配置到localStorage
@@ -607,15 +563,6 @@ const applyColumnSelection = () => {
 
 .search-input {
   width: 100%;
-}
-
-.search-input :deep(.el-input__wrapper) {
-  border-top-right-radius: 0;
-  border-bottom-right-radius: 0;
-}
-
-.search-input :deep(.el-input-group__prepend) {
-  background-color: #f8f9fa;
 }
 
 .advanced-filters {
@@ -685,14 +632,6 @@ const applyColumnSelection = () => {
   box-shadow: var(--shadow-md);
 }
 
-.table-card :deep(.el-card__body) {
-  flex: 1;
-  padding: 0;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-}
-
 .pagination-container {
   display: flex;
   justify-content: center;
@@ -711,14 +650,6 @@ const applyColumnSelection = () => {
 .repo-cell {
   display: flex;
   align-items: center;
-}
-
-.repo-cell :deep(.el-tag) {
-  transition: all var(--transition-normal);
-}
-
-.repo-cell:hover :deep(.el-tag) {
-  transform: scale(1.05);
 }
 
 .hash-cell {
@@ -935,81 +866,5 @@ tr:hover .deletion {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: var(--spacing-md);
-}
-
-/* Element Plus 样式覆盖 */
-:deep(.el-table) {
-  --el-table-border-color: var(--border-color);
-  --el-table-header-bg-color: #f8f9fa;
-  --el-table-row-hover-bg-color: var(--hover-bg);
-  border-radius: var(--radius-md);
-  overflow: hidden;
-}
-
-:deep(.el-table th) {
-  font-weight: var(--font-weight-semibold);
-  color: var(--text-primary);
-  background-color: #f8f9fa;
-}
-
-:deep(.el-table .el-table__header-wrapper) {
-  border-bottom: var(--border);
-}
-
-:deep(.el-table--enable-row-hover .el-table__body tr:hover > td.el-table__cell) {
-  background-color: var(--hover-bg);
-}
-
-:deep(.el-table .el-button.is-circle) {
-  opacity: 0.7;
-  transition: all var(--transition-normal);
-}
-
-:deep(.el-table .el-button.is-circle:hover) {
-  transform: rotate(15deg);
-}
-
-:deep(.el-pagination) {
-  --el-pagination-button-color: var(--text-secondary);
-  --el-pagination-hover-color: var(--primary-color);
-}
-
-:deep(.el-pagination.is-background .el-pager li:not(.is-disabled).is-active) {
-  background-color: var(--primary-color);
-}
-
-:deep(.el-avatar) {
-  --el-avatar-bg-color: var(--primary-light);
-  --el-avatar-text-color: var(--primary-color);
-}
-
-:deep(.el-drawer__header) {
-  margin-bottom: 0;
-  padding: var(--spacing-md);
-  border-bottom: var(--border);
-}
-
-:deep(.el-descriptions__label) {
-  font-weight: var(--font-weight-semibold);
-  color: var(--text-primary);
-}
-
-:deep(.el-descriptions__cell) {
-  padding: 16px 12px;
-}
-
-:deep(.el-descriptions) {
-  box-shadow: var(--shadow-sm);
-  border-radius: var(--radius-md);
-}
-
-:deep(.el-descriptions__header) {
-  margin-bottom: var(--spacing-md);
-}
-
-:deep(.el-descriptions__title) {
-  font-weight: var(--font-weight-semibold);
-  color: var(--primary-color);
-  font-size: var(--font-size-lg);
 }
 </style>

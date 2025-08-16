@@ -72,9 +72,9 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue';
-import { Card, Input, Select, Table, Avatar, Progress } from 'ant-design-vue';
-import { SearchOutlined } from '@ant-design/icons-vue';
+import { ref, computed } from 'vue'
+import { Card, Input, Select, Table, Avatar, Progress } from 'ant-design-vue'
+import { SearchOutlined } from '@ant-design/icons-vue'
 
 const props = defineProps({
   contributors: { type: Array, required: true },
@@ -84,81 +84,121 @@ const props = defineProps({
   formatNumber: { type: Function, required: true },
   getInitials: { type: Function, required: true },
   getContributorColor: { type: Function, required: true }
-});
+})
 
-defineEmits(['select']);
+defineEmits(['select'])
 
-const searchQuery = ref('');
-const sortBy = ref('commits');
+const searchQuery = ref('')
+const sortBy = ref('commits')
 
 const getCommitPercentage = (commits) => {
-  if (props.totalCommits === 0) return 0;
-  return Math.round((commits / props.totalCommits) * 100);
-};
+  if (props.totalCommits === 0) return 0
+  return Math.round((commits / props.totalCommits) * 100)
+}
 
 const filteredContributors = computed(() => {
-  let result = [...props.contributors];
+  let result = [...props.contributors]
 
   if (searchQuery.value) {
-    const query = searchQuery.value.toLowerCase();
+    const query = searchQuery.value.toLowerCase()
     result = result.filter(
       (c) => c.name.toLowerCase().includes(query) || c.email.toLowerCase().includes(query)
-    );
+    )
   }
 
   return result.sort((a, b) => {
     switch (sortBy.value) {
-      case 'commits': return b.commits - a.commits;
-      case 'additions': return b.additions - a.additions;
-      case 'deletions': return b.deletions - a.deletions;
-      case 'lastActive': return new Date(b.lastActive).getTime() - new Date(a.lastActive).getTime();
-      default: return b.commits - a.commits;
+      case 'commits':
+        return b.commits - a.commits
+      case 'additions':
+        return b.additions - a.additions
+      case 'deletions':
+        return b.deletions - a.deletions
+      case 'lastActive':
+        return new Date(b.lastActive).getTime() - new Date(a.lastActive).getTime()
+      default:
+        return b.commits - a.commits
     }
-  });
-});
+  })
+})
 
 const columns = ref([
   {
     title: '贡献者',
     key: 'contributor',
-    minWidth: 200,
+    minWidth: 200
   },
   {
     title: '提交数',
     dataIndex: 'commits',
     key: 'commits',
     width: 100,
-    sorter: (a, b) => a.commits - b.commits,
+    sorter: (a, b) => a.commits - b.commits
   },
   {
     title: '代码行数变更',
     key: 'lineChanges',
-    width: 160,
+    width: 160
   },
   {
     title: '提交占比',
     key: 'commitPercentage',
-    width: 180,
+    width: 180
   },
   {
     title: '最近活跃',
     key: 'lastActive',
-    width: 180,
-  },
-]);
+    width: 180
+  }
+])
 </script>
 
 <style scoped>
-.card-header { display: flex; justify-content: space-between; align-items: center; }
-.header-actions { display: flex; gap: 10px; align-items: center; }
-.search-input { width: 200px; }
-.contributor-info { display: flex; align-items: center; }
-.contributor-avatar { background-color: var(--primary-color); color: white; font-weight: bold; margin-right: 12px; }
-.contributor-details { display: flex; flex-direction: column; }
-.contributor-name { font-weight: 500; }
-.contributor-email { font-size: 12px; color: var(--text-secondary); }
-.line-changes { display: flex; gap: 8px; }
-.additions { color: #2ecc71; }
-.deletions { color: #e74c3c; }
-.text-secondary { color: var(--text-secondary); }
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.header-actions {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+.search-input {
+  width: 200px;
+}
+.contributor-info {
+  display: flex;
+  align-items: center;
+}
+.contributor-avatar {
+  background-color: var(--primary-color);
+  color: white;
+  font-weight: bold;
+  margin-right: 12px;
+}
+.contributor-details {
+  display: flex;
+  flex-direction: column;
+}
+.contributor-name {
+  font-weight: 500;
+}
+.contributor-email {
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+.line-changes {
+  display: flex;
+  gap: 8px;
+}
+.additions {
+  color: #2ecc71;
+}
+.deletions {
+  color: #e74c3c;
+}
+.text-secondary {
+  color: var(--text-secondary);
+}
 </style>

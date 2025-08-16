@@ -6,14 +6,23 @@
     </div>
     <div class="header-actions">
       <div class="repo-selector">
-        <a-select v-model:value="currentRepo" placeholder="选择仓库" show-search :filter-option="filterOption">
-          <a-select-option
-            v-for="repo in repositories"
-            :key="repo.id"
-            :value="repo.id"
-          >{{ repo.name }}</a-select-option>
+        <a-select
+          v-model:value="currentRepo"
+          placeholder="选择仓库"
+          show-search
+          :filter-option="filterOption"
+        >
+          <a-select-option v-for="repo in repositories" :key="repo.id" :value="repo.id">{{
+            repo.name
+          }}</a-select-option>
         </a-select>
-        <a-button class="add-repo-btn" type="primary" shape="circle" size="small" @click="openAddRepoDialog">
+        <a-button
+          class="add-repo-btn"
+          type="primary"
+          shape="circle"
+          size="small"
+          @click="openAddRepoDialog"
+        >
           <template #icon><PlusOutlined /></template>
         </a-button>
       </div>
@@ -49,7 +58,13 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
-import { PlusOutlined, DownOutlined, SettingOutlined, ReloadOutlined, LogoutOutlined } from '@ant-design/icons-vue'
+import {
+  PlusOutlined,
+  DownOutlined,
+  SettingOutlined,
+  ReloadOutlined,
+  LogoutOutlined
+} from '@ant-design/icons-vue'
 
 const router = useRouter()
 const route = useRoute()
@@ -83,8 +98,8 @@ const userAvatar = ref('https://i.pravatar.cc/150?u=gitcommit')
 
 // Select组件的过滤方法
 const filterOption = (input: string, option: any) => {
-  return option.children[0].toLowerCase().indexOf(input.toLowerCase()) >= 0;
-};
+  return option.children[0].toLowerCase().indexOf(input.toLowerCase()) >= 0
+}
 
 // 打开添加仓库对话框
 const openAddRepoDialog = () => {

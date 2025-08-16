@@ -2,7 +2,7 @@
   <div class="settings-container page-container">
     <h2 class="page-title">设置</h2>
 
-    <AppearanceSettings 
+    <AppearanceSettings
       :settings="settings.appearance"
       @update:theme="updateTheme($event)"
       @update:sidebarPosition="settings.appearance.sidebarPosition = $event"
@@ -10,14 +10,14 @@
       @update:animations="settings.appearance.animations = $event"
     />
 
-    <LocaleSettings 
+    <LocaleSettings
       :settings="settings.locale"
       @update:language="settings.locale.language = $event"
       @update:dateFormat="settings.locale.dateFormat = $event"
       @update:timeFormat="settings.locale.timeFormat = $event"
     />
 
-    <GitSettings 
+    <GitSettings
       :settings="settings.git"
       @update:defaultAuthor="settings.git.defaultAuthor = $event"
       @update:defaultEmail="settings.git.defaultEmail = $event"
@@ -26,7 +26,7 @@
       @selectDirectory="selectDirectory"
     />
 
-    <SystemSettings 
+    <SystemSettings
       :settings="settings.system"
       @update:startWithSystem="settings.system.startWithSystem = $event"
       @update:notifications="settings.system.notifications = $event"
@@ -42,12 +42,12 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, onMounted } from 'vue'
-import { message, Modal } from 'ant-design-vue' 
-import AppearanceSettings from '@/components/SettingsView/AppearanceSettings.vue';
-import LocaleSettings from '@/components/SettingsView/LocaleSettings.vue';
-import GitSettings from '@/components/SettingsView/GitSettings.vue';
-import SystemSettings from '@/components/SettingsView/SystemSettings.vue';
+import { ref, reactive, onMounted, watch } from 'vue'
+import { message, Modal } from 'ant-design-vue'
+import AppearanceSettings from '@/components/SettingsView/AppearanceSettings.vue'
+import LocaleSettings from '@/components/SettingsView/LocaleSettings.vue'
+import GitSettings from '@/components/SettingsView/GitSettings.vue'
+import SystemSettings from '@/components/SettingsView/SystemSettings.vue'
 import { useTheme } from '../composables/useTheme'
 
 // 使用主题组合式函数
@@ -80,6 +80,16 @@ const settings = reactive({
   }
 })
 
+// 应用缩放
+const applyZoom = (zoomValue: string | number) => {
+  document.documentElement.style.zoom = String(zoomValue);
+}
+
+// 应用动画设置
+const applyAnimations = (enabled: boolean) => {
+  document.documentElement.classList.toggle('no-animations', !enabled);
+}
+
 // 读取设置
 const loadSettings = () => {
   // 先读取主题模式以确保UI状态与存储一致
@@ -105,10 +115,10 @@ const loadSettings = () => {
       // 确保主题设置始终优先使用themeMode而不是从appSettings读取
       settings.appearance.theme = savedThemeMode
 
-      message.success('设置已加载') 
+      message.success('设置已加载')
     } catch (error) {
       console.error('Failed to parse settings:', error)
-      message.error('设置加载失败') 
+      message.error('设置加载失败')
     }
   }
 }
@@ -116,7 +126,7 @@ const loadSettings = () => {
 // 保存设置
 const saveSettings = () => {
   localStorage.setItem('appSettings', JSON.stringify(settings))
-  message.success('设置已保存') 
+  message.success('设置已保存')
 }
 
 // 重置设置
@@ -130,7 +140,9 @@ const resetSettings = () => {
       settings.appearance.theme = 'light'
       settings.appearance.sidebarPosition = 'left'
       settings.appearance.zoom = '1'
+      applyZoom('1')
       settings.appearance.animations = true
+      applyAnimations(true)
 
       settings.locale.language = 'zh-CN'
       settings.locale.dateFormat = 'YYYY-MM-DD'
@@ -152,17 +164,18 @@ const resetSettings = () => {
       // 保存默认设置
       saveSettings()
 
-      message.success('设置已重置为默认值') 
+      message.success('设置已重置为默认值')
     },
     onCancel() {
       // 用户取消操作
-    },
-  });
+    }
+  })
 }
 
 // 更新主题
 const updateTheme = (theme: string) => {
   console.log('设置页面更新主题:', theme)
+  settings.appearance.theme = theme
   setThemeMode(theme as 'light' | 'dark' | 'system')
 }
 
@@ -172,7 +185,7 @@ const selectDirectory = async () => {
   // 以下是模拟效果
   setTimeout(() => {
     settings.git.repositoryPath = 'D:\\Projects\\GitRepositories'
-    message.success('已选择目录：' + settings.git.repositoryPath) 
+    message.success('已选择目录：' + settings.git.repositoryPath)
   }, 500)
 }
 
@@ -184,7 +197,27 @@ onMounted(() => {
   const themeMode = localStorage.getItem('themeMode') || 'light'
   settings.appearance.theme = themeMode
   console.log('设置页面加载时的主题模式:', themeMode)
+
+  // 应用初始设置
+  applyZoom(settings.appearance.zoom)
+  applyAnimations(settings.appearance.animations)
 })
+
+// 监听缩放设置变化
+watch(
+  () => settings.appearance.zoom,
+  (newZoom) => {
+    applyZoom(newZoom)
+  }
+)
+
+// 监听动画设置变化
+watch(
+  () => settings.appearance.animations,
+  (enabled) => {
+    applyAnimations(enabled)
+  }
+)
 </script>
 
 <style scoped>

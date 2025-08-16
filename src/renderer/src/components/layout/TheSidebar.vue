@@ -49,7 +49,8 @@ import {
   AreaChartOutlined,
   SettingOutlined,
   LeftOutlined,
-  RightOutlined
+  RightOutlined,
+  SearchOutlined
 } from '@ant-design/icons-vue'
 
 const isExpanded = ref(true)
@@ -72,6 +73,7 @@ const toggleSidebar = () => {
 
 const menuItems = [
   { path: '/', label: '概览', icon: HomeOutlined },
+  { path: '/scan', label: '开始扫描', icon: SearchOutlined },
   { path: '/commits', label: '提交记录', icon: FileTextOutlined },
   { path: '/branches', label: '分支管理', icon: ShareAltOutlined },
   { path: '/analysis', label: '代码分析', icon: BarChartOutlined },

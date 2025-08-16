@@ -42,6 +42,12 @@ const routes = [
         name: 'Settings',
         component: () => import('../views/Settings.vue'),
         meta: { title: '设置' }
+      },
+      {
+        path: 'scan',
+        name: 'Scan',
+        component: () => import('../views/BasicSettings.vue'),
+        meta: { title: '开始扫描' }
       }
     ]
   }

@@ -1,100 +1,106 @@
 <template>
-  <el-card class="control-panel">
-    <template #header>
-      <div class="card-header">
-        <span>数据控制</span>
-      </div>
-    </template>
+  <a-card class="control-panel" :bordered="false">
     <div class="controls">
       <div class="filter-section">
-        <el-input
-          v-model="searchQuery"
-          placeholder="搜索提交信息、作者或ID"
-          class="search-input"
-          clearable
-          :prefix-icon="Search"
-        >
-          <template #prepend>
-            <el-select v-model="searchField" placeholder="搜索字段" style="width: 120px">
-              <el-option label="全部字段" value="all" />
-              <el-option label="提交消息" value="message" />
-              <el-option label="作者" value="author" />
-              <el-option label="提交ID" value="commitId" />
-              <el-option label="邮箱" value="email" />
-            </el-select>
-          </template>
-        </el-input>
+        <a-input-group compact class="search-input">
+          <a-select :value="searchField" style="width: 120px" @change="updateSearchField">
+            <a-select-option value="all">全部字段</a-select-option>
+            <a-select-option value="message">提交消息</a-select-option>
+            <a-select-option value="author">作者</a-select-option>
+            <a-select-option value="commitId">提交ID</a-select-option>
+            <a-select-option value="email">邮箱</a-select-option>
+          </a-select>
+          <a-input
+            :value="searchQuery"
+            placeholder="搜索提交信息、作者或ID"
+            allow-clear
+            @change="updateSearchQuery"
+          >
+            <template #prefix>
+              <SearchOutlined />
+            </template>
+          </a-input>
+        </a-input-group>
 
-        <div class="advanced-filters">
-          <div class="filter-label">高级筛选：</div>
-          <el-tag
+        <div class="advanced-filters" v-if="hasFilters">
+          <span class="filter-label">高级筛选:</span>
+          <a-tag
             v-if="filters.author"
             closable
             @close="$emit('removeFilter', 'author')"
             class="filter-tag"
-            type="primary"
+            color="blue"
           >
             作者: {{ filters.author }}
-          </el-tag>
-          <el-tag
+          </a-tag>
+          <a-tag
             v-if="filters.dateRange"
             closable
             @close="$emit('removeFilter', 'dateRange')"
             class="filter-tag"
-            type="success"
+            color="green"
           >
             日期: {{ formatDateRange(filters.dateRange) }}
-          </el-tag>
-          <el-tag
+          </a-tag>
+          <a-tag
             v-if="filters.repository"
             closable
             @close="$emit('removeFilter', 'repository')"
             class="filter-tag"
-            type="warning"
+            color="orange"
           >
             仓库: {{ filters.repository }}
-          </el-tag>
-          <el-button v-if="hasFilters" size="small" type="info" @click="$emit('clearAllFilters')">
+          </a-tag>
+          <a-button size="small" type="link" @click="$emit('clearAllFilters')">
             清除全部
-          </el-button>
+          </a-button>
         </div>
       </div>
 
       <div class="action-section">
         <div class="count-info">总数: {{ filteredDataLength }} 条提交记录</div>
         <div class="button-group">
-          <el-button type="primary" @click="$emit('exportData')" :disabled="filteredDataLength === 0">
-            <el-icon><Download /></el-icon> 导出数据
-          </el-button>
-          <el-tooltip content="使用统计" placement="top">
-            <el-button @click="$emit('goToResults')" :disabled="filteredDataLength === 0">
-              <el-icon><DataAnalysis /></el-icon>
-            </el-button>
-          </el-tooltip>
-          <el-dropdown @command="$emit('handleCommand', $event)">
-            <el-button>
-              <el-icon><Setting /></el-icon>
-              <el-icon><ArrowDown /></el-icon>
-            </el-button>
-            <template #dropdown>
-              <el-dropdown-menu>
-                <el-dropdown-item command="settings">设置</el-dropdown-item>
-                <el-dropdown-item command="toggleColumns">选择列</el-dropdown-item>
-                <el-dropdown-item command="exportCSV">导出为CSV</el-dropdown-item>
-                <el-dropdown-item command="exportExcel">导出为Excel</el-dropdown-item>
-                <el-dropdown-item command="refresh">刷新数据</el-dropdown-item>
-              </el-dropdown-menu>
+          <a-button
+            type="primary"
+            @click="$emit('exportData')"
+            :disabled="filteredDataLength === 0"
+          >
+            <template #icon><DownloadOutlined /></template> 导出数据
+          </a-button>
+          <a-tooltip title="使用统计">
+            <a-button @click="$emit('goToResults')" :disabled="filteredDataLength === 0">
+              <template #icon><BarChartOutlined /></template>
+            </a-button>
+          </a-tooltip>
+          <a-dropdown>
+            <template #overlay>
+              <a-menu @click="handleMenuClick">
+                <a-menu-item key="settings">设置</a-menu-item>
+                <a-menu-item key="toggleColumns">选择列</a-menu-item>
+                <a-menu-item key="exportCSV">导出为CSV</a-menu-item>
+                <a-menu-item key="exportExcel">导出为Excel</a-menu-item>
+                <a-menu-item key="refresh">刷新数据</a-menu-item>
+              </a-menu>
             </template>
-          </el-dropdown>
+            <a-button>
+              <SettingOutlined />
+              <DownOutlined />
+            </a-button>
+          </a-dropdown>
         </div>
       </div>
     </div>
-  </el-card>
+  </a-card>
 </template>
 
 <script setup lang="ts">
-import { ref, watch } from 'vue';
-import { Search, Download, DataAnalysis, Setting, ArrowDown } from '@element-plus/icons-vue';
+import {
+  SearchOutlined,
+  DownloadOutlined,
+  BarChartOutlined,
+  SettingOutlined,
+  DownOutlined
+} from '@ant-design/icons-vue'
 
 const props = defineProps({
   searchQuery: { type: String, required: true },
@@ -103,7 +109,7 @@ const props = defineProps({
   hasFilters: { type: Boolean, required: true },
   filteredDataLength: { type: Number, required: true },
   formatDateRange: { type: Function, required: true }
-});
+})
 
 const emit = defineEmits([
   'update:searchQuery',
@@ -113,25 +119,30 @@ const emit = defineEmits([
   'exportData',
   'goToResults',
   'handleCommand'
-]);
+])
 
-const searchQuery = ref(props.searchQuery);
-const searchField = ref(props.searchField);
+const updateSearchQuery = (e: Event) => {
+  emit('update:searchQuery', (e.target as HTMLInputElement).value)
+}
 
-watch(searchQuery, (newVal) => emit('update:searchQuery', newVal));
-watch(searchField, (newVal) => emit('update:searchField', newVal));
+const updateSearchField = (value: string) => {
+  emit('update:searchField', value)
+}
+
+const handleMenuClick = ({ key }: { key: string }) => {
+  emit('handleCommand', key)
+}
 </script>
 
 <style scoped>
 .control-panel {
-  margin-bottom: var(--spacing-md);
   border-radius: var(--radius-md);
   box-shadow: var(--shadow-sm);
   transition: all var(--transition-normal);
 }
 
-.control-panel:hover {
-  box-shadow: var(--shadow-md);
+.control-panel :deep(.ant-card-body) {
+  padding: var(--spacing-md);
 }
 
 .controls {
@@ -148,15 +159,6 @@ watch(searchField, (newVal) => emit('update:searchField', newVal));
 
 .search-input {
   width: 100%;
-}
-
-.search-input :deep(.el-input__wrapper) {
-  border-top-right-radius: 0;
-  border-bottom-right-radius: 0;
-}
-
-.search-input :deep(.el-input-group__prepend) {
-  background-color: #f8f9fa;
 }
 
 .advanced-filters {
@@ -179,30 +181,19 @@ watch(searchField, (newVal) => emit('update:searchField', newVal));
 
 .filter-tag {
   cursor: pointer;
-  transition: var(--transition-bounce);
-  position: relative;
-}
-
-.filter-tag:hover {
-  transform: translateY(-3px);
-  box-shadow: var(--shadow-sm);
 }
 
 .action-section {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: var(--spacing-sm) 0;
-  border-top: var(--border);
-  margin-top: var(--spacing-sm);
+  padding-top: var(--spacing-sm);
+  border-top: 1px solid var(--border-color);
 }
 
 .count-info {
   font-size: var(--font-size-sm);
   color: var(--text-secondary);
-  background-color: #f8f9fa;
-  padding: 6px 12px;
-  border-radius: var(--radius-pill);
   font-weight: var(--font-weight-medium);
 }
 

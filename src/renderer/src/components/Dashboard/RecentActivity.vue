@@ -7,7 +7,12 @@
           <a-button type="link" @click="$emit('viewAllCommits')">查看全部</a-button>
         </div>
       </template>
-      <a-table :data-source="recentCommits" :columns="columns" :pagination="false" :scroll="{ x: 'max-content' }">
+      <a-table
+        :data-source="recentCommits"
+        :columns="columns"
+        :pagination="false"
+        :scroll="{ x: 'max-content' }"
+      >
         <template #bodyCell="{ column, record }">
           <template v-if="column.key === 'commitInfo'">
             <div class="commit-message">
@@ -34,51 +39,49 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
-import { Card, Button, Table, Avatar } from 'ant-design-vue';
+import { ref } from 'vue'
+import { useFormatters } from '@/composables/useFormatters'
 
 defineProps({
   recentCommits: {
     type: Array,
     required: true
   },
-  formatDate: {
-    type: Function,
-    required: true
-  },
   getAvatarUrl: {
     type: Function,
     required: true
   }
-});
+})
 
-defineEmits(['viewAllCommits', 'viewCommitDetail']);
+defineEmits(['viewAllCommits', 'viewCommitDetail'])
+
+const { formatDate } = useFormatters()
 
 const columns = ref([
   {
     title: '提交信息',
     dataIndex: 'title',
     key: 'commitInfo',
-    width: 300,
+    width: 300
   },
   {
     title: '作者',
     dataIndex: 'author',
     key: 'authorInfo',
-    width: 180,
+    width: 180
   },
   {
     title: '日期',
     dataIndex: 'date',
     key: 'date',
-    width: 180,
+    width: 180
   },
   {
     title: '操作',
     key: 'action',
-    width: 120,
-  },
-]);
+    width: 120
+  }
+])
 </script>
 
 <style scoped>

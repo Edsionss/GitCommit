@@ -1,83 +1,81 @@
 <template>
-  <el-card class="settings-card">
-    <template #header>
+  <a-card class="settings-card">
+    <template #title>
       <div class="card-header">
-        <span>系统设置</span>
+        <span>系统</span>
+        <SettingOutlined />
       </div>
     </template>
-
     <div class="settings-section">
       <div class="setting-item">
         <div class="setting-label">
-          <el-icon><Switch /></el-icon>
+          <RocketOutlined />
           <span>开机自启</span>
         </div>
         <div class="setting-control">
-          <el-switch
-            :model-value="settings.startWithSystem"
-            @update:modelValue="$emit('update:startWithSystem', $event)"
-            active-text="启用"
-            inactive-text="禁用"
+          <a-switch
+            :checked="settings.startWithSystem"
+            @change="(checked) => $emit('update:startWithSystem', checked)"
           />
         </div>
       </div>
 
       <div class="setting-item">
         <div class="setting-label">
-          <el-icon><Bell /></el-icon>
-          <span>通知提醒</span>
+          <NotificationOutlined />
+          <span>启用通知</span>
         </div>
         <div class="setting-control">
-          <el-switch
-            :model-value="settings.notifications"
-            @update:modelValue="$emit('update:notifications', $event)"
-            active-text="启用"
-            inactive-text="禁用"
+          <a-switch
+            :checked="settings.notifications"
+            @change="(checked) => $emit('update:notifications', checked)"
           />
         </div>
       </div>
 
       <div class="setting-item">
         <div class="setting-label">
-          <el-icon><Download /></el-icon>
-          <span>自动更新</span>
+          <CloudSyncOutlined />
+          <span>自动检查更新</span>
         </div>
         <div class="setting-control">
-          <el-switch
-            :model-value="settings.autoUpdate"
-            @update:modelValue="$emit('update:autoUpdate', $event)"
-            active-text="启用"
-            inactive-text="禁用"
+          <a-switch
+            :checked="settings.autoUpdate"
+            @change="(checked) => $emit('update:autoUpdate', checked)"
           />
         </div>
       </div>
 
       <div class="setting-item">
         <div class="setting-label">
-          <el-icon><DataLine /></el-icon>
-          <span>数据统计</span>
+          <CodeOutlined />
+          <span>发送匿名使用数据</span>
         </div>
         <div class="setting-control">
-          <el-switch
-            :model-value="settings.telemetry"
-            @update:modelValue="$emit('update:telemetry', $event)"
-            active-text="允许收集匿名统计数据"
-            inactive-text="禁用"
+          <a-switch
+            :checked="settings.telemetry"
+            @change="(checked) => $emit('update:telemetry', checked)"
           />
         </div>
       </div>
     </div>
-  </el-card>
+  </a-card>
 </template>
 
 <script setup lang="ts">
-import { Switch, Bell, Download, DataLine } from '@element-plus/icons-vue';
+import {
+  SettingOutlined,
+  RocketOutlined,
+  NotificationOutlined,
+  CloudSyncOutlined,
+  CodeOutlined
+} from '@ant-design/icons-vue'
 
 defineProps({
   settings: { type: Object, required: true }
-});
+})
 
-defineEmits(['update:startWithSystem', 'update:notifications', 'update:autoUpdate', 'update:telemetry']);
+defineEmits(['update:startWithSystem', 'update:notifications', 'update:autoUpdate', 'update:telemetry'])
 </script>
 
 <style scoped>
@@ -109,11 +107,11 @@ defineEmits(['update:startWithSystem', 'update:notifications', 'update:autoUpdat
   display: flex;
   align-items: center;
   gap: 8px;
-  color: var(--color-text);
   font-weight: 500;
 }
 
 .setting-control {
   min-width: 200px;
+  justify-content: flex-end;
 }
 </style>

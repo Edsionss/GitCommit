@@ -2,7 +2,9 @@
 .el-card {
   border-radius: var(--radius-md);
   border: var(--border);
-  transition: box-shadow var(--transition-normal), transform var(--transition-fast);
+  transition:
+    box-shadow var(--transition-normal),
+    transform var(--transition-fast);
   overflow: hidden;
   margin-bottom: var(--spacing-lg);
   box-shadow: var(--shadow-sm) !important;
@@ -40,44 +42,50 @@
   border-color: var(--primary-light);
 }
 
-[data-theme="dark"] .el-button {
+[data-theme='dark'] .el-button {
   color: var(--text-light);
   background-color: var(--card-bg);
   border-color: var(--border-color);
 }
 
-[data-theme="dark"] .el-button--primary {
+[data-theme='dark'] .el-button--primary {
   background-color: var(--primary-color);
   border-color: var(--primary-color);
   color: #ffffff;
 }
 
-[data-theme="dark"] .el-button--primary:hover,
-[data-theme="dark"] .el-button--primary:focus {
+[data-theme='dark'] .el-button--primary:hover,
+[data-theme='dark'] .el-button--primary:focus {
   background-color: var(--primary-light);
   border-color: var(--primary-light);
 }
 
 .el-input .el-input__wrapper {
   border-radius: var(--radius-sm);
-  box-shadow: var(--shadow-inset), 0 0 0 1px var(--border-color) inset !important;
+  box-shadow:
+    var(--shadow-inset),
+    0 0 0 1px var(--border-color) inset !important;
   transition: all var(--transition-fast);
 }
 
 .el-input .el-input__wrapper:hover {
-  box-shadow: var(--shadow-inset), 0 0 0 1px var(--primary-color) inset !important;
+  box-shadow:
+    var(--shadow-inset),
+    0 0 0 1px var(--primary-color) inset !important;
 }
 
 .el-input .el-input__wrapper.is-focus {
-  box-shadow: var(--shadow-inset), 0 0 0 1px var(--primary-color) inset !important;
+  box-shadow:
+    var(--shadow-inset),
+    0 0 0 1px var(--primary-color) inset !important;
 }
 
-[data-theme="dark"] .el-input .el-input__wrapper {
+[data-theme='dark'] .el-input .el-input__wrapper {
   background-color: #2a2a2a;
   box-shadow: 0 0 0 1px var(--border-color) inset;
 }
 
-[data-theme="dark"] .el-input__inner {
+[data-theme='dark'] .el-input__inner {
   color: var(--text-primary);
 }
 
@@ -160,7 +168,7 @@
 }
 
 .el-menu-item.is-active::before {
-  content: "";
+  content: '';
   position: absolute;
   left: 0;
   top: 50%;
@@ -175,16 +183,16 @@
   background-color: var(--hover-bg);
 }
 
-[data-theme="dark"] .el-menu-item {
+[data-theme='dark'] .el-menu-item {
   color: var(--text-secondary);
 }
 
-[data-theme="dark"] .el-menu-item.is-active {
+[data-theme='dark'] .el-menu-item.is-active {
   color: var(--primary-light);
   background-color: rgba(76, 201, 240, 0.15);
 }
 
-[data-theme="dark"] .el-menu-item:hover {
+[data-theme='dark'] .el-menu-item:hover {
   background-color: rgba(76, 201, 240, 0.1);
 }
 
@@ -265,7 +273,7 @@
   --el-table-row-hover-bg-color: var(--hover-bg);
 }
 
-[data-theme="dark"] .el-table {
+[data-theme='dark'] .el-table {
   --el-table-border-color: var(--border-color);
   --el-table-header-bg-color: var(--table-header-bg);
   --el-table-row-hover-bg-color: var(--hover-bg);
@@ -275,12 +283,12 @@
 }
 
 /* 卡片组件 */
-[data-theme="dark"] .el-card {
+[data-theme='dark'] .el-card {
   background-color: var(--card-bg);
   color: var(--text-primary);
   border-color: var(--border-color);
 }
 
-[data-theme="dark"] .el-card__header {
+[data-theme='dark'] .el-card__header {
   border-bottom-color: var(--border-color);
 }

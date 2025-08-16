@@ -177,7 +177,9 @@ body {
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  transition: background-color var(--transition-normal), color var(--transition-normal);
+  transition:
+    background-color var(--transition-normal),
+    color var(--transition-normal);
 }
 
 body {
@@ -196,7 +198,10 @@ body {
   background-color: var(--card-bg);
   color: var(--text-primary);
   border-color: var(--border-color);
-  transition: background-color var(--transition-normal), color var(--transition-normal), border-color var(--transition-normal);
+  transition:
+    background-color var(--transition-normal),
+    color var(--transition-normal),
+    border-color var(--transition-normal);
 }
 
 .el-card__header {
@@ -211,7 +216,9 @@ body {
 .el-table {
   background-color: var(--card-bg);
   color: var(--text-primary);
-  transition: background-color var(--transition-normal), color var(--transition-normal);
+  transition:
+    background-color var(--transition-normal),
+    color var(--transition-normal);
 }
 
 .el-table th.el-table__cell {
@@ -283,4 +290,10 @@ body {
 
 ::-webkit-scrollbar-thumb:hover {
   background: var(--text-muted);
+}
+
+/* Animation disabling utility */
+.no-animations * {
+  transition: none !important;
+  animation: none !important;
 }

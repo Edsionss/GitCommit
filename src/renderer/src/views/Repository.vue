@@ -1,9 +1,6 @@
 <template>
   <div class="repository-container">
-    <RepositoryToolbar 
-      @addRepo="openRepositoryDialog"
-      @refreshRepos="refreshRepositories"
-    />
+    <RepositoryToolbar @addRepo="openRepositoryDialog" @refreshRepos="refreshRepositories" />
 
     <a-card v-if="repositories.length === 0" class="empty-state">
       <a-empty description="暂无仓库数据">
@@ -11,7 +8,7 @@
       </a-empty>
     </a-card>
 
-    <RepositoryList 
+    <RepositoryList
       v-else
       :repositories="repositories"
       :format-date="formatDate"
@@ -22,7 +19,7 @@
       @confirmRemoveRepo="confirmRemoveRepo"
     />
 
-    <AddEditRepositoryDialog 
+    <AddEditRepositoryDialog
       :visible="repositoryDialog.visible"
       :title="repositoryDialog.title"
       :is-edit="repositoryDialog.isEdit"
@@ -33,7 +30,7 @@
       @save="saveRepository"
     />
 
-    <RepositorySettingsDialog 
+    <RepositorySettingsDialog
       :visible="settingsDialog.visible"
       :active-tab="settingsDialog.activeTab"
       :repo-id="settingsDialog.repoId"
@@ -60,7 +57,9 @@ import repositoriesMockData from '@/mock/repositoriesData.json'
 const availableTags = ref(repositoryAvailableTagsData)
 
 // 示例仓库数据
-const repositories = ref(repositoriesMockData.map(repo => ({ ...repo, lastUpdated: new Date(repo.lastUpdated) })));
+const repositories = ref(
+  repositoriesMockData.map((repo) => ({ ...repo, lastUpdated: new Date(repo.lastUpdated) }))
+)
 
 // 格式化日期
 const formatDate = (date: Date) => {
@@ -195,8 +194,8 @@ const confirmRemoveRepo = (repo: any) => {
     },
     onCancel() {
       // 取消删除
-    },
-  });
+    }
+  })
 }
 </script>
 

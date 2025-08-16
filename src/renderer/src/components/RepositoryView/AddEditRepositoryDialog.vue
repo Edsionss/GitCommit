@@ -1,11 +1,12 @@
 <template>
-  <el-dialog v-model="dialogVisible" :title="title" width="500px" destroy-on-close @close="$emit('update:visible', false)">
-    <el-form
-      ref="repoForm"
-      :model="formData"
-      :rules="rules"
-      label-width="80px"
-    >
+  <el-dialog
+    v-model="dialogVisible"
+    :title="title"
+    width="500px"
+    destroy-on-close
+    @close="$emit('update:visible', false)"
+  >
+    <el-form ref="repoForm" :model="formData" :rules="rules" label-width="80px">
       <el-form-item label="仓库名称" prop="name">
         <el-input v-model="formData.name" placeholder="输入仓库名称"></el-input>
       </el-form-item>
@@ -27,12 +28,7 @@
           default-first-option
           placeholder="可选，添加标签"
         >
-          <el-option
-            v-for="tag in availableTags"
-            :key="tag"
-            :label="tag"
-            :value="tag"
-          ></el-option>
+          <el-option v-for="tag in availableTags" :key="tag" :label="tag" :value="tag"></el-option>
         </el-select>
       </el-form-item>
       <el-form-item label="描述">
@@ -52,8 +48,8 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, watch } from 'vue';
-import { FolderOpened } from '@element-plus/icons-vue';
+import { ref, reactive, watch } from 'vue'
+import { FolderOpened } from '@element-plus/icons-vue'
 
 const props = defineProps({
   visible: { type: Boolean, default: false },
@@ -62,36 +58,39 @@ const props = defineProps({
   editId: { type: [String, Number], default: null },
   formData: { type: Object, required: true },
   availableTags: { type: Array, required: true }
-});
+})
 
-const emit = defineEmits(['update:visible', 'save']);
+const emit = defineEmits(['update:visible', 'save'])
 
-const dialogVisible = ref(props.visible);
-const repoForm = ref(null); // Ref for the form component
+const dialogVisible = ref(props.visible)
+const repoForm = ref(null) // Ref for the form component
 
-watch(() => props.visible, (newVal) => {
-  dialogVisible.value = newVal;
-  if (newVal && !props.isEdit) {
-    // Reset form when dialog opens for new repo
-    Object.assign(props.formData, { name: '', path: '', description: '', tags: [] });
+watch(
+  () => props.visible,
+  (newVal) => {
+    dialogVisible.value = newVal
+    if (newVal && !props.isEdit) {
+      // Reset form when dialog opens for new repo
+      Object.assign(props.formData, { name: '', path: '', description: '', tags: [] })
+    }
   }
-});
+)
 
 const selectDirectory = () => {
   // This should call Electron's dialog.showOpenDialog
   // Simulate selection
   setTimeout(() => {
-    props.formData.path = 'D:/Selected/Repository/Path';
-  }, 500);
-};
+    props.formData.path = 'D:/Selected/Repository/Path'
+  }, 500)
+}
 
 const submit = async () => {
   try {
-    await repoForm.value.validate();
-    emit('save', { ...props.formData, id: props.editId });
-    dialogVisible.value = false;
+    await repoForm.value.validate()
+    emit('save', { ...props.formData, id: props.editId })
+    dialogVisible.value = false
   } catch (error) {
-    console.error('Form validation failed:', error);
+    console.error('Form validation failed:', error)
   }
-};
+}
 </script>

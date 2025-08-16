@@ -12,12 +12,12 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue';
-import { Doughnut } from 'vue-chartjs';
-import { Chart as ChartJS, Title, Tooltip, Legend, ArcElement } from 'chart.js';
-import { Card } from 'ant-design-vue'; // Added Card import
+import { ref, computed } from 'vue'
+import { Doughnut } from 'vue-chartjs'
+import { Chart as ChartJS, Title, Tooltip, Legend, ArcElement } from 'chart.js'
+import { Card } from 'ant-design-vue' // Added Card import
 
-ChartJS.register(Title, Tooltip, Legend, ArcElement);
+ChartJS.register(Title, Tooltip, Legend, ArcElement)
 
 const chartData = computed(() => ({
   labels: ['JavaScript', 'HTML', 'CSS', 'TypeScript', '其他'],
@@ -27,17 +27,17 @@ const chartData = computed(() => ({
       data: [48, 17, 15, 14, 6]
     }
   ]
-}));
+}))
 
 const chartOptions = ref({
   responsive: true,
   maintainAspectRatio: false,
   plugins: {
     legend: {
-      position: 'right',
+      position: 'right'
     }
   }
-});
+})
 </script>
 
 <style scoped>

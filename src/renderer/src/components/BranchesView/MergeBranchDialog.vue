@@ -1,5 +1,11 @@
 <template>
-  <a-modal v-model:open="dialogVisible" title="合并分支" width="500px" :destroy-on-close="true" @cancel="$emit('update:visible', false)">
+  <a-modal
+    v-model:open="dialogVisible"
+    title="合并分支"
+    width="500px"
+    :destroy-on-close="true"
+    @cancel="$emit('update:visible', false)"
+  >
     <a-form :model="form" :label-col="{ span: 6 }" :wrapper-col="{ span: 16 }">
       <a-form-item label="源分支">
         <a-input v-model:value="form.sourceBranch" disabled />
@@ -10,7 +16,8 @@
             v-for="branch in availableTargets"
             :key="branch.name"
             :value="branch.name"
-          >{{ branch.name }}</a-select-option>
+            >{{ branch.name }}</a-select-option
+          >
         </a-select>
       </a-form-item>
       <a-form-item label="合并方式">
@@ -21,10 +28,7 @@
         </a-radio-group>
       </a-form-item>
       <a-form-item label="合并信息">
-        <a-textarea
-          v-model:value="form.message"
-          placeholder="合并提交信息"
-        />
+        <a-textarea v-model:value="form.message" placeholder="合并提交信息" />
       </a-form-item>
     </a-form>
     <template #footer>
@@ -35,40 +39,53 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch, reactive, computed } from 'vue';
-import { Modal, Form, Select, Radio, Input, Button } from 'ant-design-vue';
+import { ref, watch, reactive, computed } from 'vue'
+import type { PropType } from 'vue'
+
+interface Branch {
+  name: string;
+}
 
 const props = defineProps({
   visible: { type: Boolean, default: false },
-  branches: { type: Array, required: true },
+  branches: { type: Array as PropType<Branch[]>, required: true },
   sourceBranch: { type: String, default: '' }
-});
+})
 
-const emit = defineEmits(['update:visible', 'merge']);
+const emit = defineEmits(['update:visible', 'merge'])
 
-const dialogVisible = ref(props.visible);
+const dialogVisible = ref(props.visible)
 const form = reactive({
   sourceBranch: '',
   targetBranch: 'main',
   mergeType: 'merge',
   message: ''
-});
+})
 
 const availableTargets = computed(() => {
-  return props.branches.filter(b => b.name !== form.sourceBranch);
-});
+  return props.branches.filter((b: Branch) => b.name !== form.sourceBranch)
+})
 
-watch(() => props.visible, (newVal) => {
-  dialogVisible.value = newVal;
-  if (newVal) {
-    form.sourceBranch = props.sourceBranch;
-    form.targetBranch = 'main';
-    form.mergeType = 'merge';
-    form.message = `将 ${props.sourceBranch} 合并到 main`;
+watch(
+  () => props.visible,
+  (newVal) => {
+    dialogVisible.value = newVal
+    if (newVal) {
+      form.sourceBranch = props.sourceBranch
+      form.targetBranch = 'main'
+      form.mergeType = 'merge'
+      form.message = `将 ${props.sourceBranch} 合并到 main`
+    }
   }
-});
+)
+
+watch(dialogVisible, (newVal) => {
+  if (!newVal) {
+    emit('update:visible', false)
+  }
+})
 
 const submit = () => {
-  emit('merge', { ...form });
-};
+  emit('merge', { ...form })
+}
 </script>

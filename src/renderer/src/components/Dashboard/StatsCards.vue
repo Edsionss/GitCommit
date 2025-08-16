@@ -58,8 +58,13 @@
 </template>
 
 <script setup lang="ts">
-import { Row, Col, Card } from 'ant-design-vue';
-import { UnorderedListOutlined, FileTextOutlined, UserOutlined, BarChartOutlined } from '@ant-design/icons-vue';
+import { Row, Col, Card } from 'ant-design-vue'
+import {
+  UnorderedListOutlined,
+  FileTextOutlined,
+  UserOutlined,
+  BarChartOutlined
+} from '@ant-design/icons-vue'
 
 defineProps({
   stats: {
@@ -70,7 +75,7 @@ defineProps({
     type: Function,
     required: true
   }
-});
+})
 </script>
 
 <style scoped>

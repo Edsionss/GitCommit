@@ -56,8 +56,8 @@
 </template>
 
 <script setup lang="ts">
-import { Row, Col, Card } from 'ant-design-vue';
-import { UserOutlined, CalendarOutlined, PlusOutlined, MinusOutlined } from '@ant-design/icons-vue';
+import { Row, Col, Card } from 'ant-design-vue'
+import { UserOutlined, CalendarOutlined, PlusOutlined, MinusOutlined } from '@ant-design/icons-vue'
 
 defineProps({
   stats: {
@@ -68,19 +68,56 @@ defineProps({
     type: Function,
     required: true
   }
-});
+})
 </script>
 
 <style scoped>
-.stats-row { margin-bottom: 20px; }
-.stats-card { margin-bottom: 0; }
-.stat-item { display: flex; align-items: center; }
-.stat-icon { width: 50px; height: 50px; border-radius: 50%; display: flex; justify-content: center; align-items: center; margin-right: 15px; font-size: 24px; }
-.stat-icon.contributors-icon { background-color: rgba(67, 97, 238, 0.1); color: #4361ee; }
-.stat-icon.commits-icon { background-color: rgba(52, 152, 219, 0.1); color: #3498db; }
-.stat-icon.additions-icon { background-color: rgba(46, 204, 113, 0.1); color: #2ecc71; }
-.stat-icon.deletions-icon { background-color: rgba(231, 76, 60, 0.1); color: #e74c3c; }
-.stat-info { flex: 1; }
-.stat-value { font-size: 24px; font-weight: bold; line-height: 1.2; }
-.stat-label { font-size: 14px; color: var(--color-text-light); }
+.stats-row {
+  margin-bottom: 20px;
+}
+.stats-card {
+  margin-bottom: 0;
+}
+.stat-item {
+  display: flex;
+  align-items: center;
+}
+.stat-icon {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-right: 15px;
+  font-size: 24px;
+}
+.stat-icon.contributors-icon {
+  background-color: rgba(67, 97, 238, 0.1);
+  color: #4361ee;
+}
+.stat-icon.commits-icon {
+  background-color: rgba(52, 152, 219, 0.1);
+  color: #3498db;
+}
+.stat-icon.additions-icon {
+  background-color: rgba(46, 204, 113, 0.1);
+  color: #2ecc71;
+}
+.stat-icon.deletions-icon {
+  background-color: rgba(231, 76, 60, 0.1);
+  color: #e74c3c;
+}
+.stat-info {
+  flex: 1;
+}
+.stat-value {
+  font-size: 24px;
+  font-weight: bold;
+  line-height: 1.2;
+}
+.stat-label {
+  font-size: 14px;
+  color: var(--color-text-light);
+}
 </style>

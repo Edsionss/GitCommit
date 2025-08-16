@@ -1,241 +1,181 @@
 <template>
-  <a-card class="table-card">
+  <a-card class="table-card" :bordered="false">
     <template #title>
       <div class="card-header">
-        <span>Git提交历史</span>
-        <div v-if="selectedRows.length > 0" class="selection-actions">
+        <div v-if="selectedRows.length === 0">提交历史</div>
+        <div v-else class="selection-actions">
           <span class="selection-count">已选择 {{ selectedRows.length }} 项</span>
-          <a-button size="small" @click="$emit('exportSelected')" type="primary">导出选中项</a-button>
-          <a-button size="small" @click="$emit('clearSelection')" type="text">取消选择</a-button>
+          <a-button type="primary" size="small" @click="$emit('exportSelected')">导出选中</a-button>
+          <a-button size="small" @click="$emit('clearSelection')">取消选择</a-button>
         </div>
       </div>
     </template>
 
     <a-table
-      :data-source="paginatedData"
-      :columns="columns"
       :loading="loading"
+      :data-source="paginatedData"
+      :columns="tableColumns"
+      :row-selection="rowSelection"
       :pagination="false"
-      :scroll="{ y: tableHeight, x: 'max-content' }"
+      :scroll="{ y: tableHeight }"
+      size="middle"
       row-key="commitId"
-      @change="(pagination, filters, sorter) => $emit('tableChange', pagination, filters, sorter)"
-      @select="(record, selected, selectedRows, nativeEvent) => $emit('selectionChange', selectedRows)"
-      @select-all="(selected, selectedRows, changeRows) => $emit('selectionChange', selectedRows)"
+      @change="handleTableChange"
     >
       <template #bodyCell="{ column, record }">
         <template v-if="column.key === 'repository'">
           <div class="repo-cell">
-            <a-tag color="blue">{{ record.repository }}</a-tag>
+            <a-tag :color="getRepoColor(record.repository)">{{ record.repository }}</a-tag>
           </div>
         </template>
-        <template v-else-if="column.key === 'shortHash'">
+
+        <template v-if="column.key === 'shortHash'">
           <div class="hash-cell">
-            <span @click="$emit('copyToClipboard', record.commitId)" class="copy-icon">
-              <CopyOutlined />
-            </span>
-            <a-tooltip :title="record.commitId" placement="top">
-              <span class="hash-value">{{ record.shortHash }}</span>
-            </a-tooltip>
+            <span class="hash-value" @click="copyToClipboard(record.commitId)">{{ record.shortHash }}</span>
+            <CopyOutlined class="copy-icon" @click="copyToClipboard(record.commitId)" />
           </div>
         </template>
-        <template v-else-if="column.key === 'author'">
-          <div
-            class="author-cell"
-            @click="$emit('applyFilter', 'author', record.author)"
-            :title="`筛选作者: ${record.author}`"
-          >
-            <a-avatar :size="24">
-              {{ record.author ? record.author.substring(0, 1).toUpperCase() : '?' }}
-            </a-avatar>
+
+        <template v-if="column.key === 'author'">
+          <div class="author-cell" @click="applyAuthorFilter(record.author)">
+            <a-avatar class="author-avatar" :size="24">{{ record.author.charAt(0) }}</a-avatar>
             <span class="author-name">{{ record.author }}</span>
           </div>
         </template>
-        <template v-else-if="column.key === 'date'">
-          <div
-            class="date-cell"
-            @click="$emit('applyFilter', 'dateRange', [record.date, record.date])"
-            :title="`筛选日期: ${formatDate(record.date)}`"
-          >
-            <CalendarOutlined />
-            <span>{{ formatDate(record.date) }}</span>
-          </div>
-        </template>
-        <template v-else-if="column.key === 'message'">
+
+        <template v-if="column.key === 'message'">
           <div class="message-cell">
-            <span v-if="hasTags(record.message)" class="message-tags">
-              <a-tag
-                v-for="tag in extractTags(record.message)"
-                :key="tag"
-                size="small"
-                class="message-tag"
-              >
+            <div v-if="hasTags(record.message)" class="message-tags">
+              <a-tag class="message-tag" v-for="tag in extractTags(record.message)" :key="tag" color="blue">
                 {{ tag }}
               </a-tag>
-            </span>
+            </div>
             <span class="message-text">{{ cleanMessage(record.message) }}</span>
           </div>
         </template>
-        <template v-else-if="column.key === 'filesChanged'">
-          {{ formatNumber(record.filesChanged) }}
+
+        <template v-if="column.key === 'filesChanged'">
+          <a-tag color="purple">{{ record.filesChanged }}</a-tag>
         </template>
-        <template v-else-if="column.key === 'insertions'">
+
+        <template v-if="column.key === 'insertions'">
           <span class="insertion">+{{ record.insertions }}</span>
         </template>
-        <template v-else-if="column.key === 'deletions'">
+
+        <template v-if="column.key === 'deletions'">
           <span class="deletion">-{{ record.deletions }}</span>
         </template>
-        <template v-else-if="column.key === 'action'">
+
+        <template v-if="column.key === 'actions'">
           <div class="action-cell">
-            <a-tooltip title="查看详情" placement="top">
-              <a-button type="text" shape="circle" size="small" @click="$emit('viewDetails', record)">
-                <EyeOutlined />
-              </a-button>
-            </a-tooltip>
-            <a-tooltip title="复制ID" placement="top">
-              <a-button type="text" shape="circle" size="small" @click="$emit('copyToClipboard', record.commitId)">
-                <CopyOutlined />
-              </a-button>
-            </a-tooltip>
+            <a-button type="link" size="small" @click="viewDetails(record)">详情</a-button>
           </div>
         </template>
       </template>
     </a-table>
 
-    <!-- 分页控件 -->
     <div class="pagination-container">
       <a-pagination
-        v-model:current="currentPage"
-        v-model:page-size="pageSize"
-        :page-size-options="['10', '20', '50', '100']"
+        :current="currentPage"
+        :page-size="pageSize"
+        :total="filteredDataLength"
         show-size-changer
         show-quick-jumper
-        :total="filteredDataLength"
-        show-total="total => `总数: ${total} 条`"
-        @showSizeChange="(current, size) => $emit('update:pageSize', size)"
-        @change="(page, pageSize) => $emit('update:currentPage', page)"
+        :page-size-options="['10', '20', '50', '100']"
+        @update:current="updateCurrentPage"
+        @update:page-size="updatePageSize"
       />
     </div>
   </a-card>
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
-import { Card, Table, Tag, Button, Tooltip, Pagination, Avatar } from 'ant-design-vue';
-import { FileTextOutlined, CopyOutlined, CalendarOutlined, EyeOutlined } from '@ant-design/icons-vue';
+import { computed } from 'vue'
+import { CopyOutlined } from '@ant-design/icons-vue'
 
 const props = defineProps({
-  loading: { type: Boolean, default: false },
-  paginatedData: { type: Array, required: true },
-  tableHeight: { type: Number, required: true },
-  columns: { type: Object, required: true }, // This will be the reactive 'columns' object from parent
-  formatNumber: { type: Function, required: true },
-  formatDate: { type: Function, required: true },
-  formatDateRange: { type: Function, required: true },
-  hasTags: { type: Function, required: true },
-  extractTags: { type: Function, required: true },
-  cleanMessage: { type: Function, required: true },
-  copyToClipboard: { type: Function, required: true },
-  viewDetails: { type: Function, required: true },
-  selectedRows: { type: Array, required: true },
-  currentPage: { type: Number, required: true },
-  pageSize: { type: Number, required: true },
-  filteredDataLength: { type: Number, required: true },
-});
+  loading: Boolean,
+  paginatedData: Array,
+  tableHeight: Number,
+  columns: Object,
+  formatNumber: Function,
+  formatDate: Function,
+  formatDateRange: Function,
+  hasTags: Function,
+  extractTags: Function,
+  cleanMessage: Function,
+  copyToClipboard: Function,
+  viewDetails: Function,
+  selectedRows: Array,
+  currentPage: Number,
+  pageSize: Number,
+  filteredDataLength: Number
+})
 
 const emit = defineEmits([
   'update:currentPage',
   'update:pageSize',
-  'exportSelected',
-  'clearSelection',
-  'viewDetails',
-  'copyToClipboard',
-  'applyFilter',
   'selectionChange',
-  'tableChange'
-]);
+  'applyFilter',
+  'tableChange',
+  'exportSelected',
+  'clearSelection'
+])
 
-const columns = ref([
-  {
-    type: 'selection',
-    width: 55,
-    fixed: 'left',
-  },
-  {
-    type: 'index',
-    title: '#',
-    width: 60,
-    fixed: 'left',
-  },
-  {
-    title: '仓库',
-    dataIndex: 'repository',
-    key: 'repository',
-    minWidth: 150,
-    sorter: (a, b) => a.repository.localeCompare(b.repository),
-  },
-  {
-    title: '提交ID',
-    dataIndex: 'shortHash',
-    key: 'shortHash',
-    minWidth: 100,
-    sorter: (a, b) => a.shortHash.localeCompare(b.shortHash),
-  },
-  {
-    title: '作者',
-    dataIndex: 'author',
-    key: 'author',
-    minWidth: 120,
-    sorter: (a, b) => a.author.localeCompare(b.author),
-  },
-  {
-    title: '邮箱',
-    dataIndex: 'email',
-    key: 'email',
-    minWidth: 180,
-    ellipsis: true,
-  },
-  {
-    title: '日期',
-    dataIndex: 'date',
-    key: 'date',
-    minWidth: 180,
-    sorter: (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime(),
-  },
-  {
-    title: '提交消息',
-    dataIndex: 'message',
-    key: 'message',
-    minWidth: 300,
-    ellipsis: true,
-  },
-  {
-    title: '文件变更',
-    dataIndex: 'filesChanged',
-    key: 'filesChanged',
-    minWidth: 100,
-    sorter: (a, b) => a.filesChanged - b.filesChanged,
-  },
-  {
-    title: '新增',
-    dataIndex: 'insertions',
-    key: 'insertions',
-    minWidth: 80,
-    sorter: (a, b) => a.insertions - b.insertions,
-  },
-  {
-    title: '删除',
-    dataIndex: 'deletions',
-    key: 'deletions',
-    minWidth: 80,
-    sorter: (a, b) => a.deletions - b.deletions,
-  },
-  {
-    title: '操作',
-    key: 'action',
-    width: 120,
-    fixed: 'right',
-  },
-]);
+const tableColumns = computed(() => {
+  const columnMap = {
+    repository: { title: '仓库', dataIndex: 'repository', key: 'repository', width: 120 },
+    shortHash: { title: '提交ID', dataIndex: 'shortHash', key: 'shortHash', width: 120 },
+    author: { title: '作者', dataIndex: 'author', key: 'author', width: 150 },
+    message: { title: '提交消息', dataIndex: 'message', key: 'message', ellipsis: true },
+    filesChanged: { title: '文件', dataIndex: 'filesChanged', key: 'filesChanged', width: 80, align: 'center' },
+    insertions: { title: '新增', dataIndex: 'insertions', key: 'insertions', width: 80, align: 'center' },
+    deletions: { title: '删除', dataIndex: 'deletions', key: 'deletions', width: 80, align: 'center' },
+    actions: { title: '操作', key: 'actions', width: 100, align: 'center', fixed: 'right' }
+  }
+  return Object.keys(props.columns)
+    .filter(key => props.columns[key])
+    .map(key => columnMap[key])
+    .concat(columnMap['actions']);
+});
+
+const rowSelection = computed(() => {
+  return {
+    selectedRowKeys: props.selectedRows.map(row => row.commitId),
+    onChange: (selectedRowKeys: string[], selectedRows: any[]) => {
+      emit('selectionChange', selectedRows)
+    }
+  }
+})
+
+const updateCurrentPage = (page: number) => {
+  emit('update:currentPage', page)
+}
+
+const updatePageSize = (size: number) => {
+  emit('update:pageSize', size)
+}
+
+const handleTableChange = (pagination, filters, sorter) => {
+  emit('tableChange', pagination, filters, sorter)
+}
+
+const applyAuthorFilter = (author: string) => {
+  emit('applyFilter', 'author', author)
+}
+
+const repoColors = ['blue', 'green', 'cyan', 'purple', 'orange', 'red'];
+const repoColorMap = new Map();
+let colorIndex = 0;
+
+const getRepoColor = (repoName: string) => {
+  if (!repoColorMap.has(repoName)) {
+    repoColorMap.set(repoName, repoColors[colorIndex % repoColors.length]);
+    colorIndex++;
+  }
+  return repoColorMap.get(repoName);
+};
+
 </script>
 
 <style scoped>
@@ -262,6 +202,28 @@ const columns = ref([
   overflow: hidden;
 }
 
+.card-header {
+  display: flex;
+  align-items: center;
+  height: 32px;
+}
+
+.selection-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  background-color: var(--info-light);
+  padding: 4px 12px;
+  border-radius: var(--radius-sm);
+  animation: fadeInDown 0.3s ease-out;
+}
+
+.selection-count {
+  font-size: var(--font-size-sm);
+  color: var(--info);
+  font-weight: var(--font-weight-medium);
+}
+
 .pagination-container {
   display: flex;
   justify-content: center;
@@ -270,19 +232,8 @@ const columns = ref([
   border-top: var(--border);
 }
 
-.card-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-/* 表格单元格样式 */
-.repo-cell {
-  display: flex;
-  align-items: center;
-}
-
 .repo-cell .ant-tag {
+  cursor: pointer;
   transition: all var(--transition-normal);
 }
 
@@ -305,6 +256,17 @@ const columns = ref([
 .hash-value:hover {
   color: var(--primary-color);
   text-decoration: underline;
+}
+
+.copy-icon {
+  cursor: pointer;
+  color: var(--text-secondary);
+  transition: all var(--transition-fast);
+}
+
+.copy-icon:hover {
+  color: var(--primary-color);
+  transform: scale(1.2);
 }
 
 .author-cell {
@@ -331,17 +293,11 @@ const columns = ref([
   transform: scale(1.1);
 }
 
-.date-cell {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  cursor: pointer;
-  transition: all var(--transition-fast);
-}
-
-.date-cell:hover {
-  color: var(--primary-color);
-  transform: translateX(3px);
+.author-name {
+  max-width: 120px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .message-cell {
@@ -369,42 +325,25 @@ const columns = ref([
 
 .message-text {
   line-height: 1.5;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .insertion {
   color: var(--success);
   font-weight: var(--font-weight-semibold);
-  transition: all var(--transition-fast);
 }
 
 .deletion {
   color: var(--danger);
   font-weight: var(--font-weight-semibold);
-  transition: all var(--transition-fast);
-}
-
-tr:hover .insertion {
-  text-shadow: 0 0 1px rgba(46, 204, 113, 0.5);
-}
-
-tr:hover .deletion {
-  text-shadow: 0 0 1px rgba(231, 76, 60, 0.5);
 }
 
 .action-cell {
   display: flex;
   justify-content: center;
   gap: 8px;
-}
-
-.selection-actions {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-sm);
-  background-color: var(--info-light);
-  padding: 4px 12px;
-  border-radius: var(--radius-sm);
-  animation: fadeInDown 0.3s ease-out;
 }
 
 @keyframes fadeInDown {
@@ -416,22 +355,5 @@ tr:hover .deletion {
     opacity: 1;
     transform: translateY(0);
   }
-}
-
-.selection-count {
-  font-size: var(--font-size-sm);
-  color: var(--info);
-  font-weight: var(--font-weight-medium);
-}
-
-.copy-icon {
-  cursor: pointer;
-  color: var(--text-secondary);
-  transition: all var(--transition-fast);
-}
-
-.copy-icon:hover {
-  color: var(--primary-color);
-  transform: scale(1.2);
 }
 </style>

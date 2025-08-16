@@ -2,208 +2,18 @@
   <div class="branches-container">
     <div class="branches-header">
       <h2 class="page-title">分支管理</h2>
-      <div class="branches-actions">
-        <el-select v-model="selectedRepo" placeholder="选择仓库" class="filter-item">
-          <el-option
-            v-for="repo in repositories"
-            :key="repo.id"
-            :label="repo.name"
-            :value="repo.id"
-          />
-        </el-select>
-        <el-button type="primary" @click="refreshBranches">
-          <el-icon class="mr-5"><RefreshRight /></el-icon>
-          刷新分支
-        </el-button>
-        <el-button type="success" @click="createBranch">
-          <el-icon class="mr-5"><Plus /></el-icon>
-          新建分支
-        </el-button>
-      </div>
+      <BranchesToolbar
+        :repositories="repositories"
+        :selected-repo="selectedRepo"
+        @update:selectedRepo="selectedRepo = $event"
+        @refresh="refreshBranches"
+        @create="createBranch"
+      />
     </div>
 
-<<<<<<< Updated upstream
-    <el-row :gutter="20">
-      <el-col :xs="24" :lg="16">
-        <el-card class="branches-table-card" v-loading="loading">
-          <template #header>
-            <div class="card-header">
-              <span>分支列表</span>
-              <el-input v-model="searchQuery" placeholder="搜索分支" class="search-input" clearable>
-                <template #prefix>
-                  <el-icon><Search /></el-icon>
-                </template>
-              </el-input>
-            </div>
-          </template>
-
-          <el-table :data="filteredBranches" style="width: 100%">
-            <el-table-column type="expand">
-              <template #default="props">
-                <div class="branch-detail">
-                  <el-descriptions :column="2" border>
-                    <el-descriptions-item label="最后提交者">
-                      {{ props.row.lastCommitAuthor }}
-                    </el-descriptions-item>
-                    <el-descriptions-item label="提交日期">
-                      {{ formatDate(props.row.lastCommitDate) }}
-                    </el-descriptions-item>
-                    <el-descriptions-item label="提交ID">
-                      <el-tag size="small" type="info">{{ props.row.lastCommitHash }}</el-tag>
-                    </el-descriptions-item>
-                    <el-descriptions-item label="提交消息">
-                      {{ props.row.lastCommitMessage }}
-                    </el-descriptions-item>
-                  </el-descriptions>
-                </div>
-              </template>
-            </el-table-column>
-
-            <el-table-column label="状态" width="60">
-              <template #default="scope">
-                <div class="branch-status">
-                  <el-icon v-if="scope.row.name === 'main'" color="#67C23A"><Star /></el-icon>
-                  <el-icon v-else-if="scope.row.isRemote" color="#409EFF"><Connection /></el-icon>
-                  <el-icon v-else color="#E6A23C"><Share /></el-icon>
-                </div>
-              </template>
-            </el-table-column>
-
-            <el-table-column prop="name" label="分支名称" min-width="200">
-              <template #default="scope">
-                <div class="branch-name">
-                  <span>{{ scope.row.name }}</span>
-                  <el-tag v-if="scope.row.current" size="small" type="success">当前分支</el-tag>
-                  <el-tag v-if="scope.row.isRemote" size="small" type="info">远程</el-tag>
-                </div>
-              </template>
-            </el-table-column>
-
-            <el-table-column prop="commitsCount" label="提交数" width="100" sortable />
-
-            <el-table-column label="最近更新" width="180">
-              <template #default="scope">
-                {{ formatDate(scope.row.lastCommitDate) }}
-              </template>
-            </el-table-column>
-
-            <el-table-column label="操作" width="200">
-              <template #default="scope">
-                <el-button-group>
-                  <el-button
-                    size="small"
-                    :disabled="scope.row.current"
-                    @click="checkoutBranch(scope.row)"
-                  >
-                    切换
-                  </el-button>
-                  <el-button
-                    size="small"
-                    type="primary"
-                    :disabled="scope.row.name === 'main'"
-                    @click="mergeBranch(scope.row)"
-                  >
-                    合并
-                  </el-button>
-                  <el-button
-                    size="small"
-                    type="danger"
-                    :disabled="scope.row.name === 'main' || scope.row.current"
-                    @click="deleteBranch(scope.row)"
-                  >
-                    删除
-                  </el-button>
-                </el-button-group>
-              </template>
-            </el-table-column>
-          </el-table>
-        </el-card>
-      </el-col>
-
-      <el-col :xs="24" :lg="8">
-        <el-card class="branch-visualization-card">
-          <template #header>
-            <div class="card-header">
-              <span>分支可视化</span>
-            </div>
-          </template>
-
-          <div class="branch-graph-container" ref="branchGraph">
-            <el-empty v-if="!graphReady" description="加载分支图...">
-              <el-button type="primary" @click="initBranchGraph">加载</el-button>
-            </el-empty>
-          </div>
-
-          <div class="branch-stats">
-            <el-row :gutter="10">
-              <el-col :span="8">
-                <div class="stat-item">
-                  <div class="stat-value">{{ branchStats.totalBranches }}</div>
-                  <div class="stat-label">分支总数</div>
-                </div>
-              </el-col>
-              <el-col :span="8">
-                <div class="stat-item">
-                  <div class="stat-value">{{ branchStats.activeBranches }}</div>
-                  <div class="stat-label">活跃分支</div>
-                </div>
-              </el-col>
-              <el-col :span="8">
-                <div class="stat-item">
-                  <div class="stat-value">{{ branchStats.aheadCount }}</div>
-                  <div class="stat-label">领先提交</div>
-                </div>
-              </el-col>
-            </el-row>
-          </div>
-        </el-card>
-
-        <el-card class="merge-requests-card">
-          <template #header>
-            <div class="card-header">
-              <span>待处理合并请求</span>
-            </div>
-          </template>
-
-          <div v-if="mergeRequests.length > 0">
-            <div v-for="mr in mergeRequests" :key="mr.id" class="merge-request-item">
-              <div class="mr-header">
-                <span class="mr-title">{{ mr.title }}</span>
-                <el-tag :type="getMrStatusType(mr.status)">{{ mr.status }}</el-tag>
-              </div>
-              <div class="mr-info">
-                <span
-                  >源: <b>{{ mr.source }}</b></span
-                >
-                <el-icon><ArrowRight /></el-icon>
-                <span
-                  >目标: <b>{{ mr.target }}</b></span
-                >
-              </div>
-              <div class="mr-actions">
-                <span class="mr-author">{{ mr.author }} · {{ formatDate(mr.date) }}</span>
-                <div>
-                  <el-button size="small" @click="viewMergeRequest(mr)">查看</el-button>
-                  <el-button
-                    size="small"
-                    type="success"
-                    :disabled="mr.status !== '待合并'"
-                    @click="approveMergeRequest(mr)"
-                  >
-                    合并
-                  </el-button>
-                </div>
-              </div>
-            </div>
-          </div>
-          <el-empty v-else description="暂无待处理的合并请求" />
-        </el-card>
-      </el-col>
-    </el-row>
-=======
     <a-row :gutter="20">
       <a-col :xs="24" :lg="16">
-        <BranchesList 
+        <BranchesList
           :branches="branches"
           :loading="loading"
           :format-date="formatDate"
@@ -214,7 +24,7 @@
       </a-col>
 
       <a-col :xs="24" :lg="8">
-        <BranchSidebar 
+        <BranchSidebar
           :branch-stats="branchStats"
           :merge-requests="mergeRequests"
           :format-date="formatDate"
@@ -223,105 +33,31 @@
         />
       </a-col>
     </a-row>
->>>>>>> Stashed changes
 
-    <!-- 新建分支对话框 -->
-    <el-dialog v-model="createBranchDialog.visible" title="新建分支" width="500px" destroy-on-close>
-      <el-form :model="createBranchDialog.form" label-width="120px">
-        <el-form-item label="源分支">
-          <el-select v-model="createBranchDialog.form.sourceBranch" placeholder="选择源分支">
-            <el-option
-              v-for="branch in branches"
-              :key="branch.name"
-              :label="branch.name"
-              :value="branch.name"
-            />
-          </el-select>
-        </el-form-item>
-        <el-form-item label="新分支名称">
-          <el-input v-model="createBranchDialog.form.name" placeholder="输入新分支名称" />
-        </el-form-item>
-        <el-form-item label="描述">
-          <el-input
-            v-model="createBranchDialog.form.description"
-            type="textarea"
-            placeholder="分支描述（可选）"
-          />
-        </el-form-item>
-      </el-form>
-      <template #footer>
-        <span class="dialog-footer">
-          <el-button @click="createBranchDialog.visible = false">取消</el-button>
-          <el-button type="primary" @click="doCreateBranch">创建</el-button>
-        </span>
-      </template>
-    </el-dialog>
+    <CreateBranchDialog
+      v-model:visible="createBranchDialog.visible"
+      :form="createBranchDialog.form"
+      :branches="branches"
+      @create="doCreateBranch"
+    />
 
-    <!-- 合并分支对话框 -->
-    <el-dialog v-model="mergeBranchDialog.visible" title="合并分支" width="500px" destroy-on-close>
-      <el-form :model="mergeBranchDialog.form" label-width="120px">
-        <el-form-item label="源分支">
-          <el-input v-model="mergeBranchDialog.form.sourceBranch" disabled />
-        </el-form-item>
-        <el-form-item label="目标分支">
-          <el-select v-model="mergeBranchDialog.form.targetBranch" placeholder="选择目标分支">
-            <el-option
-              v-for="branch in branches.filter(
-                (b) => b.name !== mergeBranchDialog.form.sourceBranch
-              )"
-              :key="branch.name"
-              :label="branch.name"
-              :value="branch.name"
-            />
-          </el-select>
-        </el-form-item>
-        <el-form-item label="合并方式">
-          <el-radio-group v-model="mergeBranchDialog.form.mergeType">
-            <el-radio :value="'merge'">普通合并 (Merge)</el-radio>
-            <el-radio :value="'rebase'">变基 (Rebase)</el-radio>
-            <el-radio :value="'squash'">压缩提交 (Squash)</el-radio>
-          </el-radio-group>
-        </el-form-item>
-        <el-form-item label="合并信息">
-          <el-input
-            v-model="mergeBranchDialog.form.message"
-            type="textarea"
-            placeholder="合并提交信息"
-          />
-        </el-form-item>
-      </el-form>
-      <template #footer>
-        <span class="dialog-footer">
-          <el-button @click="mergeBranchDialog.visible = false">取消</el-button>
-          <el-button type="primary" @click="doMergeBranch">合并</el-button>
-        </span>
-      </template>
-    </el-dialog>
+    <MergeBranchDialog
+      v-model:visible="mergeBranchDialog.visible"
+      :form="mergeBranchDialog.form"
+      :branches="branches"
+      @merge="doMergeBranch"
+    />
   </div>
 </template>
 
 <script setup lang="ts">
-<<<<<<< Updated upstream
-import { ref, computed, onMounted, reactive } from 'vue'
-import { ElMessage, ElMessageBox } from 'element-plus'
-import {
-  RefreshRight,
-  Plus,
-  Search,
-  Star,
-  Connection,
-  Share,
-  ArrowRight
-} from '@element-plus/icons-vue'
-=======
-import { ref, onMounted, reactive } from 'vue'
+import { ref, onMounted, reactive, computed } from 'vue'
 import { message, Modal } from 'ant-design-vue' // Changed from ElMessage, ElMessageBox
 import BranchesToolbar from '@/components/BranchesView/BranchesToolbar.vue'
 import BranchesList from '@/components/BranchesView/BranchesList.vue'
 import BranchSidebar from '@/components/BranchesView/BranchSidebar.vue'
 import CreateBranchDialog from '@/components/BranchesView/CreateBranchDialog.vue'
 import MergeBranchDialog from '@/components/BranchesView/MergeBranchDialog.vue'
->>>>>>> Stashed changes
 import dayjs from 'dayjs'
 
 // 仓库数据
@@ -706,8 +442,8 @@ const initBranchGraph = () => {
       container.innerHTML = `
         <div style="display: flex; flex-direction: column; align-items: center;">
           <div style="margin: 10px 0;">图表加载中，这里将显示分支关系图</div>
-          <img src="https://git-scm.com/book/en/v2/images/advance-master.png" 
-               alt="Branch Graph Example" 
+          <img src="https://git-scm.com/book/en/v2/images/advance-master.png"
+               alt="Branch Graph Example"
                style="max-width: 100%; height: auto;" />
         </div>
       `
@@ -753,132 +489,9 @@ onMounted(() => {
   flex-wrap: wrap;
 }
 
-.filter-item {
-  min-width: 180px;
-}
-
-.card-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.search-input {
-  max-width: 250px;
-}
-
-.branches-table-card {
-  margin-bottom: 20px;
-}
-
-.branch-visualization-card {
-  margin-bottom: 20px;
-}
-
-.branch-detail {
-  padding: 15px;
-}
-
-.branch-status {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.branch-name {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.branch-graph-container {
-  height: 300px;
-  background-color: var(--color-background-soft);
-  border-radius: 4px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin-bottom: 20px;
-  overflow: hidden;
-}
-
-.branch-stats {
-  padding: 10px 0;
-}
-
-.stat-item {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-}
-
-.stat-value {
-  font-size: 24px;
-  font-weight: bold;
-  color: var(--color-primary);
-}
-
-.stat-label {
-  font-size: 14px;
-  color: var(--color-text-light);
-}
-
-.merge-requests-card {
-  margin-bottom: 20px;
-}
-
-.merge-request-item {
-  padding: 12px;
-  border-bottom: 1px solid var(--color-border);
-}
-
-.merge-request-item:last-child {
-  border-bottom: none;
-}
-
-.mr-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 8px;
-}
-
-.mr-title {
-  font-weight: 500;
-}
-
-.mr-info {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-bottom: 8px;
-  font-size: 14px;
-  color: var(--color-text-light);
-}
-
-.mr-actions {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.mr-author {
-  font-size: 13px;
-  color: var(--color-text-light);
-}
-
-.mr-5 {
-  margin-right: 5px;
-}
-
 @media (max-width: 768px) {
   .branches-actions {
     flex-direction: column;
-  }
-
-  .filter-item {
-    width: 100%;
   }
 }
 </style>
