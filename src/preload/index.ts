@@ -1,6 +1,8 @@
 import { contextBridge, ipcRenderer } from 'electron'
 import { electronAPI } from '@electron-toolkit/preload'
 
+console.log('Preload script loaded and exposing API');
+
 interface GitCommit {
   repository: string
   repoPath: string

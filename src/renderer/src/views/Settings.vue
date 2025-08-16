@@ -181,12 +181,18 @@ const updateTheme = (theme: string) => {
 
 // 选择目录
 const selectDirectory = async () => {
-  // 这里应该用Electron的dialog选择目录
-  // 以下是模拟效果
-  setTimeout(() => {
-    settings.git.repositoryPath = 'D:\\Projects\\GitRepositories'
-    message.success('已选择目录：' + settings.git.repositoryPath)
-  }, 500)
+  try {
+    const result = await window.api.selectDirectory()
+    if (result) {
+      settings.git.repositoryPath = result
+      message.success('已选择目录：' + result)
+    } else {
+      message.info('未选择目录')
+    }
+  } catch (error) {
+    console.error('选择目录失败:', error)
+    message.error('选择目录失败')
+  }
 }
 
 // 组件挂载时加载设置
