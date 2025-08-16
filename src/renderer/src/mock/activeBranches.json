@@ -1,0 +1,22 @@
+[
+  {
+    "name": "main",
+    "lastCommitDate": "2023-09-15T14:30:00",
+    "commitCount": 785
+  },
+  {
+    "name": "dev",
+    "lastCommitDate": "2023-09-15T13:45:00",
+    "commitCount": 682
+  },
+  {
+    "name": "feature/analytics",
+    "lastCommitDate": "2023-09-14T16:20:00",
+    "commitCount": 128
+  },
+  {
+    "name": "feature/reports",
+    "lastCommitDate": "2023-09-13T11:10:00",
+    "commitCount": 86
+  }
+]

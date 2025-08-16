@@ -1,0 +1,29 @@
+[
+  {
+    "id": 1,
+    "title": "实现报表导出功能",
+    "source": "feature/reports",
+    "target": "dev",
+    "status": "待合并",
+    "author": "赵六",
+    "date": "2023-09-12T11:30:00"
+  },
+  {
+    "id": 2,
+    "title": "完成新版仪表盘UI",
+    "source": "feature/dashboard",
+    "target": "dev",
+    "status": "审核中",
+    "author": "王五",
+    "date": "2023-09-13T17:45:00"
+  },
+  {
+    "id": 3,
+    "title": "修复认证模块问题",
+    "source": "dev",
+    "target": "main",
+    "status": "已通过",
+    "author": "李四",
+    "date": "2023-09-14T14:20:00"
+  }
+]

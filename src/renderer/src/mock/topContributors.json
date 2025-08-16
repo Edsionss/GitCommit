@@ -1,0 +1,38 @@
+[
+  {
+    "name": "张三",
+    "email": "zhangsan@example.com",
+    "commits": 463,
+    "additions": 28540,
+    "deletions": 12136,
+    "percentage": 36,
+    "color": "#67C23A"
+  },
+  {
+    "name": "李四",
+    "email": "lisi@example.com",
+    "commits": 356,
+    "additions": 23684,
+    "deletions": 9728,
+    "percentage": 28,
+    "color": "#409EFF"
+  },
+  {
+    "name": "王五",
+    "email": "wangwu@example.com",
+    "commits": 252,
+    "additions": 18105,
+    "deletions": 7125,
+    "percentage": 20,
+    "color": "#E6A23C"
+  },
+  {
+    "name": "赵六",
+    "email": "zhaoliu@example.com",
+    "commits": 203,
+    "additions": 11446,
+    "deletions": 5834,
+    "percentage": 16,
+    "color": "#F56C6C"
+  }
+]
