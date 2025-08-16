@@ -6,42 +6,41 @@
     </div>
     <div class="header-actions">
       <div class="repo-selector">
-        <el-select v-model="currentRepo" placeholder="选择仓库" filterable>
-          <el-option
+        <a-select v-model:value="currentRepo" placeholder="选择仓库" show-search :filter-option="filterOption">
+          <a-select-option
             v-for="repo in repositories"
             :key="repo.id"
-            :label="repo.name"
             :value="repo.id"
-          />
-        </el-select>
-        <el-button class="add-repo-btn" circle size="small" @click="openAddRepoDialog">
-          <el-icon><Plus /></el-icon>
-        </el-button>
+          >{{ repo.name }}</a-select-option>
+        </a-select>
+        <a-button class="add-repo-btn" type="primary" shape="circle" size="small" @click="openAddRepoDialog">
+          <template #icon><PlusOutlined /></template>
+        </a-button>
       </div>
 
       <div class="user-menu">
-        <el-dropdown trigger="click">
+        <a-dropdown trigger="click">
           <div class="user-avatar">
-            <el-avatar :size="36" :src="userAvatar"></el-avatar>
-            <el-icon class="el-icon--right"><ArrowDown /></el-icon>
+            <a-avatar :size="36" :src="userAvatar"></a-avatar>
+            <DownOutlined />
           </div>
-          <template #dropdown>
-            <el-dropdown-menu>
-              <el-dropdown-item @click="goToSettings">
-                <el-icon><Setting /></el-icon>
+          <template #overlay>
+            <a-menu>
+              <a-menu-item key="settings" @click="goToSettings">
+                <SettingOutlined />
                 <span>设置</span>
-              </el-dropdown-item>
-              <el-dropdown-item @click="refreshApp">
-                <el-icon><RefreshRight /></el-icon>
+              </a-menu-item>
+              <a-menu-item key="refresh" @click="refreshApp">
+                <ReloadOutlined />
                 <span>刷新</span>
-              </el-dropdown-item>
-              <el-dropdown-item divided @click="exitApp">
-                <el-icon><SwitchButton /></el-icon>
+              </a-menu-item>
+              <a-menu-item key="exit" @click="exitApp">
+                <LogoutOutlined />
                 <span>退出</span>
-              </el-dropdown-item>
-            </el-dropdown-menu>
+              </a-menu-item>
+            </a-menu>
           </template>
-        </el-dropdown>
+        </a-dropdown>
       </div>
     </div>
   </div>
@@ -50,7 +49,7 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
-import { Plus, ArrowDown, Setting, RefreshRight, SwitchButton } from '@element-plus/icons-vue'
+import { PlusOutlined, DownOutlined, SettingOutlined, ReloadOutlined, LogoutOutlined } from '@ant-design/icons-vue'
 
 const router = useRouter()
 const route = useRoute()
@@ -81,6 +80,11 @@ const currentRepo = ref(1)
 
 // 用户头像
 const userAvatar = ref('https://i.pravatar.cc/150?u=gitcommit')
+
+// Select组件的过滤方法
+const filterOption = (input: string, option: any) => {
+  return option.children[0].toLowerCase().indexOf(input.toLowerCase()) >= 0;
+};
 
 // 打开添加仓库对话框
 const openAddRepoDialog = () => {
@@ -170,10 +174,6 @@ const exitApp = () => {
   align-items: center;
   gap: 8px;
   cursor: pointer;
-}
-
-.el-dropdown-menu .el-icon {
-  margin-right: 8px;
 }
 
 /* 当侧边栏展开时调整头部位置 */

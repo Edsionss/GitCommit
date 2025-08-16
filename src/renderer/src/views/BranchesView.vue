@@ -22,6 +22,7 @@
       </div>
     </div>
 
+<<<<<<< Updated upstream
     <el-row :gutter="20">
       <el-col :xs="24" :lg="16">
         <el-card class="branches-table-card" v-loading="loading">
@@ -199,6 +200,30 @@
         </el-card>
       </el-col>
     </el-row>
+=======
+    <a-row :gutter="20">
+      <a-col :xs="24" :lg="16">
+        <BranchesList 
+          :branches="branches"
+          :loading="loading"
+          :format-date="formatDate"
+          @checkout="checkoutBranch"
+          @merge="mergeBranch"
+          @delete="deleteBranch"
+        />
+      </a-col>
+
+      <a-col :xs="24" :lg="8">
+        <BranchSidebar 
+          :branch-stats="branchStats"
+          :merge-requests="mergeRequests"
+          :format-date="formatDate"
+          @view-merge-request="viewMergeRequest"
+          @approve-merge-request="approveMergeRequest"
+        />
+      </a-col>
+    </a-row>
+>>>>>>> Stashed changes
 
     <!-- 新建分支对话框 -->
     <el-dialog v-model="createBranchDialog.visible" title="新建分支" width="500px" destroy-on-close>
@@ -276,6 +301,7 @@
 </template>
 
 <script setup lang="ts">
+<<<<<<< Updated upstream
 import { ref, computed, onMounted, reactive } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import {
@@ -287,6 +313,15 @@ import {
   Share,
   ArrowRight
 } from '@element-plus/icons-vue'
+=======
+import { ref, onMounted, reactive } from 'vue'
+import { message, Modal } from 'ant-design-vue' // Changed from ElMessage, ElMessageBox
+import BranchesToolbar from '@/components/BranchesView/BranchesToolbar.vue'
+import BranchesList from '@/components/BranchesView/BranchesList.vue'
+import BranchSidebar from '@/components/BranchesView/BranchSidebar.vue'
+import CreateBranchDialog from '@/components/BranchesView/CreateBranchDialog.vue'
+import MergeBranchDialog from '@/components/BranchesView/MergeBranchDialog.vue'
+>>>>>>> Stashed changes
 import dayjs from 'dayjs'
 
 // 仓库数据
@@ -466,7 +501,7 @@ const refreshBranches = () => {
 
   setTimeout(() => {
     loading.value = false
-    ElMessage.success('分支列表已刷新')
+    message.success('分支列表已刷新') // Changed from ElMessage
   }, 1000)
 }
 
@@ -481,7 +516,7 @@ const createBranch = () => {
 // 创建分支
 const doCreateBranch = () => {
   if (!createBranchDialog.form.name) {
-    ElMessage.warning('请输入分支名称')
+    message.warning('请输入分支名称') // Changed from ElMessage
     return
   }
 
@@ -512,23 +547,23 @@ const doCreateBranch = () => {
     branchStats.totalBranches++
     branchStats.activeBranches++
 
-    ElMessage.success(`已创建分支: ${createBranchDialog.form.name}`)
+    message.success(`已创建分支: ${createBranchDialog.form.name}`) // Changed from ElMessage
   }, 1000)
 }
 
 // 切换分支
 const checkoutBranch = (branch: any) => {
   if (branch.isRemote) {
-    ElMessage.warning('不能直接切换到远程分支')
+    message.warning('不能直接切换到远程分支') // Changed from ElMessage
     return
   }
 
-  ElMessageBox.confirm(`确定要切换到分支 "${branch.name}" 吗？`, '切换分支', {
-    confirmButtonText: '确定',
-    cancelButtonText: '取消',
-    type: 'warning'
-  })
-    .then(() => {
+  Modal.confirm({
+    title: '切换分支',
+    content: `确定要切换到分支 "${branch.name}" 吗？`,
+    okText: '确定',
+    cancelText: '取消',
+    onOk() {
       loading.value = true
 
       setTimeout(() => {
@@ -539,18 +574,19 @@ const checkoutBranch = (branch: any) => {
           b.current = b.name === branch.name
         })
 
-        ElMessage.success(`已切换到分支: ${branch.name}`)
+        message.success(`已切换到分支: ${branch.name}`) // Changed from ElMessage
       }, 1000)
-    })
-    .catch(() => {
+    },
+    onCancel() {
       // 用户取消操作
-    })
+    },
+  });
 }
 
 // 打开合并分支对话框
 const mergeBranch = (branch: any) => {
   if (branch.isRemote) {
-    ElMessage.warning('不能直接合并远程分支')
+    message.warning('不能直接合并远程分支') // Changed from ElMessage
     return
   }
 
@@ -564,7 +600,7 @@ const mergeBranch = (branch: any) => {
 // 执行分支合并
 const doMergeBranch = () => {
   if (!mergeBranchDialog.form.targetBranch) {
-    ElMessage.warning('请选择目标分支')
+    message.warning('请选择目标分支') // Changed from ElMessage
     return
   }
 
@@ -574,30 +610,31 @@ const doMergeBranch = () => {
     loading.value = false
     mergeBranchDialog.visible = false
 
-    ElMessage.success(
+    message.success(
       `已将分支 ${mergeBranchDialog.form.sourceBranch} 合并到 ${mergeBranchDialog.form.targetBranch}`
-    )
+    ) // Changed from ElMessage
   }, 1500)
 }
 
 // 删除分支
 const deleteBranch = (branch: any) => {
   if (branch.name === 'main') {
-    ElMessage.error('不能删除主分支')
+    message.error('不能删除主分支') // Changed from ElMessage
     return
   }
 
   if (branch.current) {
-    ElMessage.error('不能删除当前分支')
+    message.error('不能删除当前分支') // Changed from ElMessage
     return
   }
 
-  ElMessageBox.confirm(`确定要删除分支 "${branch.name}" 吗？此操作不可撤销。`, '删除分支', {
-    confirmButtonText: '删除',
-    cancelButtonText: '取消',
-    type: 'warning'
-  })
-    .then(() => {
+  Modal.confirm({
+    title: '删除分支',
+    content: `确定要删除分支 "${branch.name}" 吗？此操作不可撤销。`,
+    okText: '删除',
+    cancelText: '取消',
+    okType: 'danger',
+    onOk() {
       loading.value = true
 
       setTimeout(() => {
@@ -614,17 +651,18 @@ const deleteBranch = (branch: any) => {
           branchStats.activeBranches--
         }
 
-        ElMessage.success(`已删除分支: ${branch.name}`)
+        message.success(`已删除分支: ${branch.name}`) // Changed from ElMessage
       }, 1000)
-    })
-    .catch(() => {
+    },
+    onCancel() {
       // 用户取消操作
-    })
+    },
+  });
 }
 
 // 查看合并请求
 const viewMergeRequest = (mergeRequest: any) => {
-  ElMessage.info(`查看合并请求 #${mergeRequest.id}: ${mergeRequest.title}`)
+  message.info(`查看合并请求 #${mergeRequest.id}: ${mergeRequest.title}`) // Changed from ElMessage
 }
 
 // 批准并合并
@@ -633,12 +671,12 @@ const approveMergeRequest = (mergeRequest: any) => {
     return
   }
 
-  ElMessageBox.confirm(`确定要批准并合并请求 "${mergeRequest.title}" 吗？`, '批准合并请求', {
-    confirmButtonText: '批准并合并',
-    cancelButtonText: '取消',
-    type: 'warning'
-  })
-    .then(() => {
+  Modal.confirm({
+    title: '批准合并请求',
+    content: `确定要批准并合并请求 "${mergeRequest.title}" 吗？`,
+    okText: '批准并合并',
+    cancelText: '取消',
+    onOk() {
       loading.value = true
 
       setTimeout(() => {
@@ -647,12 +685,13 @@ const approveMergeRequest = (mergeRequest: any) => {
         // 更新合并请求状态
         mergeRequest.status = '已通过'
 
-        ElMessage.success(`已批准并合并: ${mergeRequest.title}`)
+        message.success(`已批准并合并: ${mergeRequest.title}`) // Changed from ElMessage
       }, 1500)
-    })
-    .catch(() => {
+    },
+    onCancel() {
       // 用户取消操作
-    })
+    },
+  });
 }
 
 // 初始化分支图

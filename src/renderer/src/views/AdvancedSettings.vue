@@ -1,80 +1,81 @@
 <template>
   <div class="router-view-container">
     <div class="advanced-settings">
-      <el-card class="settings-card">
-        <template #header>
+      <a-card class="settings-card">
+        <template #title>
           <div class="card-header">
             <span>高级设置</span>
-            <el-icon><Setting /></el-icon>
+            <SettingOutlined />
           </div>
         </template>
-        <el-form :model="form" label-width="120px">
+        <a-form :model="form" :label-col="{ span: 6 }" :wrapper-col="{ span: 16 }">
           <!-- 输出格式设置 -->
-          <el-form-item label="输出文件格式">
-            <el-radio-group v-model="form.outputFormat">
-              <el-radio label="csv">CSV</el-radio>
-              <el-radio label="json">JSON</el-radio>
-              <el-radio label="txt">TXT</el-radio>
-            </el-radio-group>
-          </el-form-item>
+          <a-form-item label="输出文件格式">
+            <a-radio-group v-model:value="form.outputFormat">
+              <a-radio value="csv">CSV</a-radio>
+              <a-radio value="json">JSON</a-radio>
+              <a-radio value="txt">TXT</a-radio>
+            </a-radio-group>
+          </a-form-item>
 
           <!-- 日期格式设置 -->
-          <el-form-item label="日期格式">
-            <el-select v-model="form.dateFormat" placeholder="选择日期格式">
-              <el-option label="YYYY-MM-DD" value="YYYY-MM-DD" />
-              <el-option label="YYYY/MM/DD" value="YYYY/MM/DD" />
-              <el-option label="DD/MM/YYYY" value="DD/MM/YYYY" />
-              <el-option label="MM/DD/YYYY" value="MM/DD/YYYY" />
-            </el-select>
-          </el-form-item>
+          <a-form-item label="日期格式">
+            <a-select v-model:value="form.dateFormat" placeholder="选择日期格式">
+              <a-select-option value="YYYY-MM-DD">YYYY-MM-DD</a-select-option>
+              <a-select-option value="YYYY/MM/DD">YYYY/MM/DD</a-select-option>
+              <a-select-option value="DD/MM/YYYY">DD/MM/YYYY</a-select-option>
+              <a-select-option value="MM/DD/YYYY">MM/DD/YYYY</a-select-option>
+            </a-select>
+          </a-form-item>
 
           <!-- 编码设置 -->
-          <el-form-item label="文件编码">
-            <el-select v-model="form.encoding" placeholder="选择文件编码">
-              <el-option label="UTF-8" value="utf8" />
-              <el-option label="GBK" value="gbk" />
-              <el-option label="GB2312" value="gb2312" />
-            </el-select>
-          </el-form-item>
+          <a-form-item label="文件编码">
+            <a-select v-model:value="form.encoding" placeholder="选择文件编码">
+              <a-select-option value="utf8">UTF-8</a-select-option>
+              <a-select-option value="gbk">GBK</a-select-option>
+              <a-select-option value="gb2312">GB2312</a-select-option>
+            </a-select>
+          </a-form-item>
 
           <!-- 输出目录设置 -->
-          <el-form-item label="输出目录">
-            <el-input v-model="form.outputDir" placeholder="请选择输出目录">
-              <template #append>
-                <el-button @click="selectOutputDir">
-                  <el-icon><Folder /></el-icon>
-                </el-button>
+          <a-form-item label="输出目录">
+            <a-input v-model:value="form.outputDir" placeholder="请选择输出目录">
+              <template #addonAfter>
+                <a-button @click="selectOutputDir">
+                  <FolderOutlined />
+                </a-button>
               </template>
-            </el-input>
-          </el-form-item>
+            </a-input>
+          </a-form-item>
 
           <!-- 日志设置 -->
-          <el-form-item label="日志级别">
-            <el-select v-model="form.logLevel" placeholder="选择日志级别">
-              <el-option label="DEBUG" value="debug" />
-              <el-option label="INFO" value="info" />
-              <el-option label="WARN" value="warn" />
-              <el-option label="ERROR" value="error" />
-            </el-select>
-          </el-form-item>
+          <a-form-item label="日志级别">
+            <a-select v-model:value="form.logLevel" placeholder="选择日志级别">
+              <a-select-option value="debug">DEBUG</a-select-option>
+              <a-select-option value="info">INFO</a-select-option>
+              <a-select-option value="warn">WARN</a-select-option>
+              <a-select-option value="error">ERROR</a-select-option>
+            </a-select>
+          </a-form-item>
 
           <!-- 保存设置 -->
-          <el-form-item>
+          <a-form-item>
             <div class="action-buttons">
-              <el-button type="primary" @click="saveSettings">保存设置</el-button>
-              <el-button @click="resetSettings">重置设置</el-button>
+              <a-button type="primary" @click="saveSettings">保存设置</a-button>
+              <a-button @click="resetSettings">重置设置</a-button>
             </div>
-          </el-form-item>
-        </el-form>
-      </el-card>
+          </a-form-item>
+        </a-form>
+      </a-card>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import { reactive } from 'vue'
-import { ElMessage } from 'element-plus'
-import { Setting, Folder } from '@element-plus/icons-vue'
+import { message } from 'ant-design-vue' // Changed from ElMessage
+import { SettingOutlined, FolderOutlined } from '@ant-design/icons-vue'
+import { Card, Form, FormItem, RadioGroup, Radio, Select, SelectOption, Input, Button, Textarea } from 'ant-design-vue';
 
 const form = reactive({
   outputFormat: 'csv',
@@ -92,14 +93,14 @@ const selectOutputDir = async () => {
     }
   } catch (error) {
     console.error('选择目录失败:', error)
-    ElMessage.error('选择目录失败')
+    message.error('选择目录失败') // Changed from ElMessage
   }
 }
 
 const saveSettings = () => {
   // 将设置保存到localStorage
   localStorage.setItem('appSettings', JSON.stringify(form))
-  ElMessage.success('设置已保存')
+  message.success('设置已保存') // Changed from ElMessage
 }
 
 const resetSettings = () => {
@@ -110,7 +111,7 @@ const resetSettings = () => {
   form.logLevel = 'info'
   // 清除保存的设置
   localStorage.removeItem('appSettings')
-  ElMessage.info('设置已重置')
+  message.info('设置已重置') // Changed from ElMessage
 }
 </script>
 
@@ -163,18 +164,17 @@ const resetSettings = () => {
   color: var(--text-primary);
 }
 
-.card-header .el-icon {
+.card-header .anticon {
   font-size: 20px;
   color: var(--primary-color);
   transition: transform var(--transition-normal);
 }
 
-.settings-card:hover .card-header .el-icon {
+.settings-card:hover .card-header .anticon {
   transform: rotate(45deg);
 }
 
-.el-radio-group,
-.el-select {
+.ant-radio-group {
   width: 100%;
   margin-bottom: var(--spacing-sm);
   display: flex;
@@ -182,7 +182,7 @@ const resetSettings = () => {
   gap: var(--spacing-lg);
 }
 
-.el-radio {
+.ant-radio-wrapper {
   padding: var(--spacing-xs) var(--spacing-sm);
   border-radius: var(--radius-sm);
   transition:
@@ -190,28 +190,24 @@ const resetSettings = () => {
     transform var(--transition-fast);
 }
 
-.el-radio:hover {
+.ant-radio-wrapper:hover {
   background-color: var(--hover-bg);
   transform: translateY(-2px);
 }
 
-.el-radio.is-checked {
+.ant-radio-wrapper-checked {
   background-color: var(--primary-color);
   color: white;
   padding: var(--spacing-xs) var(--spacing-sm);
   border-radius: var(--radius-sm);
 }
 
-.el-radio.is-checked .el-radio__label {
-  color: white !important;
-}
-
-.el-radio.is-checked .el-radio__inner {
+.ant-radio-wrapper-checked .ant-radio-inner {
   background-color: white !important;
   border-color: white !important;
 }
 
-.el-radio.is-checked .el-radio__inner::after {
+.ant-radio-wrapper-checked .ant-radio-inner::after {
   background-color: var(--primary-color) !important;
 }
 
@@ -223,18 +219,18 @@ const resetSettings = () => {
   justify-content: center;
 }
 
-.action-buttons .el-button {
+.action-buttons .ant-btn {
   min-width: 120px;
   transition: all var(--transition-normal);
 }
 
-.action-buttons .el-button:hover {
+.action-buttons .ant-btn:hover {
   transform: translateY(-3px);
   box-shadow: var(--shadow-md);
 }
 
 /* 表单项动画效果 */
-:deep(.el-form-item) {
+:deep(.ant-form-item) {
   transition: all var(--transition-normal);
   animation: slideIn 0.5s ease-out;
   animation-fill-mode: both;
@@ -251,33 +247,33 @@ const resetSettings = () => {
   }
 }
 
-:deep(.el-form-item:nth-child(1)) {
+:deep(.ant-form-item:nth-child(1)) {
   animation-delay: 0.1s;
 }
-:deep(.el-form-item:nth-child(2)) {
+:deep(.ant-form-item:nth-child(2)) {
   animation-delay: 0.2s;
 }
-:deep(.el-form-item:nth-child(3)) {
+:deep(.ant-form-item:nth-child(3)) {
   animation-delay: 0.3s;
 }
-:deep(.el-form-item:nth-child(4)) {
+:deep(.ant-form-item:nth-child(4)) {
   animation-delay: 0.4s;
 }
-:deep(.el-form-item:nth-child(5)) {
+:deep(.ant-form-item:nth-child(5)) {
   animation-delay: 0.5s;
 }
-:deep(.el-form-item:nth-child(6)) {
+:deep(.ant-form-item:nth-child(6)) {
   animation-delay: 0.6s;
 }
 
 /* 表单标签样式 */
-:deep(.el-form-item__label) {
+:deep(.ant-form-item-label label) {
   font-weight: var(--font-weight-medium);
   color: var(--text-primary);
 }
 
 /* 输入框样式 */
-:deep(.el-input__wrapper) {
+:deep(.ant-input-affix-wrapper) {
   box-shadow:
     var(--shadow-inset),
     0 0 0 1px var(--border-color) inset !important;
@@ -285,13 +281,13 @@ const resetSettings = () => {
   border-radius: var(--radius-md);
 }
 
-:deep(.el-input__wrapper:hover) {
+:deep(.ant-input-affix-wrapper:hover) {
   box-shadow:
     var(--shadow-inset),
     0 0 0 1px var(--primary-color) inset !important;
 }
 
-:deep(.el-input.is-focus .el-input__wrapper) {
+:deep(.ant-input-focused) {
   box-shadow:
     var(--shadow-inset),
     0 0 0 1px var(--primary-color) inset !important;
@@ -299,21 +295,21 @@ const resetSettings = () => {
 }
 
 /* 下拉选择框样式 */
-:deep(.el-select .el-input__wrapper) {
+:deep(.ant-select-selector) {
   border-radius: var(--radius-md);
 }
 
-:deep(.el-select-dropdown__item) {
+:deep(.ant-select-item) {
   padding: 8px 20px;
 }
 
-:deep(.el-select-dropdown__item.selected) {
+:deep(.ant-select-item-option-selected) {
   background-color: var(--hover-bg);
   color: var(--primary-color);
   font-weight: var(--font-weight-medium);
 }
 
-:deep(.el-form-item:last-child) {
+:deep(.ant-form-item:last-child) {
   margin-top: var(--spacing-xl);
   border-top: var(--border);
   padding-top: var(--spacing-lg);

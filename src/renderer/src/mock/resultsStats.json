@@ -1,0 +1,47 @@
+{
+  "totalCommits": 1234,
+  "totalRepositories": 3,
+  "totalAuthors": 10,
+  "totalFilesChanged": 5678,
+  "totalInsertions": 123456,
+  "totalDeletions": 78901,
+  "authorStats": [
+    {
+      "name": "Author A",
+      "count": 50,
+      "percentage": 0.5,
+      "filesChanged": 100,
+      "insertions": 5000,
+      "deletions": 2000
+    },
+    {
+      "name": "Author B",
+      "count": 30,
+      "percentage": 0.3,
+      "filesChanged": 60,
+      "insertions": 3000,
+      "deletions": 1000
+    }
+  ],
+  "dateStats": [
+    {
+      "name": "2023-01-01",
+      "count": 10,
+      "percentage": 0.1,
+      "filesChanged": 20,
+      "insertions": 1000,
+      "deletions": 500
+    }
+  ],
+  "repositoryStats": [
+    {
+      "name": "Repo X",
+      "count": 80,
+      "percentage": 0.8,
+      "filesChanged": 150,
+      "insertions": 8000,
+      "deletions": 3000
+    }
+  ],
+  "hourStats": []
+}

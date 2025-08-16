@@ -3,26 +3,22 @@
     <div class="contributors-header">
       <h2 class="page-title">贡献者分析</h2>
       <div class="contributors-actions">
-        <el-select v-model="selectedRepo" placeholder="选择仓库" class="filter-item">
-          <el-option
+        <a-select v-model:value="selectedRepo" placeholder="选择仓库" class="filter-item">
+          <a-select-option
             v-for="repo in repositories"
             :key="repo.id"
-            :label="repo.name"
             :value="repo.id"
-          />
-        </el-select>
-        <el-date-picker
-          v-model="dateRange"
-          type="daterange"
-          range-separator="至"
-          start-placeholder="开始日期"
-          end-placeholder="结束日期"
+          >{{ repo.name }}</a-select-option>
+        </a-select>
+        <a-range-picker
+          v-model:value="dateRange"
+          :placeholder="['开始日期', '结束日期']"
           class="filter-item"
         />
-        <el-button type="primary" @click="analyzeContributors">
-          <el-icon class="mr-5"><DataAnalysis /></el-icon>
+        <a-button type="primary" @click="analyzeContributors">
+          <template #icon><BarChartOutlined /></template>
           分析
-        </el-button>
+        </a-button>
       </div>
     </div>
 
@@ -81,6 +77,7 @@
       </el-col>
     </el-row>
 
+<<<<<<< Updated upstream
     <el-row :gutter="20" class="content-row">
       <el-col :span="16">
         <el-card class="contributors-list-card">
@@ -215,10 +212,38 @@
         </el-card>
       </el-col>
     </el-row>
+=======
+    <a-row :gutter="20" class="content-row">
+      <a-col :span="16">
+        <ContributorsList 
+          :contributors="contributors"
+          :loading="loading"
+          :total-commits="contributorStats.totalCommits"
+          :format-date="formatDate"
+          :format-number="formatNumber"
+          :get-initials="getInitials"
+          :get-contributor-color="getContributorColor"
+          @select="selectContributor"
+        />
+      </a-col>
+
+      <a-col :span="8">
+        <ContributorDetails 
+          :contributor="selectedContributor"
+          :all-contributors="contributors"
+          :get-initials="getInitials"
+          :format-number="formatNumber"
+          :get-contributor-color="getContributorColor"
+          @clear="clearSelectedContributor"
+        />
+      </a-col>
+    </a-row>
+>>>>>>> Stashed changes
   </div>
 </template>
 
 <script setup lang="ts">
+<<<<<<< Updated upstream
 import { ref, computed, onMounted, reactive } from 'vue'
 import {
   User,
@@ -239,6 +264,15 @@ import {
   GridComponent
 } from 'echarts/components'
 import { CanvasRenderer } from 'echarts/renderers'
+=======
+import { ref, reactive } from 'vue'
+import { message } from 'ant-design-vue' // Changed from ElMessage
+import ContributorsStats from '@/components/ContributorsView/ContributorsStats.vue'
+import ContributorsList from '@/components/ContributorsView/ContributorsList.vue'
+import ContributorDetails from '@/components/ContributorsView/ContributorDetails.vue'
+import { Select, DatePicker, Button, Row, Col } from 'ant-design-vue';
+import { BarChartOutlined } from '@ant-design/icons-vue';
+>>>>>>> Stashed changes
 
 // 注册ECharts组件
 echarts.use([
@@ -566,6 +600,7 @@ const analyzeContributors = () => {
   loading.value = true
 
   setTimeout(() => {
+<<<<<<< Updated upstream
     loading.value = false
     ElMessage.success('贡献者分析已完成')
   }, 800)
@@ -575,6 +610,12 @@ const analyzeContributors = () => {
 onMounted(() => {
   initCommitsPieChart()
 })
+=======
+    loading.value = false;
+    message.success('贡献者分析已完成'); // Changed from ElMessage
+  }, 800);
+};
+>>>>>>> Stashed changes
 </script>
 
 <style scoped>

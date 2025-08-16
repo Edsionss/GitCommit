@@ -1,293 +1,45 @@
 <template>
   <div class="router-view-container">
     <div class="table-view">
-      <el-card class="control-panel">
-        <template #header>
-          <div class="card-header">
-            <span>数据控制</span>
-          </div>
-        </template>
-        <div class="controls">
-          <div class="filter-section">
-            <el-input
-              v-model="searchQuery"
-              placeholder="搜索提交信息、作者或ID"
-              class="search-input"
-              clearable
-              :prefix-icon="Search"
-            >
-              <template #prepend>
-                <el-select v-model="searchField" placeholder="搜索字段" style="width: 120px">
-                  <el-option label="全部字段" value="all" />
-                  <el-option label="提交消息" value="message" />
-                  <el-option label="作者" value="author" />
-                  <el-option label="提交ID" value="commitId" />
-                  <el-option label="邮箱" value="email" />
-                </el-select>
-              </template>
-            </el-input>
+            <TableControlPanel 
+        v-model:searchQuery="searchQuery"
+        v-model:searchField="searchField"
+        :filters="filters"
+        :has-filters="hasFilters"
+        :filtered-data-length="filteredData.length"
+        :format-date-range="formatDateRange"
+        @removeFilter="removeFilter"
+        @clearAllFilters="clearAllFilters"
+        @exportData="exportData"
+        @goToResults="goToResults"
+        @handleCommand="handleCommand"
+      />
 
-            <div class="advanced-filters">
-              <div class="filter-label">高级筛选：</div>
-              <el-tag
-                v-if="filters.author"
-                closable
-                @close="removeFilter('author')"
-                class="filter-tag"
-                type="primary"
-              >
-                作者: {{ filters.author }}
-              </el-tag>
-              <el-tag
-                v-if="filters.dateRange"
-                closable
-                @close="removeFilter('dateRange')"
-                class="filter-tag"
-                type="success"
-              >
-                日期: {{ formatDateRange(filters.dateRange) }}
-              </el-tag>
-              <el-tag
-                v-if="filters.repository"
-                closable
-                @close="removeFilter('repository')"
-                class="filter-tag"
-                type="warning"
-              >
-                仓库: {{ filters.repository }}
-              </el-tag>
-              <el-button v-if="hasFilters" size="small" type="info" @click="clearAllFilters">
-                清除全部
-              </el-button>
-            </div>
-          </div>
-
-          <div class="action-section">
-            <div class="count-info">总数: {{ filteredData.length }} 条提交记录</div>
-            <div class="button-group">
-              <el-button type="primary" @click="exportData" :disabled="filteredData.length === 0">
-                <el-icon><Download /></el-icon> 导出数据
-              </el-button>
-              <el-tooltip content="使用统计" placement="top">
-                <el-button @click="goToResults" :disabled="filteredData.length === 0">
-                  <el-icon><DataAnalysis /></el-icon>
-                </el-button>
-              </el-tooltip>
-              <el-dropdown @command="handleCommand">
-                <el-button>
-                  <el-icon><Setting /></el-icon>
-                  <el-icon><ArrowDown /></el-icon>
-                </el-button>
-                <template #dropdown>
-                  <el-dropdown-menu>
-                    <el-dropdown-item command="settings">设置</el-dropdown-item>
-                    <el-dropdown-item command="toggleColumns">选择列</el-dropdown-item>
-                    <el-dropdown-item command="exportCSV">导出为CSV</el-dropdown-item>
-                    <el-dropdown-item command="exportExcel">导出为Excel</el-dropdown-item>
-                    <el-dropdown-item command="refresh">刷新数据</el-dropdown-item>
-                  </el-dropdown-menu>
-                </template>
-              </el-dropdown>
-            </div>
-          </div>
-        </div>
-      </el-card>
-
-      <!-- 表格组件 -->
-      <el-card class="table-card">
-        <template #header>
-          <div class="card-header">
-            <span>Git提交历史</span>
-            <div v-if="selectedRows.length > 0" class="selection-actions">
-              <span class="selection-count">已选择 {{ selectedRows.length }} 项</span>
-              <el-button size="small" @click="exportSelected" type="primary">导出选中项</el-button>
-              <el-button size="small" @click="clearSelection" type="info">取消选择</el-button>
-            </div>
-          </div>
-        </template>
-
-        <el-table
-          v-loading="loading"
-          :data="paginatedData"
-          stripe
-          border
-          style="width: 100%"
-          :max-height="tableHeight"
-          @selection-change="handleSelectionChange"
-          :row-class-name="rowClassName"
-          highlight-current-row
-        >
-          <!-- 表格列 -->
-          <el-table-column type="selection" width="55" fixed="left" />
-          <el-table-column type="index" label="#" width="60" fixed="left" />
-
-          <el-table-column
-            v-if="columns.repository"
-            prop="repository"
-            label="仓库"
-            min-width="150"
-            sortable
-          >
-            <template #default="{ row }">
-              <div class="repo-cell">
-                <el-tag effect="dark">{{ row.repository }}</el-tag>
-              </div>
-            </template>
-          </el-table-column>
-
-          <el-table-column
-            v-if="columns.shortHash"
-            prop="shortHash"
-            label="提交ID"
-            min-width="100"
-            sortable
-          >
-            <template #default="{ row }">
-              <div class="hash-cell">
-                <span @click="copyToClipboard(row.commitId)" class="copy-icon">
-                  <el-icon><DocumentCopy /></el-icon>
-                </span>
-                <el-tooltip
-                  :content="row.commitId"
-                  placement="top"
-                  :show-after="500"
-                  :hide-after="2000"
-                >
-                  <span class="hash-value">{{ row.shortHash }}</span>
-                </el-tooltip>
-              </div>
-            </template>
-          </el-table-column>
-
-          <el-table-column
-            v-if="columns.author"
-            prop="author"
-            label="作者"
-            min-width="120"
-            sortable
-          >
-            <template #default="{ row }">
-              <div
-                class="author-cell"
-                @click="applyFilter('author', row.author)"
-                :title="`筛选作者: ${row.author}`"
-              >
-                <el-avatar :size="24" class="author-avatar">
-                  {{ row.author ? row.author.substring(0, 1).toUpperCase() : '?' }}
-                </el-avatar>
-                <span class="author-name">{{ row.author }}</span>
-              </div>
-            </template>
-          </el-table-column>
-
-          <el-table-column
-            v-if="columns.email"
-            prop="email"
-            label="邮箱"
-            min-width="180"
-            show-overflow-tooltip
-          />
-
-          <el-table-column v-if="columns.date" prop="date" label="日期" min-width="180" sortable>
-            <template #default="{ row }">
-              <div
-                class="date-cell"
-                @click="applyFilter('dateRange', [row.date, row.date])"
-                :title="`筛选日期: ${formatDate(row.date)}`"
-              >
-                <el-icon><Calendar /></el-icon>
-                <span>{{ formatDate(row.date) }}</span>
-              </div>
-            </template>
-          </el-table-column>
-
-          <el-table-column
-            v-if="columns.message"
-            prop="message"
-            label="提交消息"
-            min-width="300"
-            show-overflow-tooltip
-          >
-            <template #default="{ row }">
-              <div class="message-cell">
-                <span v-if="hasTags(row.message)" class="message-tags">
-                  <el-tag
-                    v-for="tag in extractTags(row.message)"
-                    :key="tag"
-                    size="small"
-                    class="message-tag"
-                  >
-                    {{ tag }}
-                  </el-tag>
-                </span>
-                <span class="message-text">{{ cleanMessage(row.message) }}</span>
-              </div>
-            </template>
-          </el-table-column>
-
-          <el-table-column
-            v-if="columns.filesChanged"
-            label="文件变更"
-            min-width="100"
-            :formatter="formatNumber"
-            prop="filesChanged"
-            sortable
-          />
-
-          <el-table-column
-            v-if="columns.insertions"
-            label="新增"
-            min-width="80"
-            prop="insertions"
-            sortable
-          >
-            <template #default="{ row }">
-              <span class="insertion">+{{ row.insertions }}</span>
-            </template>
-          </el-table-column>
-
-          <el-table-column
-            v-if="columns.deletions"
-            label="删除"
-            min-width="80"
-            prop="deletions"
-            sortable
-          >
-            <template #default="{ row }">
-              <span class="deletion">-{{ row.deletions }}</span>
-            </template>
-          </el-table-column>
-
-          <el-table-column label="操作" width="120" fixed="right">
-            <template #default="{ row }">
-              <div class="action-cell">
-                <el-tooltip content="查看详情" placement="top">
-                  <el-button circle size="small" @click="viewDetails(row)">
-                    <el-icon><View /></el-icon>
-                  </el-button>
-                </el-tooltip>
-                <el-tooltip content="复制ID" placement="top">
-                  <el-button circle size="small" @click="copyToClipboard(row.commitId)">
-                    <el-icon><DocumentCopy /></el-icon>
-                  </el-button>
-                </el-tooltip>
-              </div>
-            </template>
-          </el-table-column>
-        </el-table>
-
-        <!-- 分页控件 -->
-        <div class="pagination-container">
-          <el-pagination
-            v-model:current-page="currentPage"
-            v-model:page-size="pageSize"
-            :page-sizes="[10, 20, 50, 100]"
-            layout="total, sizes, prev, pager, next, jumper"
-            :total="filteredData.length"
-            background
-          />
-        </div>
-      </el-card>
+      <CommitTable 
+        :loading="loading"
+        :paginated-data="paginatedData"
+        :table-height="tableHeight"
+        :columns="columns"
+        :format-number="formatNumber"
+        :format-date="formatDate"
+        :format-date-range="formatDateRange"
+        :has-tags="hasTags"
+        :extract-tags="extractTags"
+        :clean-message="cleanMessage"
+        :copy-to-clipboard="copyToClipboard"
+        :view-details="viewDetails"
+        :selected-rows="selectedRows"
+        :current-page="currentPage"
+        :page-size="pageSize"
+        :filtered-data-length="filteredData.length"
+        @update:currentPage="currentPage = $event"
+        @update:pageSize="pageSize = $event"
+        @exportSelected="exportSelected"
+        @clearSelection="clearSelection"
+        @selectionChange="handleSelectionChange"
+        @applyFilter="applyFilter"
+        @tableChange="handleTableChange"
+      />
 
       <!-- 详情抽屉 -->
       <el-drawer v-model="detailsVisible" title="提交详情" size="50%" direction="rtl">
@@ -376,17 +128,8 @@ import { gitService } from '../services/GitService'
 import { useRouter } from 'vue-router'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import dayjs from 'dayjs'
-import {
-  Search,
-  Calendar,
-  Download,
-  Setting,
-  View,
-  DocumentCopy,
-  DataAnalysis,
-  ArrowDown,
-  Delete
-} from '@element-plus/icons-vue'
+import TableControlPanel from '@/components/TableView/TableControlPanel.vue';
+import CommitTable from '@/components/TableView/CommitTable.vue';
 
 interface Commit {
   repository: string

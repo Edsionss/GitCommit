@@ -218,6 +218,7 @@
 <script setup lang="ts">
 import { ref, computed, watch, onMounted } from 'vue'
 import dayjs from 'dayjs'
+<<<<<<< Updated upstream
 import {
   RefreshRight,
   Search,
@@ -231,6 +232,17 @@ import {
   Bottom
 } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
+=======
+import { message } from 'ant-design-vue' // Changed from ElMessage
+import CommitsToolbar from '@/components/CommitsView/CommitsToolbar.vue'
+import CommitsList from '@/components/CommitsView/CommitsList.vue'
+import CommitDetails from '@/components/CommitsView/CommitDetails.vue'
+
+import repositoriesData from '@/mock/repositories.json'
+import branchesData from '@/mock/branches.json'
+import authorsData from '@/mock/authors.json'
+import commitsData from '@/mock/commits.json'
+>>>>>>> Stashed changes
 
 // 加载状态
 const loading = ref(false)
@@ -438,21 +450,37 @@ const refreshCommits = () => {
 
   // 模拟API请求
   setTimeout(() => {
+<<<<<<< Updated upstream
     loading.value = false
     ElMessage.success('提交记录已刷新')
   }, 1000)
 }
+=======
+    loading.value = false;
+    message.success('提交记录已刷新'); // Changed from ElMessage
+  }, 1000);
+};
+>>>>>>> Stashed changes
 
 const copyToClipboard = (text: string) => {
   navigator.clipboard
     .writeText(text)
     .then(() => {
+<<<<<<< Updated upstream
       ElMessage.success('已复制到剪贴板')
     })
     .catch(() => {
       ElMessage.error('复制失败')
     })
 }
+=======
+      message.success('已复制到剪贴板'); // Changed from ElMessage
+    })
+    .catch(() => {
+      message.error('复制失败'); // Changed from ElMessage
+    });
+};
+>>>>>>> Stashed changes
 
 const formatDate = (dateString: string, format = 'YYYY-MM-DD HH:mm') => {
   return dayjs(dateString).format(format)
@@ -465,9 +493,14 @@ const getAvatarUrl = (email: string) => {
 }
 
 const loadCommit = (hash: string) => {
+<<<<<<< Updated upstream
   // 实际项目中这里会请求特定提交的详细信息
   ElMessage.info(`加载提交: ${hash}`)
 }
+=======
+  message.info(`加载提交: ${hash}`); // Changed from ElMessage
+};
+>>>>>>> Stashed changes
 
 // 监听仓库变化
 watch(selectedRepo, () => {

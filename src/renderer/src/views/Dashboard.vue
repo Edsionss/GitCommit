@@ -4,6 +4,7 @@
       <h2 class="page-title">数据概览</h2>
     </div>
 
+<<<<<<< Updated upstream
     <div class="stats-cards">
       <el-row :gutter="16">
         <el-col :xs="24" :sm="12" :md="6">
@@ -59,6 +60,19 @@
           </el-card>
         </el-col>
       </el-row>
+=======
+    <StatsCards :stats="stats" :format-number="formatNumber" />
+
+    <div class="chart-section">
+      <a-row :gutter="16">
+        <a-col :xs="24" :lg="12">
+          <CommitTrendChart />
+        </a-col>
+        <a-col :xs="24" :lg="12">
+          <LanguageDistChart />
+        </a-col>
+      </a-row>
+>>>>>>> Stashed changes
     </div>
 
     <div class="chart-section">
@@ -508,6 +522,7 @@ onMounted(() => {
   line-height: 1.5;
 }
 
+<<<<<<< Updated upstream
 .stats-cards {
   margin-bottom: 20px;
 }
@@ -710,6 +725,8 @@ onMounted(() => {
   color: var(--color-danger);
 }
 
+=======
+>>>>>>> Stashed changes
 @media (max-width: 768px) {
   .stats-card {
     margin-bottom: 16px;

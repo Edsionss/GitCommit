@@ -6,12 +6,12 @@
         <img v-else :src="logoFull" alt="GitCommit Icon" class="logo-icon" />
       </div>
       <div class="sidebar-toggle-button">
-        <el-button class="toggle-button" circle size="small" @click="toggleSidebar">
-          <el-icon>
-            <ArrowLeft v-if="isExpanded" />
-            <ArrowRight v-else />
-          </el-icon>
-        </el-button>
+        <a-button class="toggle-button" type="text" size="small" @click="toggleSidebar">
+          <template #icon>
+            <LeftOutlined v-if="isExpanded" />
+            <RightOutlined v-else />
+          </template>
+        </a-button>
       </div>
     </div>
 
@@ -23,16 +23,14 @@
         class="menu-item"
         :class="{ active: isActive(item.path) }"
       >
-        <el-icon>
-          <component :is="item.icon" />
-        </el-icon>
+        <component :is="item.icon" />
         <span v-if="isExpanded" class="menu-label">{{ item.label }}</span>
       </router-link>
     </div>
 
     <div class="sidebar-footer">
       <router-link to="/settings" class="menu-item" :class="{ active: isActive('/settings') }">
-        <el-icon><Setting /></el-icon>
+        <SettingOutlined />
         <span v-if="isExpanded" class="menu-label">设置</span>
       </router-link>
     </div>
@@ -44,16 +42,15 @@ import logoFull from '@/assets/img/logo/LOGO1.png'
 import { ref, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import {
-  HomeFilled,
-  Document,
-  Histogram,
-  Share,
-  DataAnalysis,
-  DocumentCopy,
-  Setting,
-  ArrowLeft,
-  ArrowRight
-} from '@element-plus/icons-vue'
+  HomeOutlined,
+  FileTextOutlined,
+  BarChartOutlined,
+  ShareAltOutlined,
+  AreaChartOutlined,
+  SettingOutlined,
+  LeftOutlined,
+  RightOutlined
+} from '@ant-design/icons-vue'
 
 const isExpanded = ref(true)
 const route = useRoute()
@@ -74,11 +71,11 @@ const toggleSidebar = () => {
 }
 
 const menuItems = [
-  { path: '/', label: '概览', icon: HomeFilled },
-  { path: '/commits', label: '提交记录', icon: Document },
-  { path: '/branches', label: '分支管理', icon: Share },
-  { path: '/analysis', label: '代码分析', icon: DataAnalysis },
-  { path: '/reports', label: '报告生成', icon: DocumentCopy }
+  { path: '/', label: '概览', icon: HomeOutlined },
+  { path: '/commits', label: '提交记录', icon: FileTextOutlined },
+  { path: '/branches', label: '分支管理', icon: ShareAltOutlined },
+  { path: '/analysis', label: '代码分析', icon: BarChartOutlined },
+  { path: '/reports', label: '报告生成', icon: AreaChartOutlined }
 ]
 
 const isActive = (path: string): boolean => {
@@ -155,7 +152,7 @@ initSidebar()
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* 增强阴影效果 */
 }
 
-.toggle-button .el-icon {
+.toggle-button .anticon {
   font-size: 14px;
 }
 
@@ -192,13 +189,7 @@ initSidebar()
   color: var(--el-color-primary);
 }
 
-.menu-label {
-  margin-left: 12px;
-  font-size: 14px;
-  white-space: nowrap;
-}
-
-.el-icon {
+.anticon {
   font-size: 18px;
 }
 </style>

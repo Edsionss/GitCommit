@@ -2,282 +2,52 @@
   <div class="settings-container page-container">
     <h2 class="page-title">设置</h2>
 
-    <el-card class="settings-card">
-      <template #header>
-        <div class="card-header">
-          <span>外观设置</span>
-        </div>
-      </template>
+    <AppearanceSettings 
+      :settings="settings.appearance"
+      @update:theme="updateTheme($event)"
+      @update:sidebarPosition="settings.appearance.sidebarPosition = $event"
+      @update:zoom="settings.appearance.zoom = $event"
+      @update:animations="settings.appearance.animations = $event"
+    />
 
-      <div class="settings-section">
-        <div class="setting-item">
-          <div class="setting-label">
-            <el-icon><Brush /></el-icon>
-            <span>主题设置</span>
-          </div>
-          <div class="setting-control">
-            <el-radio-group v-model="settings.appearance.theme" @change="updateTheme">
-              <el-radio-button :value="'light'">浅色</el-radio-button>
-              <el-radio-button :value="'dark'">深色</el-radio-button>
-              <el-radio-button :value="'system'">跟随系统</el-radio-button>
-            </el-radio-group>
-          </div>
-        </div>
+    <LocaleSettings 
+      :settings="settings.locale"
+      @update:language="settings.locale.language = $event"
+      @update:dateFormat="settings.locale.dateFormat = $event"
+      @update:timeFormat="settings.locale.timeFormat = $event"
+    />
 
-        <div class="setting-item">
-          <div class="setting-label">
-            <el-icon><Menu /></el-icon>
-            <span>侧边栏位置</span>
-          </div>
-          <div class="setting-control">
-            <el-radio-group v-model="settings.appearance.sidebarPosition">
-              <el-radio-button :value="'left'">左侧</el-radio-button>
-              <el-radio-button :value="'right'">右侧</el-radio-button>
-            </el-radio-group>
-          </div>
-        </div>
+    <GitSettings 
+      :settings="settings.git"
+      @update:defaultAuthor="settings.git.defaultAuthor = $event"
+      @update:defaultEmail="settings.git.defaultEmail = $event"
+      @update:repositoryPath="settings.git.repositoryPath = $event"
+      @update:refreshInterval="settings.git.refreshInterval = $event"
+      @selectDirectory="selectDirectory"
+    />
 
-        <div class="setting-item">
-          <div class="setting-label">
-            <el-icon><ZoomIn /></el-icon>
-            <span>界面缩放</span>
-          </div>
-          <div class="setting-control">
-            <el-select v-model="settings.appearance.zoom">
-              <el-option label="80%" value="0.8" />
-              <el-option label="90%" value="0.9" />
-              <el-option label="100%" value="1" />
-              <el-option label="110%" value="1.1" />
-              <el-option label="120%" value="1.2" />
-            </el-select>
-          </div>
-        </div>
-
-        <div class="setting-item">
-          <div class="setting-label">
-            <el-icon><Operation /></el-icon>
-            <span>动画效果</span>
-          </div>
-          <div class="setting-control">
-            <el-switch
-              v-model="settings.appearance.animations"
-              active-text="启用"
-              inactive-text="禁用"
-            />
-          </div>
-        </div>
-      </div>
-    </el-card>
-
-    <el-card class="settings-card">
-      <template #header>
-        <div class="card-header">
-          <span>语言和地区</span>
-        </div>
-      </template>
-
-      <div class="settings-section">
-        <div class="setting-item">
-          <div class="setting-label">
-            <el-icon><ChatLineRound /></el-icon>
-            <span>界面语言</span>
-          </div>
-          <div class="setting-control">
-            <el-select v-model="settings.locale.language">
-              <el-option label="简体中文" value="zh-CN" />
-              <el-option label="English" value="en-US" />
-              <el-option label="日本語" value="ja-JP" />
-              <el-option label="한국어" value="ko-KR" />
-            </el-select>
-          </div>
-        </div>
-
-        <div class="setting-item">
-          <div class="setting-label">
-            <el-icon><Calendar /></el-icon>
-            <span>日期格式</span>
-          </div>
-          <div class="setting-control">
-            <el-select v-model="settings.locale.dateFormat">
-              <el-option label="YYYY-MM-DD" value="YYYY-MM-DD" />
-              <el-option label="MM/DD/YYYY" value="MM/DD/YYYY" />
-              <el-option label="DD/MM/YYYY" value="DD/MM/YYYY" />
-              <el-option label="YYYY年MM月DD日" value="YYYY年MM月DD日" />
-            </el-select>
-          </div>
-        </div>
-
-        <div class="setting-item">
-          <div class="setting-label">
-            <el-icon><Timer /></el-icon>
-            <span>时间格式</span>
-          </div>
-          <div class="setting-control">
-            <el-radio-group v-model="settings.locale.timeFormat">
-              <el-radio-button :value="'24'">24小时制</el-radio-button>
-              <el-radio-button :value="'12'">12小时制</el-radio-button>
-            </el-radio-group>
-          </div>
-        </div>
-      </div>
-    </el-card>
-
-    <el-card class="settings-card">
-      <template #header>
-        <div class="card-header">
-          <span>Git 设置</span>
-        </div>
-      </template>
-
-      <div class="settings-section">
-        <div class="setting-item">
-          <div class="setting-label">
-            <el-icon><UserFilled /></el-icon>
-            <span>默认作者</span>
-          </div>
-          <div class="setting-control">
-            <el-input v-model="settings.git.defaultAuthor" placeholder="输入默认作者名称" />
-          </div>
-        </div>
-
-        <div class="setting-item">
-          <div class="setting-label">
-            <el-icon><Message /></el-icon>
-            <span>默认邮箱</span>
-          </div>
-          <div class="setting-control">
-            <el-input v-model="settings.git.defaultEmail" placeholder="输入默认邮箱地址" />
-          </div>
-        </div>
-
-        <div class="setting-item">
-          <div class="setting-label">
-            <el-icon><FolderOpened /></el-icon>
-            <span>仓库扫描路径</span>
-          </div>
-          <div class="setting-control">
-            <el-input v-model="settings.git.repositoryPath" placeholder="输入默认仓库扫描路径">
-              <template #append>
-                <el-button @click="selectDirectory">
-                  <el-icon><FolderAdd /></el-icon>
-                </el-button>
-              </template>
-            </el-input>
-          </div>
-        </div>
-
-        <div class="setting-item">
-          <div class="setting-label">
-            <el-icon><RefreshRight /></el-icon>
-            <span>自动刷新时间间隔</span>
-          </div>
-          <div class="setting-control">
-            <el-select v-model="settings.git.refreshInterval">
-              <el-option label="禁用" value="0" />
-              <el-option label="1分钟" value="60000" />
-              <el-option label="5分钟" value="300000" />
-              <el-option label="10分钟" value="600000" />
-              <el-option label="30分钟" value="1800000" />
-            </el-select>
-          </div>
-        </div>
-      </div>
-    </el-card>
-
-    <el-card class="settings-card">
-      <template #header>
-        <div class="card-header">
-          <span>系统设置</span>
-        </div>
-      </template>
-
-      <div class="settings-section">
-        <div class="setting-item">
-          <div class="setting-label">
-            <el-icon><Switch /></el-icon>
-            <span>开机自启</span>
-          </div>
-          <div class="setting-control">
-            <el-switch
-              v-model="settings.system.startWithSystem"
-              active-text="启用"
-              inactive-text="禁用"
-            />
-          </div>
-        </div>
-
-        <div class="setting-item">
-          <div class="setting-label">
-            <el-icon><Bell /></el-icon>
-            <span>通知提醒</span>
-          </div>
-          <div class="setting-control">
-            <el-switch
-              v-model="settings.system.notifications"
-              active-text="启用"
-              inactive-text="禁用"
-            />
-          </div>
-        </div>
-
-        <div class="setting-item">
-          <div class="setting-label">
-            <el-icon><Download /></el-icon>
-            <span>自动更新</span>
-          </div>
-          <div class="setting-control">
-            <el-switch
-              v-model="settings.system.autoUpdate"
-              active-text="启用"
-              inactive-text="禁用"
-            />
-          </div>
-        </div>
-
-        <div class="setting-item">
-          <div class="setting-label">
-            <el-icon><DataLine /></el-icon>
-            <span>数据统计</span>
-          </div>
-          <div class="setting-control">
-            <el-switch
-              v-model="settings.system.telemetry"
-              active-text="允许收集匿名统计数据"
-              inactive-text="禁用"
-            />
-          </div>
-        </div>
-      </div>
-    </el-card>
+    <SystemSettings 
+      :settings="settings.system"
+      @update:startWithSystem="settings.system.startWithSystem = $event"
+      @update:notifications="settings.system.notifications = $event"
+      @update:autoUpdate="settings.system.autoUpdate = $event"
+      @update:telemetry="settings.system.telemetry = $event"
+    />
 
     <div class="settings-actions">
-      <el-button type="primary" @click="saveSettings">保存设置</el-button>
-      <el-button @click="resetSettings">重置设置</el-button>
+      <a-button type="primary" @click="saveSettings">保存设置</a-button>
+      <a-button @click="resetSettings">重置设置</a-button>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, reactive, onMounted } from 'vue'
-import {
-  Brush,
-  Menu,
-  ZoomIn,
-  Operation,
-  ChatLineRound,
-  Calendar,
-  Timer,
-  UserFilled,
-  Message,
-  FolderOpened,
-  FolderAdd,
-  RefreshRight,
-  Switch,
-  Bell,
-  Download,
-  DataLine
-} from '@element-plus/icons-vue'
-import { ElMessage, ElMessageBox } from 'element-plus'
+import { message, Modal } from 'ant-design-vue' 
+import AppearanceSettings from '@/components/SettingsView/AppearanceSettings.vue';
+import LocaleSettings from '@/components/SettingsView/LocaleSettings.vue';
+import GitSettings from '@/components/SettingsView/GitSettings.vue';
+import SystemSettings from '@/components/SettingsView/SystemSettings.vue';
 import { useTheme } from '../composables/useTheme'
 
 // 使用主题组合式函数
@@ -335,10 +105,10 @@ const loadSettings = () => {
       // 确保主题设置始终优先使用themeMode而不是从appSettings读取
       settings.appearance.theme = savedThemeMode
 
-      ElMessage.success('设置已加载')
+      message.success('设置已加载') 
     } catch (error) {
       console.error('Failed to parse settings:', error)
-      ElMessage.error('设置加载失败')
+      message.error('设置加载失败') 
     }
   }
 }
@@ -346,17 +116,17 @@ const loadSettings = () => {
 // 保存设置
 const saveSettings = () => {
   localStorage.setItem('appSettings', JSON.stringify(settings))
-  ElMessage.success('设置已保存')
+  message.success('设置已保存') 
 }
 
 // 重置设置
 const resetSettings = () => {
-  ElMessageBox.confirm('确定要重置所有设置到默认值吗？此操作不可撤销。', '重置设置', {
-    confirmButtonText: '确定',
-    cancelButtonText: '取消',
-    type: 'warning'
-  })
-    .then(() => {
+  Modal.confirm({
+    title: '重置设置',
+    content: '确定要重置所有设置到默认值吗？此操作不可撤销。',
+    okText: '确定',
+    cancelText: '取消',
+    onOk() {
       settings.appearance.theme = 'light'
       settings.appearance.sidebarPosition = 'left'
       settings.appearance.zoom = '1'
@@ -382,11 +152,12 @@ const resetSettings = () => {
       // 保存默认设置
       saveSettings()
 
-      ElMessage.success('设置已重置为默认值')
-    })
-    .catch(() => {
+      message.success('设置已重置为默认值') 
+    },
+    onCancel() {
       // 用户取消操作
-    })
+    },
+  });
 }
 
 // 更新主题
@@ -401,7 +172,7 @@ const selectDirectory = async () => {
   // 以下是模拟效果
   setTimeout(() => {
     settings.git.repositoryPath = 'D:\\Projects\\GitRepositories'
-    ElMessage.success('已选择目录：' + settings.git.repositoryPath)
+    message.success('已选择目录：' + settings.git.repositoryPath) 
   }, 500)
 }
 

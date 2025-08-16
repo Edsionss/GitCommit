@@ -1,0 +1,35 @@
+[
+  {
+    "id": 1,
+    "name": "GitCommit",
+    "path": "D:/Projects/GitCommit",
+    "description": "Git提交记录分析工具",
+    "commits": 246,
+    "contributors": 5,
+    "files": 180,
+    "tags": ["Desktop", "Frontend"],
+    "lastUpdated": "2023-04-05T00:00:00.000Z"
+  },
+  {
+    "id": 2,
+    "name": "WebProject",
+    "path": "D:/Projects/WebProject",
+    "description": "一个Web项目",
+    "commits": 128,
+    "contributors": 3,
+    "files": 95,
+    "tags": ["Web", "Frontend"],
+    "lastUpdated": "2023-04-02T00:00:00.000Z"
+  },
+  {
+    "id": 3,
+    "name": "APIService",
+    "path": "D:/Projects/APIService",
+    "description": "API服务",
+    "commits": 321,
+    "contributors": 7,
+    "files": 210,
+    "tags": ["Backend", "API"],
+    "lastUpdated": "2023-04-07T00:00:00.000Z"
+  }
+]
