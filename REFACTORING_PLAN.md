@@ -194,6 +194,24 @@ Electron 的多进程架构要求前后端（主进程与渲染器进程）之�
 
 *   **超大文件拆分**: `GitLogsComponent.vue` 拆分为 `ScanProgressDisplay.vue`, `LogDisplay.vue` 和 `useLogManager.ts`, `useScanTracker.ts`。
 
+### 5. 图表组件抽象化 (已完成)
+
+*   **状态**: <font color="green">**已完成**</font>
+*   **目标**: 将所有图表封装到高度可复用的基础组件中，统一外观、简化维护并确保主题一致性。
+*   **实施详情**:
+    *   创建了 `ChartContainer.vue`，一个包含图表标题、响应式容器和插槽的通用图表容器组件，它不强制包含 `a-card`。
+    *   创建了 `BaseBarChart.vue` 和 `BasePieChart.vue` 作为底层的图表渲染器。
+    *   所有父组件被彻底重构，移除了所有图表相关的容器和样式代码，现在只需将图表内容放置在 `ChartContainer` 中即可，极大地简化了页面结构并保留了布局灵活性。
+    *   重构了以下所有视图，使其全部使用新的基础图表组件:
+        *   `CommitActivityReport.vue`
+        *   `CodeChangesReport.vue`
+        *   `ProjectProgressReport.vue`
+        *   `CodeQualityOverview.vue`
+        *   `CommitTrendChart.vue`
+        *   `LanguageDistChart.vue`
+*   **开发警告**:
+    *   **严重警告**: 在未来的开发中，**绝对禁止**通过追加代码的方式修改 Vue 单文件组件。修改时必须使用**覆盖写**或**精确替换**，以避免产生重复的 `<script>` 或 `<style>` 块。这是一个曾导致严重编译错误的低级问题，绝不能再次发生。
+
 ---
 
 ## 新计划：功能实现与后端集成

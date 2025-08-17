@@ -115,8 +115,8 @@ initSidebar()
   flex-direction: column;
   height: 100%;
   width: 60px;
-  background-color: var(--color-background-soft);
-  border-right: 1px solid var(--color-border);
+  background-color: var(--bg-content);
+  border-right: 1px solid var(--border-color);
   transition: width 0.3s ease;
   overflow: hidden;
   z-index: 40; /* 确保高于header */
@@ -131,7 +131,7 @@ initSidebar()
   align-items: center;
   justify-content: space-between;
   padding: 16px;
-  border-bottom: 1px solid var(--color-border);
+  border-bottom: 1px solid var(--border-color);
   position: relative;
   z-index: 30;
   min-height: 60px;
@@ -168,14 +168,14 @@ initSidebar()
 
 .sidebar-footer {
   padding: 16px 0;
-  border-top: 1px solid var(--color-border);
+  border-top: 1px solid var(--border-color);
 }
 
 .menu-item {
   display: flex;
   align-items: center;
   padding: 12px 16px;
-  color: var(--color-text);
+  color: var(--text-primary);
   text-decoration: none;
   margin: 4px 8px;
   border-radius: 8px;
@@ -183,12 +183,12 @@ initSidebar()
 }
 
 .menu-item:hover {
-  background-color: var(--color-background-mute);
+  background-color: var(--hover-bg);
 }
 
 .menu-item.active {
-  background-color: var(--el-color-primary-light-9);
-  color: var(--el-color-primary);
+  background-color: rgba(var(--primary-color-rgb), 0.1);
+  color: var(--primary-color);
 }
 
 .anticon {

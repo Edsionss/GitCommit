@@ -17,15 +17,13 @@
     </template>
 
     <div class="reports-preview">
-      <div class="chart-container">
-        <h3 class="chart-title">提交频率</h3>
-        <Bar :data="commitFrequencyData" :options="chartOptions" />
-      </div>
+      <ChartContainer title="提交频率">
+        <BaseBarChart :chart-data="commitFrequencyData" />
+      </ChartContainer>
 
-      <div class="chart-container">
-        <h3 class="chart-title">提交时间分布</h3>
-        <Pie :data="commitTimeData" :options="chartOptions" />
-      </div>
+      <ChartContainer title="提交时间分布">
+        <BasePieChart :chart-data="commitTimeData" type="pie" />
+      </ChartContainer>
     </div>
 
     <h3 class="section-title">提交统计摘要</h3>
@@ -53,22 +51,12 @@
 
 <script setup lang="ts">
 import { computed } from 'vue'
-import { Bar, Pie } from 'vue-chartjs'
-import {
-  Chart as ChartJS,
-  Title,
-  Tooltip,
-  Legend,
-  BarElement,
-  CategoryScale,
-  LinearScale,
-  ArcElement
-} from 'chart.js'
 import { FileExcelOutlined, FilePdfOutlined } from '@ant-design/icons-vue'
+import ChartContainer from '../charts/ChartContainer.vue'
+import BaseBarChart from '../charts/BaseBarChart.vue'
+import BasePieChart from '../charts/BasePieChart.vue'
 
-ChartJS.register(Title, Tooltip, Legend, BarElement, CategoryScale, LinearScale, ArcElement)
-
-const props = defineProps({
+defineProps({
   loading: { type: Boolean, default: false },
   commitStats: { type: Object, required: true },
   topContributors: { type: Array, required: true }
@@ -85,11 +73,6 @@ const columns = [
   { title: '删除行数', dataIndex: 'deletions', key: 'deletions', sorter: (a, b) => a.deletions - b.deletions, width: 120 },
   { title: '贡献占比', dataIndex: 'percentage', key: 'percentage', width: 150 }
 ]
-
-const chartOptions = {
-  responsive: true,
-  maintainAspectRatio: false
-}
 
 const commitFrequencyData = computed(() => ({
   labels: ['1月', '2月', '3月', '4月', '5月', '6月', '7月', '8月', '9月', '10月', '11月', '12月'],
@@ -116,23 +99,9 @@ const commitTimeData = computed(() => ({
 <style scoped>
 .reports-preview {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
   gap: 24px;
   margin-bottom: 32px;
-}
-
-.chart-container {
-  border: 1px solid #f0f0f0;
-  border-radius: 8px;
-  padding: 16px;
-  background-color: #fff;
-  height: 350px;
-  position: relative;
-}
-
-.chart-title {
-  font-size: 16px;
-  margin-bottom: 16px;
 }
 
 .section-title {

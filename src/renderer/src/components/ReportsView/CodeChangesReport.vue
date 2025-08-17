@@ -17,15 +17,13 @@
     </template>
 
     <div class="reports-preview">
-      <div class="chart-container">
-        <h3 class="chart-title">每日修改活动</h3>
-        <Bar :data="dailyActivityData" :options="chartOptions" />
-      </div>
+      <ChartContainer title="每日修改活动">
+        <BaseBarChart :chart-data="dailyActivityData" />
+      </ChartContainer>
 
-      <div class="chart-container">
-        <h3 class="chart-title">代码变更趋势</h3>
-        <Bar :data="changesTrendData" :options="chartOptions" />
-      </div>
+      <ChartContainer title="代码变更趋势">
+        <BaseBarChart :chart-data="changesTrendData" />
+      </ChartContainer>
     </div>
 
     <h3 class="section-title">变更最频繁的文件</h3>
@@ -43,22 +41,12 @@
 
 <script setup lang="ts">
 import { computed } from 'vue'
-import { Bar } from 'vue-chartjs'
-import {
-  Chart as ChartJS,
-  Title,
-  Tooltip,
-  Legend,
-  BarElement,
-  CategoryScale,
-  LinearScale
-} from 'chart.js'
 import { FileExcelOutlined, FilePdfOutlined } from '@ant-design/icons-vue'
 import dayjs from 'dayjs'
+import ChartContainer from '../charts/ChartContainer.vue'
+import BaseBarChart from '../charts/BaseBarChart.vue'
 
-ChartJS.register(Title, Tooltip, Legend, BarElement, CategoryScale, LinearScale)
-
-const props = defineProps({
+defineProps({
   loading: { type: Boolean, default: false },
   topChangedFiles: { type: Array, required: true }
 })
@@ -82,12 +70,6 @@ const getChangeFrequencyColor = (frequency: string) => {
   }
 }
 
-const chartOptions = {
-  responsive: true,
-  maintainAspectRatio: false
-}
-
-// Mock data for daily activity (replaces heatmap)
 const dailyActivityData = computed(() => ({
   labels: ['周一', '周二', '周三', '周四', '周五', '周六', '周日'],
   datasets: [
@@ -99,7 +81,6 @@ const dailyActivityData = computed(() => ({
   ]
 }))
 
-// Mock data for changes trend
 const changesTrendData = computed(() => {
     const labels = [];
     const additions = [];
@@ -117,29 +98,14 @@ const changesTrendData = computed(() => {
         ]
     }
 });
-
 </script>
 
 <style scoped>
 .reports-preview {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
   gap: 24px;
   margin-bottom: 32px;
-}
-
-.chart-container {
-  border: 1px solid #f0f0f0;
-  border-radius: 8px;
-  padding: 16px;
-  background-color: #fff;
-  height: 350px;
-  position: relative;
-}
-
-.chart-title {
-  font-size: 16px;
-  margin-bottom: 16px;
 }
 
 .section-title {

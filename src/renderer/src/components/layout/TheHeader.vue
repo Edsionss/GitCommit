@@ -133,8 +133,8 @@ const exitApp = () => {
   height: 64px;
   min-height: 64px;
   max-height: 64px;
-  background-color: var(--color-background);
-  border-bottom: 1px solid var(--color-border);
+  background-color: var(--bg-content);
+  border-bottom: 1px solid var(--border-color);
   z-index: 100;
   box-sizing: border-box;
   overflow: hidden;
@@ -152,13 +152,14 @@ const exitApp = () => {
   font-weight: 600;
   margin: 0;
   white-space: nowrap;
+  color: var(--text-primary);
 }
 
 .page-title {
   font-size: 16px;
-  color: var(--color-text-light);
+  color: var(--text-secondary);
   padding-left: 12px;
-  border-left: 1px solid var(--color-border);
+  border-left: 1px solid var(--border-color);
   pointer-events: none;
   user-select: none;
 }

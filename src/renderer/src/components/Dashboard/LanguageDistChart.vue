@@ -1,23 +1,16 @@
 <template>
-  <a-card class="chart-card">
-    <template #title>
-      <div class="chart-header">
-        <span>语言分布</span>
-      </div>
-    </template>
-    <div class="chart-container">
-      <Doughnut :data="chartData" :options="chartOptions" />
-    </div>
-  </a-card>
+  <!-- <a-card class="chart-card"> -->
+  <ChartContainer title="语言分布">
+    <BasePieChart :chart-data="chartData" type="doughnut" />
+  </ChartContainer>
+  <!-- </a-card> -->
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
-import { Doughnut } from 'vue-chartjs'
-import { Chart as ChartJS, Title, Tooltip, Legend, ArcElement } from 'chart.js'
-import { Card } from 'ant-design-vue' // Added Card import
-
-ChartJS.register(Title, Tooltip, Legend, ArcElement)
+import { computed } from 'vue'
+import { Card as ACard } from 'ant-design-vue'
+import ChartContainer from '../charts/ChartContainer.vue'
+import BasePieChart from '../charts/BasePieChart.vue'
 
 const chartData = computed(() => ({
   labels: ['JavaScript', 'HTML', 'CSS', 'TypeScript', '其他'],
@@ -28,31 +21,10 @@ const chartData = computed(() => ({
     }
   ]
 }))
-
-const chartOptions = ref({
-  responsive: true,
-  maintainAspectRatio: false,
-  plugins: {
-    legend: {
-      position: 'right'
-    }
-  }
-})
 </script>
 
 <style scoped>
 .chart-card {
   margin-bottom: 20px;
-}
-
-.chart-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.chart-container {
-  height: 300px;
-  position: relative;
 }
 </style>

@@ -17,15 +17,13 @@
     </template>
 
     <div class="reports-preview">
-      <div class="chart-container">
-        <h3 class="chart-title">项目进度</h3>
-        <Bar :data="progressChartData" :options="progressChartOptions" />
-      </div>
+      <ChartContainer title="项目进度">
+        <BaseBarChart :chart-data="progressChartData" />
+      </ChartContainer>
 
-      <div class="chart-container">
-        <h3 class="chart-title">任务完成状态</h3>
-        <Doughnut :data="tasksChartData" :options="tasksChartOptions" />
-      </div>
+      <ChartContainer title="任务完成状态">
+        <BasePieChart :chart-data="tasksChartData" type="doughnut" />
+      </ChartContainer>
     </div>
 
     <h3 class="section-title">里程碑状态</h3>
@@ -45,22 +43,12 @@
 
 <script setup lang="ts">
 import { computed } from 'vue'
-import { Bar, Doughnut } from 'vue-chartjs'
-import {
-  Chart as ChartJS,
-  Title,
-  Tooltip,
-  Legend,
-  BarElement,
-  CategoryScale,
-  LinearScale,
-  ArcElement
-} from 'chart.js'
 import { FileExcelOutlined, FilePdfOutlined } from '@ant-design/icons-vue'
+import ChartContainer from '../charts/ChartContainer.vue'
+import BaseBarChart from '../charts/BaseBarChart.vue'
+import BasePieChart from '../charts/BasePieChart.vue'
 
-ChartJS.register(Title, Tooltip, Legend, BarElement, CategoryScale, LinearScale, ArcElement)
-
-const props = defineProps({
+defineProps({
   loading: { type: Boolean, default: false },
   milestones: { type: Array, required: true }
 })
@@ -76,25 +64,11 @@ const getMilestoneColor = (status: string) => {
   }
 }
 
-const progressChartOptions = computed(() => ({
-  indexAxis: 'y',
-  responsive: true,
-  maintainAspectRatio: false,
-  plugins: { legend: { display: true } },
-  scales: { x: { max: 100 } }
-}))
-
-const tasksChartOptions = computed(() => ({
-  responsive: true,
-  maintainAspectRatio: false,
-  plugins: { legend: { position: 'right' } }
-}))
-
 const progressChartData = computed(() => ({
   labels: ['功能开发', '界面设计', '后端API', '数据库', '测试', '文档'],
   datasets: [
-    { label: '计划进度', backgroundColor: '#91d5ff', data: [90, 95, 85, 80, 70, 60] },
-    { label: '实际进度', backgroundColor: '#1890ff', data: [95, 90, 80, 85, 60, 50] }
+    { label: '计划进度', backgroundColor: '#91d5ff', data: [90, 95, 85, 80, 70, 60], type: 'bar' as const },
+    { label: '实际进度', backgroundColor: '#1890ff', data: [95, 90, 80, 85, 60, 50], type: 'bar' as const }
   ]
 }))
 
@@ -112,23 +86,9 @@ const tasksChartData = computed(() => ({
 <style scoped>
 .reports-preview {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
   gap: 24px;
   margin-bottom: 32px;
-}
-
-.chart-container {
-  border: 1px solid #f0f0f0;
-  border-radius: 8px;
-  padding: 16px;
-  background-color: #fff;
-  height: 350px;
-  position: relative;
-}
-
-.chart-title {
-  font-size: 16px;
-  margin-bottom: 16px;
 }
 
 .section-title {

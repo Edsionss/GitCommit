@@ -44,25 +44,25 @@ const scrollToSection = (sectionId: string) => {
   display: flex;
   align-items: center;
   text-decoration: none;
-  color: #909399;
+  color: var(--text-muted);
   position: relative;
   cursor: pointer;
 }
 
 .nav-link.active {
-  color: #409eff;
+  color: var(--primary-color);
 }
 
 .nav-dot {
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background-color: #909399;
+  background-color: var(--text-muted);
   margin-right: 8px;
 }
 
 .nav-link.active .nav-dot {
-  background-color: #409eff;
+  background-color: var(--primary-color);
   width: 10px;
   height: 10px;
 }
@@ -73,7 +73,7 @@ const scrollToSection = (sectionId: string) => {
   left: 4px;
   height: 40px;
   width: 2px;
-  background-color: #ebeef5;
+  background-color: var(--border-color);
   z-index: -1;
 }
 
@@ -84,7 +84,7 @@ const scrollToSection = (sectionId: string) => {
   top: 12px;
   height: 30px;
   width: 2px;
-  background-color: #ebeef5;
+  background-color: var(--border-color);
 }
 
 .nav-label {

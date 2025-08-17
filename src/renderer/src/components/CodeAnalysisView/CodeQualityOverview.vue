@@ -54,10 +54,9 @@
     </a-row>
 
     <div class="quality-charts">
-      <div class="chart-container">
-        <h3 class="chart-title">代码质量分布</h3>
-        <Doughnut :data="chartData" :options="chartOptions" />
-      </div>
+      <ChartContainer title="代码质量分布">
+        <BasePieChart :chart-data="chartData" type="doughnut" />
+      </ChartContainer>
     </div>
 
     <a-table :data-source="codeIssues" :columns="columns" :pagination="false" :scroll="{ y: 400 }">
@@ -74,13 +73,10 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
-import { Doughnut } from 'vue-chartjs'
-import { Chart as ChartJS, Title, Tooltip, Legend, ArcElement, CategoryScale } from 'chart.js'
+import { ref, computed, PropType } from 'vue'
 import { FileTextOutlined, BranchesOutlined, WarningOutlined, StarOutlined } from '@ant-design/icons-vue'
-import type { PropType } from 'vue'
-
-ChartJS.register(Title, Tooltip, Legend, ArcElement, CategoryScale)
+import ChartContainer from '../charts/ChartContainer.vue'
+import BasePieChart from '../charts/BasePieChart.vue'
 
 interface CodeStats {
   totalFiles: number;
@@ -105,27 +101,19 @@ defineProps({
 
 const getIssueTypeColor = (type: string) => {
   switch (type) {
-    case '错误':
-      return 'error'
-    case '警告':
-      return 'warning'
-    case '信息':
-      return 'processing'
-    default:
-      return 'default'
+    case '错误': return 'error';
+    case '警告': return 'warning';
+    case '信息': return 'processing';
+    default: return 'default';
   }
 }
 
 const getIssueSeverityColor = (severity: string) => {
   switch (severity) {
-    case '高':
-      return 'error'
-    case '中':
-      return 'warning'
-    case '低':
-      return 'default'
-    default:
-      return 'default'
+    case '高': return 'error';
+    case '中': return 'warning';
+    case '低': return 'default';
+    default: return 'default';
   }
 }
 
@@ -138,11 +126,6 @@ const chartData = computed(() => ({
     }
   ]
 }))
-
-const chartOptions = {
-  responsive: true,
-  maintainAspectRatio: true
-}
 
 const columns = ref([
     { title: '文件', dataIndex: 'file', key: 'file', width: 180 },
@@ -198,32 +181,11 @@ const columns = ref([
 }
 .stat-label {
   font-size: 14px;
-  color: var(--color-text-light);
-}
-.card-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+  color: var(--text-secondary);
 }
 .quality-charts {
   display: flex;
   justify-content: center;
   margin-bottom: 30px;
-}
-.chart-container {
-  width: 100%;
-  max-width: 360px;
-  height: 360px;
-  position: relative;
-}
-.chart-title {
-  font-size: 16px;
-  font-weight: 500;
-  margin-bottom: 15px;
-  color: var(--text-primary);
-}
-.chart {
-  height: 300px;
-  width: 100%;
 }
 </style>

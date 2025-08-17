@@ -103,6 +103,7 @@ onUnmounted(() => {
   flex-direction: column;
   overflow: hidden;
   position: relative;
+  background-color: var(--bg-color);
 }
 
 .content-area {

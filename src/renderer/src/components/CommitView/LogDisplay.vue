@@ -50,8 +50,8 @@ defineEmits(['copy', 'save', 'clear'])
 }
 
 .markdown-logs {
-  background-color: #f8f9fa;
-  border: 1px solid #e9ecef;
+  background-color: var(--bg-color);
+  border: 1px solid var(--border-color);
   border-radius: 4px;
   padding: 8px;
   min-height: 150px;
@@ -63,7 +63,7 @@ defineEmits(['copy', 'save', 'clear'])
 }
 
 .empty-logs {
-  color: #909399;
+  color: var(--text-muted);
   font-style: italic;
   padding: 10px;
   text-align: center;
@@ -75,7 +75,7 @@ defineEmits(['copy', 'save', 'clear'])
 
 .markdown-content :deep(strong) {
   font-weight: 600;
-  color: #303133;
+  color: var(--text-primary);
 }
 
 .markdown-content :deep(.log-error) {
