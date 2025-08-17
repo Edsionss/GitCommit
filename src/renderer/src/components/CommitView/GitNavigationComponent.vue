@@ -14,8 +14,6 @@
 </template>
 
 <script setup lang="ts">
-import { defineProps, defineEmits } from 'vue'
-
 // 接收父组件传入的属性
 defineProps<{
   navItems: Array<{ id: string; label: string }>

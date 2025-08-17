@@ -13,7 +13,11 @@
         <div class="filter-label-row">
           <div class="filter-label">Git仓库路径</div>
           <div class="input-with-button">
-            <a-input-search v-model:value="repoPath" placeholder="请输入Git仓库路径" @search="selectRepoPath">
+            <a-input-search
+              v-model:value="repoPath"
+              placeholder="请输入Git仓库路径"
+              @search="selectRepoPath"
+            >
               <template #enterButton>
                 <a-button>
                   <FolderOutlined />
@@ -25,7 +29,11 @@
         <div class="paths-options" v-if="savedRepoPaths.length > 0">
           <div class="paths-options-row">
             <div class="verify-git-toggle">
-              <a-switch v-model:checked="verifyGitRepo" checked-children="验证Git目录" un-checked-children="不验证目录" />
+              <a-switch
+                v-model:checked="verifyGitRepo"
+                checked-children="验证Git目录"
+                un-checked-children="不验证目录"
+              />
             </div>
             <div class="saved-paths">
               <div class="saved-paths-label">历史路径:</div>
@@ -53,7 +61,7 @@
               <a-radio-button value="today">今天</a-radio-button>
               <a-radio-button value="week">本周</a-radio-button>
               <a-radio-button value="month">本月</a-radio-button>
-              
+
               <a-radio-button value="year">本年</a-radio-button>
               <a-radio-button value="custom">自定义</a-radio-button>
             </a-radio-group>
@@ -79,7 +87,7 @@
               mode="tags"
               style="flex: 1"
               placeholder="选择或输入提交作者"
-              :options="authorsList.map(author => ({ value: author }))"
+              :options="authorsList.map((author) => ({ value: author }))"
             >
             </a-select>
             <a-button @click="scanAuthors" :loading="scanningAuthors" style="margin-left: 8px">
@@ -98,7 +106,11 @@
           <div class="filter-item">
             <div class="filter-label">导出路径</div>
             <div class="filter-control">
-              <a-input-search v-model:value="exportPath" placeholder="请选择导出路径" @search="selectExportPath">
+              <a-input-search
+                v-model:value="exportPath"
+                placeholder="请选择导出路径"
+                @search="selectExportPath"
+              >
                 <template #enterButton>
                   <a-button>
                     <FolderOutlined />
@@ -156,7 +168,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, defineEmits } from 'vue'
+import { ref, onMounted } from 'vue'
 import { message, Modal } from 'ant-design-vue'
 import { FolderOutlined, ReloadOutlined } from '@ant-design/icons-vue'
 import dayjs from 'dayjs'
@@ -192,7 +204,12 @@ const scanningAuthors = ref(false)
 // 监听属性变化
 const emitUpdates = () => {
   emit('update:repoPath', repoPath.value)
-  emit('update:dateRange', dateRange.value ? [dateRange.value[0].format('YYYY-MM-DD'), dateRange.value[1].format('YYYY-MM-DD')] : null)
+  emit(
+    'update:dateRange',
+    dateRange.value
+      ? [dateRange.value[0].format('YYYY-MM-DD'), dateRange.value[1].format('YYYY-MM-DD')]
+      : null
+  )
   emit('update:selectedAuthors', selectedAuthors.value)
   emit('update:exportPath', exportPath.value)
   emit('update:exportFields', exportFields.value)
@@ -221,8 +238,8 @@ const selectRepoPath = async () => {
   // 模拟选择文件夹
   Modal.info({
     title: '选择仓库',
-    content: '请在主进程中实现选择文件夹的功能',
-  });
+    content: '请在主进程中实现选择文件夹的功能'
+  })
 }
 
 // 选择导出路径
@@ -230,8 +247,8 @@ const selectExportPath = async () => {
   // 模拟选择文件夹
   Modal.info({
     title: '选择导出路径',
-    content: '请在主进程中实现选择文件夹的功能',
-  });
+    content: '请在主进程中实现选择文件夹的功能'
+  })
 }
 
 // 从历史记录中移除路径
@@ -274,7 +291,9 @@ const startScan = () => {
   scanning.value = true
   emit('scanCommits', {
     repoPath: repoPath.value,
-    dateRange: dateRange.value ? [dateRange.value[0].format('YYYY-MM-DD'), dateRange.value[1].format('YYYY-MM-DD')] : null,
+    dateRange: dateRange.value
+      ? [dateRange.value[0].format('YYYY-MM-DD'), dateRange.value[1].format('YYYY-MM-DD')]
+      : null,
     selectedAuthors: selectedAuthors.value,
     verifyGitRepo: verifyGitRepo.value,
     exportPath: exportPath.value,

@@ -22,15 +22,14 @@
 </template>
 
 <script setup lang="ts">
-import { defineProps, defineEmits } from 'vue';
-import { CopyOutlined, DownloadOutlined } from '@ant-design/icons-vue';
+import { CopyOutlined, DownloadOutlined } from '@ant-design/icons-vue'
 
 defineProps<{
-  scanLogs: string;
-  formattedLogs: string;
-}>();
+  scanLogs: string
+  formattedLogs: string
+}>()
 
-defineEmits(['copy', 'save', 'clear']);
+defineEmits(['copy', 'save', 'clear'])
 </script>
 
 <style scoped>

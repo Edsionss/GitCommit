@@ -19,7 +19,13 @@
     <!-- 表格视图 -->
     <div v-if="commits.length > 0">
       <div v-if="viewMode === 'table'" class="table-view">
-        <a-table :data-source="pagedCommits" :columns="columns" :pagination="false" bordered size="small">
+        <a-table
+          :data-source="pagedCommits"
+          :columns="columns"
+          :pagination="false"
+          bordered
+          size="small"
+        >
           <template #bodyCell="{ column, record }">
             <template v-if="column.key === 'hash'">
               {{ record.hash.substring(0, 7) }}
@@ -82,7 +88,12 @@
         <div class="detail-item files">
           <div class="detail-label">变更文件:</div>
           <div class="detail-value">
-            <a-table :data-source="selectedCommit.files" :columns="fileColumns" bordered size="small">
+            <a-table
+              :data-source="selectedCommit.files"
+              :columns="fileColumns"
+              bordered
+              size="small"
+            >
               <template #bodyCell="{ column, record }">
                 <template v-if="column.key === 'changes'">
                   <span class="additions">+{{ record.additions }}</span>
@@ -98,7 +109,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, defineProps, defineEmits } from 'vue'
+import { ref, computed } from 'vue'
 import { message } from 'ant-design-vue'
 import { DownloadOutlined } from '@ant-design/icons-vue'
 import type { PropType } from 'vue'
@@ -189,20 +200,25 @@ const resetPagination = () => {
 }
 
 const columns = ref([
-    { title: '提交哈希', dataIndex: 'hash', key: 'hash', width: 100 },
-    { title: '作者', dataIndex: 'author', key: 'author', width: 120 },
-    { title: '日期', dataIndex: 'date', key: 'date', width: 180, sorter: (a: Commit, b: Commit) => new Date(a.date).getTime() - new Date(b.date).getTime() },
-    { title: '提交信息', dataIndex: 'message', key: 'message' },
-    { title: '变更统计', key: 'changes', width: 120 },
-    { title: '操作', key: 'action', width: 100 },
-]);
+  { title: '提交哈希', dataIndex: 'hash', key: 'hash', width: 100 },
+  { title: '作者', dataIndex: 'author', key: 'author', width: 120 },
+  {
+    title: '日期',
+    dataIndex: 'date',
+    key: 'date',
+    width: 180,
+    sorter: (a: Commit, b: Commit) => new Date(a.date).getTime() - new Date(b.date).getTime()
+  },
+  { title: '提交信息', dataIndex: 'message', key: 'message' },
+  { title: '变更统计', key: 'changes', width: 120 },
+  { title: '操作', key: 'action', width: 100 }
+])
 
 const fileColumns = ref([
-    { title: '文件路径', dataIndex: 'path', key: 'path' },
-    { title: '状态', dataIndex: 'status', key: 'status', width: 100 },
-    { title: '变更', dataIndex: 'changes', key: 'changes', width: 120 },
-]);
-
+  { title: '文件路径', dataIndex: 'path', key: 'path' },
+  { title: '状态', dataIndex: 'status', key: 'status', width: 100 },
+  { title: '变更', dataIndex: 'changes', key: 'changes', width: 120 }
+])
 
 // 暴露方法给父组件调用
 defineExpose({

@@ -25,20 +25,18 @@
 </template>
 
 <script setup lang="ts">
-import { defineProps, defineEmits } from 'vue';
+defineProps<{
+  scanning: boolean
+  scanStatus: string
+  scanProgress: number
+}>()
 
-defineProps<{ 
-  scanning: boolean;
-  scanStatus: string;
-  scanProgress: number;
-}>();
-
-defineEmits(['stopScanning']);
+defineEmits(['stopScanning'])
 
 const progressFormat = (percentage: number | undefined) => {
-  if (percentage === undefined) return '0%';
-  return percentage === 100 ? '完成' : `${percentage}%`;
-};
+  if (percentage === undefined) return '0%'
+  return percentage === 100 ? '完成' : `${percentage}%`
+}
 </script>
 
 <style scoped>

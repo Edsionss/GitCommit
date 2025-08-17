@@ -17,22 +17,22 @@
 </template>
 
 <script setup lang="ts">
-import { defineEmits } from 'vue';
-import { useLogManager } from '../../composables/useLogManager';
-import { useScanTracker } from '../../composables/useScanTracker';
-import ScanProgressDisplay from './ScanProgressDisplay.vue';
-import LogDisplay from './LogDisplay.vue';
+import { useLogManager } from '../../composables/useLogManager'
+import { useScanTracker } from '../../composables/useScanTracker'
+import ScanProgressDisplay from './ScanProgressDisplay.vue'
+import LogDisplay from './LogDisplay.vue'
 
-const emit = defineEmits(['stopScanning']);
+const emit = defineEmits(['stopScanning'])
 
-const { scanLogs, formattedLogs, addLog, clearLogs, copyLogs, saveLogs } = useLogManager();
-const { scanProgress, scanStatus, scanning, setScanProgress, setScanStatus, setScanningState } = useScanTracker();
+const { scanLogs, formattedLogs, addLog, clearLogs, copyLogs, saveLogs } = useLogManager()
+const { scanProgress, scanStatus, scanning, setScanProgress, setScanStatus, setScanningState } =
+  useScanTracker()
 
 const stopScanning = () => {
   if (scanning.value) {
-    emit('stopScanning');
+    emit('stopScanning')
   }
-};
+}
 
 // Expose methods for the parent component
 defineExpose({
@@ -40,8 +40,8 @@ defineExpose({
   clearLogs,
   setScanningState,
   setScanStatus,
-  setScanProgress,
-});
+  setScanProgress
+})
 </script>
 
 <style scoped>
