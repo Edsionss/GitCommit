@@ -23,7 +23,7 @@
         class="menu-item"
         :class="{ active: isActive(item.path) }"
       >
-        <component :is="item.icon" />
+        <component :is="item.icon" size="10" />
         <span v-if="isExpanded" class="menu-label">{{ item.label }}</span>
       </router-link>
     </div>
@@ -181,7 +181,9 @@ initSidebar()
   border-radius: 8px;
   transition: all 0.2s ease;
 }
-
+.menu-label {
+  padding-left: 8px;
+}
 .menu-item:hover {
   background-color: var(--hover-bg);
 }
@@ -192,6 +194,6 @@ initSidebar()
 }
 
 .anticon {
-  font-size: 18px;
+  font-size: 16px;
 }
 </style>

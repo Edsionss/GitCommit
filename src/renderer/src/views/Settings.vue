@@ -82,12 +82,12 @@ const settings = reactive({
 
 // 应用缩放
 const applyZoom = (zoomValue: string | number) => {
-  document.documentElement.style.zoom = String(zoomValue);
+  document.documentElement.style.zoom = String(zoomValue)
 }
 
 // 应用动画设置
 const applyAnimations = (enabled: boolean) => {
-  document.documentElement.classList.toggle('no-animations', !enabled);
+  document.documentElement.classList.toggle('no-animations', !enabled)
 }
 
 // 读取设置
@@ -127,6 +127,9 @@ const loadSettings = () => {
 const saveSettings = () => {
   localStorage.setItem('appSettings', JSON.stringify(settings))
   message.success('设置已保存')
+  setTimeout(() => {
+    location.reload()
+  }, 500)
 }
 
 // 重置设置

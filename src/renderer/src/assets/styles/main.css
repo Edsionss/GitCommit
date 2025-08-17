@@ -11,6 +11,38 @@ body,
   overflow: hidden;
 }
 
+/* 针对现代浏览器（包括 Firefox）的 W3C 标准写法 */
+html {
+  /* 设置滚动条颜色：第一个是滑块颜色，第二个是轨道颜色 */
+  scrollbar-color: #999 transparent;
+  /* 设置滚动条宽度：auto(默认), thin(窄), none(隐藏) */
+  scrollbar-width: thin;
+}
+
+/* 针对 WebKit 浏览器 (Chrome, Safari, Edge 等) */
+/* 定义整个滚动条的宽高和样式 */
+html::-webkit-scrollbar {
+  width: 8px; /* 垂直滚动条宽度 */
+  height: 8px; /* 水平滚动条高度 */
+}
+
+/* 定义滚动条轨道的样式 */
+html::-webkit-scrollbar-track {
+  background: transparent; /* 将轨道背景设置为透明 */
+  border-radius: 4px;
+}
+
+/* 定义滚动条滑块的样式 */
+html::-webkit-scrollbar-thumb {
+  background: #999; /* 滑块颜色 */
+  border-radius: 4px; /* 滑块圆角 */
+}
+
+/* 鼠标悬停在滑块上时的样式 */
+html::-webkit-scrollbar-thumb:hover {
+  background: #555; /* 鼠标悬停时颜色变深 */
+}
+
 /* 防止内容跳动 */
 .el-tabs__content,
 .el-table,
