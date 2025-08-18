@@ -93,10 +93,6 @@ defineEmits(['selectCommit', 'refresh'])
   background-color: var(--color-background-soft);
 }
 
-.commit-item.active {
-  background-color: var(--color-background-mute);
-}
-
 .commit-header,
 .commit-info,
 .commit-stats {
@@ -161,5 +157,10 @@ defineEmits(['selectCommit', 'refresh'])
   justify-content: center;
   align-items: center;
   width: 350px;
+}
+
+.commit-item.active {
+  background-color: rgba(var(--primary-color-rgb), 0.1);
+  color: var(--primary-color) !important;
 }
 </style>
