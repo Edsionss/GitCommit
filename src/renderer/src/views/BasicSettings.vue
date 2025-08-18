@@ -23,6 +23,9 @@
         @load-branches="loadBranches"
         @handle-preset-change="handlePresetChange"
         @discover-sub-repos="discoverSubRepos"
+        @select-all-repos="selectAllRepos"
+        @clear-all-repos="clearAllRepos"
+        @select-all-authors="selectAllAuthors"
       />
       <LogPanel
         :scanning="scanning"
@@ -341,11 +344,11 @@ const startScan = async () => {
     const commits = await window.api.scanGitRepo(form.repoPath, {
       authorFilter: form.authorFilter.join(','),
       dateRange: form.dateRange.map((d) => d.format('YYYY-MM-DD HH:mm:ss')) as [string, string],
-      selectedFields: form.selectedFields,
+      selectedFields: [...form.selectedFields],
       maxCommits: form.maxCommits || undefined,
       branch: form.branch || undefined,
       scanSubfolders: form.scanSubfolders,
-      selectedRepos: form.selectedRepos
+      selectedRepos: [...form.selectedRepos]
     })
 
     addLog(`扫描完成，共找到 ${commits.length} 条提交记录`, 'success')
@@ -397,9 +400,25 @@ const copyLogs = () => {
 const clearLogs = () => {
   logs.value = []
 }
+
+const selectAllRepos = () => {
+  form.selectedRepos = subRepos.value.map((repo) => repo)
+}
+
+const clearAllRepos = () => {
+  form.selectedRepos = []
+}
+
+const selectAllAuthors = () => {
+  form.authorFilter = availableAuthors.value.map((author) => author)
+}
 </script>
 
 <style scoped>
+:deep(.form-row-label) {
+  width: auto;
+}
+
 .basic-settings-container {
   height: 100%;
   display: flex;

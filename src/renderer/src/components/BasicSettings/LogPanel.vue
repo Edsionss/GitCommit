@@ -64,6 +64,12 @@ defineEmits(['stop-scan', 'copy-logs', 'clear-logs'])
 </script>
 
 <style scoped>
+:deep(.ant-card-body) {
+  height: 100%;
+  overflow: auto;
+  padding: 5px;
+}
+
 .log-column {
   flex: 2;
   min-width: 0;
@@ -82,13 +88,16 @@ defineEmits(['stop-scan', 'copy-logs', 'clear-logs'])
 .log-content {
   flex: 1;
   overflow-y: auto;
-  font-family: 'Fira Code', monospace;
+  /* font-family: 'Fira Code', monospace; */
+  font-family: ' inherit', monospace;
   white-space: pre-wrap;
   font-size: 13px;
   background-color: #f8f9fa;
   border-radius: 4px;
   padding: 5px;
   user-select: text; /* Allow text selection */
+  overflow: auto;
+  height: 100%;
 }
 
 .empty-logs {

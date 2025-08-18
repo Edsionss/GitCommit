@@ -26,7 +26,11 @@
 
         <div class="form-row">
           <label class="form-row-label">统计选项</label>
-          <a-select v-model:value="form.statsDimension" placeholder="选择统计维度" style="width: 200px;">
+          <a-select
+            v-model:value="form.statsDimension"
+            placeholder="选择统计维度"
+            style="width: 200px"
+          >
             <a-select-option value="author">按作者统计</a-select-option>
             <a-select-option value="repository">按仓库统计</a-select-option>
             <a-select-option value="date">按日期统计</a-select-option>
@@ -61,10 +65,7 @@
               />
             </template>
             <template #addonAfter>
-              <span
-                @click="$emit('select-repo-path')"
-                style="cursor: pointer"
-              >
+              <span @click="$emit('select-repo-path')" style="cursor: pointer">
                 <FolderOutlined />
               </span>
             </template>
@@ -73,7 +74,12 @@
           <div class="recent-paths">
             <div class="recent-paths-header">
               <span>最近扫描位置</span>
-              <a-button type="link" @click="$emit('clear-repo-history')" :disabled="!repoHistory || repoHistory.length === 0">清空历史</a-button>
+              <a-button
+                type="link"
+                @click="$emit('clear-repo-history')"
+                :disabled="!repoHistory || repoHistory.length === 0"
+                >清空历史</a-button
+              >
             </div>
             <div class="recent-paths-list">
               <a-empty v-if="!repoHistory || repoHistory.length === 0" description="暂无历史记录" />
@@ -108,19 +114,21 @@
         </div>
 
         <a-form-item label="选择仓库">
-           <a-input-group compact>
+          <a-input-group compact>
             <a-select
               v-model:value="form.selectedRepos"
               mode="multiple"
-              style="width: calc(100% - 110px);"
+              style="width: calc(100% - 110px)"
               :disabled="!form.scanSubfolders || !form.repoPath"
               placeholder="请先选择父目录并扫描子仓库"
-              :options="subRepos.map(repo => ({ value: repo, label: repo.replace(form.repoPath, '') }))"
+              :options="
+                subRepos.map((repo) => ({ value: repo, label: repo.replace(form.repoPath, '') }))
+              "
             />
-            <a-button 
-              style="width: 110px;"
-              @click="$emit('discover-sub-repos')" 
-              :loading="isDiscoveringRepos" 
+            <a-button
+              style="width: 110px"
+              @click="$emit('discover-sub-repos')"
+              :loading="isDiscoveringRepos"
               :disabled="!form.scanSubfolders || !form.repoPath"
             >
               扫描子仓库
@@ -339,10 +347,10 @@ const formatLastAccessed = (timestamp: string): string => {
 .form-row {
   display: flex;
   align-items: center;
-  margin-bottom: 24px; 
+  margin-bottom: 24px;
 }
 .form-row-label {
-  width: 150px; 
+  width: 150px;
   text-align: right;
   margin-right: 8px;
   color: rgba(0, 0, 0, 0.88);
