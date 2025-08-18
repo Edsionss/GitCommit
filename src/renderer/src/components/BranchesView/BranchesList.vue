@@ -21,6 +21,8 @@
       :columns="columns"
       :pagination="false"
       :scroll="{ x: 'max-content' }"
+      row-key="name"
+      v-model:expandedRowKeys="expandedRowKeys"
     >
       <template #expandedRowRender="{ record }">
         <div class="branch-detail">
@@ -61,7 +63,12 @@
         </template>
         <template v-else-if="column.key === 'action'">
           <a-button-group>
-            <a-button size="small" :disabled="record.current" @click="$emit('checkout', record)">
+            <a-button
+              size="small"
+              :disabled="record.current"
+              @click="$emit('checkout', record)"
+              style="margin-right: 5px"
+            >
               切换
             </a-button>
             <a-button
@@ -69,12 +76,14 @@
               type="primary"
               :disabled="record.name === 'main'"
               @click="$emit('merge', record)"
+              style="margin-right: 5px"
             >
               合并
             </a-button>
             <a-button
               size="small"
-              type="danger"
+              type="primary"
+              danger
               :disabled="record.name === 'main' || record.current"
               @click="$emit('delete', record)"
             >
@@ -94,19 +103,19 @@ import type { PropType } from 'vue'
 import { useFormatters } from '@/composables/useFormatters'
 
 interface Branch {
-  name: string;
-  current: boolean;
-  isRemote: boolean;
-  commitsCount: number;
-  lastCommitHash: string;
-  lastCommitAuthor: string;
-  lastCommitDate: string;
-  lastCommitMessage: string;
+  name: string
+  current: boolean
+  isRemote: boolean
+  commitsCount: number
+  lastCommitHash: string
+  lastCommitAuthor: string
+  lastCommitDate: string
+  lastCommitMessage: string
 }
 
 const props = defineProps({
   branches: { type: Array as PropType<Branch[]>, required: true },
-  loading: { type: Boolean, default: false },
+  loading: { type: Boolean, default: false }
 })
 
 defineEmits(['checkout', 'merge', 'delete'])
@@ -114,6 +123,7 @@ defineEmits(['checkout', 'merge', 'delete'])
 const { formatDate } = useFormatters()
 
 const searchQuery = ref('')
+const expandedRowKeys = ref<string[]>([])
 
 const filteredBranches = computed(() => {
   if (!searchQuery.value) return props.branches

@@ -62,7 +62,12 @@
           <div class="mr-actions">
             <span class="mr-author">{{ mr.author }} · {{ formatDate(mr.date) }}</span>
             <div>
-              <a-button size="small" @click="$emit('viewMergeRequest', mr)">查看</a-button>
+              <a-button
+                size="small"
+                @click="$emit('viewMergeRequest', mr)"
+                style="margin-right: 5px"
+                >查看</a-button
+              >
               <a-button
                 size="small"
                 type="primary"
@@ -86,19 +91,19 @@ import { ArrowRightOutlined } from '@ant-design/icons-vue'
 import type { PropType } from 'vue'
 
 interface MergeRequest {
-  id: number;
-  title: string;
-  source: string;
-  target: string;
-  status: string;
-  author: string;
-  date: string;
+  id: number
+  title: string
+  source: string
+  target: string
+  status: string
+  author: string
+  date: string
 }
 
 interface BranchStats {
-  totalBranches: number;
-  activeBranches: number;
-  aheadCount: number;
+  totalBranches: number
+  activeBranches: number
+  aheadCount: number
 }
 
 defineProps({

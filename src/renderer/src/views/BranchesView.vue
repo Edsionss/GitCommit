@@ -1,7 +1,6 @@
 <template>
   <div class="branches-container">
     <div class="branches-header">
-      <h2 class="page-title">分支管理</h2>
       <BranchesToolbar
         :repositories="repositories"
         :selected-repo="selectedRepo"
@@ -315,8 +314,8 @@ const checkoutBranch = (branch: any) => {
     },
     onCancel() {
       // 用户取消操作
-    },
-  });
+    }
+  })
 }
 
 // 打开合并分支对话框
@@ -392,8 +391,8 @@ const deleteBranch = (branch: any) => {
     },
     onCancel() {
       // 用户取消操作
-    },
-  });
+    }
+  })
 }
 
 // 查看合并请求
@@ -426,8 +425,8 @@ const approveMergeRequest = (mergeRequest: any) => {
     },
     onCancel() {
       // 用户取消操作
-    },
-  });
+    }
+  })
 }
 
 // 初始化分支图

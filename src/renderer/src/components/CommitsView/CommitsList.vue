@@ -76,6 +76,7 @@ defineEmits(['selectCommit', 'refresh'])
 <style scoped>
 .commits-list {
   width: 350px;
+  padding: 5px;
   border-right: 1px solid var(--color-border);
   overflow-y: auto;
 }
