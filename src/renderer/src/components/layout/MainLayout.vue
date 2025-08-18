@@ -108,7 +108,7 @@ onUnmounted(() => {
 
 .content-area {
   flex: 1;
-  padding: 24px;
+  padding: 10px;
   width: 100%;
   box-sizing: border-box;
   overflow: auto;

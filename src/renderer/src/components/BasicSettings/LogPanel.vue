@@ -43,10 +43,7 @@
 </template>
 
 <script setup lang="ts">
-import {
-  CopyOutlined,
-  DeleteOutlined
-} from '@ant-design/icons-vue'
+import { CopyOutlined, DeleteOutlined } from '@ant-design/icons-vue'
 
 interface Log {
   type: 'info' | 'error' | 'success'
@@ -90,7 +87,7 @@ defineEmits(['stop-scan', 'copy-logs', 'clear-logs'])
   font-size: 13px;
   background-color: #f8f9fa;
   border-radius: 4px;
-  padding: 12px;
+  padding: 5px;
   user-select: text; /* Allow text selection */
 }
 

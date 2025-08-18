@@ -172,6 +172,18 @@ ipcMain.handle('get-repo-authors', async (_, repoPath: string) => {
   }
 })
 
+// 获取仓库分支列表
+ipcMain.handle('git:getBranches', async (_, repoPath: string) => {
+  try {
+    const git: SimpleGit = simpleGit(repoPath)
+    const branches = await git.branchLocal()
+    return branches.all
+  } catch (error) {
+    console.error(`获取Git分支列表失败 for repo ${repoPath}:`, error)
+    throw error // Rethrow the error to be caught by the renderer
+  }
+})
+
 // 添加取消扫描标志
 let cancelScanFlag = false
 
@@ -321,7 +333,7 @@ ipcMain.handle('scan-git-repo', async (_, repoPath: string, options?: GitScanOpt
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error)
     BrowserWindow.getAllWindows()[0]?.webContents.send('scan-error', { message: errorMessage })
-    throw error
+    throw new Error(errorMessage)
   }
 })
 

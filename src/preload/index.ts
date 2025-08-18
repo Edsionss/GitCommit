@@ -39,6 +39,10 @@ const api = {
   getRepoAuthors: (repoPath: string): Promise<string[]> =>
     ipcRenderer.invoke('get-repo-authors', repoPath),
 
+  // 获取仓库分支
+  getRepoBranches: (repoPath: string): Promise<string[]> =>
+    ipcRenderer.invoke('git:getBranches', repoPath),
+
   // 获取子仓库
   getSubRepos: (repoPath: string): Promise<GetSubReposResult> => 
     ipcRenderer.invoke('get-sub-repos', repoPath),

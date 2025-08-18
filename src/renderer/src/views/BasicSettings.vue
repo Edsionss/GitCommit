@@ -11,6 +11,8 @@
         :date-preset="datePreset"
         :sub-repos="subRepos"
         :is-discovering-repos="isDiscoveringRepos"
+        :available-branches="availableBranches"
+        :branches-loading="branchesLoading"
         @validate-repo-path="validateRepoPath"
         @clear-repo-path="clearRepoPath"
         @select-repo-path="selectRepoPath"
@@ -18,6 +20,7 @@
         @select-recent-path="selectRecentPath"
         @remove-repo-from-history="removeRepoFromHistory"
         @load-authors="loadAuthors"
+        @load-branches="loadBranches"
         @handle-preset-change="handlePresetChange"
         @discover-sub-repos="discoverSubRepos"
       />
@@ -86,6 +89,8 @@ const logs = ref<Log[]>([])
 const isValidRepo = ref(false)
 const availableAuthors = ref<string[]>([])
 const authorsLoading = ref(false)
+const branchesLoading = ref(false)
+const availableBranches = ref<string[]>([])
 const datePreset = ref('本月')
 const scanPhase = ref('准备中')
 const scanPercentage = ref(0)
@@ -94,13 +99,16 @@ const unsubscribeError = ref<(() => void) | null>(null)
 const unsubscribeCancelled = ref<(() => void) | null>(null)
 const isSelectingPath = ref(false)
 
-watch(() => form.scanSubfolders, (newVal) => {
-  form.selectedRepos = [];
-  subRepos.value = [];
-  if (newVal === false && isValidRepo.value) {
-    form.selectedRepos = [form.repoPath];
+watch(
+  () => form.scanSubfolders,
+  (newVal) => {
+    form.selectedRepos = []
+    subRepos.value = []
+    if (newVal === false && isValidRepo.value) {
+      form.selectedRepos = [form.repoPath]
+    }
   }
-});
+)
 
 onMounted(() => {
   if (window.api?.onScanProgress) {
@@ -108,7 +116,9 @@ onMounted(() => {
       scanPhase.value = data.phase
       scanPercentage.value = data.percentage
       if (data.percentage === 100) {
-        setTimeout(() => { scanning.value = false }, 500)
+        setTimeout(() => {
+          scanning.value = false
+        }, 500)
       }
     })
   }
@@ -126,11 +136,43 @@ onMounted(() => {
   }
 })
 
+watch(isValidRepo, (newVal) => {
+  availableBranches.value = []
+  form.branch = ''
+  if (newVal) {
+    loadBranches()
+    loadAuthors()
+  }
+})
+
 onUnmounted(() => {
   unsubscribeProgress.value?.()
   unsubscribeError.value?.()
   unsubscribeCancelled.value?.()
 })
+
+const loadBranches = async () => {
+  if (!isValidRepo.value) return
+  branchesLoading.value = true
+  try {
+    addLog(`加载分支列表: ${form.repoPath}`, 'info')
+    const branches = await window.api.getRepoBranches(form.repoPath)
+    availableBranches.value = branches
+    if (branches.length > 0) {
+      addLog(`成功加载 ${branches.length} 个分支`, 'success')
+      // 可以在这里默认选中一个分支，例如第一个
+      // form.branch = branches[0];
+    } else {
+      addLog('未找到任何分支', 'info')
+    }
+  } catch (error) {
+    const msg = error instanceof Error ? error.message : String(error)
+    addLog(`加载分支失败: ${msg}`, 'error')
+    message.error(`加载分支失败: ${msg}`)
+  } finally {
+    branchesLoading.value = false
+  }
+}
 
 const addLog = (msg: string, type: Log['type'] = 'info') => {
   const timestamp = dayjs().format('HH:mm:ss')
@@ -255,44 +297,44 @@ const clearRepoHistory = () => {
 
 const discoverSubRepos = async () => {
   if (!form.repoPath) {
-    message.warning('请先选择一个父目录');
-    return;
+    message.warning('请先选择一个父目录')
+    return
   }
-  isDiscoveringRepos.value = true;
-  addLog(`正在扫描子仓库: ${form.repoPath}`, 'info');
+  isDiscoveringRepos.value = true
+  addLog(`正在扫描子仓库: ${form.repoPath}`, 'info')
   try {
-    const result = await window.api.getSubRepos(form.repoPath);
+    const result = await window.api.getSubRepos(form.repoPath)
     if (result.success && result.repos) {
-      subRepos.value = result.repos;
+      subRepos.value = result.repos
       if (result.repos.length > 0) {
-        addLog(`发现了 ${result.repos.length} 个子仓库`, 'success');
-        message.success(`发现了 ${result.repos.length} 个子仓库`);
+        addLog(`发现了 ${result.repos.length} 个子仓库`, 'success')
+        message.success(`发现了 ${result.repos.length} 个子仓库`)
       } else {
-        addLog('未发现任何子仓库', 'info');
-        message.info('未发现任何子仓库');
+        addLog('未发现任何子仓库', 'info')
+        message.info('未发现任何子仓库')
       }
     } else {
-      throw new Error(result.error || 'An unknown error occurred');
+      throw new Error(result.error || 'An unknown error occurred')
     }
   } catch (error) {
-    const errorMsg = error instanceof Error ? error.message : String(error);
-    message.error(`扫描子仓库时出错: ${errorMsg}`);
-    addLog(`扫描子仓库时出错: ${errorMsg}`, 'error');
+    const errorMsg = error instanceof Error ? error.message : String(error)
+    message.error(`扫描子仓库时出错: ${errorMsg}`)
+    addLog(`扫描子仓库时出错: ${errorMsg}`, 'error')
   } finally {
-    isDiscoveringRepos.value = false;
+    isDiscoveringRepos.value = false
   }
-};
+}
 
 const startScan = async () => {
   if (!form.repoPath) return message.warning('请选择Git仓库路径')
   if (form.selectedFields.length === 0) return message.warning('请至少选择一个字段')
-  if (form.scanSubfolders && form.selectedRepos.length === 0) return message.warning('请至少选择一个子仓库进行扫描')
+  if (form.scanSubfolders && form.selectedRepos.length === 0)
+    return message.warning('请至少选择一个子仓库进行扫描')
   if (!form.scanSubfolders && !isValidRepo.value) return message.warning('请选择一个有效的Git仓库')
 
   scanning.value = true
   scanPhase.value = '准备中'
   scanPercentage.value = 0
-  logs.value = []
   addLog(`开始扫描仓库: ${form.repoPath}`)
 
   try {

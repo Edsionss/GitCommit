@@ -129,11 +129,18 @@
         </a-form-item>
 
         <a-form-item label="分支选择">
-          <a-input v-model:value="form.branch" placeholder="默认为当前分支 (HEAD)">
+          <a-select
+            v-model:value="form.branch"
+            show-search
+            placeholder="默认为当前分支 (HEAD)，可搜索"
+            :options="availableBranches.map((branch) => ({ value: branch }))"
+            :loading="branchesLoading"
+            @focus="$emit('load-branches')"
+          >
             <template #prefix>
               <BranchesOutlined />
             </template>
-          </a-input>
+          </a-select>
         </a-form-item>
 
         <a-form-item label="最大提交数">
@@ -222,7 +229,9 @@ defineProps({
   authorsLoading: Boolean,
   datePreset: String,
   subRepos: Array,
-  isDiscoveringRepos: Boolean
+  isDiscoveringRepos: Boolean,
+  availableBranches: Array,
+  branchesLoading: Boolean
 })
 
 defineEmits([
@@ -234,7 +243,8 @@ defineEmits([
   'remove-repo-from-history',
   'load-authors',
   'handle-preset-change',
-  'discover-sub-repos'
+  'discover-sub-repos',
+  'load-branches'
 ])
 
 const formatLastAccessed = (timestamp: string): string => {
