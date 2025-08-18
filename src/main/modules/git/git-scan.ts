@@ -94,7 +94,10 @@ export function registerGitScanHandlers() {
           logOptions['-n'] = options.maxCommits;
         }
         if (options?.authorFilter) {
-          logOptions.author = options.authorFilter.split(',').map((a) => a.trim());
+          const authors = options.authorFilter.split(',').map((a) => a.trim()).filter(a => a);
+          if (authors.length > 0) {
+            logOptions['--author'] = authors;
+          }
         }
         if (options?.dateRange && options.dateRange[0] && options.dateRange[1]) {
           logOptions.after = options.dateRange[0];
