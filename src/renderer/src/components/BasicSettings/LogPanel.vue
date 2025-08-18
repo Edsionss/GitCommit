@@ -23,10 +23,10 @@
         <div class="card-header">
           <span>扫描日志</span>
           <div class="log-actions">
-            <a-button type="link" @click="$emit('copy-logs')" :disabled="logs.length === 0">
+            <a-button type="link" @click="copyLogs" :disabled="logs.length === 0">
               <template #icon><CopyOutlined /></template>复制
             </a-button>
-            <a-button type="link" danger @click="$emit('clear-logs')" :disabled="logs.length === 0">
+            <a-button type="link" danger @click="clearLogs" :disabled="logs.length === 0">
               <template #icon><DeleteOutlined /></template>清除
             </a-button>
           </div>
@@ -43,7 +43,10 @@
 </template>
 
 <script setup lang="ts">
+import { ref, onMounted, onUnmounted } from 'vue'
 import { CopyOutlined, DeleteOutlined } from '@ant-design/icons-vue'
+import { message } from 'ant-design-vue'
+import dayjs from 'dayjs'
 
 interface Log {
   type: 'info' | 'error' | 'success'
@@ -51,16 +54,69 @@ interface Log {
 }
 
 defineProps({
-  scanning: Boolean,
-  scanPhase: String,
-  scanPercentage: Number,
-  logs: {
-    type: Array as () => Log[],
-    required: true
+  scanning: Boolean
+})
+
+const emit = defineEmits(['stop-scan', 'scan-started', 'scan-finished'])
+
+const logs = ref<Log[]>([])
+const scanPhase = ref('准备中')
+const scanPercentage = ref(0)
+const unsubscribeProgress = ref<(() => void) | null>(null)
+const unsubscribeError = ref<(() => void) | null>(null)
+const unsubscribeCancelled = ref<(() => void) | null>(null)
+
+const addLog = (msg: string, type: Log['type'] = 'info') => {
+  const timestamp = dayjs().format('HH:mm:ss')
+  logs.value.push({ message: `[${timestamp}] ${msg}`, type })
+}
+
+defineExpose({ addLog })
+
+onMounted(() => {
+  if (window.api?.onScanProgress) {
+    unsubscribeProgress.value = window.api.onScanProgress((data) => {
+      emit('scan-started')
+      scanPhase.value = data.phase
+      scanPercentage.value = data.percentage
+      if (data.percentage === 100) {
+        setTimeout(() => {
+          emit('scan-finished')
+        }, 500)
+      }
+    })
+  }
+  if (window.api?.onScanError) {
+    unsubscribeError.value = window.api.onScanError((data) => {
+      addLog(`扫描错误: ${data.message}`, 'error')
+      emit('scan-finished')
+    })
+  }
+  if (window.api?.onScanCancelled) {
+    unsubscribeCancelled.value = window.api.onScanCancelled(() => {
+      addLog('扫描已取消', 'info')
+      emit('scan-finished')
+    })
   }
 })
 
-defineEmits(['stop-scan', 'copy-logs', 'clear-logs'])
+onUnmounted(() => {
+  unsubscribeProgress.value?.()
+  unsubscribeError.value?.()
+  unsubscribeCancelled.value?.()
+})
+
+const copyLogs = () => {
+  const logText = logs.value.map((log) => log.message).join('\n')
+  navigator.clipboard
+    .writeText(logText)
+    .then(() => message.success('日志已复制到剪贴板'))
+    .catch(() => message.error('复制失败'))
+}
+
+const clearLogs = () => {
+  logs.value = []
+}
 </script>
 
 <style scoped>

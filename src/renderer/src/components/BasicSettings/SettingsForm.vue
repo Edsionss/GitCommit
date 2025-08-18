@@ -51,7 +51,7 @@
           <a-input
             v-model:value="form.repoPath"
             placeholder="请输入Git仓库路径"
-            @change="$emit('validate-repo-path')"
+            @change="validateRepoPath"
           >
             <template #prefix>
               <CheckCircleFilled v-if="isValidRepo" style="color: green" />
@@ -61,11 +61,11 @@
               <CloseCircleFilled
                 v-if="form.repoPath"
                 class="clear-icon"
-                @click="$emit('clear-repo-path')"
+                @click="clearRepoPath"
               />
             </template>
             <template #addonAfter>
-              <span @click="$emit('select-repo-path')" style="cursor: pointer">
+              <span @click="selectRepoPath" style="cursor: pointer">
                 <FolderOutlined />
               </span>
             </template>
@@ -76,7 +76,7 @@
               <span>最近扫描位置</span>
               <a-button
                 type="link"
-                @click="$emit('clear-repo-history')"
+                @click="clearRepoHistory"
                 :disabled="!repoHistory || repoHistory.length === 0"
                 >清空历史</a-button
               >
@@ -88,7 +88,7 @@
                 v-for="item in repoHistory"
                 :key="item.path"
                 class="recent-path-item"
-                @click="$emit('select-recent-path', item.path)"
+                @click="selectRecentPath(item.path)"
               >
                 <div class="path-info">
                   <span class="path-text">{{ item.path }}</span>
@@ -98,7 +98,7 @@
                   <a-button
                     type="text"
                     danger
-                    @click.stop="$emit('remove-repo-from-history', item.path)"
+                    @click.stop="removeRepoFromHistory(item.path)"
                   >
                     <DeleteOutlined />
                   </a-button>
@@ -127,7 +127,7 @@
             />
             <a-button
               style="width: 110px"
-              @click="$emit('discover-sub-repos')"
+              @click="discoverSubRepos"
               :loading="isDiscoveringRepos"
               :disabled="!form.scanSubfolders || !form.repoPath"
             >
@@ -143,7 +143,7 @@
             placeholder="默认为当前分支 (HEAD)，可搜索"
             :options="availableBranches.map((branch) => ({ value: branch }))"
             :loading="branchesLoading"
-            @focus="$emit('load-branches')"
+            @focus="loadBranches"
           >
             <template #prefix>
               <BranchesOutlined />
@@ -168,7 +168,7 @@
           <div class="author-actions">
             <a-button
               type="link"
-              @click="$emit('load-authors')"
+              @click="loadAuthors"
               :loading="authorsLoading"
               :disabled="!isValidRepo"
             >
@@ -182,7 +182,7 @@
 
         <a-form-item label="时间范围">
           <div class="date-range-selector">
-            <a-radio-group :value="datePreset" @change="(e) => $emit('handle-preset-change', e)">
+            <a-radio-group :value="datePreset" @change="handlePresetChange">
               <a-radio-button value="今日">今日</a-radio-button>
               <a-radio-button value="本周">本周</a-radio-button>
               <a-radio-button value="本月">本月</a-radio-button>
@@ -214,6 +214,7 @@
 </template>
 
 <script setup lang="ts">
+import { ref, watch, reactive } from 'vue'
 import {
   FolderOutlined,
   CheckCircleFilled,
@@ -223,37 +224,216 @@ import {
   SyncOutlined,
   ClearOutlined
 } from '@ant-design/icons-vue'
-import dayjs from 'dayjs'
+import { message } from 'ant-design-vue'
+import { gitService } from '../../../../services/GitService'
+import dayjs, { Dayjs } from 'dayjs'
 
-defineProps({
+const props = defineProps({
   form: {
     type: Object,
     required: true
   },
-  isValidRepo: Boolean,
-  isSelectingPath: Boolean,
-  repoHistory: Array,
-  availableAuthors: Array,
-  authorsLoading: Boolean,
-  datePreset: String,
-  subRepos: Array,
-  isDiscoveringRepos: Boolean,
-  availableBranches: Array,
-  branchesLoading: Boolean
+  isValidRepo: Boolean
 })
 
-defineEmits([
-  'validate-repo-path',
-  'clear-repo-path',
-  'select-repo-path',
-  'clear-repo-history',
-  'select-recent-path',
-  'remove-repo-from-history',
-  'load-authors',
-  'handle-preset-change',
-  'discover-sub-repos',
-  'load-branches'
-])
+const emit = defineEmits(['update:form', 'add-log', 'validate-repo-path'])
+
+const localForm = reactive(props.form)
+
+watch(
+  localForm,
+  (newVal) => {
+    emit('update:form', newVal)
+  },
+  { deep: true }
+)
+
+const PRESET_RANGES: { [key: string]: [Dayjs, Dayjs] | string } = {
+  今日: [dayjs().startOf('day'), dayjs().endOf('day')],
+  本周: [dayjs().startOf('week'), dayjs().endOf('week')],
+  本月: [dayjs().startOf('month'), dayjs().endOf('month')],
+  自定义: 'custom'
+}
+
+const subRepos = ref<string[]>([])
+const isDiscoveringRepos = ref(false)
+const repoHistory = ref(gitService.getRepoHistory())
+const availableAuthors = ref<string[]>([])
+const authorsLoading = ref(false)
+const branchesLoading = ref(false)
+const availableBranches = ref<string[]>([])
+const datePreset = ref('本月')
+const isSelectingPath = ref(false)
+
+watch(
+  () => localForm.scanSubfolders,
+  (newVal) => {
+    localForm.selectedRepos = []
+    subRepos.value = []
+    if (newVal === false && props.isValidRepo) {
+      localForm.selectedRepos = [localForm.repoPath]
+    }
+  }
+)
+
+watch(
+  () => props.isValidRepo,
+  (newVal) => {
+    availableBranches.value = []
+    localForm.branch = ''
+    if (newVal) {
+      message.success('验证成功，是有效的Git仓库')
+      emit('add-log', `选择并验证仓库: ${localForm.repoPath} 有效`, 'success')
+      if (!localForm.scanSubfolders) {
+        localForm.selectedRepos = [localForm.repoPath]
+      }
+      loadBranches()
+      loadAuthors()
+    } else {
+      if (localForm.repoPath) {
+        message.error('验证失败，当前路径不是有效的Git仓库')
+        emit('add-log', `选择的目录无效: ${localForm.repoPath}`, 'error')
+      }
+    }
+  }
+)
+
+const loadBranches = async () => {
+  if (!props.isValidRepo) return
+  branchesLoading.value = true
+  try {
+    emit('add-log', `加载分支列表: ${localForm.repoPath}`, 'info')
+    const branches = await window.api.getRepoBranches(localForm.repoPath)
+    availableBranches.value = branches
+    if (branches.length > 0) {
+      emit('add-log', `成功加载 ${branches.length} 个分支`, 'success')
+    } else {
+      emit('add-log', '未找到任何分支', 'info')
+    }
+  } catch (error) {
+    const msg = error instanceof Error ? error.message : String(error)
+    emit('add-log', `加载分支失败: ${msg}`, 'error')
+    message.error(`加载分支失败: ${msg}`)
+  } finally {
+    branchesLoading.value = false
+  }
+}
+
+const clearRepoPath = () => {
+  localForm.repoPath = ''
+  emit('validate-repo-path', '')
+  availableAuthors.value = []
+  localForm.authorFilter = []
+  subRepos.value = []
+  localForm.selectedRepos = []
+}
+
+const selectRepoPath = async () => {
+  isSelectingPath.value = true
+  try {
+    const result = await window.api.selectDirectory()
+    if (result) {
+      const { path } = result
+      localForm.repoPath = path
+      emit('validate-repo-path', path)
+      gitService.addToHistory(path)
+      repoHistory.value = gitService.getRepoHistory()
+
+      if (localForm.scanSubfolders) {
+        message.success(`已选择目录，请点击“扫描子仓库”按钮: ${path}`)
+        emit('add-log', `已选择父目录进行子文件夹扫描: ${path}`, 'info')
+      }
+    }
+  } catch (error) {
+    message.error('选择目录失败')
+    console.error('Error in selectRepoPath:', error)
+  } finally {
+    isSelectingPath.value = false
+  }
+}
+
+const validateRepoPath = () => {
+  emit('validate-repo-path', localForm.repoPath)
+  if (localForm.repoPath) {
+    gitService.addToHistory(localForm.repoPath)
+    repoHistory.value = gitService.getRepoHistory()
+  }
+}
+
+const loadAuthors = async () => {
+  if (!props.isValidRepo) {
+    message.warning('请先选择有效的Git仓库')
+    return
+  }
+  authorsLoading.value = true
+  try {
+    emit('add-log', `加载仓库作者列表: ${localForm.repoPath}`)
+    const authors = await window.api.getRepoAuthors(localForm.repoPath)
+    availableAuthors.value = authors
+    emit('add-log', `找到 ${authors.length} 个作者`, 'success')
+  } catch (error) {
+    const errorMsg = error instanceof Error ? error.message : String(error)
+    emit('add-log', `加载作者列表失败: ${errorMsg}`, 'error')
+    message.error('加载作者列表失败')
+  } finally {
+    authorsLoading.value = false
+  }
+}
+
+const handlePresetChange = (e: any) => {
+  const preset = e.target.value
+  datePreset.value = preset
+  if (preset === '自定义') return
+  const range = PRESET_RANGES[preset]
+  if (Array.isArray(range)) {
+    localForm.dateRange = [range[0], range[1]]
+  }
+}
+
+const selectRecentPath = (path: string) => {
+  localForm.repoPath = path
+  validateRepoPath()
+}
+
+const removeRepoFromHistory = (path: string) => {
+  gitService.removeFromHistory(path)
+  repoHistory.value = gitService.getRepoHistory()
+}
+
+const clearRepoHistory = () => {
+  repoHistory.value.forEach((item) => gitService.removeFromHistory(item.path))
+  repoHistory.value = []
+}
+
+const discoverSubRepos = async () => {
+  if (!localForm.repoPath) {
+    message.warning('请先选择一个父目录')
+    return
+  }
+  isDiscoveringRepos.value = true
+  emit('add-log', `正在扫描子仓库: ${localForm.repoPath}`, 'info')
+  try {
+    const result = await window.api.getSubRepos(localForm.repoPath)
+    if (result.success && result.repos) {
+      subRepos.value = result.repos
+      if (result.repos.length > 0) {
+        emit('add-log', `发现了 ${result.repos.length} 个子仓库`, 'success')
+        message.success(`发现了 ${result.repos.length} 个子仓库`)
+      } else {
+        emit('add-log', '未发现任何子仓库', 'info')
+        message.info('未发现任何子仓库')
+      }
+    } else {
+      throw new Error(result.error || 'An unknown error occurred')
+    }
+  } catch (error) {
+    const errorMsg = error instanceof Error ? error.message : String(error)
+    message.error(`扫描子仓库时出错: ${errorMsg}`)
+    emit('add-log', `扫描子仓库时出错: ${errorMsg}`, 'error')
+  } finally {
+    isDiscoveringRepos.value = false
+  }
+}
 
 const formatLastAccessed = (timestamp: string): string => {
   const date = dayjs(timestamp)
