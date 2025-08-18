@@ -30,6 +30,8 @@ interface GitScanOptions {
   selectedFields: string[]
   maxCommits?: number
   branch?: string
+  scanSubfolders?: boolean
+  selectedRepos?: string[]
 }
 
 function createWindow(): void {
@@ -119,10 +121,10 @@ ipcMain.handle('select-directory', async () => {
   const result = await dialog.showOpenDialog({
     properties: ['openDirectory']
   })
-  if (!result.canceled) {
-    const path = result.filePaths[0]
-    const isValid = await isValidGitRepo(path)
-    return isValid ? path : null
+  if (!result.canceled && result.filePaths.length > 0) {
+    const repoPath = result.filePaths[0]
+    const isValid = await isValidGitRepo(repoPath)
+    return { path: repoPath, isValid }
   }
   return null
 })
@@ -130,6 +132,19 @@ ipcMain.handle('select-directory', async () => {
 // 验证路径
 ipcMain.handle('validate-repo-path', async (_, repoPath: string) => {
   return await isValidGitRepo(repoPath)
+})
+
+// 获取子目录中的Git仓库
+ipcMain.handle('get-sub-repos', async (_, repoPath: string) => {
+  if (!repoPath) return { success: true, repos: [] };
+  try {
+    const repos = await findGitRepos(repoPath);
+    return { success: true, repos };
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    console.error('查找子仓库失败:', errorMessage);
+    return { success: false, error: errorMessage };
+  }
 })
 
 // 获取仓库作者列表
@@ -160,142 +175,150 @@ ipcMain.handle('get-repo-authors', async (_, repoPath: string) => {
 // 添加取消扫描标志
 let cancelScanFlag = false
 
+async function findGitRepos(dir: string): Promise<string[]> {
+  const repos: string[] = []
+  const entries = await fs.readdir(dir, { withFileTypes: true })
+
+  for (const entry of entries) {
+    const fullPath = path.join(dir, entry.name)
+    if (entry.isDirectory()) {
+      if (entry.name === '.git') {
+        repos.push(path.dirname(fullPath))
+        // Once a .git folder is found, don't go deeper into that directory structure
+        continue
+      }
+      // Ignore node_modules to speed up scanning
+      if (entry.name !== 'node_modules') {
+        try {
+          repos.push(...(await findGitRepos(fullPath)))
+        } catch (error) {
+          // Ignore errors from directories we can't access
+          console.error(`Could not access ${fullPath}, skipping.`)
+        }
+      }
+    }
+  }
+  // Return unique paths
+  return [...new Set(repos)]
+}
+
 // Git操作 - 扫描仓库
 ipcMain.handle('scan-git-repo', async (_, repoPath: string, options?: GitScanOptions) => {
   try {
     // 重置取消标志
     cancelScanFlag = false
 
-    // 定义扫描进度事件
+    const mainWindow = BrowserWindow.getAllWindows()[0]
     const sendProgress = (phase: string, percentage: number) => {
       if (cancelScanFlag) {
         throw new Error('操作已取消')
       }
-      BrowserWindow.getAllWindows()[0]?.webContents.send('scan-progress', { phase, percentage })
+      mainWindow?.webContents.send('scan-progress', { phase, percentage })
     }
 
-    // 判断路径是否存在
-    try {
-      await fs.access(repoPath)
-    } catch (error) {
-      throw new Error(`仓库路径不存在: ${repoPath}`)
-    }
-
-    // 初始化Git
-    sendProgress('初始化仓库', 10)
-    const git: SimpleGit = simpleGit(repoPath)
-
-    // 检查是否是有效的Git仓库
-    const isRepo = await git.checkIsRepo()
-    if (!isRepo) {
-      throw new Error(`${repoPath} 不是有效的Git仓库`)
-    }
-
-    sendProgress('获取提交历史', 20)
-
-    // 构建log命令参数
-    const logOptions: string[] = [
-      '--no-merges',
-      '--date=iso',
-      '--pretty=format:%H|%h|%an|%ae|%ad|%s|%b',
-      '--numstat'
-    ]
-
-    // 添加分支选项
-    if (options?.branch && options.branch !== 'HEAD') {
-      logOptions.unshift(options.branch)
-    }
-
-    // 添加最大提交数限制
-    if (options?.maxCommits && options.maxCommits > 0) {
-      logOptions.unshift(`-n${options.maxCommits}`)
-    }
-
-    // 添加作者过滤
-    if (options?.authorFilter) {
-      const authors = options.authorFilter.split(',').map((a) => a.trim())
-      for (const author of authors) {
-        logOptions.unshift(`--author=${author}`)
+    let reposToScan: string[] = []
+    if (options?.scanSubfolders) {
+      // If specific sub-repos are selected, use them. Otherwise, find all.
+      if (options.selectedRepos && options.selectedRepos.length > 0) {
+        reposToScan = options.selectedRepos;
+      } else {
+        sendProgress('正在查找子目录中的Git仓库...', 5)
+        reposToScan = await findGitRepos(repoPath)
       }
+
+      if (reposToScan.length === 0) {
+        throw new Error('在指定目录及其子目录中未找到任何Git仓库')
+      }
+    } else {
+      const isRepo = await isValidGitRepo(repoPath)
+      if (!isRepo) {
+        throw new Error(`${repoPath} 不是一个有效的Git仓库`)
+      }
+      reposToScan.push(repoPath)
     }
 
-    // 添加日期范围
-    if (options?.dateRange && options.dateRange[0] && options.dateRange[1]) {
-      logOptions.unshift(`--after=${options.dateRange[0]}`, `--before=${options.dateRange[1]}`)
-    }
+    const allCommits: GitCommit[] = []
+    const totalRepos = reposToScan.length
 
-    // 获取自定义日志格式
-    const output = await git.raw(logOptions)
+    for (let i = 0; i < totalRepos; i++) {
+      const currentRepoPath = reposToScan[i]
+      const repoName = path.basename(currentRepoPath)
+      const progressPrefix = totalRepos > 1 ? `(${i + 1}/${totalRepos}) ${repoName}` : ''
 
-    sendProgress('解析提交数据', 50)
+      sendProgress(`${progressPrefix} - 初始化仓库`, 10 + (i / totalRepos) * 80)
+      const git: SimpleGit = simpleGit(currentRepoPath)
 
-    // 解析自定义格式输出
-    const commits: GitCommit[] = []
-    const blocks = output.split('\n\n')
+      const logOptions: string[] = [
+        '--no-merges',
+        '--date=iso',
+        '--pretty=format:%H|%h|%an|%ae|%ad|%s|%b',
+        '--numstat'
+      ]
 
-    for (let i = 0; i < blocks.length; i++) {
-      const block = blocks[i].trim()
-      if (!block) continue
-
-      const lines = block.split('\n')
-      if (lines.length === 0) continue
-
-      // 第一行包含基本信息
-      const commitInfo = lines[0].split('|')
-      if (commitInfo.length < 6) continue
-
-      // 解析统计信息
-      let insertions = 0
-      let deletions = 0
-      let filesChanged = 0
-
-      // 从第二行开始是文件统计
-      for (let j = 1; j < lines.length; j++) {
-        const statLine = lines[j].trim()
-        if (!statLine) continue
-
-        // 格式: 新增行数 删除行数 文件名
-        const parts = statLine.split('\t')
-        if (parts.length === 3) {
-          filesChanged++
-          insertions += parseInt(parts[0]) || 0
-          deletions += parseInt(parts[1]) || 0
+      if (options?.branch && options.branch !== 'HEAD') {
+        logOptions.unshift(options.branch)
+      }
+      if (options?.maxCommits && options.maxCommits > 0) {
+        logOptions.unshift(`-n${options.maxCommits}`)
+      }
+      if (options?.authorFilter) {
+        const authors = options.authorFilter.split(',').map((a) => a.trim())
+        for (const author of authors) {
+          logOptions.unshift(`--author=${author}`)
         }
       }
-
-      // 从commitInfo[6]获取commit message body (如果存在)
-      let body = ''
-      if (commitInfo.length > 6) {
-        body = commitInfo.slice(6).join('|')
+      if (options?.dateRange && options.dateRange[0] && options.dateRange[1]) {
+        logOptions.unshift(`--after=${options.dateRange[0]}`, `--before=${options.dateRange[1]}`)
       }
 
-      // 添加提交
-      commits.push({
-        repository: path.basename(repoPath),
-        repoPath,
-        commitId: commitInfo[0],
-        shortHash: commitInfo[1],
-        author: commitInfo[2],
-        email: commitInfo[3],
-        date: commitInfo[4],
-        message: commitInfo[5],
-        body,
-        filesChanged,
-        insertions,
-        deletions
-      })
+      sendProgress(`${progressPrefix} - 获取提交历史`, 20 + (i / totalRepos) * 80)
+      const output = await git.raw(logOptions)
 
-      // 更新进度
-      if (i % 10 === 0) {
-        sendProgress('解析提交数据', 50 + Math.floor((i / blocks.length) * 50))
+      sendProgress(`${progressPrefix} - 解析提交数据`, 50 + (i / totalRepos) * 80)
+      const blocks = output.split('\n\n')
+      for (let j = 0; j < blocks.length; j++) {
+        if (cancelScanFlag) throw new Error('操作已取消')
+        const block = blocks[j].trim()
+        if (!block) continue
+
+        const lines = block.split('\n')
+        if (lines.length === 0) continue
+
+        const commitInfo = lines[0].split('|')
+        if (commitInfo.length < 6) continue
+
+        let insertions = 0, deletions = 0, filesChanged = 0
+        for (let k = 1; k < lines.length; k++) {
+          const statLine = lines[k].trim()
+          if (!statLine) continue
+          const parts = statLine.split('\t')
+          if (parts.length === 3) {
+            filesChanged++
+            insertions += parseInt(parts[0]) || 0
+            deletions += parseInt(parts[1]) || 0
+          }
+        }
+
+        allCommits.push({
+          repository: repoName,
+          repoPath: currentRepoPath,
+          commitId: commitInfo[0],
+          shortHash: commitInfo[1],
+          author: commitInfo[2],
+          email: commitInfo[3],
+          date: commitInfo[4],
+          message: commitInfo[5],
+          body: commitInfo.length > 6 ? commitInfo.slice(6).join('|') : '',
+          filesChanged,
+          insertions,
+          deletions
+        })
       }
     }
 
     sendProgress('完成', 100)
-
-    return commits
+    return allCommits
   } catch (error) {
-    // 发送错误消息到渲染进程
     const errorMessage = error instanceof Error ? error.message : String(error)
     BrowserWindow.getAllWindows()[0]?.webContents.send('scan-error', { message: errorMessage })
     throw error

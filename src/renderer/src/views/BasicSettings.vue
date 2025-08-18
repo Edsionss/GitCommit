@@ -1,226 +1,54 @@
 <template>
-  <div class="router-view-container">
-    <div class="basic-settings">
-      <a-card class="settings-card">
-        <template #title>
-          <div class="card-header">
-            <span>字段与统计配置</span>
-          </div>
-        </template>
-        <a-form :model="form" layout="vertical">
-          <a-form-item label="字段选择">
-            <a-checkbox-group v-model:value="form.selectedFields">
-              <a-checkbox value="repository">仓库名称</a-checkbox>
-              <a-checkbox value="repoPath">仓库完整路径</a-checkbox>
-              <a-checkbox value="commitId">完整提交ID</a-checkbox>
-              <a-checkbox value="shortHash">短提交ID</a-checkbox>
-              <a-checkbox value="author">作者</a-checkbox>
-              <a-checkbox value="email">邮箱</a-checkbox>
-              <a-checkbox value="date">日期</a-checkbox>
-              <a-checkbox value="message">提交消息</a-checkbox>
-              <a-checkbox value="body">详细描述</a-checkbox>
-              <a-checkbox value="filesChanged">变更文件数</a-checkbox>
-              <a-checkbox value="insertions">新增行数</a-checkbox>
-              <a-checkbox value="deletions">删除行数</a-checkbox>
-            </a-checkbox-group>
-          </a-form-item>
-
-          <a-form-item label="统计选项">
-            <a-select v-model:value="form.statsDimension" placeholder="选择统计维度">
-              <a-select-option value="author">按作者统计</a-select-option>
-              <a-select-option value="repository">按仓库统计</a-select-option>
-              <a-select-option value="date">按日期统计</a-select-option>
-              <a-select-option value="none">不按任何</a-select-option>
-            </a-select>
-          </a-form-item>
-        </a-form>
-      </a-card>
-
-      <a-card class="settings-card">
-        <template #title>
-          <div class="card-header">
-            <span>仓库与过滤配置</span>
-          </div>
-        </template>
-        <a-form :model="form" layout="vertical">
-          <a-form-item label="仓库路径">
-            <a-input
-              v-model:value="form.repoPath"
-              placeholder="请输入Git仓库路径"
-              @change="validateRepoPath"
-            >
-              <template #addonAfter>
-                <span @click="selectRepoPath" style="cursor: pointer">
-                  <FolderOutlined />
-                </span>
-              </template>
-              <template #prefix>
-                <CheckCircleFilled v-if="isValidRepo" style="color: green" />
-                <CloseCircleFilled v-else-if="form.repoPath" style="color: red" />
-              </template>
-            </a-input>
-            <div v-if="repoHistory.length > 0" class="recent-paths">
-              <div class="recent-paths-header">
-                <span>最近扫描位置</span>
-                <a-button type="link" @click="clearRepoHistory">清空历史</a-button>
-              </div>
-              <div class="recent-paths-list">
-                <div
-                  v-for="item in repoHistory"
-                  :key="item.path"
-                  class="recent-path-item"
-                  @click="selectRecentPath(item.path)"
-                >
-                  <div class="path-info">
-                    <span class="path-text">{{ item.path }}</span>
-                    <span class="path-time">{{ formatLastAccessed(item.lastAccessed) }}</span>
-                  </div>
-                  <div class="path-actions">
-                    <a-button type="text" danger @click.stop="removeRepoFromHistory(item.path)">
-                      <DeleteOutlined />
-                    </a-button>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </a-form-item>
-
-          <a-form-item label="分支选择">
-            <a-input v-model:value="form.branch" placeholder="默认为当前分支 (HEAD)">
-              <template #prefix>
-                <BranchesOutlined />
-              </template>
-            </a-input>
-          </a-form-item>
-
-          <a-form-item label="最大提交数">
-            <a-input-number v-model:value="form.maxCommits" :min="0" :max="10000" />
-            <span class="hint">0表示不限制</span>
-          </a-form-item>
-
-          <a-form-item label="作者过滤">
-            <a-select
-              v-model:value="form.authorFilter"
-              mode="tags"
-              placeholder="选择或输入作者名称/邮箱"
-              style="width: 100%"
-              :options="availableAuthors.map((author) => ({ value: author }))"
-              :loading="authorsLoading"
-            />
-            <div class="author-actions">
-              <a-button
-                type="link"
-                @click="loadAuthors"
-                :loading="authorsLoading"
-                :disabled="!isValidRepo"
-              >
-                <template #icon><SyncOutlined /></template> 扫描作者
-              </a-button>
-              <a-button type="link" @click="form.authorFilter = []">
-                <template #icon><ClearOutlined /></template> 清空
-              </a-button>
-            </div>
-          </a-form-item>
-
-          <a-form-item label="时间范围">
-            <div class="date-range-selector">
-              <a-radio-group v-model:value="datePreset" @change="handlePresetChange">
-                <a-radio-button value="今日">今日</a-radio-button>
-                <a-radio-button value="本周">本周</a-radio-button>
-                <a-radio-button value="本月">本月</a-radio-button>
-                <a-radio-button value="自定义">自定义</a-radio-button>
-              </a-radio-group>
-              <a-range-picker
-                v-model:value="form.dateRange"
-                show-time
-                format="YYYY-MM-DD HH:mm"
-                value-format="YYYY-MM-DD HH:mm:ss"
-                style="width: 100%"
-                :disabled="datePreset !== '自定义'"
-              />
-            </div>
-          </a-form-item>
-
-          <a-form-item label="输出格式">
-            <a-select v-model:value="form.outputFormat" placeholder="选择输出格式">
-              <a-select-option value="json">JSON</a-select-option>
-              <a-select-option value="csv">CSV</a-select-option>
-              <a-select-option value="excel">Excel</a-select-option>
-              <a-select-option value="html">HTML</a-select-option>
-              <a-select-option value="markdown">Markdown</a-select-option>
-            </a-select>
-          </a-form-item>
-        </a-form>
-      </a-card>
-
-      <a-card v-if="scanning" class="progress-card">
-        <template #title>
-          <div class="card-header">
-            <span>扫描进度</span>
-            <a-button type="primary" danger size="small" @click="stopScan">停止</a-button>
-          </div>
-        </template>
-        <div class="progress-info">
-          <span>{{ scanPhase }}</span>
-          <span>{{ scanPercentage }}%</span>
-        </div>
-        <a-progress
-          :percent="scanPercentage"
-          :stroke-width="10"
-          :status="scanPercentage === 100 ? 'success' : 'active'"
-        />
-      </a-card>
-
-      <div class="action-buttons">
-        <a-button type="primary" @click="startScan" :loading="scanning">
-          <template #icon><CaretRightOutlined /></template>开始扫描
-        </a-button>
-        <a-button @click="saveResults" :disabled="!hasResults">
-          <template #icon><DownloadOutlined /></template>保存结果
-        </a-button>
-      </div>
-
-      <a-card v-if="logs.length > 0" class="log-card">
-        <template #title>
-          <div class="card-header">
-            <span>扫描日志</span>
-            <div class="log-actions">
-              <a-button type="link" @click="copyLogs"
-                ><template #icon><CopyOutlined /></template>复制</a-button
-              >
-              <a-button type="link" danger @click="clearLogs"
-                ><template #icon><DeleteOutlined /></template>清除</a-button
-              >
-            </div>
-          </div>
-        </template>
-        <div class="log-content">
-          <p v-for="(log, index) in logs" :key="index" :class="log.type">{{ log.message }}</p>
-        </div>
-      </a-card>
+  <div class="basic-settings-container">
+    <div class="basic-settings-content">
+      <SettingsForm
+        :form="form"
+        :is-valid-repo="isValidRepo"
+        :is-selecting-path="isSelectingPath"
+        :repo-history="repoHistory"
+        :available-authors="availableAuthors"
+        :authors-loading="authorsLoading"
+        :date-preset="datePreset"
+        :sub-repos="subRepos"
+        :is-discovering-repos="isDiscoveringRepos"
+        @validate-repo-path="validateRepoPath"
+        @clear-repo-path="clearRepoPath"
+        @select-repo-path="selectRepoPath"
+        @clear-repo-history="clearRepoHistory"
+        @select-recent-path="selectRecentPath"
+        @remove-repo-from-history="removeRepoFromHistory"
+        @load-authors="loadAuthors"
+        @handle-preset-change="handlePresetChange"
+        @discover-sub-repos="discoverSubRepos"
+      />
+      <LogPanel
+        :scanning="scanning"
+        :scan-phase="scanPhase"
+        :scan-percentage="scanPercentage"
+        :logs="logs"
+        @stop-scan="stopScan"
+        @copy-logs="copyLogs"
+        @clear-logs="clearLogs"
+      />
     </div>
+    <ActionPanel
+      :scanning="scanning"
+      :has-results="hasResults"
+      @start-scan="startScan"
+      @save-results="saveResults"
+    />
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, onMounted, computed, onUnmounted } from 'vue'
+import { ref, reactive, onMounted, onUnmounted, watch } from 'vue'
 import { message } from 'ant-design-vue'
 import { gitService } from '../../../services/GitService'
 import { useRouter } from 'vue-router'
 import dayjs, { Dayjs } from 'dayjs'
-import {
-  FolderOutlined,
-  UserOutlined,
-  CaretRightOutlined,
-  DownloadOutlined,
-  CopyOutlined,
-  DeleteOutlined,
-  CheckCircleFilled,
-  CloseCircleFilled,
-  SyncOutlined,
-  BranchesOutlined,
-  ClearOutlined
-} from '@ant-design/icons-vue'
+import SettingsForm from '../components/BasicSettings/SettingsForm.vue'
+import LogPanel from '../components/BasicSettings/LogPanel.vue'
+import ActionPanel from '../components/BasicSettings/ActionPanel.vue'
 
 const router = useRouter()
 
@@ -238,9 +66,10 @@ const PRESET_RANGES: { [key: string]: [Dayjs, Dayjs] | string } = {
 
 const form = reactive({
   selectedFields: ['repository', 'commitId', 'shortHash', 'author', 'date', 'message'],
-  enableStats: false,
   statsDimension: 'none',
   repoPath: '',
+  scanSubfolders: false,
+  selectedRepos: [],
   branch: '',
   maxCommits: 0,
   authorFilter: [],
@@ -248,6 +77,8 @@ const form = reactive({
   outputFormat: 'json'
 })
 
+const subRepos = ref<string[]>([])
+const isDiscoveringRepos = ref(false)
 const repoHistory = ref(gitService.getRepoHistory())
 const scanning = ref(false)
 const hasResults = ref(false)
@@ -261,16 +92,24 @@ const scanPercentage = ref(0)
 const unsubscribeProgress = ref<(() => void) | null>(null)
 const unsubscribeError = ref<(() => void) | null>(null)
 const unsubscribeCancelled = ref<(() => void) | null>(null)
+const isSelectingPath = ref(false)
+
+watch(() => form.scanSubfolders, (newVal) => {
+  form.selectedRepos = [];
+  subRepos.value = [];
+  if (newVal === false && isValidRepo.value) {
+    form.selectedRepos = [form.repoPath];
+  }
+});
 
 onMounted(() => {
   if (window.api?.onScanProgress) {
     unsubscribeProgress.value = window.api.onScanProgress((data) => {
       scanPhase.value = data.phase
       scanPercentage.value = data.percentage
-      if (data.percentage === 100)
-        setTimeout(() => {
-          scanning.value = false
-        }, 500)
+      if (data.percentage === 100) {
+        setTimeout(() => { scanning.value = false }, 500)
+      }
     })
   }
   if (window.api?.onScanError) {
@@ -293,20 +132,50 @@ onUnmounted(() => {
   unsubscribeCancelled.value?.()
 })
 
-const addLog = (message: string, type: Log['type'] = 'info') => {
+const addLog = (msg: string, type: Log['type'] = 'info') => {
   const timestamp = dayjs().format('HH:mm:ss')
-  logs.value.push({ message: `[${timestamp}] ${message}`, type })
+  logs.value.push({ message: `[${timestamp}] ${msg}`, type })
+}
+
+const clearRepoPath = () => {
+  form.repoPath = ''
+  isValidRepo.value = false
+  availableAuthors.value = []
+  form.authorFilter = []
+  subRepos.value = []
+  form.selectedRepos = []
 }
 
 const selectRepoPath = async () => {
+  isSelectingPath.value = true
   try {
     const result = await window.api.selectDirectory()
     if (result) {
-      form.repoPath = result
-      await validateRepoPath()
+      const { path, isValid } = result
+      form.repoPath = path
+      isValidRepo.value = isValid
+      gitService.addToHistory(path)
+      repoHistory.value = gitService.getRepoHistory()
+
+      if (form.scanSubfolders) {
+        message.success(`已选择目录，请点击“扫描子仓库”按钮: ${path}`)
+        addLog(`已选择父目录进行子文件夹扫描: ${path}`, 'info')
+      } else {
+        if (isValid) {
+          message.success('有效的Git仓库路径')
+          addLog(`选择并验证仓库: ${path} 有效`, 'success')
+          form.selectedRepos = [path]
+        } else {
+          message.error('选择的目录不是有效的Git仓库')
+          addLog(`选择的目录无效: ${path}`, 'error')
+        }
+      }
     }
   } catch (error) {
     message.error('选择目录失败')
+    console.error('Error in selectRepoPath:', error)
+  } finally {
+    isSelectingPath.value = false
   }
 }
 
@@ -315,12 +184,27 @@ const validateRepoPath = async () => {
     isValidRepo.value = false
     return
   }
+  isSelectingPath.value = true
   try {
     isValidRepo.value = await window.api.validateRepoPath(form.repoPath)
-    if (isValidRepo.value) addLog(`验证仓库: ${form.repoPath} 有效`, 'success')
-    else addLog(`验证仓库: ${form.repoPath} 无效`, 'error')
+    gitService.addToHistory(form.repoPath)
+    repoHistory.value = gitService.getRepoHistory()
+
+    if (form.scanSubfolders) {
+      message.info(`将扫描此目录下所有Git仓库: ${form.repoPath}`)
+    } else {
+      if (isValidRepo.value) {
+        message.success('验证成功，是有效的Git仓库')
+        form.selectedRepos = [form.repoPath]
+      } else {
+        message.error('验证失败，当前路径不是有效的Git仓库')
+      }
+    }
   } catch (error) {
     isValidRepo.value = false
+    message.error('验证过程中发生错误')
+  } finally {
+    isSelectingPath.value = false
   }
 }
 
@@ -329,8 +213,8 @@ const loadAuthors = async () => {
     message.warning('请先选择有效的Git仓库')
     return
   }
+  authorsLoading.value = true
   try {
-    authorsLoading.value = true
     addLog(`加载仓库作者列表: ${form.repoPath}`)
     const authors = await window.api.getRepoAuthors(form.repoPath)
     availableAuthors.value = authors
@@ -346,19 +230,12 @@ const loadAuthors = async () => {
 
 const handlePresetChange = (e: any) => {
   const preset = e.target.value
+  datePreset.value = preset
   if (preset === '自定义') return
   const range = PRESET_RANGES[preset]
   if (Array.isArray(range)) {
     form.dateRange = [range[0], range[1]]
   }
-}
-
-const formatLastAccessed = (timestamp: string): string => {
-  const date = dayjs(timestamp)
-  const now = dayjs()
-  if (date.isSame(now, 'day')) return '今天 ' + date.format('HH:mm')
-  if (date.isSame(now.subtract(1, 'day'), 'day')) return '昨天 ' + date.format('HH:mm')
-  return date.format('MM-DD HH:mm')
 }
 
 const selectRecentPath = (path: string) => {
@@ -376,34 +253,69 @@ const clearRepoHistory = () => {
   repoHistory.value = []
 }
 
+const discoverSubRepos = async () => {
+  if (!form.repoPath) {
+    message.warning('请先选择一个父目录');
+    return;
+  }
+  isDiscoveringRepos.value = true;
+  addLog(`正在扫描子仓库: ${form.repoPath}`, 'info');
+  try {
+    const result = await window.api.getSubRepos(form.repoPath);
+    if (result.success && result.repos) {
+      subRepos.value = result.repos;
+      if (result.repos.length > 0) {
+        addLog(`发现了 ${result.repos.length} 个子仓库`, 'success');
+        message.success(`发现了 ${result.repos.length} 个子仓库`);
+      } else {
+        addLog('未发现任何子仓库', 'info');
+        message.info('未发现任何子仓库');
+      }
+    } else {
+      throw new Error(result.error || 'An unknown error occurred');
+    }
+  } catch (error) {
+    const errorMsg = error instanceof Error ? error.message : String(error);
+    message.error(`扫描子仓库时出错: ${errorMsg}`);
+    addLog(`扫描子仓库时出错: ${errorMsg}`, 'error');
+  } finally {
+    isDiscoveringRepos.value = false;
+  }
+};
+
 const startScan = async () => {
   if (!form.repoPath) return message.warning('请选择Git仓库路径')
   if (form.selectedFields.length === 0) return message.warning('请至少选择一个字段')
+  if (form.scanSubfolders && form.selectedRepos.length === 0) return message.warning('请至少选择一个子仓库进行扫描')
+  if (!form.scanSubfolders && !isValidRepo.value) return message.warning('请选择一个有效的Git仓库')
+
+  scanning.value = true
+  scanPhase.value = '准备中'
+  scanPercentage.value = 0
+  logs.value = []
+  addLog(`开始扫描仓库: ${form.repoPath}`)
 
   try {
-    scanning.value = true
-    scanPhase.value = '准备中'
-    scanPercentage.value = 0
-    addLog(`开始扫描仓库: ${form.repoPath}`)
-
-    const commits = await gitService.scanRepository(form.repoPath, {
+    const commits = await window.api.scanGitRepo(form.repoPath, {
       authorFilter: form.authorFilter.join(','),
       dateRange: form.dateRange.map((d) => d.format('YYYY-MM-DD HH:mm:ss')) as [string, string],
       selectedFields: form.selectedFields,
       maxCommits: form.maxCommits || undefined,
-      branch: form.branch || undefined
+      branch: form.branch || undefined,
+      scanSubfolders: form.scanSubfolders,
+      selectedRepos: form.selectedRepos
     })
 
     addLog(`扫描完成，共找到 ${commits.length} 条提交记录`, 'success')
     hasResults.value = true
     localStorage.setItem('gitCommits', JSON.stringify(commits))
 
-    if (form.enableStats) router.push('/results')
-    else router.push('/table-view') // Corrected route
+    router.push('/table-view')
   } catch (error) {
     const errorMsg = error instanceof Error ? error.message : String(error)
     addLog(`扫描失败: ${errorMsg}`, 'error')
-    message.error('扫描失败')
+    message.error(`扫描失败: ${errorMsg}`)
+  } finally {
     scanning.value = false
   }
 }
@@ -446,125 +358,23 @@ const clearLogs = () => {
 </script>
 
 <style scoped>
-.basic-settings {
-  max-width: 800px;
-  margin: 0 auto;
-}
-.settings-card {
-  margin-bottom: 20px;
-}
-.card-header {
+.basic-settings-container {
+  height: 100%;
   display: flex;
-  justify-content: space-between;
-  align-items: center;
+  flex-direction: column;
 }
+
+.basic-settings-content {
+  display: flex;
+  gap: 10px;
+  flex: 1;
+  min-height: 0;
+}
+
 .action-buttons {
   display: flex;
   justify-content: center;
   gap: 12px;
-  margin: 20px 0;
-}
-.log-card {
   margin-top: 20px;
-}
-.log-actions {
-  display: flex;
-  gap: 8px;
-}
-.log-content {
-  font-family: 'Fira Code', monospace;
-  white-space: pre-wrap;
-  font-size: 13px;
-  background-color: #f8f9fa;
-  border-radius: 4px;
-  padding: 12px;
-  max-height: 300px;
-  overflow-y: auto;
-}
-.log-content p {
-  margin: 3px 0;
-  padding-left: 8px;
-  border-left: 3px solid transparent;
-}
-.info {
-  color: #555;
-  border-left-color: #1890ff;
-}
-.error {
-  color: #cf1322;
-  background-color: #fff1f0;
-  border-left-color: #cf1322;
-}
-.success {
-  color: #389e0d;
-  background-color: #f6ffed;
-  border-left-color: #389e0d;
-}
-.progress-card {
-  margin-bottom: 20px;
-}
-.progress-info {
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 8px;
-}
-.recent-paths {
-  margin-top: 12px;
-  border: 1px solid #d9d9d9;
-  border-radius: 4px;
-}
-.recent-paths-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 8px 12px;
-  border-bottom: 1px solid #d9d9d9;
-  background-color: #fafafa;
-}
-.recent-paths-list {
-  max-height: 150px;
-  overflow-y: auto;
-}
-.recent-path-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 8px 12px;
-  cursor: pointer;
-  border-bottom: 1px solid #f0f0f0;
-}
-.recent-path-item:hover {
-  background-color: #f5f5f5;
-}
-.recent-path-item:last-child {
-  border-bottom: none;
-}
-.path-info {
-  flex: 1;
-  overflow: hidden;
-}
-.path-text {
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-.path-time {
-  font-size: 12px;
-  color: #888;
-}
-.author-actions {
-  display: flex;
-  justify-content: space-between;
-  margin-top: 8px;
-}
-.date-range-selector {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-.hint {
-  margin-left: 12px;
-  font-size: 12px;
-  color: #888;
 }
 </style>

@@ -31,6 +31,8 @@ export interface GitScanOptions {
   selectedFields: string[]
   maxCommits?: number
   branch?: string
+  scanSubfolders?: boolean
+  selectedRepos?: string[]
 }
 
 // 历史路径存储接口
