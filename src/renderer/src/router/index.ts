@@ -16,7 +16,7 @@ const routes = [
       {
         path: 'commits',
         name: 'Commits',
-        component: () => import('../views/CommitsView1.vue'),
+        component: () => import('../views/CommitsView.vue'),
         meta: { title: '提交记录' }
       },
       {

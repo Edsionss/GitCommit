@@ -41,14 +41,14 @@ import { FileTextOutlined } from '@ant-design/icons-vue'
 import type { PropType } from 'vue'
 
 interface Commit {
-  hash: string;
-  title: string;
-  authorEmail: string;
-  author: string;
-  date: string;
-  files: any[];
-  additions: number;
-  deletions: number;
+  hash: string
+  title: string
+  authorEmail: string
+  author: string
+  date: string
+  files: any[]
+  additions: number
+  deletions: number
 }
 
 defineProps({
@@ -82,9 +82,10 @@ defineEmits(['selectCommit', 'refresh'])
 
 .commit-item {
   padding: 12px;
-  border-bottom: 1px solid var(--color-border);
   cursor: pointer;
   transition: background-color 0.2s;
+  border-radius: 0.5rem;
+  margin-bottom: 5px;
 }
 
 .commit-item:hover {

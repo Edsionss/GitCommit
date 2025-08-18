@@ -1,197 +1,235 @@
+<!-- eslint-disable vue/no-mutating-props -->
 <template>
+  <!-- <a-card class="page-card"> -->
   <div class="commits-container">
     <CommitsToolbar
+      v-model="filters"
       :repositories="repositories"
       :branches="branches"
       :authors="authors"
-      :date-range="dateRange"
-      :search-keyword="searchKeyword"
-      @update:selectedRepo="selectedRepo = $event"
-      @update:dateRange="dateRange = $event"
-      @update:selectedBranch="selectedBranch = $event"
-      @update:selectedAuthor="selectedAuthor = $event"
-      @update:searchKeyword="searchKeyword = $event"
       @refresh="refreshCommits"
     />
 
-    <div class="main-content" v-loading="loading">
-      <CommitsList
-        :commits="filteredCommits"
-        :selected-commit-index="selectedCommitIndex"
-        @select-commit="selectCommit"
-      />
+    <a-spin :spinning="loading" class="main-content-spin">
+      <a-card>
+        <div class="main-content">
+          <CommitsList
+            :commits="filteredCommits"
+            :selected-commit-index="selectedCommitIndex"
+            :format-date="formatDate"
+            :get-avatar-url="getAvatarUrl"
+            @select-commit="selectCommit"
+          />
 
-      <CommitDetails
-        v-if="selectedCommit"
-        :commit="selectedCommit"
-        :file-filter="fileFilter"
-        @update:fileFilter="fileFilter = $event"
-        @select-file="selectFile"
-        @load-commit="loadCommit"
-      />
+          <CommitDetails
+            v-if="selectedCommit"
+            :commit="selectedCommit"
+            :format-date="formatDate"
+            @copy="copyToClipboard"
+            @load-commit="loadCommit"
+          />
 
-      <div class="empty-state" v-else-if="!loading && commits.length === 0">
-        <a-empty description="暂无提交记录">
-          <a-button type="primary" @click="refreshCommits">刷新提交记录</a-button>
-        </a-empty>
-      </div>
-    </div>
+          <div v-else-if="!loading && commits.length === 0" class="empty-state">
+            <a-empty description="暂无提交记录">
+              <a-button type="primary" @click="refreshCommits">刷新提交记录</a-button>
+            </a-empty>
+          </div>
+        </div>
+      </a-card>
+    </a-spin>
   </div>
+  <!-- </a-card> -->
 </template>
 
 <script setup lang="ts">
 import { ref, computed, watch, onMounted } from 'vue'
 import dayjs from 'dayjs'
-import { message, Empty as AEmpty, Button as AButton } from 'ant-design-vue'
+import {
+  message,
+  Empty as AEmpty,
+  Button as AButton,
+  Spin as ASpin,
+  Card as ACard
+} from 'ant-design-vue'
 import CommitsToolbar from '@/components/CommitsView/CommitsToolbar.vue'
 import CommitsList from '@/components/CommitsView/CommitsList.vue'
 import CommitDetails from '@/components/CommitsView/CommitDetails.vue'
+import { useFormatters } from '@/composables/useFormatters'
 
 import repositoriesData from '@/mock/repositoriesData.json'
 import branchesData from '@/mock/repositoryAvailableTags.json'
 import authorsData from '@/mock/reportsTopContributors.json'
 import commitsData from '@/mock/tableViewCommits.json'
 
-// 加载状态
+// Composables
+const { formatDate } = useFormatters()
+
+// Loading State
 const loading = ref(false)
 
-// 仓库数据
+// Static Mock Data
 const repositories = ref(repositoriesData)
-const selectedRepo = ref(1)
-
-// 分支数据
 const branches = ref(branchesData)
-const selectedBranch = ref('main')
+const authors = ref(authorsData.map((c) => c.name))
 
-// 作者数据
-const authors = ref(authorsData.map(c => c.name))
-const selectedAuthor = ref('')
+// Filters
+const filters = ref({
+  repo: 1,
+  dateRange: [] as [string, string] | [],
+  branch: 'main',
+  author: [] as string[],
+  keyword: ''
+})
 
-// 日期范围
-const dateRange = ref([
-  dayjs().subtract(7, 'day').format('YYYY-MM-DD'),
-  dayjs().format('YYYY-MM-DD')
-])
+// Commits Data
+const commits = ref<any[]>([])
 
-// 搜索关键词
-const searchKeyword = ref('')
-
-// 提交数据
-const commits = ref(commitsData)
-
-// 选中的提交
-const selectedCommitIndex = ref(0)
+// Selection State
+const selectedCommitIndex = ref(-1)
 const selectedCommit = computed(() => {
-  return selectedCommitIndex.value >= 0 && selectedCommitIndex.value < filteredCommits.value.length
-    ? filteredCommits.value[selectedCommitIndex.value]
-    : null
+  return selectedCommitIndex.value > -1 ? filteredCommits.value[selectedCommitIndex.value] : null
 })
 
-// 选中的文件
-const selectedFileIndex = ref(0)
-const selectedFile = computed(() => {
-  if (!selectedCommit.value) return null
-
-  // This is a placeholder, as the file structure in the mock is different
-  const files = (selectedCommit.value as any).files || [];
-  return selectedFileIndex.value >= 0 && selectedFileIndex.value < files.length
-    ? files[selectedFileIndex.value]
-    : null
-})
-
-// 文件过滤
-const fileFilter = ref('')
-const filteredFiles = computed(() => {
-    if (!selectedCommit.value) return [];
-    const files = (selectedCommit.value as any).files || [];
-    if (!fileFilter.value) return files;
-    return files.filter((file: any) =>
-        file.path.toLowerCase().includes(fileFilter.value.toLowerCase())
-    );
-});
-
-
-// 提交过滤
+// Computed property for filtered commits
 const filteredCommits = computed(() => {
   let result = commits.value
 
-  // 按作者过滤
-  if (selectedAuthor.value) {
-    result = result.filter((commit) => commit.author === selectedAuthor.value)
+  if (filters.value.author && filters.value.author.length > 0) {
+    result = result.filter((commit) => filters.value.author.includes(commit.author))
   }
 
-  // 按日期范围过滤
-  if (dateRange.value && dateRange.value[0] && dateRange.value[1]) {
-    const startDate = dayjs(dateRange.value[0])
-    const endDate = dayjs(dateRange.value[1]).endOf('day')
-
+  if (filters.value.dateRange && filters.value.dateRange.length === 2) {
+    const [startDate, endDate] = filters.value.dateRange.map((d) => dayjs(d))
     result = result.filter((commit) => {
       const commitDate = dayjs(commit.date)
-      return commitDate.isAfter(startDate) && commitDate.isBefore(endDate)
+      return (
+        commitDate.isAfter(startDate.startOf('day')) && commitDate.isBefore(endDate.endOf('day'))
+      )
     })
   }
 
-  // 按关键词搜索
-  if (searchKeyword.value) {
-    const keyword = searchKeyword.value.toLowerCase()
+  if (filters.value.keyword) {
+    const keyword = filters.value.keyword.toLowerCase()
     result = result.filter(
       (commit) =>
-        commit.message.toLowerCase().includes(keyword)
+        commit.title.toLowerCase().includes(keyword) ||
+        commit.fullMessage.toLowerCase().includes(keyword)
     )
   }
 
   return result
 })
 
-// 方法
-const selectCommit = (index: number) => {
-  selectedCommitIndex.value = index
-  selectedFileIndex.value = 0
+// Methods
+const getAvatarUrl = (author: string): string => {
+  if (!author) return '' // Prevent requests with undefined seed
+  return `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(author)}`
 }
 
-const selectFile = (index: number) => {
-  selectedFileIndex.value = index
+const selectCommit = (index: number) => {
+  selectedCommitIndex.value = index
 }
+
+const normalizeCommit = (commit: any) => ({
+  title: commit.title || 'No Title',
+  hash: commit.hash || `nohash_${Math.random().toString(36).substring(2, 9)}`,
+  author: commit.author || 'Unknown Author',
+  authorEmail: commit.authorEmail || 'unknown@example.com',
+  date: commit.date || new Date().toISOString(),
+  message: commit.message || '',
+  fullMessage: commit.fullMessage || commit.message || '',
+  files: commit.files || [],
+  additions: commit.additions || 0,
+  deletions: commit.deletions || 0,
+  parents: commit.parents || [],
+  branches: commit.branches || []
+})
 
 const refreshCommits = () => {
   loading.value = true
-
-  // 模拟API请求
   setTimeout(() => {
-    loading.value = false;
-    message.success('提交记录已刷新');
-  }, 1000);
-};
+    commits.value = commitsData.map(normalizeCommit)
+    if (commits.value.length > 0) {
+      selectCommit(0)
+    } else {
+      selectCommit(-1)
+    }
+    loading.value = false
+    message.success('提交记录已刷新')
+  }, 500)
+}
 
 const loadCommit = (hash: string) => {
-  message.info(`加载提交: ${hash}`);
-};
+  const index = commits.value.findIndex((c) => c.hash === hash)
+  if (index > -1) {
+    selectCommit(index)
+    message.info(`已加载提交: ${hash.substring(0, 7)}`)
+  } else {
+    message.error('找不到指定的提交')
+  }
+}
 
-// 监听仓库变化
-watch(selectedRepo, () => {
-  refreshCommits()
-})
+const copyToClipboard = async (text: string) => {
+  try {
+    await navigator.clipboard.writeText(text)
+    message.success('已复制到剪贴板')
+  } catch (err) {
+    message.error('复制失败')
+  }
+}
 
-// 监听分支变化
-watch(selectedBranch, () => {
-  refreshCommits()
-})
+// Watchers
+watch(
+  () => filters.value.repo,
+  () => refreshCommits(),
+  { deep: true }
+)
 
-// 挂载时获取数据
+watch(
+  () => filters.value.branch,
+  () => refreshCommits(),
+  { deep: true }
+)
+
+// Lifecycle Hooks
 onMounted(() => {
   refreshCommits()
 })
 </script>
 
 <style scoped>
-.commits-container {
+.page-card {
   height: 100%;
   display: flex;
   flex-direction: column;
 }
 
-.main-content {
+.page-card :deep(.ant-card-body) {
   flex: 1;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.commits-container {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.main-content-spin {
+  flex: 1;
+  overflow: auto;
+}
+
+.main-content-spin :deep(.ant-spin-container) {
+  height: 100%;
+}
+
+.main-content {
+  height: 100%;
   display: flex;
   overflow: hidden;
 }

@@ -55,7 +55,7 @@
       <a-tab-pane key="files" tab="变更文件">
         <div class="files-summary">
           <div class="files-count">
-            <span>共 {{ commit.files.length }} 个文件变更</span>
+            <span>共 {{ (commit.files || []).length }} 个文件变更</span>
             <span class="changes-summary">
               <span class="additions">+{{ commit.additions }}</span>
               <span class="deletions">-{{ commit.deletions }}</span>
@@ -133,17 +133,17 @@ import {
 import type { PropType } from 'vue'
 
 interface Commit {
-  title: string;
-  hash: string;
-  author: string;
-  authorEmail: string;
-  date: string;
-  branches: string[];
-  fullMessage: string;
-  parents: string[];
-  files: any[];
-  additions: number;
-  deletions: number;
+  title: string
+  hash: string
+  author: string
+  authorEmail: string
+  date: string
+  branches: string[]
+  fullMessage: string
+  parents: string[]
+  files: any[]
+  additions: number
+  deletions: number
 }
 
 const props = defineProps({
