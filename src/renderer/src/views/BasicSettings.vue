@@ -26,16 +26,11 @@
           </a-form-item>
 
           <a-form-item label="统计选项">
-            <a-switch v-model:checked="form.enableStats" />
-            <a-select
-              v-model:value="form.statsDimension"
-              :disabled="!form.enableStats"
-              placeholder="选择统计维度"
-              style="margin-left: 10px"
-            >
+            <a-select v-model:value="form.statsDimension" placeholder="选择统计维度">
               <a-select-option value="author">按作者统计</a-select-option>
               <a-select-option value="repository">按仓库统计</a-select-option>
               <a-select-option value="date">按日期统计</a-select-option>
+              <a-select-option value="none">不按任何</a-select-option>
             </a-select>
           </a-form-item>
         </a-form>
@@ -55,9 +50,9 @@
               @change="validateRepoPath"
             >
               <template #addonAfter>
-                <a-button @click="selectRepoPath">
+                <span @click="selectRepoPath" style="cursor: pointer">
                   <FolderOutlined />
-                </a-button>
+                </span>
               </template>
               <template #prefix>
                 <CheckCircleFilled v-if="isValidRepo" style="color: green" />
@@ -109,7 +104,7 @@
               mode="tags"
               placeholder="选择或输入作者名称/邮箱"
               style="width: 100%"
-              :options="availableAuthors.map(author => ({ value: author }))"
+              :options="availableAuthors.map((author) => ({ value: author }))"
               :loading="authorsLoading"
             />
             <div class="author-actions">
@@ -190,8 +185,12 @@
           <div class="card-header">
             <span>扫描日志</span>
             <div class="log-actions">
-              <a-button type="link" @click="copyLogs"><template #icon><CopyOutlined /></template>复制</a-button>
-              <a-button type="link" danger @click="clearLogs"><template #icon><DeleteOutlined /></template>清除</a-button>
+              <a-button type="link" @click="copyLogs"
+                ><template #icon><CopyOutlined /></template>复制</a-button
+              >
+              <a-button type="link" danger @click="clearLogs"
+                ><template #icon><DeleteOutlined /></template>清除</a-button
+              >
             </div>
           </div>
         </template>
@@ -240,7 +239,7 @@ const PRESET_RANGES: { [key: string]: [Dayjs, Dayjs] | string } = {
 const form = reactive({
   selectedFields: ['repository', 'commitId', 'shortHash', 'author', 'date', 'message'],
   enableStats: false,
-  statsDimension: 'author',
+  statsDimension: 'none',
   repoPath: '',
   branch: '',
   maxCommits: 0,
@@ -268,7 +267,10 @@ onMounted(() => {
     unsubscribeProgress.value = window.api.onScanProgress((data) => {
       scanPhase.value = data.phase
       scanPercentage.value = data.percentage
-      if (data.percentage === 100) setTimeout(() => { scanning.value = false }, 500)
+      if (data.percentage === 100)
+        setTimeout(() => {
+          scanning.value = false
+        }, 500)
     })
   }
   if (window.api?.onScanError) {
@@ -370,7 +372,7 @@ const removeRepoFromHistory = (path: string) => {
 }
 
 const clearRepoHistory = () => {
-  repoHistory.value.forEach(item => gitService.removeFromHistory(item.path))
+  repoHistory.value.forEach((item) => gitService.removeFromHistory(item.path))
   repoHistory.value = []
 }
 
@@ -386,7 +388,7 @@ const startScan = async () => {
 
     const commits = await gitService.scanRepository(form.repoPath, {
       authorFilter: form.authorFilter.join(','),
-      dateRange: form.dateRange.map(d => d.format('YYYY-MM-DD HH:mm:ss')) as [string, string],
+      dateRange: form.dateRange.map((d) => d.format('YYYY-MM-DD HH:mm:ss')) as [string, string],
       selectedFields: form.selectedFields,
       maxCommits: form.maxCommits || undefined,
       branch: form.branch || undefined
@@ -431,37 +433,138 @@ const saveResults = async () => {
 }
 
 const copyLogs = () => {
-  const logText = logs.value.map(log => log.message).join('\n')
-  navigator.clipboard.writeText(logText).then(() => message.success('日志已复制到剪贴板')).catch(() => message.error('复制失败'))
+  const logText = logs.value.map((log) => log.message).join('\n')
+  navigator.clipboard
+    .writeText(logText)
+    .then(() => message.success('日志已复制到剪贴板'))
+    .catch(() => message.error('复制失败'))
 }
 
-const clearLogs = () => { logs.value = [] }
+const clearLogs = () => {
+  logs.value = []
+}
 </script>
 
 <style scoped>
-.basic-settings { max-width: 800px; margin: 0 auto; }
-.settings-card { margin-bottom: 20px; }
-.card-header { display: flex; justify-content: space-between; align-items: center; }
-.action-buttons { display: flex; justify-content: center; gap: 12px; margin: 20px 0; }
-.log-card { margin-top: 20px; }
-.log-actions { display: flex; gap: 8px; }
-.log-content { font-family: 'Fira Code', monospace; white-space: pre-wrap; font-size: 13px; background-color: #f8f9fa; border-radius: 4px; padding: 12px; max-height: 300px; overflow-y: auto; }
-.log-content p { margin: 3px 0; padding-left: 8px; border-left: 3px solid transparent; }
-.info { color: #555; border-left-color: #1890ff; }
-.error { color: #cf1322; background-color: #fff1f0; border-left-color: #cf1322; }
-.success { color: #389e0d; background-color: #f6ffed; border-left-color: #389e0d; }
-.progress-card { margin-bottom: 20px; }
-.progress-info { display: flex; justify-content: space-between; margin-bottom: 8px; }
-.recent-paths { margin-top: 12px; border: 1px solid #d9d9d9; border-radius: 4px; }
-.recent-paths-header { display: flex; justify-content: space-between; align-items: center; padding: 8px 12px; border-bottom: 1px solid #d9d9d9; background-color: #fafafa; }
-.recent-paths-list { max-height: 150px; overflow-y: auto; }
-.recent-path-item { display: flex; justify-content: space-between; align-items: center; padding: 8px 12px; cursor: pointer; border-bottom: 1px solid #f0f0f0; }
-.recent-path-item:hover { background-color: #f5f5f5; }
-.recent-path-item:last-child { border-bottom: none; }
-.path-info { flex: 1; overflow: hidden; }
-.path-text { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.path-time { font-size: 12px; color: #888; }
-.author-actions { display: flex; justify-content: space-between; margin-top: 8px; }
-.date-range-selector { display: flex; flex-direction: column; gap: 12px; }
-.hint { margin-left: 12px; font-size: 12px; color: #888; }
+.basic-settings {
+  max-width: 800px;
+  margin: 0 auto;
+}
+.settings-card {
+  margin-bottom: 20px;
+}
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.action-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin: 20px 0;
+}
+.log-card {
+  margin-top: 20px;
+}
+.log-actions {
+  display: flex;
+  gap: 8px;
+}
+.log-content {
+  font-family: 'Fira Code', monospace;
+  white-space: pre-wrap;
+  font-size: 13px;
+  background-color: #f8f9fa;
+  border-radius: 4px;
+  padding: 12px;
+  max-height: 300px;
+  overflow-y: auto;
+}
+.log-content p {
+  margin: 3px 0;
+  padding-left: 8px;
+  border-left: 3px solid transparent;
+}
+.info {
+  color: #555;
+  border-left-color: #1890ff;
+}
+.error {
+  color: #cf1322;
+  background-color: #fff1f0;
+  border-left-color: #cf1322;
+}
+.success {
+  color: #389e0d;
+  background-color: #f6ffed;
+  border-left-color: #389e0d;
+}
+.progress-card {
+  margin-bottom: 20px;
+}
+.progress-info {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+.recent-paths {
+  margin-top: 12px;
+  border: 1px solid #d9d9d9;
+  border-radius: 4px;
+}
+.recent-paths-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 12px;
+  border-bottom: 1px solid #d9d9d9;
+  background-color: #fafafa;
+}
+.recent-paths-list {
+  max-height: 150px;
+  overflow-y: auto;
+}
+.recent-path-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 12px;
+  cursor: pointer;
+  border-bottom: 1px solid #f0f0f0;
+}
+.recent-path-item:hover {
+  background-color: #f5f5f5;
+}
+.recent-path-item:last-child {
+  border-bottom: none;
+}
+.path-info {
+  flex: 1;
+  overflow: hidden;
+}
+.path-text {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.path-time {
+  font-size: 12px;
+  color: #888;
+}
+.author-actions {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 8px;
+}
+.date-range-selector {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.hint {
+  margin-left: 12px;
+  font-size: 12px;
+  color: #888;
+}
 </style>
