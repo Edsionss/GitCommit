@@ -48,6 +48,12 @@ const routes = [
         name: 'Scan',
         component: () => import('../views/BasicSettings.vue'),
         meta: { title: '开始扫描' }
+      },
+      {
+        path: 'table-view',
+        name: 'TableView',
+        component: () => import('../views/TableView.vue'),
+        meta: { title: '提交详情' }
       }
     ]
   }
