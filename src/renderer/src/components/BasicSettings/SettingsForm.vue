@@ -58,11 +58,7 @@
               <CloseCircleFilled v-else-if="form.repoPath" style="color: red" />
             </template>
             <template #suffix>
-              <CloseCircleFilled
-                v-if="form.repoPath"
-                class="clear-icon"
-                @click="clearRepoPath"
-              />
+              <CloseCircleFilled v-if="form.repoPath" class="clear-icon" @click="clearRepoPath" />
             </template>
             <template #addonAfter>
               <span @click="selectRepoPath" style="cursor: pointer">
@@ -95,11 +91,7 @@
                   <span class="path-time">{{ formatLastAccessed(item.lastAccessed) }}</span>
                 </div>
                 <div class="path-actions">
-                  <a-button
-                    type="text"
-                    danger
-                    @click.stop="removeRepoFromHistory(item.path)"
-                  >
+                  <a-button type="text" danger @click.stop="removeRepoFromHistory(item.path)">
                     <DeleteOutlined />
                   </a-button>
                 </div>
@@ -134,6 +126,26 @@
               扫描子仓库
             </a-button>
           </a-input-group>
+          <div class="sub-actions">
+            <a-button
+              type="link"
+              @click="selectAllRepos"
+              :disabled="
+                !form.scanSubfolders || !form.repoPath || !form.scanSubfolders || !form.repoPath
+              "
+            >
+              <template #icon><CheckSquareOutlined /></template> 全选
+            </a-button>
+            <a-button
+              type="link"
+              @click="clearAllRepos"
+              :disabled="
+                !form.scanSubfolders || !form.repoPath || !form.scanSubfolders || !form.repoPath
+              "
+            >
+              <template #icon><ClearOutlined /></template> 清空
+            </a-button>
+          </div>
         </a-form-item>
 
         <a-form-item label="分支选择">
@@ -151,7 +163,7 @@
           </a-select>
         </a-form-item>
 
-        <a-form-item label="最大提交数">
+        <a-form-item label="最大提交数" class="form-row-inline">
           <a-input-number v-model:value="form.maxCommits" :min="0" :max="10000" />
           <span class="hint">0表示不限制</span>
         </a-form-item>
@@ -165,7 +177,7 @@
             :options="availableAuthors.map((author) => ({ value: author }))"
             :loading="authorsLoading"
           />
-          <div class="author-actions">
+          <div class="sub-actions">
             <a-button
               type="link"
               @click="loadAuthors"
@@ -174,7 +186,18 @@
             >
               <template #icon><SyncOutlined /></template> 扫描作者
             </a-button>
-            <a-button type="link" @click="form.authorFilter = []">
+            <a-button
+              type="link"
+              @click="selectAllAuthors"
+              :disabled="!availableAuthors || availableAuthors.length === 0"
+            >
+              <template #icon><CheckSquareOutlined /></template> 全选
+            </a-button>
+            <a-button
+              type="link"
+              @click="form.authorFilter = []"
+              :disabled="!form.authorFilter || form.authorFilter.length === 0"
+            >
               <template #icon><ClearOutlined /></template> 清空
             </a-button>
           </div>
@@ -222,7 +245,8 @@ import {
   DeleteOutlined,
   BranchesOutlined,
   SyncOutlined,
-  ClearOutlined
+  ClearOutlined,
+  CheckSquareOutlined
 } from '@ant-design/icons-vue'
 import { message } from 'ant-design-vue'
 import { gitService } from '../../../../services/GitService'
@@ -435,6 +459,18 @@ const discoverSubRepos = async () => {
   }
 }
 
+const selectAllRepos = () => {
+  localForm.selectedRepos = [...subRepos.value]
+}
+
+const clearAllRepos = () => {
+  localForm.selectedRepos = []
+}
+
+const selectAllAuthors = () => {
+  localForm.authorFilter = [...availableAuthors.value]
+}
+
 const formatLastAccessed = (timestamp: string): string => {
   const date = dayjs(timestamp)
   const now = dayjs()
@@ -502,9 +538,10 @@ const formatLastAccessed = (timestamp: string): string => {
   font-size: 12px;
   color: #888;
 }
-.author-actions {
+.sub-actions {
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-start;
+  gap: 8px;
   margin-top: 8px;
 }
 .date-range-selector {
@@ -542,5 +579,18 @@ const formatLastAccessed = (timestamp: string): string => {
   top: -0.5px;
   margin-inline-start: 2px;
   margin-inline-end: 8px;
+}
+.form-row-inline {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+}
+.form-row-inline :deep(.ant-form-item-label) {
+  width: auto;
+  padding-bottom: 0;
+}
+.form-row-inline :deep(.ant-form-item-control) {
+  flex-grow: 1;
 }
 </style>
