@@ -100,8 +100,8 @@ export function registerGitScanHandlers() {
           }
         }
         if (options?.dateRange && options.dateRange[0] && options.dateRange[1]) {
-          logOptions.after = options.dateRange[0];
-          logOptions.before = options.dateRange[1];
+          logOptions['--after'] = `"${options.dateRange[0]}"`;
+          logOptions['--before'] = `"${options.dateRange[1]}"`;
         }
 
         sendProgress(`${progressPrefix} - 获取提交历史`, 20 + (i / totalRepos) * 80)
