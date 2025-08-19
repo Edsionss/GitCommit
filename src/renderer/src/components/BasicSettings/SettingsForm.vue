@@ -167,7 +167,7 @@
               style="width: 110px"
               @click="loadBranches"
               :loading="branchesLoading"
-              :disabled="!isValidRepo"
+              :disabled="!isValidRepo && !form.scanSubfolders"
             >
               扫描分支
             </a-button>
@@ -209,7 +209,7 @@
               type="link"
               @click="loadAuthors"
               :loading="authorsLoading"
-              :disabled="!isValidRepo"
+              :disabled="!isValidRepo || form.scanSubfolders"
             >
               <template #icon><SyncOutlined /></template> 扫描作者
             </a-button>
@@ -321,6 +321,10 @@ watch(
   (newVal) => {
     localForm.selectedRepos = []
     subRepos.value = []
+    // 当开启子文件夹扫描时，重置仓库验证状态
+    if (newVal) {
+      emit('validate-repo-path', '')
+    }
     if (newVal === false && props.isValidRepo) {
       localForm.selectedRepos = [localForm.repoPath]
     }
@@ -341,7 +345,7 @@ watch(
       loadBranches()
       loadAuthors()
     } else {
-      if (localForm.repoPath) {
+      if (localForm.repoPath && !localForm.scanSubfolders) {
         message.error('验证失败，当前路径不是有效的Git仓库')
         emit('add-log', `选择的目录无效: ${localForm.repoPath}`, 'error')
       }
@@ -350,7 +354,7 @@ watch(
 )
 
 const loadBranches = async () => {
-  if (!props.isValidRepo) return
+  // if (!props.isValidRepo) return
   branchesLoading.value = true
   try {
     emit('add-log', `加载分支列表: ${localForm.repoPath}`, 'info')
@@ -404,7 +408,9 @@ const selectRepoPath = async () => {
 }
 
 const validateRepoPath = () => {
-  emit('validate-repo-path', localForm.repoPath)
+  if (!localForm.scanSubfolders) {
+    emit('validate-repo-path', localForm.repoPath)
+  }
   if (localForm.repoPath) {
     gitService.addToHistory(localForm.repoPath)
     repoHistory.value = gitService.getRepoHistory()
