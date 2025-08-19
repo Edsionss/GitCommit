@@ -107,10 +107,12 @@ const getStatusText = (status: 'success' | 'failed' | 'cancelled') => {
 
 .record-item {
   padding: var(--spacing-md);
-  border-bottom: 1px solid var(--color-border);
+  /* border-bottom: 1px solid var(--color-border); */
   cursor: pointer;
   transition: background-color 0.2s;
   padding: 10px;
+  margin-bottom: 8px;
+  border-radius: 0.5rem;
 }
 
 .record-item:last-child {
