@@ -149,18 +149,45 @@
         </a-form-item>
 
         <a-form-item label="分支选择">
-          <a-select
-            v-model:value="form.branch"
-            show-search
-            placeholder="默认为当前分支 (HEAD)，可搜索"
-            :options="availableBranches.map((branch) => ({ value: branch }))"
-            :loading="branchesLoading"
-            @focus="loadBranches"
-          >
-            <template #prefix>
-              <BranchesOutlined />
-            </template>
-          </a-select>
+          <a-input-group compact>
+            <a-select
+              v-model:value="form.branches"
+              mode="multiple"
+              show-search
+              placeholder="默认为当前分支 (HEAD)，可搜索"
+              :options="availableBranches.map((branch) => ({ value: branch }))"
+              :loading="branchesLoading"
+              style="width: calc(100% - 110px)"
+            >
+              <template #prefix>
+                <BranchesOutlined />
+              </template>
+            </a-select>
+            <a-button
+              style="width: 110px"
+              @click="loadBranches"
+              :loading="branchesLoading"
+              :disabled="!isValidRepo"
+            >
+              扫描分支
+            </a-button>
+          </a-input-group>
+          <div class="sub-actions">
+            <a-button
+              type="link"
+              @click="selectAllBranches"
+              :disabled="!availableBranches || availableBranches.length === 0"
+            >
+              <template #icon><CheckSquareOutlined /></template> 全选
+            </a-button>
+            <a-button
+              type="link"
+              @click="form.branches = []"
+              :disabled="!form.branches || form.branches.length === 0"
+            >
+              <template #icon><ClearOutlined /></template> 清空
+            </a-button>
+          </div>
         </a-form-item>
 
         <a-form-item label="最大提交数" class="form-row-inline">
@@ -304,7 +331,7 @@ watch(
   () => props.isValidRepo,
   (newVal) => {
     availableBranches.value = []
-    localForm.branch = ''
+    localForm.branches = []
     if (newVal) {
       message.success('验证成功，是有效的Git仓库')
       emit('add-log', `选择并验证仓库: ${localForm.repoPath} 有效`, 'success')
@@ -404,6 +431,10 @@ const loadAuthors = async () => {
   }
 }
 
+defineExpose({
+  loadAuthors
+})
+
 const handlePresetChange = (e: any) => {
   const preset = e.target.value
   datePreset.value = preset
@@ -465,6 +496,10 @@ const selectAllRepos = () => {
 
 const clearAllRepos = () => {
   localForm.selectedRepos = []
+}
+
+const selectAllBranches = () => {
+  localForm.branches = [...availableBranches.value]
 }
 
 const selectAllAuthors = () => {

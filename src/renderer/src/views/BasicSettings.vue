@@ -2,6 +2,7 @@
   <div class="basic-settings-container">
     <div class="basic-settings-content">
       <SettingsForm
+        ref="settingsFormRef"
         :form="form"
         @update:form="Object.assign(form, $event)"
         @add-log="addLog"
@@ -21,6 +22,7 @@
       :has-results="hasResults"
       @start-scan="startScan"
       @save-results="saveResults"
+      @scan-authors="scanAuthors"
     />
   </div>
 </template>
@@ -48,7 +50,7 @@ const form = reactive({
   repoPath: '',
   scanSubfolders: false,
   selectedRepos: [],
-  branch: '',
+  branches: [],
   maxCommits: 0,
   authorFilter: [],
   dateRange: [dayjs().startOf('month'), dayjs()],
@@ -59,6 +61,7 @@ const scanning = ref(false)
 const hasResults = ref(false)
 const isValidRepo = ref(false)
 const logPanelRef = ref<InstanceType<typeof LogPanel> | null>(null)
+const settingsFormRef = ref<InstanceType<typeof SettingsForm> | null>(null)
 const currentLogs = ref<string[]>([]) // 用于存储当前扫描的日志
 
 const addLog = (msg: string, type: Log['type'] = 'info') => {
@@ -96,7 +99,7 @@ const startScan = async () => {
       dateRange: form.dateRange.map((d) => d.format('YYYY-MM-DD HH:mm:ss')) as [string, string],
       selectedFields: [...form.selectedFields],
       maxCommits: form.maxCommits || undefined,
-      branch: form.branch || undefined,
+      branches: form.branches.join(','),
       scanSubfolders: form.scanSubfolders,
       selectedRepos: [...form.selectedRepos]
     })
@@ -158,6 +161,12 @@ const saveResults = async () => {
     const errorMsg = error instanceof Error ? error.message : String(error)
     addLog(`保存失败: ${errorMsg}`, 'error')
     message.error('保存失败')
+  }
+}
+
+const scanAuthors = () => {
+  if (settingsFormRef.value) {
+    settingsFormRef.value.loadAuthors()
   }
 }
 </script>
