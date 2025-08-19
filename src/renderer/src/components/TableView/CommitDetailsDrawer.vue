@@ -1,6 +1,6 @@
 <template>
   <a-drawer
-    v-model:open="visible"
+    :open="visible"
     title="提交详情"
     width="50%"
     placement="right"
