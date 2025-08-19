@@ -26,13 +26,13 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive } from 'vue'
+import { ref, reactive, computed } from 'vue'
 import { message } from 'ant-design-vue'
-import { gitService } from '../../../services/GitService'
+import { gitService } from '@services/GitService'
 import { useRouter } from 'vue-router'
 import dayjs from 'dayjs'
-import SettingsForm from '../components/BasicSettings/SettingsForm.vue'
-import LogPanel from '../components/BasicSettings/LogPanel.vue'
+import SettingsForm from '@components/BasicSettings/SettingsForm.vue'
+import LogPanel from '@components/BasicSettings/LogPanel.vue'
 import ActionPanel from '@components/BasicSettings/ActionPanel.vue'
 
 const router = useRouter()
@@ -59,8 +59,12 @@ const scanning = ref(false)
 const hasResults = ref(false)
 const isValidRepo = ref(false)
 const logPanelRef = ref<InstanceType<typeof LogPanel> | null>(null)
+const currentLogs = ref<string[]>([]) // 用于存储当前扫描的日志
 
 const addLog = (msg: string, type: Log['type'] = 'info') => {
+  const timestamp = dayjs().format('HH:mm:ss')
+  const formattedLog = `[${timestamp}] ${msg}`
+  currentLogs.value.push(formattedLog)
   logPanelRef.value?.addLog(msg, type)
 }
 
@@ -83,6 +87,7 @@ const startScan = async () => {
     return message.warning('请至少选择一个子仓库进行扫描')
   if (!form.scanSubfolders && !isValidRepo.value) return message.warning('请选择一个有效的Git仓库')
 
+  currentLogs.value = [] // 清空之前的日志
   addLog(`开始扫描仓库: ${form.repoPath}`)
 
   try {
@@ -100,11 +105,35 @@ const startScan = async () => {
     hasResults.value = true
     localStorage.setItem('gitCommits', JSON.stringify(commits))
 
-    router.push('/table-view')
+    // 跳转到扫描记录页面并传递结果
+    router.push({
+      name: 'ScanHistory',
+      query: {
+        scanResult: JSON.stringify({
+          commits: commits,
+          options: form,
+          log: currentLogs.value,
+          status: 'success'
+        })
+      }
+    })
   } catch (error) {
     const errorMsg = error instanceof Error ? error.message : String(error)
     addLog(`扫描失败: ${errorMsg}`, 'error')
     message.error(`扫描失败: ${errorMsg}`)
+
+    // 跳转到扫描记录页面并传递失败信息
+    router.push({
+      name: 'ScanHistory',
+      query: {
+        scanResult: JSON.stringify({
+          commits: [],
+          options: form,
+          log: currentLogs.value,
+          status: 'failed'
+        })
+      }
+    })
   }
 }
 

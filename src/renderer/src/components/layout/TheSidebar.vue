@@ -50,7 +50,8 @@ import {
   SettingOutlined,
   LeftOutlined,
   RightOutlined,
-  SearchOutlined
+  SearchOutlined,
+  HistoryOutlined
 } from '@ant-design/icons-vue'
 
 const isExpanded = ref(true)
@@ -74,6 +75,7 @@ const toggleSidebar = () => {
 const menuItems = [
   { path: '/', label: '概览', icon: HomeOutlined },
   { path: '/scan', label: '开始扫描', icon: SearchOutlined },
+  { path: '/scanHistory', label: '扫描记录', icon: HistoryOutlined },
   { path: '/commits', label: '提交记录', icon: FileTextOutlined },
   { path: '/branches', label: '分支管理', icon: ShareAltOutlined },
   { path: '/analysis', label: '代码分析', icon: BarChartOutlined },
@@ -84,7 +86,7 @@ const isActive = (path: string): boolean => {
   if (path === '/') {
     return route.path === '/'
   }
-  return route.path.startsWith(path)
+  return route.path === path
 }
 
 // 组件初始化时读取侧边栏状态

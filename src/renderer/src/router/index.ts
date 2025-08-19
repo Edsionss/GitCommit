@@ -50,10 +50,16 @@ const routes = [
         meta: { title: '开始扫描' }
       },
       {
-        path: 'table-view',
+        path: 'tableView',
         name: 'TableView',
         component: () => import('@views/TableView.vue'),
         meta: { title: '提交详情' }
+      },
+      {
+        path: 'scanHistory',
+        name: 'ScanHistory',
+        component: () => import('@views/ScanHistory.vue'),
+        meta: { title: '扫描记录' }
       }
     ]
   }
