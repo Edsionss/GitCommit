@@ -56,7 +56,7 @@ import BranchesToolbar from '@/components/BranchesView/BranchesToolbar.vue'
 import BranchesList from '@/components/BranchesView/BranchesList.vue'
 import BranchSidebar from '@/components/BranchesView/BranchSidebar.vue'
 import CreateBranchDialog from '@/components/BranchesView/CreateBranchDialog.vue'
-import MergeBranchDialog from '@/components/BranchesView/MergeBranchDialog.vue'
+import MergeBranchDialog from '@components/BranchesView/MergeBranchDialog.vue'
 import dayjs from 'dayjs'
 
 // 仓库数据

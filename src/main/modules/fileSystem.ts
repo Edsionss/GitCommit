@@ -1,7 +1,7 @@
 import { ipcMain, dialog } from 'electron'
 import { promises as fs } from 'fs'
 import * as path from 'path'
-import { createExcelFile, GitCommit } from './excel'
+import { createExcelFile, GitCommit } from '@main/modules/excel'
 
 // This function needs to be passed from the git module or defined globally
 // For now, we'll assume it's passed in or imported if it were in a shared utility file.

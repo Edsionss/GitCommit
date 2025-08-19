@@ -59,7 +59,7 @@ import { useFormatters } from '@/composables/useFormatters'
 import repositoriesData from '@/mock/repositoriesData.json'
 import branchesData from '@/mock/repositoryAvailableTags.json'
 import authorsData from '@/mock/reportsTopContributors.json'
-import commitsData from '@/mock/tableViewCommits.json'
+import commitsData from '@mock/tableViewCommits.json'
 
 // Composables
 const { formatDate } = useFormatters()

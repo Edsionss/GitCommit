@@ -23,7 +23,7 @@ import { ref, reactive } from 'vue'
 import { message } from 'ant-design-vue' // Changed from ElMessage
 import CodeAnalysisToolbar from '@/components/CodeAnalysisView/CodeAnalysisToolbar.vue'
 import CodeQualityOverview from '@/components/CodeAnalysisView/CodeQualityOverview.vue'
-import CodeStructureAnalysis from '@/components/CodeAnalysisView/CodeStructureAnalysis.vue'
+import CodeStructureAnalysis from '@components/CodeAnalysisView/CodeStructureAnalysis.vue'
 import { Tabs, TabPane, Row, Col } from 'ant-design-vue'
 
 // 示例仓库数据

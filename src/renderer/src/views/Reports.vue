@@ -51,7 +51,7 @@ import repositoriesData from '@/mock/repositoriesData.json'
 import reportsCommitStatsData from '@/mock/reportsCommitStats.json'
 import reportsTopContributorsData from '@/mock/reportsTopContributors.json'
 import reportsTopChangedFilesData from '@/mock/reportsTopChangedFiles.json'
-import reportsMilestonesData from '@/mock/reportsMilestones.json'
+import reportsMilestonesData from '@mock/reportsMilestones.json'
 
 // 数据
 const repositories = ref(repositoriesData)

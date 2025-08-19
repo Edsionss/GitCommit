@@ -249,7 +249,7 @@ import {
   CheckSquareOutlined
 } from '@ant-design/icons-vue'
 import { message } from 'ant-design-vue'
-import { gitService } from '../../../../services/GitService'
+import { gitService } from '@services/GitService'
 import dayjs, { Dayjs } from 'dayjs'
 
 const props = defineProps({

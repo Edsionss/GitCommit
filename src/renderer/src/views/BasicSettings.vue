@@ -33,7 +33,7 @@ import { useRouter } from 'vue-router'
 import dayjs from 'dayjs'
 import SettingsForm from '../components/BasicSettings/SettingsForm.vue'
 import LogPanel from '../components/BasicSettings/LogPanel.vue'
-import ActionPanel from '../components/BasicSettings/ActionPanel.vue'
+import ActionPanel from '@components/BasicSettings/ActionPanel.vue'
 
 const router = useRouter()
 

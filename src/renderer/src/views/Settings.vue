@@ -48,7 +48,7 @@ import AppearanceSettings from '@/components/SettingsView/AppearanceSettings.vue
 import LocaleSettings from '@/components/SettingsView/LocaleSettings.vue'
 import GitSettings from '@/components/SettingsView/GitSettings.vue'
 import SystemSettings from '@/components/SettingsView/SystemSettings.vue'
-import { useTheme } from '../composables/useTheme'
+import { useTheme } from '@composables/useTheme'
 
 // 使用主题组合式函数
 const { setThemeMode, currentTheme } = useTheme()

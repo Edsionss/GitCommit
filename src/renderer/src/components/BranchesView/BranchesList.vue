@@ -100,7 +100,7 @@
 import { ref, computed } from 'vue'
 import { SearchOutlined, StarOutlined, LinkOutlined, ShareAltOutlined } from '@ant-design/icons-vue'
 import type { PropType } from 'vue'
-import { useFormatters } from '@/composables/useFormatters'
+import { useFormatters } from '@composables/useFormatters'
 
 interface Branch {
   name: string

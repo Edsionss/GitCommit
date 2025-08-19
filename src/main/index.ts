@@ -5,7 +5,7 @@ import icon from '../../resources/icon.png?asset'
 import { promises as fs } from 'fs'
 import * as path from 'path'
 
-import { registerIpcHandlers } from './modules/ipcHandlers'
+import { registerIpcHandlers } from '@main/modules/ipcHandlers'
 
 function createWindow(): void {
   // Create the browser window.

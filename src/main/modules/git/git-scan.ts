@@ -1,7 +1,7 @@
 import { ipcMain, BrowserWindow } from 'electron'
 import simpleGit, { SimpleGit, LogOptions } from 'simple-git'
 import * as path from 'path'
-import { isValidGitRepo, findGitRepos } from './git-utils'
+import { isValidGitRepo, findGitRepos } from '@main/modules/git/git-utils'
 
 // Git提交记录接口
 export interface GitCommit {

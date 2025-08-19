@@ -52,7 +52,7 @@ const routes = [
       {
         path: 'table-view',
         name: 'TableView',
-        component: () => import('../views/TableView.vue'),
+        component: () => import('@views/TableView.vue'),
         meta: { title: '提交详情' }
       }
     ]

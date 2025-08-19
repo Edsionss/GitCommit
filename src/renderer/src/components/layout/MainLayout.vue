@@ -20,7 +20,7 @@
 import { ref, onMounted, onUnmounted, computed } from 'vue'
 import TheSidebar from './TheSidebar.vue'
 import TheHeader from './TheHeader.vue'
-import { useTheme } from '../../composables/useTheme'
+import { useTheme } from '@composables/useTheme'
 
 const { currentTheme } = useTheme()
 

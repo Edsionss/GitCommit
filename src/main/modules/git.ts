@@ -1,5 +1,5 @@
 import { ipcMain } from 'electron'
-import { isValidGitRepo, findGitRepos } from './git/git-utils'
+import { isValidGitRepo, getSubRepos } from '@main/modules/git/git-utils'
 import { registerGitInfoHandlers } from './git/git-info'
 import { registerGitScanHandlers } from './git/git-scan'
 

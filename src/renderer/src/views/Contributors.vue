@@ -55,7 +55,7 @@ import { ref, reactive, computed } from 'vue'
 import { message, Select as ASelect, DatePicker as ARangePicker, Button as AButton, Row as ARow, Col as ACol } from 'ant-design-vue'
 import ContributorsStats from '@/components/ContributorsView/ContributorsStats.vue'
 import ContributorsList from '@/components/ContributorsView/ContributorsList.vue'
-import ContributorDetails from '@/components/ContributorsView/ContributorDetails.vue'
+import ContributorDetails from '@components/ContributorsView/ContributorDetails.vue'
 import { BarChartOutlined } from '@ant-design/icons-vue';
 
 // 示例仓库数据

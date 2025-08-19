@@ -50,7 +50,7 @@ import ResultsStats from '@/components/ResultsView/ResultsStats.vue'
 import ResultsDetails from '@/components/ResultsView/ResultsDetails.vue'
 import ResultsExport from '@/components/ResultsView/ResultsExport.vue'
 
-import resultsStatsData from '@/mock/resultsStats.json'
+import resultsStatsData from '@mock/resultsStats.json'
 
 // 选项卡和图表引用
 const activeTab = ref('stats')

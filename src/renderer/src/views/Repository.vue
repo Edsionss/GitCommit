@@ -51,7 +51,7 @@ import AddEditRepositoryDialog from '@/components/RepositoryView/AddEditReposito
 import RepositorySettingsDialog from '@/components/RepositoryView/RepositorySettingsDialog.vue'
 
 import repositoryAvailableTagsData from '@/mock/repositoryAvailableTags.json'
-import repositoriesMockData from '@/mock/repositoriesData.json'
+import repositoriesMockData from '@mock/repositoriesData.json'
 
 // 可用标签
 const availableTags = ref(repositoryAvailableTagsData)

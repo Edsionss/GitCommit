@@ -66,7 +66,7 @@
 
 <script setup lang="ts">
 import { ref, computed, watch, reactive, onMounted, nextTick, h } from 'vue'
-import { gitService } from '../../../services/GitService'
+import { gitService } from '@services/GitService'
 import { useRouter } from 'vue-router'
 import { message, Modal, Input } from 'ant-design-vue'
 import dayjs from 'dayjs'
