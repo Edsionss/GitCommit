@@ -5,6 +5,7 @@
       v-model:selectedRepo="selectedRepo"
       v-model:dateRange="dateRange"
       @filter="filterScanHistory"
+      @deleteAll="deleteAllScanRecords"
     />
 
     <div class="content-row">
@@ -13,6 +14,7 @@
           :scan-records="filteredScanRecords"
           :loading="loading"
           @select-record="selectScanRecord"
+          @delete-record="deleteScanRecord"
           :selected-record-id="selectedRecord ? selectedRecord.id : null"
         />
       </div>
@@ -29,7 +31,7 @@
 
 <script setup lang="ts">
 import { ref, reactive, onMounted, computed } from 'vue'
-import { message } from 'ant-design-vue'
+import { message, Modal } from 'ant-design-vue'
 import dayjs, { Dayjs } from 'dayjs'
 import ScanHistoryToolbar from '@components/ScanHistoryView/ScanHistoryToolbar.vue'
 import ScanHistoryList from '@components/ScanHistoryView/ScanHistoryList.vue'
@@ -113,6 +115,45 @@ const saveScanRecord = (record: ScanRecord) => {
   scanRecords.value.unshift(record) // 添加到最前面
   localStorage.setItem('scanHistory', JSON.stringify(scanRecords.value))
   selectedRecord.value = record // 选中新添加的记录
+}
+
+// 方法：删除单条扫描记录
+const deleteScanRecord = (recordId: string) => {
+  Modal.confirm({
+    title: '确认删除',
+    content: '确定要删除这条扫描记录吗？此操作不可撤销。',
+    okText: '删除',
+    okType: 'danger',
+    cancelText: '取消',
+    onOk: () => {
+      const index = scanRecords.value.findIndex((r) => r.id === recordId)
+      if (index > -1) {
+        scanRecords.value.splice(index, 1)
+        localStorage.setItem('scanHistory', JSON.stringify(scanRecords.value))
+        if (selectedRecord.value && selectedRecord.value.id === recordId) {
+          selectedRecord.value = scanRecords.value.length > 0 ? scanRecords.value[0] : null
+        }
+        message.success('扫描记录已删除')
+      }
+    }
+  })
+}
+
+// 方法：删除所有扫描记录
+const deleteAllScanRecords = () => {
+  Modal.confirm({
+    title: '确认删除全部',
+    content: '确定要删除所有扫描记录吗？此操作不可撤销。',
+    okText: '全部删除',
+    okType: 'danger',
+    cancelText: '取消',
+    onOk: () => {
+      scanRecords.value = []
+      localStorage.removeItem('scanHistory')
+      selectedRecord.value = null
+      message.success('所有扫描记录已清空')
+    }
+  })
 }
 
 // 方法：过滤扫描历史

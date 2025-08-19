@@ -25,9 +25,13 @@
         />
       </div>
 
-      <a-button type="primary" @click="$emit('filter')">
+            <a-button type="primary" @click="$emit('filter')">
         <template #icon><SearchOutlined /></template>
         查询
+      </a-button>
+      <a-button type="primary" danger @click="$emit('deleteAll')">
+        <template #icon><DeleteOutlined /></template>
+        删除全部
       </a-button>
     </div>
   </a-card>
@@ -35,7 +39,7 @@
 
 <script setup lang="ts">
 import { ref, PropType } from 'vue'
-import { SearchOutlined } from '@ant-design/icons-vue'
+import { SearchOutlined, DeleteOutlined } from '@ant-design/icons-vue'
 import { Dayjs } from 'dayjs'
 
 interface Repository {
@@ -49,7 +53,7 @@ defineProps({
   dateRange: { type: Array as PropType<[Dayjs, Dayjs] | null>, default: null },
 })
 
-defineEmits(['update:selectedRepo', 'update:dateRange', 'filter'])
+defineEmits(['update:selectedRepo', 'update:dateRange', 'filter', 'deleteAll'])
 </script>
 
 <style scoped>

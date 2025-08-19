@@ -58,6 +58,19 @@
           />
         </div>
       </div>
+
+      <div class="setting-item">
+        <div class="setting-label">
+          <ClearOutlined />
+          <span>扫描完成后清空配置</span>
+        </div>
+        <div class="setting-control">
+          <a-switch
+            :checked="settings.clearScanConfigOnFinish"
+            @change="(checked) => $emit('update:clearScanConfigOnFinish', checked)"
+          />
+        </div>
+      </div>
     </div>
   </a-card>
 </template>
@@ -68,14 +81,15 @@ import {
   RocketOutlined,
   NotificationOutlined,
   CloudSyncOutlined,
-  CodeOutlined
+  CodeOutlined,
+  ClearOutlined
 } from '@ant-design/icons-vue'
 
 defineProps({
   settings: { type: Object, required: true }
 })
 
-defineEmits(['update:startWithSystem', 'update:notifications', 'update:autoUpdate', 'update:telemetry'])
+defineEmits(['update:startWithSystem', 'update:notifications', 'update:autoUpdate', 'update:telemetry', 'update:clearScanConfigOnFinish'])
 </script>
 
 <style scoped>

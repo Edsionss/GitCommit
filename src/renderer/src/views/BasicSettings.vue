@@ -23,6 +23,7 @@
       @start-scan="startScan"
       @save-results="saveResults"
       @scan-authors="scanAuthors"
+      @reset-config="resetForm"
     />
   </div>
 </template>
@@ -39,12 +40,7 @@ import ActionPanel from '@components/BasicSettings/ActionPanel.vue'
 
 const router = useRouter()
 
-interface Log {
-  type: 'info' | 'error' | 'success'
-  message: string
-}
-
-const form = reactive({
+const defaultFormState = {
   selectedFields: ['repository', 'commitId', 'shortHash', 'author', 'date', 'message'],
   statsDimension: 'none',
   repoPath: '',
@@ -55,7 +51,9 @@ const form = reactive({
   authorFilter: [],
   dateRange: [dayjs().startOf('month'), dayjs()],
   outputFormat: 'json'
-})
+}
+
+const form = reactive({ ...defaultFormState })
 
 const scanning = ref(false)
 const hasResults = ref(false)
@@ -63,6 +61,11 @@ const isValidRepo = ref(false)
 const logPanelRef = ref<InstanceType<typeof LogPanel> | null>(null)
 const settingsFormRef = ref<InstanceType<typeof SettingsForm> | null>(null)
 const currentLogs = ref<string[]>([]) // 用于存储当前扫描的日志
+
+const resetForm = () => {
+  Object.assign(form, defaultFormState)
+  message.success('配置已重置')
+}
 
 const addLog = (msg: string, type: Log['type'] = 'info') => {
   const timestamp = dayjs().format('HH:mm:ss')
@@ -90,7 +93,6 @@ const startScan = async () => {
     return message.warning('请至少选择一个子仓库进行扫描')
   if (!form.scanSubfolders && !isValidRepo.value) return message.warning('请选择一个有效的Git仓库')
 
-  currentLogs.value = [] // 清空之前的日志
   addLog(`开始扫描仓库: ${form.repoPath}`)
 
   try {
@@ -120,6 +122,15 @@ const startScan = async () => {
         })
       }
     })
+
+    const savedSettings = localStorage.getItem('appSettings')
+    if (savedSettings) {
+      const parsedSettings = JSON.parse(savedSettings)
+      if (parsedSettings.system?.clearScanConfigOnFinish) {
+        resetForm()
+      }
+    }
+
   } catch (error) {
     const errorMsg = error instanceof Error ? error.message : String(error)
     addLog(`扫描失败: ${errorMsg}`, 'error')

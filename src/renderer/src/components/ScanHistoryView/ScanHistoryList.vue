@@ -7,21 +7,28 @@
     </template>
     <div class="scan-records-list">
       <a-empty v-if="scanRecords.length === 0" description="暂无扫描记录" />
-      <div
-        v-for="record in scanRecords"
-        :key="record.id"
-        class="record-item"
-        :class="{ active: selectedRecordId === record.id }"
-        @click="$emit('selectRecord', record)"
-      >
-        <div class="record-header">
-          <span class="repo-path">{{ record.repoPath }}</span>
-          <a-tag :color="getStatusColor(record.status)">{{ getStatusText(record.status) }}</a-tag>
-        </div>
-        <div class="record-info">
-          <span>{{ formatDate(record.scanTime) }}</span>
-          <span>共 {{ record.totalCommits }} 条提交</span>
-        </div>
+      <div v-for="record in scanRecords" :key="record.id">
+        <a-dropdown :trigger="['contextmenu']">
+          <div
+            class="record-item"
+            :class="{ active: selectedRecordId === record.id }"
+            @click="$emit('selectRecord', record)"
+          >
+            <div class="record-header">
+              <span class="repo-path">{{ record.repoPath }}</span>
+              <a-tag :color="getStatusColor(record.status)">{{ getStatusText(record.status) }}</a-tag>
+            </div>
+            <div class="record-info">
+              <span>{{ formatDate(record.scanTime) }}</span>
+              <span>共 {{ record.totalCommits }} 条提交</span>
+            </div>
+          </div>
+          <template #overlay>
+            <a-menu @click="({ key }) => $emit('deleteRecord', record.id, key)">
+              <a-menu-item key="delete">删除</a-menu-item>
+            </a-menu>
+          </template>
+        </a-dropdown>
       </div>
     </div>
   </a-card>
@@ -49,7 +56,7 @@ defineProps({
   selectedRecordId: { type: String, default: null }
 })
 
-defineEmits(['selectRecord'])
+defineEmits(['selectRecord', 'deleteRecord'])
 
 const formatDate = (dateString: string) => {
   return dayjs(dateString).format('YYYY-MM-DD HH:mm')

@@ -32,6 +32,7 @@
       @update:notifications="settings.system.notifications = $event"
       @update:autoUpdate="settings.system.autoUpdate = $event"
       @update:telemetry="settings.system.telemetry = $event"
+      @update:clearScanConfigOnFinish="settings.system.clearScanConfigOnFinish = $event"
     />
 
     <div class="settings-actions">
@@ -76,7 +77,8 @@ const settings = reactive({
     startWithSystem: false,
     notifications: true,
     autoUpdate: true,
-    telemetry: true
+    telemetry: true,
+    clearScanConfigOnFinish: true
   }
 })
 
@@ -160,6 +162,7 @@ const resetSettings = () => {
       settings.system.notifications = true
       settings.system.autoUpdate = true
       settings.system.telemetry = true
+      settings.system.clearScanConfigOnFinish = true
 
       // 应用默认主题
       updateTheme('light')

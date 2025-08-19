@@ -3,8 +3,11 @@
     <a-button type="primary" @click="$emit('start-scan')" :loading="scanning">
       <template #icon><CaretRightOutlined /></template>开始扫描
     </a-button>
-    <a-button @click="$emit('scan-authors')">
+    <!-- <a-button @click="$emit('scan-authors')">
       <template #icon><UserOutlined /></template>扫描作者
+    </a-button> -->
+    <a-button @click="$emit('reset-config')">
+      <template #icon><ClearOutlined /></template>重置配置
     </a-button>
     <a-button @click="$emit('save-results')" :disabled="!hasResults">
       <template #icon><DownloadOutlined /></template>保存结果
@@ -16,7 +19,8 @@
 import {
   CaretRightOutlined,
   DownloadOutlined,
-  UserOutlined
+  UserOutlined,
+  ClearOutlined
 } from '@ant-design/icons-vue'
 
 defineProps({
@@ -30,7 +34,7 @@ defineProps({
   }
 })
 
-defineEmits(['start-scan', 'save-results', 'scan-authors'])
+defineEmits(['start-scan', 'save-results', 'scan-authors', 'reset-config'])
 </script>
 
 <style scoped>
