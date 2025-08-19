@@ -43,7 +43,7 @@ interface ScanRecord {
 
 defineProps({
   record: { type: Object as PropType<ScanRecord | null>, default: null },
-  loading: { type: Boolean, default: false },
+  loading: { type: Boolean, default: false }
 })
 
 defineEmits(['exportResults'])
@@ -61,7 +61,7 @@ const activeTab = ref('parameters')
 .details-card :deep(.ant-card-body) {
   flex: 1;
   overflow: hidden;
-  padding: 0;
+  padding: 10px;
 }
 
 .card-header {

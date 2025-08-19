@@ -46,7 +46,7 @@ interface ScanRecord {
 defineProps({
   scanRecords: { type: Array as PropType<ScanRecord[]>, required: true },
   loading: { type: Boolean, default: false },
-  selectedRecordId: { type: String, default: null },
+  selectedRecordId: { type: String, default: null }
 })
 
 defineEmits(['selectRecord'])
@@ -92,7 +92,7 @@ const getStatusText = (status: 'success' | 'failed' | 'cancelled') => {
 .list-card :deep(.ant-card-body) {
   flex: 1;
   overflow-y: auto;
-  padding: 0;
+  padding: 10px;
 }
 
 .card-header {
@@ -110,6 +110,7 @@ const getStatusText = (status: 'success' | 'failed' | 'cancelled') => {
   border-bottom: 1px solid var(--color-border);
   cursor: pointer;
   transition: background-color 0.2s;
+  padding: 10px;
 }
 
 .record-item:last-child {

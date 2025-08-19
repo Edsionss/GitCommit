@@ -7,23 +7,23 @@
       @filter="filterScanHistory"
     />
 
-    <a-row :gutter="20" class="content-row">
-      <a-col :span="8">
+    <div :gutter="20" class="content-row">
+      <div class="content-list">
         <ScanHistoryList
           :scan-records="filteredScanRecords"
           :loading="loading"
           @select-record="selectScanRecord"
           :selected-record-id="selectedRecord ? selectedRecord.id : null"
         />
-      </a-col>
-      <a-col :span="16">
+      </div>
+      <div class="content-detail">
         <ScanHistoryDetails
           :record="selectedRecord"
           :loading="loading"
           @export-results="exportScanResults"
         />
-      </a-col>
-    </a-row>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -55,7 +55,7 @@ interface ScanRecord {
 const repositories = ref([
   { id: 'all', name: '所有仓库' },
   { id: 'repo1', name: 'GitCommit' },
-  { id: 'repo2', name: 'WebProject' },
+  { id: 'repo2', name: 'WebProject' }
 ])
 
 // 筛选条件
@@ -72,14 +72,17 @@ const filteredScanRecords = computed(() => {
   let records = [...scanRecords.value]
 
   if (selectedRepo.value !== 'all') {
-    records = records.filter(record => record.repoPath.includes(selectedRepo.value))
+    records = records.filter((record) => record.repoPath.includes(selectedRepo.value))
   }
 
   if (dateRange.value && dateRange.value.length === 2) {
-    const [startDate, endDate] = dateRange.value.map(d => d.startOf('day'))
-    records = records.filter(record => {
+    const [startDate, endDate] = dateRange.value.map((d) => d.startOf('day'))
+    records = records.filter((record) => {
       const recordDate = dayjs(record.scanTime).startOf('day')
-      return recordDate.isAfter(startDate.subtract(1, 'day')) && recordDate.isBefore(endDate.add(1, 'day'))
+      return (
+        recordDate.isAfter(startDate.subtract(1, 'day')) &&
+        recordDate.isBefore(endDate.add(1, 'day'))
+      )
     })
   }
 
@@ -156,16 +159,24 @@ onMounted(() => {
 })
 
 // 暴露给外部的方法，用于从BasicSettings页面接收扫描结果
-const addScanResult = (result: { commits: GitCommit[], options: GitScanOptions, log: string[], status: 'success' | 'failed' | 'cancelled' }) => {
+const addScanResult = (result: {
+  commits: GitCommit[]
+  options: GitScanOptions
+  log: string[]
+  status: 'success' | 'failed' | 'cancelled'
+}) => {
   const newRecord: ScanRecord = {
     id: dayjs().valueOf().toString(), // 唯一ID
-    repoPath: result.options.selectedRepos && result.options.selectedRepos.length > 0 ? result.options.selectedRepos.join(', ') : result.options.repoPath || '未知仓库',
+    repoPath:
+      result.options.selectedRepos && result.options.selectedRepos.length > 0
+        ? result.options.selectedRepos.join(', ')
+        : result.options.repoPath || '未知仓库',
     scanTime: dayjs().toISOString(),
     status: result.status,
     totalCommits: result.commits.length,
     scanOptions: result.options,
     log: result.log,
-    results: result.commits,
+    results: result.commits
   }
   saveScanRecord(newRecord)
 }
@@ -181,11 +192,17 @@ defineExpose({
   padding: var(--spacing-md);
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-md);
+  gap: 10px;
 }
 
 .content-row {
+  display: flex;
+  gap: 10px;
+}
+.content-list {
   flex: 1;
-  min-height: 0;
+}
+.content-detail {
+  flex: 2;
 }
 </style>
