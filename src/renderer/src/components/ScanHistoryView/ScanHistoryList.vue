@@ -5,39 +5,36 @@
         <span>扫描记录</span>
       </div>
     </template>
-    <div class="scan-records-list">
+    <div class="scan-records-list" @contextmenu.prevent="onContextMenu($event, null)">
       <a-empty v-if="scanRecords.length === 0" description="暂无扫描记录" />
-      <div v-for="record in scanRecords" :key="record.id">
-        <a-dropdown :trigger="['contextmenu']">
-          <div
-            class="record-item"
-            :class="{ active: selectedRecordId === record.id }"
-            @click="$emit('selectRecord', record)"
-          >
-            <div class="record-header">
-              <span class="repo-path">{{ record.repoPath }}</span>
-              <a-tag :color="getStatusColor(record.status)">{{ getStatusText(record.status) }}</a-tag>
-            </div>
-            <div class="record-info">
-              <span>{{ formatDate(record.scanTime) }}</span>
-              <span>共 {{ record.totalCommits }} 条提交</span>
-            </div>
-          </div>
-          <template #overlay>
-            <a-menu @click="({ key }) => $emit('deleteRecord', record.id, key)">
-              <a-menu-item key="delete">删除</a-menu-item>
-            </a-menu>
-          </template>
-        </a-dropdown>
+      <div
+        v-for="record in scanRecords"
+        :key="record.id"
+        class="record-item"
+        :class="{ active: selectedRecordId === record.id }"
+        @click="$emit('selectRecord', record)"
+        @contextmenu.prevent.stop="onContextMenu($event, record)"
+      >
+        <div class="record-header">
+          <span class="repo-path">{{ record.repoPath }}</span>
+          <a-tag :color="getStatusColor(record.status)">{{ getStatusText(record.status) }}</a-tag>
+        </div>
+        <div class="record-info">
+          <span>{{ formatDate(record.scanTime) }}</span>
+          <span>共 {{ record.totalCommits }} 条提交</span>
+        </div>
       </div>
     </div>
   </a-card>
 </template>
 
 <script setup lang="ts">
-import { PropType } from 'vue'
+import { PropType, h } from 'vue'
 import dayjs from 'dayjs'
 import { GitCommit, GitScanOptions } from '@services/GitService'
+import ContextMenu from '@imengyu/vue3-context-menu'
+import { useTheme } from '@/composables/useTheme'
+import { DeleteOutlined, ClearOutlined } from '@ant-design/icons-vue'
 
 interface ScanRecord {
   id: string
@@ -50,13 +47,51 @@ interface ScanRecord {
   results: GitCommit[]
 }
 
-defineProps({
+const props = defineProps({
   scanRecords: { type: Array as PropType<ScanRecord[]>, required: true },
   loading: { type: Boolean, default: false },
   selectedRecordId: { type: String, default: null }
 })
 
-defineEmits(['selectRecord', 'deleteRecord'])
+const emit = defineEmits(['selectRecord', 'deleteRecord', 'deleteAllRecords'])
+
+const { currentTheme } = useTheme()
+
+const onContextMenu = (e: MouseEvent, record: ScanRecord | null) => {
+  if (record) {
+    emit('selectRecord', record)
+  }
+
+  const items = []
+  if (record) {
+    items.push({
+      label: '删除此记录',
+      icon: () => h(DeleteOutlined),
+      onClick: () => {
+        emit('deleteRecord', record.id)
+      }
+    })
+  }
+  if (props.scanRecords.length > 0) {
+    items.push({
+      label: '删除全部记录',
+      icon: () => h(ClearOutlined),
+      onClick: () => {
+        emit('deleteAllRecords')
+      }
+    })
+  }
+
+  if (items.length > 0) {
+    ContextMenu.showContextMenu({
+      x: e.x,
+      y: e.y,
+      items: items,
+      theme: currentTheme.value,
+      customClass: 'context-menu-custom'
+    })
+  }
+}
 
 const formatDate = (dateString: string) => {
   return dayjs(dateString).format('YYYY-MM-DD HH:mm')
@@ -88,6 +123,13 @@ const getStatusText = (status: 'success' | 'failed' | 'cancelled') => {
   }
 }
 </script>
+
+<style>
+.mx-context-menu-item:hover {
+  background-color: var(--primary-bg-hover);
+  color: var(--primary-color) !important;
+}
+</style>
 
 <style scoped>
 .list-card {

@@ -6,6 +6,8 @@ import router from './router'
 import { createPinia } from 'pinia'
 import Antd from 'ant-design-vue'
 import 'ant-design-vue/dist/reset.css' // Use reset.css for a cleaner start
+import ContextMenu from '@imengyu/vue3-context-menu'
+import '@imengyu/vue3-context-menu/lib/vue3-context-menu.css'
 
 const app = createApp(App)
 
@@ -19,5 +21,6 @@ app.config.errorHandler = (err, vm, info) => {
 app.use(createPinia())
 app.use(router)
 app.use(Antd)
+app.use(ContextMenu)
 
 app.mount('#app')

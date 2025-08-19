@@ -21,6 +21,8 @@
   --color-info: #909399;
 
   --el-color-primary: var(--color-primary);
+
+  --primary-bg-hover: rgba(var(--primary-color-rgb), 0.1);
 }
 
 /* 深色主题变量 */

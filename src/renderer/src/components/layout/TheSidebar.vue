@@ -191,7 +191,7 @@ initSidebar()
 }
 
 .menu-item.active {
-  background-color: rgba(var(--primary-color-rgb), 0.1);
+  background-color: var(--primary-bg-hover);
   color: var(--primary-color);
 }
 

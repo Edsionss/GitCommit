@@ -5,7 +5,6 @@
       v-model:selectedRepo="selectedRepo"
       v-model:dateRange="dateRange"
       @filter="filterScanHistory"
-      @deleteAll="deleteAllScanRecords"
     />
 
     <div class="content-row">
@@ -15,6 +14,7 @@
           :loading="loading"
           @select-record="selectScanRecord"
           @delete-record="deleteScanRecord"
+          @delete-all-records="deleteAllScanRecords"
           :selected-record-id="selectedRecord ? selectedRecord.id : null"
         />
       </div>

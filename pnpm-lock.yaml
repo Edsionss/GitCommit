@@ -14,6 +14,9 @@ importers:
       '@electron-toolkit/utils':
         specifier: ^4.0.0
         version: 4.0.0(electron@35.1.4)
+      '@imengyu/vue3-context-menu':
+        specifier: ^1.5.2
+        version: 1.5.2
       ant-design-vue:
         specifier: ^4.2.3
         version: 4.2.6(vue@3.5.13(typescript@5.8.3))
@@ -396,6 +399,12 @@ packages:
 
   '@gar/promisify@1.1.3':
     resolution: {integrity: sha512-k2Ty1JcVojjJFwrg/ThKi2ujJ7XNLYaFGNB/bWT9wGR+oSMJHMa5w+CUq6p/pVrKeNNgA7pCqEcjSnHVoqJQFw==}
+
+  '@imengyu/vue-scroll-rect@0.1.7':
+    resolution: {integrity: sha512-a1ysL8LV2iFcHzMJ6tlrqr8JKtYIBrb1U3XcbjNmhponENUSbRvxs4b1sJd5sXdCFIIkDydwQM/SjVhfT7uBUw==}
+
+  '@imengyu/vue3-context-menu@1.5.2':
+    resolution: {integrity: sha512-JtM9y4JKsqwpsLQnK38Fm3DqV5ZwIs/HksxQYHU6yUuuWScdr5C+NTF16J0KxmSbMHOTwVTMwJCBkwcC1X6y1w==}
 
   '@isaacs/cliui@8.0.2':
     resolution: {integrity: sha512-O8jcjabXaleOG9DQ0+ARXWZBTfnP4WNAqzuiJK7ll44AmxGKv/J2M4TPjxjY3znBCfvBXFzucm1twdyFybFqEA==}
@@ -2665,6 +2674,12 @@ snapshots:
       lodash.uniq: 4.5.0
 
   '@gar/promisify@1.1.3': {}
+
+  '@imengyu/vue-scroll-rect@0.1.7': {}
+
+  '@imengyu/vue3-context-menu@1.5.2':
+    dependencies:
+      '@imengyu/vue-scroll-rect': 0.1.7
 
   '@isaacs/cliui@8.0.2':
     dependencies:
