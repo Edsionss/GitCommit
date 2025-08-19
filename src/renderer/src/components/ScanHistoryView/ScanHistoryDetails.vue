@@ -12,11 +12,14 @@
     </template>
     <div v-if="record" class="details-content">
       <a-tabs v-model:activeKey="activeTab" class="details-tabs">
-        <a-tab-pane key="parameters" tab="扫描参数与日志">
-          <ScanParametersTab :record="record" />
+        <a-tab-pane key="parameters" tab="扫描参数">
+          <ScanParametersTab :record="record" class="detail-item" />
+        </a-tab-pane>
+        <a-tab-pane key="log" tab="扫描日志">
+          <ScanLogTab :log="record.log" class="detail-item" />
         </a-tab-pane>
         <a-tab-pane key="results" tab="扫描结果">
-          <ScanResultsTable :results="record.results" />
+          <ScanResultsTable :results="record.results" class="detail-item" />
         </a-tab-pane>
       </a-tabs>
     </div>
@@ -28,6 +31,7 @@
 import { ref, PropType } from 'vue'
 import ScanParametersTab from './ScanParametersTab.vue'
 import ScanResultsTable from './ScanResultsTable.vue'
+import ScanLogTab from './ScanLogTab.vue'
 import { GitCommit, GitScanOptions } from '@services/GitService'
 
 interface ScanRecord {
@@ -52,6 +56,15 @@ const activeTab = ref('parameters')
 </script>
 
 <style scoped>
+:deep(.ant-tabs-content) {
+  height: 100%;
+  padding-top: 15px;
+  overflow: auto;
+}
+.detail-item {
+  height: 100%;
+  overflow: auto;
+}
 .details-card {
   height: 100%;
   display: flex;
@@ -60,7 +73,7 @@ const activeTab = ref('parameters')
 
 .details-card :deep(.ant-card-body) {
   flex: 1;
-  overflow: hidden;
+  overflow: auto;
   padding: 10px;
 }
 

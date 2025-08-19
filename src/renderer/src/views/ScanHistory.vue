@@ -7,8 +7,8 @@
       @filter="filterScanHistory"
     />
 
-    <div :gutter="20" class="content-row">
-      <div class="content-list">
+    <div class="content-row">
+      <div class="content-list overflow">
         <ScanHistoryList
           :scan-records="filteredScanRecords"
           :loading="loading"
@@ -16,7 +16,7 @@
           :selected-record-id="selectedRecord ? selectedRecord.id : null"
         />
       </div>
-      <div class="content-detail">
+      <div class="content-detail overflow">
         <ScanHistoryDetails
           :record="selectedRecord"
           :loading="loading"
@@ -198,11 +198,15 @@ defineExpose({
 .content-row {
   display: flex;
   gap: 10px;
+  height: calc(100vh - 185px);
 }
 .content-list {
   flex: 1;
 }
 .content-detail {
   flex: 2;
+}
+.overflow {
+  overflow: auto;
 }
 </style>

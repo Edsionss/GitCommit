@@ -68,6 +68,8 @@ const formatDate = (dateString: string) => {
 <style scoped>
 .scan-results-table {
   padding: var(--spacing-md);
+  height: 100%;
+  overflow: auto;
 }
 
 .expanded-row-content {
