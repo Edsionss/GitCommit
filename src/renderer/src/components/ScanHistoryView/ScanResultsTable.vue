@@ -24,6 +24,22 @@
           <span style="color: red;">-{{ text }}</span>
         </template>
       </template>
+      <template #expandedRowRender="{ record }">
+        <div class="expanded-row-content">
+          <p><strong>完整提交ID:</strong> <a-typography-paragraph copyable style="display: inline;">{{ record.commitId }}</a-typography-paragraph></p>
+          <p><strong>消息:</strong> <pre class="commit-message-pre">{{ record.message }}</pre></p>
+          <p v-if="record.body"><strong>详细描述:</strong> <pre class="commit-message-pre">{{ record.body }}</pre></p>
+          <p>
+            <strong>邮箱:</strong> {{ record.email }}
+            <a-divider type="vertical" />
+            <strong>文件变更数:</strong> {{ record.filesChanged }}
+            <a-divider type="vertical" />
+            <strong>新增行数:</strong> <span style="color: green;">{{ record.insertions }}</span>
+            <a-divider type="vertical" />
+            <strong>删除行数:</strong> <span style="color: red;">{{ record.deletions }}</span>
+          </p>
+        </div>
+      </template>
     </a-table>
   </div>
 </template>
@@ -39,14 +55,9 @@ defineProps({
 
 const columns = [
   { title: '仓库', dataIndex: 'repository', key: 'repository', width: 120 },
-  { title: '短哈希', dataIndex: 'shortHash', key: 'shortHash', width: 100 },
   { title: '作者', dataIndex: 'author', key: 'author', width: 120 },
-  { title: '邮箱', dataIndex: 'email', key: 'email', width: 150 },
   { title: '日期', dataIndex: 'date', key: 'date', width: 180 },
-  { title: '消息', dataIndex: 'message', key: 'message', ellipsis: true },
-  { title: '文件变更', dataIndex: 'filesChanged', key: 'filesChanged', width: 100 },
-  { title: '新增', dataIndex: 'insertions', key: 'insertions', width: 80 },
-  { title: '删除', dataIndex: 'deletions', key: 'deletions', width: 80 },
+  // 其他列默认不显示，通过展开行显示
 ]
 
 const formatDate = (dateString: string) => {
@@ -57,5 +68,22 @@ const formatDate = (dateString: string) => {
 <style scoped>
 .scan-results-table {
   padding: var(--spacing-md);
+}
+
+.expanded-row-content {
+  padding: 10px 20px;
+  background-color: #f9f9f9;
+  border-radius: 4px;
+  margin-bottom: 10px;
+}
+
+.commit-message-pre {
+  white-space: pre-wrap;
+  word-break: break-all;
+  font-family: monospace;
+  font-size: 12px;
+  background-color: #eee;
+  padding: 5px;
+  border-radius: 3px;
 }
 </style>
