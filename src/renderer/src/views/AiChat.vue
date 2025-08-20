@@ -1,5 +1,6 @@
 <template>
   <div class="ai-chat-container">
+    <div class="toolbar">123</div>
     <div class="chat-history" ref="chatHistoryRef">
       <a-list :data-source="messages" item-layout="horizontal">
         <template #renderItem="{ item }">
@@ -16,7 +17,11 @@
               <template #description>
                 <div class="message-content">
                   <div v-if="item.isLoading"><a-spin /></div>
-                  <div v-else-if="item.sender === 'ai'" v-html="renderMarkdown(item.text)" class="markdown-body"></div>
+                  <div
+                    v-else-if="item.sender === 'ai'"
+                    v-html="renderMarkdown(item.text)"
+                    class="markdown-body"
+                  ></div>
                   <div v-else>{{ item.text }}</div>
                 </div>
               </template>
@@ -63,7 +68,7 @@ const chatHistoryRef = ref<HTMLElement | null>(null)
 const settingsStore = useSettingsStore()
 
 const renderMarkdown = (text: string) => {
-  return marked.parse(text, { gfm: true, breaks: true });
+  return marked.parse(text, { gfm: true, breaks: true })
 }
 
 const scrollToBottom = () => {
@@ -97,7 +102,7 @@ const sendMessage = async () => {
     if (!appSettings || !appSettings.ai) {
       throw new Error('请在设置页面中配置AI设置。')
     }
-    
+
     const aiConfig = appSettings.ai
 
     if (!aiConfig.provider || !aiConfig.apiKey) {
@@ -130,7 +135,7 @@ const sendMessage = async () => {
 }
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 :deep(.ant-list-item) {
   border-bottom: none;
 }
@@ -140,6 +145,14 @@ const sendMessage = async () => {
   flex-direction: column;
   height: 100%;
   user-select: text;
+  position: relative;
+  .toolbar {
+    position: fixed;
+    background-color: red;
+    height: 50px;
+    width: 100%;
+    z-index: 100;
+  }
 }
 
 .chat-history {
@@ -203,7 +216,13 @@ const sendMessage = async () => {
   margin-bottom: 1em;
 }
 
-:deep(.markdown-body h1, .markdown-body h2, .markdown-body h3, .markdown-body h4, .markdown-body h5) {
+:deep(
+  .markdown-body h1,
+  .markdown-body h2,
+  .markdown-body h3,
+  .markdown-body h4,
+  .markdown-body h5
+) {
   margin-top: 1.5em;
   margin-bottom: 1em;
   font-weight: 600;

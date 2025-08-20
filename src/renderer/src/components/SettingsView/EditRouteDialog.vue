@@ -9,6 +9,9 @@
       <a-form-item label="菜单名称">
         <a-input v-model:value="editableRoute.meta.title" />
       </a-form-item>
+      <a-form-item label="菜单顺序">
+        <a-input-number v-model:value="editableRoute.menuOrder" style="width: 100%" />
+      </a-form-item>
       <a-form-item label="路由路径">
         <a-input v-model:value="editableRoute.path" />
       </a-form-item>
@@ -18,18 +21,18 @@
       <a-form-item label="组件路径">
         <a-input v-model:value="editableRoute.componentPath" />
       </a-form-item>
-      <a-form-item label="设为菜单">
+      <!-- <a-form-item label="设为菜单">
         <a-switch v-model:checked="editableRoute.isMenu" />
       </a-form-item>
       <a-form-item label="缓存页面">
         <a-switch v-model:checked="editableRoute.meta.keepAlive" />
-      </a-form-item>
+      </a-form-item> -->
     </a-form>
   </a-modal>
 </template>
 
 <script setup lang="ts">
-import { ref, watch } from 'vue'
+import { ref, watch, defineProps, defineEmits } from 'vue'
 import { RouteRecord } from '@/stores/routesStore'
 
 const props = defineProps<{

@@ -85,6 +85,7 @@ const editingRoute = ref<RouteRecord | null>(null)
 
 const columns = [
   { title: '菜单名称', dataIndex: ['meta', 'title'], key: 'title' },
+  { title: '菜单顺序', key: 'menuOrder', width: 120 },
   { title: '路由路径', dataIndex: 'path', key: 'path' },
   { title: '设为菜单', key: 'isMenu', width: 100 },
   { title: '缓存页面', key: 'keepAlive', width: 100 },
@@ -107,15 +108,18 @@ const handleUpdate = (updatedRoute: RouteRecord) => {
   message.success('路由已更新')
 }
 
-const onFieldChange = (record: RouteRecord, field: string, value: boolean) => {
-  const updatedRecord = { ...record }
+const onFieldChange = (record: RouteRecord, field: string, value: any) => {
+  const updatedRecord = { ...record };
   if (field === 'isMenu') {
-    updatedRecord.isMenu = value
+    updatedRecord.isMenu = value;
   } else if (field === 'keepAlive') {
-    updatedRecord.meta = { ...updatedRecord.meta, keepAlive: value }
+    updatedRecord.meta = { ...updatedRecord.meta, keepAlive: value };
+  } else if (field === 'menuOrder') {
+    if (value === null) return; // Do not update if value is cleared
+    updatedRecord.menuOrder = value;
   }
-  routesStore.updateRoute(record.name, updatedRecord)
-  message.success('设置已更新')
+  routesStore.updateRoute(record.name, updatedRecord);
+  message.success('设置已更新');
 }
 </script>
 
