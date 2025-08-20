@@ -3,24 +3,26 @@ import simpleGit, { SimpleGit } from 'simple-git'
 
 export function registerGitInfoHandlers() {
   // 获取仓库作者列表
-  ipcMain.handle('get-repo-authors', async (_, repoPath: string) => {
+  ipcMain.handle('get-repo-authors', async (_, repoPaths: string | string[]) => {
     try {
-      const git: SimpleGit = simpleGit(repoPath)
-      // 使用git shortlog获取所有作者
-      const result = await git.raw(['shortlog', '-sne', 'HEAD'])
+      const allAuthors = new Set<string>()
+      const paths = Array.isArray(repoPaths) ? repoPaths : [repoPaths]
 
-      // 解析输出，提取作者姓名和邮箱
-      const authors: string[] = []
-      const regex = /^\s*\d+\s+(.+?)\s+<(.+?)>$/gm
-      let match
+      for (const repoPath of paths) {
+        const git: SimpleGit = simpleGit(repoPath)
+        const result = await git.raw(['shortlog', '-sne', 'HEAD'])
 
-      while ((match = regex.exec(result)) !== null) {
-        if (match[1] && match[2]) {
-          authors.push(match[1])
+        const regex = /^\s*\d+\s+(.+?)\s+<(.+?)>$/gm
+        let match
+
+        while ((match = regex.exec(result)) !== null) {
+          if (match[1]) {
+            allAuthors.add(match[1])
+          }
         }
       }
 
-      return authors
+      return Array.from(allAuthors)
     } catch (error) {
       console.error('获取Git作者列表失败:', error)
       const errorMessage = error instanceof Error ? error.message : String(error)

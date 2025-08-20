@@ -7,7 +7,8 @@
         @update:form="Object.assign(form, $event)"
         @add-log="addLog"
         @validate-repo-path="validateRepoPath"
-        :is-valid-repo="isValidRepo"
+        :repo-status="repoStatus"
+        @update:repoStatus="repoStatus = $event"
       />
       <LogPanel
         ref="logPanelRef"
@@ -57,13 +58,14 @@ const form = reactive({ ...defaultFormState })
 
 const scanning = ref(false)
 const hasResults = ref(false)
-const isValidRepo = ref(false)
+const repoStatus = ref<'valid' | 'invalid' | 'warning' | 'none'>('none')
 const logPanelRef = ref<InstanceType<typeof LogPanel> | null>(null)
 const settingsFormRef = ref<InstanceType<typeof SettingsForm> | null>(null)
 const currentLogs = ref<string[]>([]) // 用于存储当前扫描的日志
 
 const resetForm = () => {
   Object.assign(form, defaultFormState)
+  repoStatus.value = 'none'
   message.success('配置已重置')
 }
 
@@ -75,14 +77,19 @@ const addLog = (msg: string, type: Log['type'] = 'info') => {
 }
 
 const validateRepoPath = async (path: string) => {
+  if (form.scanSubfolders) {
+    repoStatus.value = 'warning'
+    return
+  }
   if (!path) {
-    isValidRepo.value = false
+    repoStatus.value = 'none'
     return
   }
   try {
-    isValidRepo.value = await window.api.validateRepoPath(path)
+    const isValid = await window.api.validateRepoPath(path)
+    repoStatus.value = isValid ? 'valid' : 'invalid'
   } catch (error) {
-    isValidRepo.value = false
+    repoStatus.value = 'invalid'
   }
 }
 
@@ -91,7 +98,8 @@ const startScan = async () => {
   if (form.selectedFields.length === 0) return message.warning('请至少选择一个字段')
   if (form.scanSubfolders && form.selectedRepos.length === 0)
     return message.warning('请至少选择一个子仓库进行扫描')
-  if (!form.scanSubfolders && !isValidRepo.value) return message.warning('请选择一个有效的Git仓库')
+  if (!form.scanSubfolders && repoStatus.value !== 'valid')
+    return message.warning('请选择一个有效的Git仓库')
 
   addLog(`开始扫描仓库: ${form.repoPath}`)
 

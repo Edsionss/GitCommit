@@ -54,11 +54,19 @@
             @change="validateRepoPath"
           >
             <template #prefix>
-              <CheckCircleFilled v-if="isValidRepo" style="color: green" />
-              <CloseCircleFilled v-else-if="localForm.repoPath" style="color: red" />
+              <CheckCircleFilled v-if="repoStatus === 'valid'" style="color: green" />
+              <ExclamationCircleFilled v-if="repoStatus === 'warning'" style="color: orange" />
+              <CloseCircleFilled
+                v-else-if="repoStatus === 'invalid' && localForm.repoPath"
+                style="color: red"
+              />
             </template>
             <template #suffix>
-              <CloseCircleFilled v-if="localForm.repoPath" class="clear-icon" @click="clearRepoPath" />
+              <CloseCircleFilled
+                v-if="localForm.repoPath"
+                class="clear-icon"
+                @click="clearRepoPath"
+              />
             </template>
             <template #addonAfter>
               <span @click="selectRepoPath" style="cursor: pointer">
@@ -114,7 +122,10 @@
               :disabled="!localForm.scanSubfolders || !localForm.repoPath"
               placeholder="请先选择父目录并扫描子仓库"
               :options="
-                subRepos.map((repo) => ({ value: repo, label: repo.replace(localForm.repoPath, '') }))
+                subRepos.map((repo) => ({
+                  value: repo,
+                  label: repo.replace(localForm.repoPath, '')
+                }))
               "
             />
             <a-button
@@ -130,9 +141,7 @@
             <a-button
               type="link"
               @click="selectAllRepos"
-              :disabled="
-                !localForm.scanSubfolders || !localForm.repoPath || !localForm.scanSubfolders || !localForm.repoPath
-              "
+              :disabled="!localForm.scanSubfolders || !localForm.repoPath || subRepos.length === 0"
             >
               <template #icon><CheckSquareOutlined /></template> 全选
             </a-button>
@@ -140,7 +149,9 @@
               type="link"
               @click="clearAllRepos"
               :disabled="
-                !localForm.scanSubfolders || !localForm.repoPath || !localForm.scanSubfolders || !localForm.repoPath
+                !localForm.scanSubfolders ||
+                !localForm.repoPath ||
+                localForm.selectedRepos.length === 0
               "
             >
               <template #icon><ClearOutlined /></template> 清空
@@ -154,10 +165,15 @@
               v-model:value="localForm.branches"
               mode="multiple"
               show-search
-              placeholder="默认为当前分支 (HEAD)，可搜索"
+              :placeholder="
+                localForm.scanSubfolders
+                  ? '多仓库模式不支持选择分支'
+                  : '默认为当前分支 (HEAD)，可搜索'
+              "
               :options="availableBranches.map((branch) => ({ value: branch }))"
               :loading="branchesLoading"
               style="width: calc(100% - 110px)"
+              :disabled="localForm.scanSubfolders"
             >
               <template #prefix>
                 <BranchesOutlined />
@@ -167,7 +183,7 @@
               style="width: 110px"
               @click="loadBranches"
               :loading="branchesLoading"
-              :disabled="!isValidRepo && !localForm.scanSubfolders"
+              :disabled="repoStatus !== 'valid' || localForm.scanSubfolders"
             >
               扫描分支
             </a-button>
@@ -176,14 +192,18 @@
             <a-button
               type="link"
               @click="selectAllBranches"
-              :disabled="!availableBranches || availableBranches.length === 0"
+              :disabled="
+                localForm.scanSubfolders || !availableBranches || availableBranches.length === 0
+              "
             >
               <template #icon><CheckSquareOutlined /></template> 全选
             </a-button>
             <a-button
               type="link"
               @click="localForm.branches = []"
-              :disabled="!localForm.branches || localForm.branches.length === 0"
+              :disabled="
+                localForm.scanSubfolders || !localForm.branches || localForm.branches.length === 0
+              "
             >
               <template #icon><ClearOutlined /></template> 清空
             </a-button>
@@ -209,7 +229,7 @@
               type="link"
               @click="loadAuthors"
               :loading="authorsLoading"
-              :disabled="!isValidRepo || localForm.scanSubfolders"
+              :disabled="isScanAuthorDisabled"
             >
               <template #icon><SyncOutlined /></template> 扫描作者
             </a-button>
@@ -264,7 +284,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch, reactive } from 'vue'
+import { ref, watch, reactive, computed } from 'vue'
 import {
   FolderOutlined,
   CheckCircleFilled,
@@ -273,7 +293,8 @@ import {
   BranchesOutlined,
   SyncOutlined,
   ClearOutlined,
-  CheckSquareOutlined
+  CheckSquareOutlined,
+  ExclamationCircleFilled
 } from '@ant-design/icons-vue'
 import { message } from 'ant-design-vue'
 import { gitService } from '@services/GitService'
@@ -284,10 +305,13 @@ const props = defineProps({
     type: Object,
     required: true
   },
-  isValidRepo: Boolean
+  repoStatus: {
+    type: String as () => 'valid' | 'invalid' | 'warning' | 'none',
+    required: true
+  }
 })
 
-const emit = defineEmits(['update:form', 'add-log', 'validate-repo-path'])
+const emit = defineEmits(['update:form', 'add-log', 'validate-repo-path', 'update:repoStatus'])
 
 const localForm = reactive(props.form)
 
@@ -316,27 +340,42 @@ const availableBranches = ref<string[]>([])
 const datePreset = ref('本月')
 const isSelectingPath = ref(false)
 
+const isScanAuthorDisabled = computed(() => {
+  if (localForm.scanSubfolders) {
+    return localForm.selectedRepos.length === 0
+  }
+  return props.repoStatus !== 'valid'
+})
+
 watch(
   () => localForm.scanSubfolders,
   (newVal) => {
     localForm.selectedRepos = []
     subRepos.value = []
-    // 当开启子文件夹扫描时，重置仓库验证状态
+    availableBranches.value = []
+    localForm.branches = []
+    availableAuthors.value = []
+    localForm.authorFilter = []
+
     if (newVal) {
-      emit('validate-repo-path', '')
-    }
-    if (newVal === false && props.isValidRepo) {
-      localForm.selectedRepos = [localForm.repoPath]
+      emit('update:repoStatus', 'warning')
+      emit('add-log', '多个仓库不支持选择分支，请清除分支选择', 'info')
+    } else {
+      emit('update:repoStatus', 'none')
+      // Re-validate if a path already exists
+      if (localForm.repoPath) {
+        emit('validate-repo-path', localForm.repoPath)
+      }
     }
   }
 )
 
 watch(
-  () => props.isValidRepo,
-  (newVal) => {
+  () => props.repoStatus,
+  (newStatus) => {
     availableBranches.value = []
     localForm.branches = []
-    if (newVal) {
+    if (newStatus === 'valid') {
       message.success('验证成功，是有效的Git仓库')
       emit('add-log', `选择并验证仓库: ${localForm.repoPath} 有效`, 'success')
       if (!localForm.scanSubfolders) {
@@ -344,17 +383,23 @@ watch(
       }
       loadBranches()
       loadAuthors()
-    } else {
+    } else if (newStatus === 'invalid') {
       if (localForm.repoPath && !localForm.scanSubfolders) {
         message.error('验证失败，当前路径不是有效的Git仓库')
-        emit('add-log', `选择的目录无效: ${localForm.repoPath}`, 'error')
+        emit(
+          'add-log',
+          `选择并验证仓库: ${localForm.repoPath} 无效，请尝试开启自动扫描子文件夹。`,
+          'error'
+        )
       }
+    } else if (newStatus === 'warning') {
+      emit('add-log', `已切换到多仓库扫描模式，请在下方选择要扫描的仓库`, 'info')
     }
   }
 )
 
 const loadBranches = async () => {
-  // if (!props.isValidRepo) return
+  if (props.repoStatus !== 'valid') return
   branchesLoading.value = true
   try {
     emit('add-log', `加载分支列表: ${localForm.repoPath}`, 'info')
@@ -408,9 +453,7 @@ const selectRepoPath = async () => {
 }
 
 const validateRepoPath = () => {
-  if (!localForm.scanSubfolders) {
-    emit('validate-repo-path', localForm.repoPath)
-  }
+  emit('validate-repo-path', localForm.repoPath)
   if (localForm.repoPath) {
     gitService.addToHistory(localForm.repoPath)
     repoHistory.value = gitService.getRepoHistory()
@@ -418,16 +461,19 @@ const validateRepoPath = () => {
 }
 
 const loadAuthors = async () => {
-  if (!props.isValidRepo) {
-    message.warning('请先选择有效的Git仓库')
+  if (isScanAuthorDisabled.value) {
+    message.warning('请先选择一个或多个有效的Git仓库')
     return
   }
   authorsLoading.value = true
   try {
-    emit('add-log', `加载仓库作者列表: ${localForm.repoPath}`)
-    const authors = await window.api.getRepoAuthors(localForm.repoPath)
-    availableAuthors.value = authors
-    emit('add-log', `找到 ${authors.length} 个作者`, 'success')
+    const reposToScan = localForm.scanSubfolders ? localForm.selectedRepos : [localForm.repoPath]
+    emit('add-log', `加载作者列表于: ${reposToScan.join(', ')}`)
+    // Note: getRepoAuthors might need adjustment to accept multiple paths if not already done
+    const authors = await window.api.getRepoAuthors(reposToScan)
+    const uniqueAuthors = [...new Set(authors)]
+    availableAuthors.value = uniqueAuthors
+    emit('add-log', `找到 ${uniqueAuthors.length} 个独立作者`, 'success')
   } catch (error) {
     const errorMsg = error instanceof Error ? error.message : String(error)
     emit('add-log', `加载作者列表失败: ${errorMsg}`, 'error')
