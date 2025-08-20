@@ -163,7 +163,9 @@ export function useSettingsForm(
     }
     authorsLoading.value = true
     try {
-      const reposToScan = localForm.scanSubfolders ? localForm.selectedRepos : [localForm.repoPath]
+      const reposToScan = localForm.scanSubfolders
+        ? [...localForm.selectedRepos]
+        : [localForm.repoPath]
       emit('add-log', `加载作者列表于: ${reposToScan.join(', ')}`)
       const authors = await window.api.getRepoAuthors(reposToScan)
       const uniqueAuthors = [...new Set(authors)]
