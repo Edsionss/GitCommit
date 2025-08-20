@@ -1,5 +1,5 @@
 <template>
-  <div class="ai-chat-container page-container">
+  <div class="ai-chat-container">
     <div class="chat-history" ref="chatHistoryRef">
       <a-list :data-source="messages" item-layout="horizontal">
         <template #renderItem="{ item }">
@@ -15,7 +15,7 @@
               </template>
               <template #description>
                 <div class="message-content">
-                  <p v-if="!item.isLoading">{{ item.text }}</p>
+                  <div v-if="!item.isLoading">{{ item.text }}</div>
                   <a-spin v-else />
                 </div>
               </template>
@@ -28,7 +28,7 @@
       <a-textarea
         v-model:value="userInput"
         placeholder="在这里输入您的问题..."
-        :auto-size="{ minRows: 2, maxRows: 6 }"
+        :auto-size="{ maxRows: 6 }"
         @pressEnter="sendMessage"
       />
       <a-button
@@ -93,7 +93,9 @@ const sendMessage = async () => {
     const aiConfig = parsedAppSettings.ai
 
     if (!aiConfig || !aiConfig.provider || !aiConfig.apiKey) {
-      throw new Error('AI settings are incomplete. Please configure provider and API key in Settings.')
+      throw new Error(
+        'AI settings are incomplete. Please configure provider and API key in Settings.'
+      )
     }
 
     const result = await window.api.aiChat(text, aiConfig)
@@ -120,11 +122,14 @@ const sendMessage = async () => {
 </script>
 
 <style scoped>
+:deep(.ant-list-item) {
+  border-bottom: none;
+}
+
 .ai-chat-container {
   display: flex;
   flex-direction: column;
   height: 100%;
-  background-color: #fff;
   user-select: text;
 }
 
@@ -135,11 +140,10 @@ const sendMessage = async () => {
 .chat-history {
   flex-grow: 1;
   overflow-y: auto;
-  padding: 16px;
-  border: 1px solid #d9d9d9;
   border-radius: 4px;
   margin-bottom: 16px;
-  background: #f9f9f9;
+  background-color: #fff;
+  border-radius: 0.5rem;
 }
 
 .chat-message.user {
@@ -148,6 +152,7 @@ const sendMessage = async () => {
 
 .chat-message.user .ant-list-item-meta {
   flex-direction: row-reverse;
+  gap: 10px;
 }
 
 .chat-message.user .ant-list-item-meta-content {
@@ -169,9 +174,15 @@ const sendMessage = async () => {
   color: #fff;
 }
 
+.chat-message.ai .message-content {
+  background: var(--color-success);
+  color: #fff;
+}
+
 .chat-input-area {
   display: flex;
   gap: 8px;
   align-items: flex-end;
+  margin-bottom: 10px;
 }
 </style>
