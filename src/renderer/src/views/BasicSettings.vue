@@ -45,7 +45,7 @@ const defaultFormState = {
   selectedFields: ['repository', 'commitId', 'shortHash', 'author', 'date', 'message'],
   statsDimension: 'none',
   repoPath: '',
-  scanSubfolders: false,
+  scanSubfolders: true,
   selectedRepos: [],
   branches: [],
   maxCommits: 0,

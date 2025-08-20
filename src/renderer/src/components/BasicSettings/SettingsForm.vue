@@ -110,7 +110,7 @@
         </a-form-item>
 
         <div class="form-row">
-          <label class="form-row-label">自动扫描子文件夹</label>
+          <label class="form-row-label">扫描子文件夹</label>
           <a-switch v-model:checked="localForm.scanSubfolders" />
         </div>
 
