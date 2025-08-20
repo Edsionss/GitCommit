@@ -108,7 +108,7 @@ const startScan = async () => {
     dateRange: form.dateRange.map((d) => d.format('YYYY-MM-DD HH:mm:ss')) as [string, string],
     selectedFields: [...form.selectedFields],
     maxCommits: form.maxCommits || undefined,
-    branches: form.branches.join(','),
+    branches: [...form.branches],
     scanSubfolders: form.scanSubfolders,
     selectedRepos: [...form.selectedRepos]
   }

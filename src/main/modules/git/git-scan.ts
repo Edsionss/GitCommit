@@ -17,6 +17,7 @@ export interface GitCommit {
   filesChanged: number
   insertions: number
   deletions: number
+  branch?: string
 }
 
 // Git扫描选项
@@ -82,6 +83,9 @@ export function registerGitScanHandlers() {
           sendProgress(`${progressPrefix} - 初始化仓库`, 10 + (i / totalRepos) * 80)
           const git: SimpleGit = simpleGit(currentRepoPath)
 
+          const branchSummary = await git.branchLocal()
+          const currentBranch = branchSummary.current
+
           // 检查仓库是否为空
           const latestLog = await git.log(['-1']).catch(() => null)
           if (!latestLog) {
@@ -99,7 +103,9 @@ export function registerGitScanHandlers() {
           }
 
           if (options?.branches && options.branches.length > 0) {
-            logOptions.file = options.branches // simple-git uses `file` for branch
+            options.branches.forEach((branch) => {
+              logOptions[branch] = null
+            })
           }
           if (options?.maxCommits && options.maxCommits > 0) {
             logOptions['-n'] = options.maxCommits
@@ -145,7 +151,8 @@ export function registerGitScanHandlers() {
               body: commit.body,
               filesChanged,
               insertions,
-              deletions
+              deletions,
+              branch: options?.branches?.join(', ') || currentBranch
             })
           }
         } catch (repoError) {
