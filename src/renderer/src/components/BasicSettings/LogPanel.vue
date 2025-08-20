@@ -1,21 +1,24 @@
 <template>
   <div class="log-column">
-    <a-card v-if="scanning" class="progress-card settings-card">
+    <!-- <a-card v-if="scanning" class="progress-card settings-card"> -->
+    <a-card class="progress-card settings-card">
       <template #title>
         <div class="card-header">
           <span>扫描进度</span>
           <a-button type="primary" danger size="small" @click="$emit('stop-scan')">停止</a-button>
         </div>
       </template>
-      <div class="progress-info">
-        <span>{{ scanPhase }}</span>
-        <span>{{ scanPercentage }}%</span>
+      <div class="progress">
+        <div class="progress-info">
+          <span>{{ scanPhase }}</span>
+          <span>{{ scanPercentage }}%</span>
+        </div>
+        <a-progress
+          :percent="scanPercentage"
+          :stroke-width="10"
+          :status="scanPercentage === 100 ? 'success' : 'active'"
+        />
       </div>
-      <a-progress
-        :percent="scanPercentage"
-        :stroke-width="10"
-        :status="scanPercentage === 100 ? 'success' : 'active'"
-      />
     </a-card>
 
     <a-card class="log-card settings-card">
@@ -131,7 +134,7 @@ const clearLogs = () => {
   min-width: 0;
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 10px;
 }
 
 .log-card {
@@ -204,6 +207,9 @@ const clearLogs = () => {
 
 .progress-card {
   margin-bottom: 0;
+}
+.progress {
+  padding: 10px;
 }
 
 .progress-info {

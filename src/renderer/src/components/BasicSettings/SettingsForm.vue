@@ -4,41 +4,47 @@
     <a-card class="settings-card">
       <template #title>
         <div class="card-header">
-          <span>字段与统计配置</span>
+          <div>字段与统计配置</div>
+          <div @click="filterFiledShow = !filterFiledShow" style="cursor: pointer">
+            <DownOutlined v-if="!filterFiledShow" />
+            <UpOutlined v-else />
+          </div>
         </div>
       </template>
-      <a-form :model="localForm" layout="vertical">
-        <a-form-item label="字段选择">
-          <a-checkbox-group v-model:value="localForm.selectedFields">
-            <a-checkbox value="repository">仓库名称</a-checkbox>
-            <a-checkbox value="repoPath">仓库完整路径</a-checkbox>
-            <a-checkbox value="commitId">完整提交ID</a-checkbox>
-            <a-checkbox value="shortHash">短提交ID</a-checkbox>
-            <a-checkbox value="author">作者</a-checkbox>
-            <a-checkbox value="email">邮箱</a-checkbox>
-            <a-checkbox value="date">日期</a-checkbox>
-            <a-checkbox value="message">提交消息</a-checkbox>
-            <a-checkbox value="body">详细描述</a-checkbox>
-            <a-checkbox value="filesChanged">变更文件数</a-checkbox>
-            <a-checkbox value="insertions">新增行数</a-checkbox>
-            <a-checkbox value="deletions">删除行数</a-checkbox>
-          </a-checkbox-group>
-        </a-form-item>
+      <div class="head-container" v-show="filterFiledShow">
+        <a-form :model="localForm" layout="vertical">
+          <a-form-item label="字段选择">
+            <a-checkbox-group v-model:value="localForm.selectedFields">
+              <a-checkbox value="repository">仓库名称</a-checkbox>
+              <a-checkbox value="repoPath">仓库完整路径</a-checkbox>
+              <a-checkbox value="commitId">完整提交ID</a-checkbox>
+              <a-checkbox value="shortHash">短提交ID</a-checkbox>
+              <a-checkbox value="author">作者</a-checkbox>
+              <a-checkbox value="email">邮箱</a-checkbox>
+              <a-checkbox value="date">日期</a-checkbox>
+              <a-checkbox value="message">提交消息</a-checkbox>
+              <a-checkbox value="body">详细描述</a-checkbox>
+              <a-checkbox value="filesChanged">变更文件数</a-checkbox>
+              <a-checkbox value="insertions">新增行数</a-checkbox>
+              <a-checkbox value="deletions">删除行数</a-checkbox>
+            </a-checkbox-group>
+          </a-form-item>
 
-        <div class="form-row">
-          <label class="form-row-label">统计选项</label>
-          <a-select
-            v-model:value="localForm.statsDimension"
-            placeholder="选择统计维度"
-            style="width: 200px"
-          >
-            <a-select-option value="author">按作者统计</a-select-option>
-            <a-select-option value="repository">按仓库统计</a-select-option>
-            <a-select-option value="date">按日期统计</a-select-option>
-            <a-select-option value="none">不按任何</a-select-option>
-          </a-select>
-        </div>
-      </a-form>
+          <div class="form-row">
+            <label class="form-row-label">统计选项</label>
+            <a-select
+              v-model:value="localForm.statsDimension"
+              placeholder="选择统计维度"
+              style="width: 200px"
+            >
+              <a-select-option value="author">按作者统计</a-select-option>
+              <a-select-option value="repository">按仓库统计</a-select-option>
+              <a-select-option value="date">按日期统计</a-select-option>
+              <a-select-option value="none">不按任何</a-select-option>
+            </a-select>
+          </div>
+        </a-form>
+      </div>
     </a-card>
 
     <a-card class="settings-card">
@@ -285,7 +291,7 @@
 </template>
 
 <script setup lang="ts">
-import { reactive, watch, toRef } from 'vue'
+import { reactive, watch, toRef, ref } from 'vue'
 import {
   FolderOutlined,
   CheckCircleFilled,
@@ -295,7 +301,9 @@ import {
   SyncOutlined,
   ClearOutlined,
   CheckSquareOutlined,
-  ExclamationCircleFilled
+  ExclamationCircleFilled,
+  DownOutlined,
+  UpOutlined
 } from '@ant-design/icons-vue'
 import { useSettingsForm } from './hooks/settingsForm'
 
@@ -309,6 +317,8 @@ const props = defineProps({
     required: true
   }
 })
+
+const filterFiledShow: any = ref(false)
 
 const emit = defineEmits(['update:form', 'add-log', 'validate-repo-path', 'update:repoStatus'])
 

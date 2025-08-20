@@ -1,10 +1,15 @@
+:deep(.ant-card-body) {
+  height: 100%;
+  overflow: auto;
+  padding: 15px;
+}
 .config-column {
   flex: 3;
   min-width: 0;
   overflow-y: auto;
 }
 .settings-card {
-  margin-bottom: 20px;
+  margin-bottom: 10px;
 }
 .card-header {
   display: flex;
@@ -81,7 +86,7 @@
 .form-row {
   display: flex;
   align-items: center;
-  margin-bottom: 24px;
+  margin-bottom: 0px;
 }
 .form-row-label {
   width: 150px;

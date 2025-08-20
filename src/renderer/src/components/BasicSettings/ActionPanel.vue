@@ -42,6 +42,6 @@ defineEmits(['start-scan', 'save-results', 'scan-authors', 'reset-config'])
   display: flex;
   justify-content: center;
   gap: 12px;
-  margin-top: 20px;
+  margin-top: 8px;
 }
 </style>
