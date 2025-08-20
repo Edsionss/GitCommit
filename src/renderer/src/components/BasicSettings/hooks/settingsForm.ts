@@ -13,6 +13,11 @@ interface FormState {
   [key: string]: any
 }
 
+interface SubRepo {
+  name: string
+  path: string
+}
+
 export function useSettingsForm(
   localForm: FormState,
   repoStatus: ToRefs<{ value: 'valid' | 'invalid' | 'warning' | 'none' }>,
@@ -25,7 +30,7 @@ export function useSettingsForm(
     自定义: 'custom'
   }
 
-  const subRepos = ref<string[]>([])
+  const subRepos = ref<SubRepo[]>([])
   const isDiscoveringRepos = ref(false)
   const repoHistory = ref(gitService.getRepoHistory())
   const availableAuthors = ref<string[]>([])
@@ -229,7 +234,7 @@ export function useSettingsForm(
   }
 
   const selectAllRepos = () => {
-    localForm.selectedRepos = [...subRepos.value]
+    localForm.selectedRepos = subRepos.value.map((repo) => repo.path)
   }
 
   const clearAllRepos = () => {

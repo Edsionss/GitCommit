@@ -124,8 +124,8 @@
               placeholder="请先选择父目录并扫描子仓库"
               :options="
                 subRepos.map((repo) => ({
-                  value: repo,
-                  label: repo.replace(localForm.repoPath, '')
+                  value: repo.path,
+                  label: repo.name
                 }))
               "
             />

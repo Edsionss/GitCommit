@@ -26,7 +26,7 @@ export function registerGitInfoHandlers() {
     } catch (error) {
       console.error('获取Git作者列表失败:', error)
       const errorMessage = error instanceof Error ? error.message : String(error)
-      throw errorMessage
+      throw new Error(errorMessage)
     }
   })
 
@@ -39,7 +39,7 @@ export function registerGitInfoHandlers() {
     } catch (error) {
       console.error(`获取Git分支列表失败 for repo ${repoPath}:`, error)
       const errorMessage = error instanceof Error ? error.message : String(error)
-      throw errorMessage
+      throw new Error(errorMessage)
     }
   })
 }

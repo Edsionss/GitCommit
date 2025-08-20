@@ -16,22 +16,26 @@ export async function isValidGitRepo(repoPath: string): Promise<boolean> {
   }
 }
 
-export async function findGitRepos(dir: string): Promise<string[]> {
-  const repos: string[] = []
+export async function findGitRepos(dir: string): Promise<{ name: string; path: string }[]> {
+  let repos: { name: string; path: string }[] = []
   const entries = await fs.readdir(dir, { withFileTypes: true })
 
   for (const entry of entries) {
     const fullPath = path.join(dir, entry.name)
     if (entry.isDirectory()) {
       if (entry.name === '.git') {
-        repos.push(path.dirname(fullPath))
+        const repoPath = path.dirname(fullPath)
+        repos.push({
+          name: path.basename(repoPath),
+          path: repoPath
+        })
         // Once a .git folder is found, don't go deeper into that directory structure
         continue
       }
       // Ignore node_modules to speed up scanning
       if (entry.name !== 'node_modules') {
         try {
-          repos.push(...(await findGitRepos(fullPath)))
+          repos = repos.concat(await findGitRepos(fullPath))
         } catch (error) {
           // Ignore errors from directories we can't access
           console.error(`Could not access ${fullPath}, skipping.`)
@@ -40,7 +44,15 @@ export async function findGitRepos(dir: string): Promise<string[]> {
     }
   }
   // Return unique paths
-  return [...new Set(repos)]
+  const uniquePaths = new Set<string>()
+  return repos.filter((repo) => {
+    if (uniquePaths.has(repo.path)) {
+      return false
+    } else {
+      uniquePaths.add(repo.path)
+      return true
+    }
+  })
 }
 
 export function registerGitUtilsHandlers() {
