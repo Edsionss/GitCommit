@@ -51,7 +51,8 @@ import {
   LeftOutlined,
   RightOutlined,
   SearchOutlined,
-  HistoryOutlined
+  HistoryOutlined,
+  RobotOutlined
 } from '@ant-design/icons-vue'
 
 const isExpanded = ref(true)
@@ -79,7 +80,8 @@ const menuItems = [
   { path: '/commits', label: '提交记录', icon: FileTextOutlined },
   { path: '/branches', label: '分支管理', icon: ShareAltOutlined },
   { path: '/analysis', label: '代码分析', icon: BarChartOutlined },
-  { path: '/reports', label: '报告生成', icon: AreaChartOutlined }
+  { path: '/reports', label: '报告生成', icon: AreaChartOutlined },
+  { path: '/ai-chat', label: 'AI Chat', icon: RobotOutlined }
 ]
 
 const isActive = (path: string): boolean => {

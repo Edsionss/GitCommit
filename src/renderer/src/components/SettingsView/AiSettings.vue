@@ -57,12 +57,14 @@ const form = reactive<AiSettings>({ ...props.settings })
 
 const aiModelDict = {
   openai: [{ value: 'gpt-3.5-turbo', label: 'gpt-3.5-turbo' }],
-  gemini: [{ value: 'gemini-2.5-flash', label: 'gemini-2.5-flash' }]
+  gemini: [{ value: 'gemini-2.5-flash', label: 'gemini-2.5-flash' }],
+  kimi: [{ value: 'kimi-k2-0711-preview', label: 'kimi-k2-0711-preview' }]
 }
 
 const aiProviderOption = reactive([
   { value: 'openai', label: 'OpenAI' },
   { value: 'gemini', label: 'Gemini' },
+  { value: 'kimi', label: 'kimi' },
   { value: 'anthropic', label: 'Anthropic' },
   { value: 'custom', label: 'Custom' }
 ])

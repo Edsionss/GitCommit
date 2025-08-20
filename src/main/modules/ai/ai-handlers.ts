@@ -23,4 +23,15 @@ export function registerAiHandlers() {
       }
     }
   );
+
+  ipcMain.handle('ai:chat', async (_, prompt: string, aiConfig: AiConfig) => {
+    try {
+      const message = await generateCommitMessage(prompt, aiConfig);
+      return { success: true, message };
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      console.error('AI chat failed:', errorMessage);
+      return { success: false, error: errorMessage };
+    }
+  });
 }

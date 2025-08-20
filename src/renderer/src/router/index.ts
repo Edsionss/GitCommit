@@ -38,6 +38,12 @@ const routes = [
         meta: { title: '分支管理' }
       },
       {
+        path: 'ai-chat',
+        name: 'AiChat',
+        component: () => import('../views/AiChat.vue'),
+        meta: { title: 'AI Chat' }
+      },
+      {
         path: 'settings',
         name: 'Settings',
         component: () => import('../views/Settings.vue'),

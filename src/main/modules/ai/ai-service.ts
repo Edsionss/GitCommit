@@ -1,12 +1,12 @@
 import { GoogleGenAI } from '@google/genai'
-
+import { OpenAI } from 'openai'
 /**
  * @file AI Service
  * @description Handles interactions with various AI providers.
  */
 // Define a common interface for AI configuration that the frontend will pass
 export interface AiConfig {
-  provider: 'openai' | 'gemini' | 'anthropic' | 'custom' | null
+  provider: 'openai' | 'gemini' | 'anthropic' | 'kimi' | 'custom' | null
   apiKey: string
   endpoint?: string
   model?: string
@@ -30,6 +30,8 @@ export async function generateCommitMessage(prompt: string, aiConfig: AiConfig):
     // Add cases for other providers here
     case 'gemini':
       return await callGemini(prompt, aiConfig.apiKey, aiConfig.model)
+    case 'kimi':
+      return await callKimi(prompt, aiConfig.apiKey, aiConfig.model)
     case 'anthropic':
     case 'custom':
       throw new Error(`${aiConfig.provider} is not yet supported.`)
@@ -75,10 +77,20 @@ async function callOpenAI(
 }
 
 async function callGemini(prompt: string, apiKey: string, model = 'gemini-2.5-flash') {
-  const ai = new GoogleGenAI({ apiKey })
-  const response = await ai.models.generateContent({
+  const client = new GoogleGenAI({ apiKey })
+  const response = await client.models.generateContent({
     model,
     contents: prompt
   })
   return response.text as string
+}
+
+async function callKimi(prompt: string, apiKey: string, model = 'kimi-k2-0711-preview') {
+  const client = new OpenAI({ apiKey, baseURL: 'https://api.moonshot.cn/v1' })
+  const response = await client.chat.completions.create({
+    model,
+    messages: [{ role: 'user', content: prompt }],
+    temperature: 0.6
+  })
+  return response.choices[0]?.message?.content || ''
 }

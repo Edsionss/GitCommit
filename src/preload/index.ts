@@ -58,6 +58,10 @@ const api = {
   // 取消扫描
   cancelScan: () => ipcRenderer.send('cancel-scan'),
 
+  // AI Chat
+  aiChat: (prompt: string, aiConfig: any): Promise<any> =>
+    ipcRenderer.invoke('ai:chat', prompt, aiConfig),
+
   // 监听事件
   onScanProgress: (callback: (data: any) => void) => {
     const listener = (_: any, data: any) => callback(data)
