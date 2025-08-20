@@ -29,6 +29,13 @@
           }}</a-select-option>
         </a-select>
       </a-form-item>
+
+      <a-form-item label="启用会话记忆">
+        <template #extra>
+          开启后，AI 将记住之前的对话内容。但这会消耗更多的 Token。
+        </template>
+        <a-switch v-model:checked="form.enableAiHistory" />
+      </a-form-item>
     </a-form>
   </a-card>
 </template>
@@ -41,6 +48,7 @@ interface AiSettings {
   apiKey: string
   endpoint?: string
   model?: string
+  enableAiHistory?: boolean
 }
 
 const props = defineProps({

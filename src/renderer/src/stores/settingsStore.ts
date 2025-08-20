@@ -9,6 +9,7 @@ export interface AppSettings {
   openAiProxy: string
   geminiApiKey: string
   geminiProxyUrl: string
+  enableAiHistory: boolean
   // 可以根据需要添加其他设置字段
 }
 
