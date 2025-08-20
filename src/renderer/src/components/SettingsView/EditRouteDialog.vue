@@ -1,9 +1,9 @@
 <template>
   <a-modal
-    :visible="visible"
+    :open="open"
     title="编辑路由"
     @ok="handleSubmit"
-    @cancel="() => $emit('update:visible', false)"
+    @cancel="() => $emit('update:open', false)"
   >
     <a-form v-if="editableRoute" :model="editableRoute" layout="vertical">
       <a-form-item label="菜单名称">
@@ -29,15 +29,15 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch, defineEmits } from 'vue'
+import { ref, watch } from 'vue'
 import { RouteRecord } from '@/stores/routesStore'
 
 const props = defineProps<{
-  visible: boolean
+  open: boolean
   routeData: RouteRecord | null
 }>()
 
-const emit = defineEmits(['update:visible', 'submit'])
+const emit = defineEmits(['update:open', 'submit'])
 
 const editableRoute = ref<RouteRecord | null>(null)
 
