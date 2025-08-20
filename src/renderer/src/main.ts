@@ -2,7 +2,7 @@ import './assets/styles/main.css'
 
 import { createApp } from 'vue'
 import App from './App.vue'
-import router from './router'
+import router, { addDynamicRoutes } from './router'
 import { createPinia } from 'pinia'
 import Antd from 'ant-design-vue'
 import 'ant-design-vue/dist/reset.css' // Use reset.css for a cleaner start
@@ -18,8 +18,15 @@ app.config.errorHandler = (err, vm, info) => {
   console.info('错误信息:', info)
 }
 
+// 1. Install Pinia
 app.use(createPinia())
+
+// 2. Add dynamic routes AFTER Pinia is initialized
+addDynamicRoutes(router)
+
+// 3. Install the router
 app.use(router)
+
 app.use(Antd)
 app.use(ContextMenu)
 

@@ -39,10 +39,11 @@
 
 <script setup lang="ts">
 import logoFull from '@/assets/img/logo/LOGO1.png'
-import { computed, watch } from 'vue'
+import { computed, watch, h } from 'vue'
 import { useRoute } from 'vue-router'
 import { storeToRefs } from 'pinia'
 import { useSettingsStore } from '@/stores/settingsStore'
+import { useRoutesStore } from '@/stores/routesStore'
 import {
   HomeOutlined,
   FileTextOutlined,
@@ -58,14 +59,30 @@ import {
 } from '@ant-design/icons-vue'
 
 const settingsStore = useSettingsStore()
+const routesStore = useRoutesStore()
+
 const { isSidebarExpanded } = storeToRefs(settingsStore)
+const { routes } = storeToRefs(routesStore)
 const route = useRoute()
+
+// Map route names to icons
+const iconMap = {
+  Dashboard: HomeOutlined,
+  Scan: SearchOutlined,
+  ScanHistory: HistoryOutlined,
+  Commits: FileTextOutlined,
+  BranchesView: ShareAltOutlined,
+  CodeAnalysis: BarChartOutlined,
+  Reports: AreaChartOutlined,
+  AiChat: RobotOutlined,
+  Settings: SettingOutlined
+}
 
 const toggleSidebar = () => {
   settingsStore.toggleSidebar()
 }
 
-// 监听侧边栏状态变化，并更新DOM和分发事件
+// Watch for sidebar state changes to dispatch events
 watch(isSidebarExpanded, (expanded) => {
   document.documentElement.dataset.sidebarExpanded = expanded.toString()
   window.dispatchEvent(
@@ -75,16 +92,16 @@ watch(isSidebarExpanded, (expanded) => {
   )
 }, { immediate: true })
 
-const menuItems = [
-  { path: '/', label: '概览', icon: HomeOutlined },
-  { path: '/scan', label: '开始扫描', icon: SearchOutlined },
-  { path: '/scanHistory', label: '扫描记录', icon: HistoryOutlined },
-  { path: '/commits', label: '提交记录', icon: FileTextOutlined },
-  { path: '/branches', label: '分支管理', icon: ShareAltOutlined },
-  { path: '/analysis', label: '代码分析', icon: BarChartOutlined },
-  { path: '/reports', label: '报告生成', icon: AreaChartOutlined },
-  { path: '/ai-chat', label: 'AI Chat', icon: RobotOutlined }
-]
+// Dynamically generate menu items from the routes store
+const menuItems = computed(() => {
+  return routes.value
+    .filter(r => r.isMenu)
+    .map(r => ({
+      path: r.path === '' ? '/' : `/${r.path}`,
+      label: r.meta.title,
+      icon: iconMap[r.name] || FileTextOutlined // Fallback icon
+    }))
+})
 
 const isActive = (path: string): boolean => {
   if (path === '/') {
@@ -93,7 +110,7 @@ const isActive = (path: string): boolean => {
   return route.path === path
 }
 
-// isExpanded is now a ref from the store, so we rename it to avoid conflict
+// isExpanded is now a ref from the store
 const isExpanded = isSidebarExpanded
 
 </script>

@@ -35,10 +35,14 @@
       @update:clearScanConfigOnFinish="settings.system.clearScanConfigOnFinish = $event"
     />
 
-    <AiSettings
-      :settings="settings.ai"
-      @update:settings="settings.ai = $event"
-    />
+    <AiSettings :settings="settings.ai" @update:settings="settings.ai = $event" />
+
+    <a-card title="菜单与路由管理">
+      <!-- <router-link to="/routes">
+        <a-button>菜单与路由管理</a-button>
+      </router-link> -->
+      <RouterSetting />
+    </a-card>
 
     <div class="settings-actions">
       <a-button type="primary" @click="saveSettings">保存设置</a-button>
@@ -57,6 +61,7 @@ import LocaleSettings from '@/components/SettingsView/LocaleSettings.vue'
 import GitSettings from '@/components/SettingsView/GitSettings.vue'
 import SystemSettings from '@/components/SettingsView/SystemSettings.vue'
 import AiSettings from '@/components/SettingsView/AiSettings.vue'
+import RouterSetting from '@/components/SettingsView/RouterSetting.vue'
 import { useTheme } from '@composables/useTheme'
 
 // 使用 Pinia Store
@@ -224,14 +229,17 @@ onMounted(() => {
 })
 
 // 监听 store 中 appSettings 的变化，同步到本地
-watch(appSettings, (newSettings) => {
-  loadSettingsFromStore()
-}, { deep: true })
+watch(
+  appSettings,
+  (newSettings) => {
+    loadSettingsFromStore()
+  },
+  { deep: true }
+)
 
 // 监听本地 zoom 和 animations 的变化以应用效果
 watch(() => settings.appearance.zoom, applyZoom)
 watch(() => settings.appearance.animations, applyAnimations)
-
 </script>
 
 <style scoped>

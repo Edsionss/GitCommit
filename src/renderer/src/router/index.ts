@@ -1,79 +1,44 @@
-import { createRouter, createWebHashHistory } from 'vue-router'
-import Dashboard from '../views/Dashboard.vue'
+import { createRouter, createWebHashHistory, RouteRecordRaw, Router } from 'vue-router'
 import MainLayout from '../components/layout/MainLayout.vue'
+import { useRoutesStore, RouteRecord } from '@/stores/routesStore'
 
-const routes = [
-  {
-    path: '/',
-    component: MainLayout,
-    children: [
-      {
-        path: '',
-        name: 'Dashboard',
-        component: Dashboard,
-        meta: { title: '仪表盘' }
-      },
-      {
-        path: 'commits',
-        name: 'Commits',
-        component: () => import('../views/CommitsView.vue'),
-        meta: { title: '提交记录' }
-      },
-      {
-        path: 'analysis',
-        name: 'CodeAnalysis',
-        component: () => import('../views/CodeAnalysis.vue'),
-        meta: { title: '代码分析' }
-      },
-      {
-        path: 'reports',
-        name: 'Reports',
-        component: () => import('../views/Reports.vue'),
-        meta: { title: '报告生成' }
-      },
-      {
-        path: 'branches',
-        name: 'BranchesView',
-        component: () => import('../views/BranchesView.vue'),
-        meta: { title: '分支管理' }
-      },
-      {
-        path: 'ai-chat',
-        name: 'AiChat',
-        component: () => import('../views/AiChat.vue'),
-        meta: { title: 'AI Chat' }
-      },
-      {
-        path: 'settings',
-        name: 'Settings',
-        component: () => import('../views/Settings.vue'),
-        meta: { title: '设置' }
-      },
-      {
-        path: 'scan',
-        name: 'Scan',
-        component: () => import('../views/BasicSettings.vue'),
-        meta: { title: '开始扫描' }
-      },
-      {
-        path: 'tableView',
-        name: 'TableView',
-        component: () => import('@views/TableView.vue'),
-        meta: { title: '提交详情' }
-      },
-      {
-        path: 'scanHistory',
-        name: 'ScanHistory',
-        component: () => import('@views/ScanHistory.vue'),
-        meta: { title: '扫描记录' }
-      }
-    ]
-  }
-]
+// A map to resolve component paths to actual dynamic imports
+const componentMap = {
+  '../views/Dashboard.vue': () => import('../views/Dashboard.vue'),
+  '../views/CommitsView.vue': () => import('../views/CommitsView.vue'),
+  '../views/CodeAnalysis.vue': () => import('../views/CodeAnalysis.vue'),
+  '../views/Reports.vue': () => import('../views/Reports.vue'),
+  '../views/BranchesView.vue': () => import('../views/BranchesView.vue'),
+  '../views/AiChat.vue': () => import('../views/AiChat.vue'),
+  '../views/Settings.vue': () => import('../views/Settings.vue'),
+  '../views/BasicSettings.vue': () => import('../views/BasicSettings.vue'),
+  '@views/TableView.vue': () => import('@views/TableView.vue'),
+  '@views/ScanHistory.vue': () => import('@views/ScanHistory.vue'),
+  '../views/RoutesView.vue': () => import('../views/RoutesView.vue')
+}
 
 const router = createRouter({
   history: createWebHashHistory(),
-  routes
+  routes: [] // Initialize with no routes
 })
+
+export function addDynamicRoutes(routerInstance: Router) {
+  const routesStore = useRoutesStore() // This is now safe to call
+
+  const mainLayoutRoute: RouteRecordRaw = {
+    path: '/',
+    component: MainLayout,
+    children: routesStore.routes.map((route: RouteRecord): RouteRecordRaw => {
+      return {
+        path: route.path,
+        name: route.name,
+        component: componentMap[route.componentPath],
+        meta: route.meta
+      } as RouteRecordRaw
+    })
+  }
+
+  routerInstance.addRoute(mainLayoutRoute)
+}
 
 export default router

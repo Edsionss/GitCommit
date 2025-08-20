@@ -9,11 +9,11 @@
       </div>
       <div class="main">
         <div class="content-area">
-          <!-- <router-view /> -->
-          <router-view v-slot="{ Component }">
-            <keep-alive :max="5">
-              <component :is="Component" :key="$route.fullPath" />
+          <router-view v-slot="{ Component, route }">
+            <keep-alive v-if="route.meta.keepAlive">
+              <component :is="Component" :key="route.fullPath" />
             </keep-alive>
+            <component v-if="!route.meta.keepAlive" :is="Component" :key="route.fullPath" />
           </router-view>
         </div>
       </div>
