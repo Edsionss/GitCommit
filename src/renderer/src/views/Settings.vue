@@ -38,16 +38,23 @@
     <AiSettings :settings="settings.ai" @update:settings="settings.ai = $event" />
 
     <a-card title="菜单与路由管理">
-      <!-- <router-link to="/routes">
-        <a-button>菜单与路由管理</a-button>
-      </router-link> -->
       <RouterSetting />
     </a-card>
 
-    <div class="settings-actions">
-      <a-button type="primary" @click="saveSettings">保存设置</a-button>
-      <a-button @click="resetSettings">重置设置</a-button>
-    </div>
+    <a-float-button-group trigger="hover" type="primary" :right="'24px'">
+      <template #tooltip>
+        <div>操作</div>
+      </template>
+      <a-float-button @click="saveSettings">
+        <template #icon><SaveOutlined /></template>
+        <template #tooltip><div>保存设置</div></template>
+      </a-float-button>
+      <a-float-button @click="resetSettings">
+        <template #icon><RedoOutlined /></template>
+        <template #tooltip><div>重置设置</div></template>
+      </a-float-button>
+    </a-float-button-group>
+
   </div>
 </template>
 
@@ -63,6 +70,7 @@ import SystemSettings from '@/components/SettingsView/SystemSettings.vue'
 import AiSettings from '@/components/SettingsView/AiSettings.vue'
 import RouterSetting from '@/components/SettingsView/RouterSetting.vue'
 import { useTheme } from '@composables/useTheme'
+import { SaveOutlined, RedoOutlined } from '@ant-design/icons-vue'
 
 // 使用 Pinia Store
 const settingsStore = useSettingsStore()
