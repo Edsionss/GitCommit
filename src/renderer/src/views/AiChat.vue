@@ -136,10 +136,9 @@ const sendMessage = async () => {
   if (!text || isLoading.value) return
 
   const userMessage = { sender: 'user' as const, text }
-  chatStore.addMessageToActiveSession(userMessage)
   userInput.value = ''
+  chatStore.addMessageToActiveSession(userMessage)
   scrollToBottom()
-
   isLoading.value = true
 
   try {
@@ -293,8 +292,8 @@ const sendMessage = async () => {
 }
 
 :deep(.markdown-body code) {
-  background-color: #2d2d2d;
-  color: #f8f8f2;
+  /* background-color: #2d2d2d; */
+  /* color: #f8f8f2; */
   padding: 0.2em 0.4em;
   border-radius: 3px;
   font-family: 'Courier New', Courier, monospace;
