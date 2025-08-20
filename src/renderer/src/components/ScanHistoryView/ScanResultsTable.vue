@@ -56,7 +56,7 @@ defineProps({
 const columns = [
   { title: '仓库', dataIndex: 'repository', key: 'repository', width: 120 },
   { title: '作者', dataIndex: 'author', key: 'author', width: 120 },
-  { title: '日期', dataIndex: 'date', key: 'date', width: 180 },
+  { title: '日期', dataIndex: 'date', key: 'date', width: 180, sorter: (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime() },
   // 其他列默认不显示，通过展开行显示
 ]
 

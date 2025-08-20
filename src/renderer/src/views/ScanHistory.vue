@@ -97,7 +97,14 @@ const loadScanHistory = () => {
   try {
     const history = localStorage.getItem('scanHistory')
     if (history) {
-      scanRecords.value = JSON.parse(history)
+      const historyData = JSON.parse(history)
+      // 对每条记录的results进行排序
+      historyData.forEach((record) => {
+        if (record.results && Array.isArray(record.results)) {
+          record.results.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
+        }
+      })
+      scanRecords.value = historyData
       if (scanRecords.value.length > 0) {
         selectedRecord.value = scanRecords.value[0] // 默认选中最新一条
       }
