@@ -20,9 +20,14 @@ interface SelectDirectoryResult {
 
 // 获取子仓库返回结果
 interface GetSubReposResult {
-  success: boolean;
-  repos?: string[];
-  error?: string;
+  success: boolean
+  repos?: string[]
+  error?: string
+}
+
+interface ChatMessage {
+  sender: 'user' | 'ai'
+  text: string
 }
 
 // 暴露给渲染进程的API
@@ -44,7 +49,7 @@ const api = {
     ipcRenderer.invoke('git:getBranches', repoPath),
 
   // 获取子仓库
-  getSubRepos: (repoPath: string): Promise<GetSubReposResult> => 
+  getSubRepos: (repoPath: string): Promise<GetSubReposResult> =>
     ipcRenderer.invoke('get-sub-repos', repoPath),
 
   // 扫描Git仓库
@@ -52,15 +57,14 @@ const api = {
     ipcRenderer.invoke('scan-git-repo', repoPath, options),
 
   // 保存文件
-  saveFile: (options: any): Promise<string | null> => 
-    ipcRenderer.invoke('save-file', options),
+  saveFile: (options: any): Promise<string | null> => ipcRenderer.invoke('save-file', options),
 
   // 取消扫描
   cancelScan: () => ipcRenderer.send('cancel-scan'),
 
   // AI Chat
-  aiChat: (prompt: string, aiConfig: any): Promise<any> =>
-    ipcRenderer.invoke('ai:chat', prompt, aiConfig),
+  aiChat: (prompt: string, aiConfig: any, history?: ChatMessage[]): Promise<any> =>
+    ipcRenderer.invoke('ai:chat', prompt, aiConfig, history),
 
   // 监听事件
   onScanProgress: (callback: (data: any) => void) => {

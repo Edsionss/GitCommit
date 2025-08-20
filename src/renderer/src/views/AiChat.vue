@@ -153,7 +153,18 @@ const sendMessage = async () => {
     }
 
     const plainAiConfig = JSON.parse(JSON.stringify(aiConfig))
-    const result = await window.api.aiChat(text, plainAiConfig)
+
+    // Prepare history if enabled
+    let history: Array<{ sender: 'user' | 'ai'; text: string }> = []
+    if (aiConfig.enableAiHistory && activeSession.value) {
+      // Exclude the last message, which is the one we are currently sending
+      history = activeSession.value.messages.slice(0, -1).map((msg) => ({
+        sender: msg.sender,
+        text: msg.text
+      }))
+    }
+
+    const result = await window.api.aiChat(text, plainAiConfig, history)
 
     if (result.success) {
       chatStore.addMessageToActiveSession({ sender: 'ai', text: result.message })

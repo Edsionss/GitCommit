@@ -35,6 +35,11 @@ interface AiChatResponse {
   error?: string;
 }
 
+interface ChatMessage {
+  sender: 'user' | 'ai';
+  text: string;
+}
+
 // Define the shape of the API object
 interface ExposedAPI {
   selectDirectory: () => Promise<SelectDirectoryResult | null>;
@@ -45,7 +50,7 @@ interface ExposedAPI {
   scanGitRepo: (repoPath: string, options?: GitScanOptions) => Promise<any>;
   saveFile: (options: any) => Promise<string | null>;
   cancelScan: () => void;
-  aiChat: (prompt: string, aiConfig: AiConfig) => Promise<AiChatResponse>;
+  aiChat: (prompt: string, aiConfig: AiConfig, history?: ChatMessage[]) => Promise<AiChatResponse>;
   onScanProgress: (callback: (data: any) => void) => () => void;
   onScanError: (callback: (data: any) => void) => () => void;
   onScanCancelled: (callback: () => void) => () => void;

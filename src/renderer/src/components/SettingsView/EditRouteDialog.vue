@@ -37,7 +37,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch, defineProps, defineEmits } from 'vue'
+import { ref, watch } from 'vue'
 import { RouteRecord } from '@/stores/routesStore'
 
 const props = defineProps<{

@@ -1,4 +1,4 @@
-import { GoogleGenAI } from '@google/genai'
+import { GoogleGenAI, Content } from '@google/genai'
 import { OpenAI } from 'openai'
 /**
  * @file AI Service
@@ -18,25 +18,12 @@ export interface ChatMessage {
 }
 
 /**
- * Generates a commit message using the configured AI provider.
+ * Generates a chat response using the configured AI provider.
  *
  * @param prompt The prompt to send to the AI.
  * @param aiConfig The AI configuration.
- * @returns The generated commit message.
- */
-export async function generateCommitMessage(prompt: string, aiConfig: AiConfig): Promise<string> {
-  // For commit messages, we generally don't need history.
-  // So we call the chat response function with an empty history.
-  return generateChatResponse(prompt, aiConfig, [])
-}
-
-/**
- * Generates a commit message using the configured AI provider.
- *
- * @param prompt The prompt to send to the AI.
  * @param history The chat history.
- * @param aiConfig The AI configuration.
- * @returns The generated commit message.
+ * @returns The generated chat message.
  */
 export async function generateChatResponse(
   prompt: string,
@@ -50,11 +37,10 @@ export async function generateChatResponse(
   switch (aiConfig.provider) {
     case 'openai':
       return await callOpenAI(prompt, aiConfig.apiKey, aiConfig.model, history)
-    // Add cases for other providers here
     case 'gemini':
       return await callGemini(prompt, aiConfig.apiKey, aiConfig.model, history)
     case 'kimi':
-      return await callKiMi(prompt, aiConfig.apiKey, aiConfig.model, history)
+      return await callKimi(prompt, aiConfig.apiKey, aiConfig.model, history)
     case 'anthropic':
     case 'custom':
       throw new Error(`${aiConfig.provider} is not yet supported.`)
@@ -64,11 +50,25 @@ export async function generateChatResponse(
 }
 
 /**
+ * Generates a commit message using the configured AI provider.
+ *
+ * @param prompt The prompt to send to the AI.
+ * @param aiConfig The AI configuration.
+ * @returns The generated commit message.
+ */
+export async function generateCommitMessage(prompt: string, aiConfig: AiConfig): Promise<string> {
+  // For commit messages, we generally don't need history.
+  // So we call the chat response function with an empty history.
+  return generateChatResponse(prompt, aiConfig, [])
+}
+
+/**
  * Calls the OpenAI API.
  *
  * @param prompt The prompt to send.
  * @param apiKey The OpenAI API key.
  * @param model The model to use.
+ * @param history The chat history.
  * @returns The generated text.
  */
 async function callOpenAI(
@@ -77,6 +77,12 @@ async function callOpenAI(
   model = 'gpt-3.5-turbo',
   history: ChatMessage[] = []
 ): Promise<string> {
+  const messages = history.map((msg) => ({
+    role: msg.sender === 'ai' ? 'assistant' : 'user',
+    content: msg.text
+  }))
+  messages.push({ role: 'user', content: prompt })
+
   const endpoint = 'https://api.openai.com/v1/chat/completions'
 
   const response = await fetch(endpoint, {
@@ -87,7 +93,7 @@ async function callOpenAI(
     },
     body: JSON.stringify({
       model: model,
-      messages: [{ role: 'user', content: prompt }]
+      messages: messages
     })
   })
 
@@ -105,30 +111,44 @@ async function callGemini(
   apiKey: string,
   model = 'gemini-2.5-flash',
   history: ChatMessage[] = []
-) {
-  let messages = history.map((m) => `${m.sender}: ${m.text}`).join('\n')
-  messages += `${messages}\n user:${prompt}`
+): Promise<string> {
+  const genAI = new GoogleGenAI({ apiKey })
+  const geminiModel = genAI.getGenerativeModel({ model })
 
-  const client = new GoogleGenAI({ apiKey })
-  const response = await client.models.generateContent({
-    model,
-    // contents: prompt
-    contents: messages
+  const chat = geminiModel.startChat({
+    history: history.map((msg) => ({
+      role: msg.sender === 'user' ? 'user' : 'model',
+      parts: [{ text: msg.text }]
+    })),
+    generationConfig: {
+      maxOutputTokens: 2048
+    }
   })
-  return response.text as string
+
+  const result = await chat.sendMessage(prompt)
+  const response = await result.response
+  return response.text()
 }
 
-async function callKiMi(
+async function callKimi(
   prompt: string,
   apiKey: string,
-  model = 'kimi-k2-0711-preview',
+  model = 'moonshot-v1-8k',
   history: ChatMessage[] = []
-) {
+): Promise<string> {
   const client = new OpenAI({ apiKey, baseURL: 'https://api.moonshot.cn/v1' })
+
+  const messages = history.map((msg) => ({
+    role: msg.sender === 'ai' ? 'assistant' : 'user',
+    content: msg.text
+  }))
+  messages.push({ role: 'user', content: prompt })
+
   const response = await client.chat.completions.create({
     model,
-    messages: [{ role: 'user', content: prompt }],
-    temperature: 0.6
+    messages: messages,
+    temperature: 0.3
   })
+
   return response.choices[0]?.message?.content || ''
 }
