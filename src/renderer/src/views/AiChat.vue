@@ -190,7 +190,7 @@ const sendMessage = async () => {
 .chat-history {
   flex-grow: 1;
   overflow-y: auto;
-  padding: 16px;
+  padding: 14px;
   background-color: var(--color-background-soft);
   border-right: 1px solid var(--color-border);
   position: relative;
@@ -212,6 +212,12 @@ const sendMessage = async () => {
 
 .chat-message.user {
   justify-content: flex-end;
+}
+
+:deep(.ant-list-item) {
+  padding: 10px 0px;
+  margin-bottom: 0px;
+  border-bottom: none;
 }
 
 /* Reverse avatar and content for user messages */

@@ -94,4 +94,7 @@ const { sessionHistory, activeSessionId } = storeToRefs(chatStore)
 .history-item:hover {
   background-color: var(--primary-bg-hover);
 }
+:deep(.ant-list-item) {
+  padding: 10px 5px;
+}
 </style>
