@@ -118,11 +118,7 @@ const loadSettings = () => {
       // 合并设置以保留新增的设置项
       Object.keys(settings).forEach((category) => {
         if (parsedSettings[category]) {
-          Object.keys(settings[category]).forEach((key) => {
-            if (parsedSettings[category][key] !== undefined) {
-              settings[category][key] = parsedSettings[category][key]
-            }
-          })
+          settings[category] = { ...settings[category], ...parsedSettings[category] }
         }
       })
 
@@ -175,6 +171,11 @@ const resetSettings = () => {
       settings.system.autoUpdate = true
       settings.system.telemetry = true
       settings.system.clearScanConfigOnFinish = true
+
+      settings.ai.provider = null
+      settings.ai.apiKey = ''
+      settings.ai.endpoint = ''
+      settings.ai.model = ''
 
       // 应用默认主题
       updateTheme('light')

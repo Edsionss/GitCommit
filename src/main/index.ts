@@ -6,6 +6,7 @@ import { promises as fs } from 'fs'
 import * as path from 'path'
 
 import { registerIpcHandlers } from '@main/modules/ipcHandlers'
+import { registerAiHandlers } from '@main/modules/ai/ai-handlers'
 
 function createWindow(): void {
   // Create the browser window.
@@ -57,6 +58,7 @@ app.whenReady().then(() => {
 
   // IPC test
   registerIpcHandlers()
+  registerAiHandlers()
 
   createWindow()
 

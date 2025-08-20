@@ -61,12 +61,26 @@ const props = defineProps({
 
 const emit = defineEmits(['update:settings']);
 
-const form = reactive({ ...props.settings });
+// Local reactive form state that mirrors the props
+const form = reactive<AiSettings>({ ...props.settings });
 
-watch(form, (newSettings) => {
-  emit('update:settings', newSettings);
-}, { deep: true });
+// Watch for changes in props (from parent) and update the local form
+watch(
+  () => props.settings,
+  (newSettings) => {
+    Object.assign(form, newSettings);
+  },
+  { deep: true }
+);
 
+// Watch for changes in the local form (from user input) and emit to parent
+watch(
+  form,
+  (newFormState) => {
+    emit('update:settings', newFormState);
+  },
+  { deep: true }
+);
 </script>
 
 <style scoped>
