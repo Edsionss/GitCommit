@@ -1,19 +1,20 @@
 <template>
   <div class="ai-chat-page">
-    <!-- Left Sidebar for Chat History -->
-    <ChatHistorySidebar :is-visible="isSidebarVisible" />
+    <ChatHistorySidebar
+      :is-visible="isSidebarVisible"
+      @select-session="setActiveSession"
+      @new-session="createNewSession"
+      @delete-session="deleteSession"
+    />
 
-    <!-- Main Chat Area -->
     <div class="main-chat-area">
-      <!-- Top Toolbar -->
       <ChatToolbar
         @toggle-sidebar="isSidebarVisible = !isSidebarVisible"
         @save-session="saveCurrentSession"
       />
 
-      <!-- Chat History -->
       <div class="chat-history" ref="chatHistoryRef" :style="borderStyle">
-        <a-list :data-source="messages" item-layout="horizontal">
+        <a-list v-if="activeSession" :data-source="activeSession.messages" item-layout="horizontal">
           <template #renderItem="{ item }">
             <a-list-item :class="['chat-message', item.sender]">
               <a-list-item-meta>
@@ -44,15 +45,18 @@
             </a-list-item>
           </template>
         </a-list>
+        <div v-if="isLoading" class="loading-spinner">
+          <a-spin tip="AI 正在思考中..."></a-spin>
+        </div>
       </div>
 
-      <!-- Chat Input -->
       <div class="chat-input-area">
         <a-textarea
           v-model:value="userInput"
           placeholder="在这里输入您的问题..."
           :auto-size="{ maxRows: 6 }"
           @pressEnter="sendMessage"
+          :disabled="isLoading"
         />
         <a-button
           type="primary"
@@ -68,24 +72,23 @@
 </template>
 
 <script setup lang="ts">
-import { ref, nextTick, onMounted, computed } from 'vue'
+import { ref, nextTick, watch, computed } from 'vue'
 import { message as antMessage } from 'ant-design-vue'
 import { useSettingsStore } from '@/stores/settingsStore'
+import { useChatStore } from '@/stores/chatStore'
+import { storeToRefs } from 'pinia'
 import { marked } from 'marked'
 import ChatHistorySidebar from '@/components/AiChat/ChatHistorySidebar.vue'
 import ChatToolbar from '@/components/AiChat/ChatToolbar.vue'
 
-interface Message {
-  sender: 'user' | 'ai'
-  text: string
-  isLoading?: boolean
-}
-
 const userInput = ref('')
 const isLoading = ref(false)
-const messages = ref<Message[]>([])
 const chatHistoryRef = ref<HTMLElement | null>(null)
+
 const settingsStore = useSettingsStore()
+const chatStore = useChatStore()
+const { activeSession } = storeToRefs(chatStore)
+
 const isSidebarVisible = ref(true)
 
 const borderStyle = computed(() => {
@@ -109,26 +112,35 @@ const scrollToBottom = () => {
   })
 }
 
+watch(activeSession, () => scrollToBottom(), { deep: true, immediate: true })
+
 const saveCurrentSession = () => {
-  antMessage.info('功能开发中：保存当前会话')
-  // Later, this will save the `messages` array to the chat store.
+  // The store saves automatically, so this is just for user feedback.
+  antMessage.success('会话保存成功！')
 }
 
-onMounted(() => {
-  messages.value.push({ sender: 'ai', text: '您好！有什么可以帮助您的吗？' })
-})
+const setActiveSession = (sessionId: string) => {
+  chatStore.setActiveSession(sessionId)
+}
+
+const createNewSession = () => {
+  chatStore.createNewSession()
+}
+
+const deleteSession = (sessionId: string) => {
+  chatStore.deleteSession(sessionId)
+}
 
 const sendMessage = async () => {
   const text = userInput.value.trim()
   if (!text || isLoading.value) return
 
-  messages.value.push({ sender: 'user', text })
+  const userMessage = { sender: 'user' as const, text }
+  chatStore.addMessageToActiveSession(userMessage)
   userInput.value = ''
   scrollToBottom()
 
-  messages.value.push({ sender: 'ai', text: '', isLoading: true })
   isLoading.value = true
-  scrollToBottom()
 
   try {
     const appSettings = settingsStore.appSettings
@@ -144,21 +156,15 @@ const sendMessage = async () => {
     const plainAiConfig = JSON.parse(JSON.stringify(aiConfig))
     const result = await window.api.aiChat(text, plainAiConfig)
 
-    messages.value.pop()
-
     if (result.success) {
-      messages.value.push({ sender: 'ai', text: result.message })
+      chatStore.addMessageToActiveSession({ sender: 'ai', text: result.message })
     } else {
       throw new Error(result.error)
     }
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred.'
     antMessage.error(errorMessage)
-    const lastMessage = messages.value[messages.value.length - 1]
-    if (lastMessage?.isLoading) {
-      messages.value.pop()
-    }
-    messages.value.push({ sender: 'ai', text: `错误: ${errorMessage}` })
+    chatStore.addMessageToActiveSession({ sender: 'ai', text: `错误: ${errorMessage}` })
   } finally {
     isLoading.value = false
     scrollToBottom()
@@ -188,10 +194,24 @@ const sendMessage = async () => {
   padding: 16px;
   background-color: var(--color-background-soft);
   border-right: 1px solid var(--color-border);
+  position: relative;
+  user-select: text;
+}
+
+.loading-spinner {
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
 }
 
 .chat-message {
   margin-bottom: 16px;
+  display: flex;
+}
+
+.chat-message.user {
+  justify-content: flex-end;
 }
 
 .message-content {
@@ -208,9 +228,8 @@ const sendMessage = async () => {
 }
 
 .chat-message.ai .message-content {
-  background: var(--color-background);
+  background: #fff;
   color: var(--color-text);
-  border: 1px solid var(--color-border);
 }
 
 .chat-input-area {

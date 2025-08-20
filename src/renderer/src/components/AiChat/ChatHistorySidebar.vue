@@ -2,12 +2,25 @@
   <div class="chat-history-sidebar" :class="{ visible: isVisible }">
     <div class="sidebar-header">
       <h3>会话历史</h3>
+      <a-button @click="$emit('newSession')" type="primary" size="small">
+        <template #icon><PlusOutlined /></template>
+        新会话
+      </a-button>
     </div>
     <div class="sidebar-content">
-      <a-list :data-source="history" item-layout="horizontal">
+      <a-list :data-source="sessionHistory" item-layout="horizontal">
         <template #renderItem="{ item }">
-          <a-list-item class="history-item">
-            <a-list-item-meta :title="item.title" :description="item.lastActivity" />
+          <a-list-item
+            class="history-item"
+            :class="{ active: item.id === activeSessionId }"
+            @click="$emit('selectSession', item.id)"
+          >
+            <a-list-item-meta :title="item.name" />
+            <a-popconfirm title="确定删除此会话吗?" @confirm.stop="$emit('deleteSession', item.id)">
+              <a-button type="text" danger size="small" @click.stop>
+                <template #icon><DeleteOutlined /></template>
+              </a-button>
+            </a-popconfirm>
           </a-list-item>
         </template>
       </a-list>
@@ -16,16 +29,15 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { useChatStore } from '@/stores/chatStore'
+import { storeToRefs } from 'pinia'
+import { PlusOutlined, DeleteOutlined } from '@ant-design/icons-vue'
 
 defineProps<{ isVisible: boolean }>()
+defineEmits(['selectSession', 'newSession', 'deleteSession'])
 
-// Dummy data for now
-const history = ref([
-  { id: '1', title: '关于项目的重构计划', lastActivity: '2 hours ago' },
-  { id: '2', title: '如何使用 Pinia', lastActivity: 'Yesterday' },
-  { id: '3', title: 'Vue 3 Composition API 最佳实践', lastActivity: '3 days ago' }
-])
+const chatStore = useChatStore()
+const { sessionHistory, activeSessionId } = storeToRefs(chatStore)
 </script>
 
 <style scoped>
@@ -47,8 +59,11 @@ const history = ref([
 }
 
 .sidebar-header {
-  padding: 11.5px;
+  padding: 16px;
   border-bottom: 1px solid var(--color-border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
 .sidebar-header h3 {
@@ -59,14 +74,24 @@ const history = ref([
 .sidebar-content {
   flex: 1;
   overflow-y: auto;
+  padding: 5px;
 }
 
 .history-item {
   cursor: pointer;
-  padding: 12px 16px;
+  padding: 8px 16px;
+  border-left: 3px solid transparent;
+  border-radius: 0.5rem;
+  margin-bottom: 5px;
+  border-bottom: none;
+}
+
+.history-item.active {
+  background-color: var(--primary-bg-hover);
+  border-left-color: var(--color-primary);
 }
 
 .history-item:hover {
-  background-color: var(--color-background-soft);
+  background-color: var(--primary-bg-hover);
 }
 </style>

@@ -1,10 +1,10 @@
 <template>
   <div class="chat-toolbar">
-    <a-button @click="$emit('toggle-sidebar')" type="text">
+    <a-button @click="$emit('toggleSidebar')" type="text">
       <template #icon><MenuOutlined /></template>
     </a-button>
-    <div class="toolbar-title">AI Chat</div>
-    <a-button @click="$emit('save-session')">
+    <div class="toolbar-title">AI 助手</div>
+    <a-button @click="$emit('saveSession')">
       <template #icon><SaveOutlined /></template>
       保存会话
     </a-button>
@@ -12,9 +12,9 @@
 </template>
 
 <script setup lang="ts">
-import { MenuOutlined, SaveOutlined } from '@ant-design/icons-vue'
+import { MenuOutlined, SaveOutlined } from '@ant-design/icons-vue';
 
-defineEmits(['toggle-sidebar', 'save-session'])
+defineEmits(['toggleSidebar', 'saveSession']);
 </script>
 
 <style scoped>
@@ -25,6 +25,7 @@ defineEmits(['toggle-sidebar', 'save-session'])
   align-items: center;
   padding: 0 16px;
   background-color: var(--color-background);
+  flex-shrink: 0; /* Prevent toolbar from shrinking */
 }
 
 .toolbar-title {
