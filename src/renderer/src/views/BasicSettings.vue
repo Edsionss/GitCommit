@@ -108,20 +108,26 @@ const startScan = async () => {
 
     addLog(`扫描完成，共找到 ${commits.length} 条提交记录`, 'success')
     hasResults.value = true
-    localStorage.setItem('gitCommits', JSON.stringify(commits))
+    localStorage.setItem('gitCommits', JSON.stringify(commits)) // 保留这个用于“保存结果”功能
 
-    // 跳转到扫描记录页面并传递结果
-    router.push({
-      name: 'ScanHistory',
-      query: {
-        scanResult: JSON.stringify({
-          commits: commits,
-          options: form,
-          log: currentLogs.value,
-          status: 'success'
-        })
-      }
-    })
+    // --- FIX START: 直接保存到扫描历史 ---
+    const history = JSON.parse(localStorage.getItem('scanHistory') || '[]')
+    const newRecord = {
+      id: dayjs().valueOf().toString(),
+      repoPath: form.repoPath || '未知仓库',
+      scanTime: dayjs().toISOString(),
+      status: 'success',
+      totalCommits: commits.length,
+      scanOptions: { ...form },
+      log: [...currentLogs.value],
+      results: commits
+    }
+    history.unshift(newRecord)
+    localStorage.setItem('scanHistory', JSON.stringify(history))
+    // --- FIX END ---
+
+    // 跳转到扫描记录页面
+    router.push({ name: 'ScanHistory' })
 
     const savedSettings = localStorage.getItem('appSettings')
     if (savedSettings) {
@@ -130,24 +136,29 @@ const startScan = async () => {
         resetForm()
       }
     }
-
   } catch (error) {
     const errorMsg = error instanceof Error ? error.message : String(error)
     addLog(`扫描失败: ${errorMsg}`, 'error')
     message.error(`扫描失败: ${errorMsg}`)
 
-    // 跳转到扫描记录页面并传递失败信息
-    router.push({
-      name: 'ScanHistory',
-      query: {
-        scanResult: JSON.stringify({
-          commits: [],
-          options: form,
-          log: currentLogs.value,
-          status: 'failed'
-        })
-      }
-    })
+    // --- FIX START: 保存失败记录到扫描历史 ---
+    const history = JSON.parse(localStorage.getItem('scanHistory') || '[]')
+    const newRecord = {
+      id: dayjs().valueOf().toString(),
+      repoPath: form.repoPath || '未知仓库',
+      scanTime: dayjs().toISOString(),
+      status: 'failed',
+      totalCommits: 0,
+      scanOptions: { ...form },
+      log: [...currentLogs.value],
+      results: []
+    }
+    history.unshift(newRecord)
+    localStorage.setItem('scanHistory', JSON.stringify(history))
+    // --- FIX END ---
+
+    // 跳转到扫描记录页面
+    router.push({ name: 'ScanHistory' })
   }
 }
 

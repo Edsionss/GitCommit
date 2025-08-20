@@ -183,48 +183,13 @@ const exportScanResults = (format: string) => {
 }
 
 // 生命周期钩子
+// 生命周期钩子
 onMounted(() => {
   loadScanHistory()
-  const route = router.currentRoute.value
-  if (route.query.scanResult) {
-    try {
-      const result = JSON.parse(route.query.scanResult as string)
-      addScanResult(result)
-      // 清除query参数，避免刷新后重复添加
-      router.replace({ query: {} })
-    } catch (error) {
-      console.error('解析扫描结果失败:', error)
-      message.error('加载扫描结果失败')
-    }
-  }
 })
 
 // 暴露给外部的方法，用于从BasicSettings页面接收扫描结果
-const addScanResult = (result: {
-  commits: GitCommit[]
-  options: GitScanOptions
-  log: string[]
-  status: 'success' | 'failed' | 'cancelled'
-}) => {
-  const newRecord: ScanRecord = {
-    id: dayjs().valueOf().toString(), // 唯一ID
-    repoPath:
-      result.options.selectedRepos && result.options.selectedRepos.length > 0
-        ? result.options.selectedRepos.join(', ')
-        : result.options.repoPath || '未知仓库',
-    scanTime: dayjs().toISOString(),
-    status: result.status,
-    totalCommits: result.commits.length,
-    scanOptions: result.options,
-    log: result.log,
-    results: result.commits
-  }
-  saveScanRecord(newRecord)
-}
 
-defineExpose({
-  addScanResult
-})
 </script>
 
 <style scoped>
