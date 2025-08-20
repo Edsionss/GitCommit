@@ -45,9 +45,9 @@
             </a-list-item>
           </template>
         </a-list>
-        <div v-if="isLoading" class="loading-spinner">
+        <!-- <div v-if="isLoading" class="loading-spinner">
           <a-spin tip="AI 正在思考中..."></a-spin>
-        </div>
+        </div> -->
       </div>
 
       <div class="chat-input-area">
@@ -206,12 +206,27 @@ const sendMessage = async () => {
 }
 
 .chat-message {
-  margin-bottom: 16px;
   display: flex;
+  width: 100%;
+  margin-bottom: 16px;
 }
 
 .chat-message.user {
   justify-content: flex-end;
+}
+
+/* Reverse avatar and content for user messages */
+:deep(.chat-message.user .ant-list-item-meta) {
+  flex-direction: row-reverse;
+}
+
+:deep(.chat-message.user .ant-list-item-meta-content) {
+  text-align: right;
+}
+
+:deep(.chat-message.user .ant-list-item-meta-avatar) {
+  margin-left: 16px;
+  margin-right: 0;
 }
 
 .message-content {
