@@ -18,26 +18,39 @@
           <a-tag>{{ text }}</a-tag>
         </template>
         <template v-else-if="column.dataIndex === 'insertions'">
-          <span style="color: green;">+{{ text }}</span>
+          <span style="color: green">+{{ text }}</span>
         </template>
         <template v-else-if="column.dataIndex === 'deletions'">
-          <span style="color: red;">-{{ text }}</span>
+          <span style="color: red">-{{ text }}</span>
         </template>
       </template>
       <template #expandedRowRender="{ record }">
         <div class="expanded-row-content">
-          <p><strong>完整提交ID:</strong> <a-typography-paragraph copyable style="display: inline;">{{ record.commitId }}</a-typography-paragraph></p>
-          <p v-if="record.branch"><strong>分支:</strong> <a-tag color="cyan">{{ record.branch }}</a-tag></p>
-          <div><strong>消息:</strong> <pre class="commit-message-pre">{{ record.message }}</pre></div>
-          <div v-if="record.body"><strong>详细描述:</strong> <pre class="commit-message-pre">{{ record.body }}</pre></div>
+          <p>
+            <strong>完整提交ID:</strong>
+            <a-typography-paragraph copyable style="display: inline">{{
+              record.commitId
+            }}</a-typography-paragraph>
+          </p>
+          <p v-if="record.branch">
+            <strong>分支:</strong> <a-tag color="cyan">{{ record.branch }}</a-tag>
+          </p>
+          <div>
+            <strong>消息:</strong>
+            <pre class="commit-message-pre">{{ record.message }}</pre>
+          </div>
+          <div v-if="record.body">
+            <strong>详细描述:</strong>
+            <pre class="commit-message-pre">{{ record.body }}</pre>
+          </div>
           <p>
             <strong>邮箱:</strong> {{ record.email }}
             <a-divider type="vertical" />
             <strong>文件变更数:</strong> {{ record.filesChanged }}
             <a-divider type="vertical" />
-            <strong>新增行数:</strong> <span style="color: green;">{{ record.insertions }}</span>
+            <strong>新增行数:</strong> <span style="color: green">{{ record.insertions }}</span>
             <a-divider type="vertical" />
-            <strong>删除行数:</strong> <span style="color: red;">{{ record.deletions }}</span>
+            <strong>删除行数:</strong> <span style="color: red">{{ record.deletions }}</span>
           </p>
         </div>
       </template>
@@ -51,13 +64,19 @@ import dayjs from 'dayjs'
 import { GitCommit } from '@services/GitService'
 
 defineProps({
-  results: { type: Array as PropType<GitCommit[]>, required: true },
+  results: { type: Array as PropType<GitCommit[]>, required: true }
 })
 
 const columns = [
   { title: '仓库', dataIndex: 'repository', key: 'repository', width: 120 },
   { title: '作者', dataIndex: 'author', key: 'author', width: 120 },
-  { title: '日期', dataIndex: 'date', key: 'date', width: 180, sorter: (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime() },
+  {
+    title: '日期',
+    dataIndex: 'date',
+    key: 'date',
+    width: 180,
+    sorter: (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
+  }
   // 其他列默认不显示，通过展开行显示
 ]
 

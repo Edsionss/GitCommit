@@ -10,7 +10,12 @@
         <a-input v-model:value="editableRoute.meta.title" />
       </a-form-item>
       <a-form-item label="菜单顺序">
-        <a-input-number v-model:value="editableRoute.menuOrder" style="width: 100%" />
+        <a-input-number
+          v-model:value="editableRoute.menuOrder"
+          style="width: 100%"
+          :disabled="!editableRoute.isMenu"
+          :placeholder="!editableRoute.isMenu && '菜单顺序仅对菜单有效'"
+        />
       </a-form-item>
       <a-form-item label="路由路径">
         <a-input v-model:value="editableRoute.path" />

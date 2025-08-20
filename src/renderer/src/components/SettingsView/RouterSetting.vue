@@ -1,22 +1,18 @@
 <template>
   <div class="routes-view-container">
     <h2 class="page-title">菜单与路由管理</h2>
-    <a-table
-      :columns="columns"
-      :data-source="routes"
-      :row-key="'name'"
-      :pagination="false"
-      bordered
-    >
-      <template #expandIcon="{ expanded, onExpand, record }">
-        <a @click="(e) => onExpand(record, e)" style="margin-right: 8px">
-          <DownOutlined v-if="expanded" :rotate="180" />
-          <RightOutlined v-else />
-        </a>
-      </template>
-
+    <a-table :columns="columns" :data-source="routes" :row-key="'name'" :pagination="false">
       <template #expandedRowRender="{ record }">
-        <a-descriptions bordered size="small">
+        <div class="expanded-row-content">
+          <strong>路由名称 (Name):</strong>
+          <span class="commit-message-pre">{{ record.name }}</span>
+          <a-divider type="vertical" />
+          <strong>菜单名称:</strong> <span class="commit-message-pre">{{ record.meta.title }}</span>
+          <a-divider type="vertical" />
+          <strong>组件路径:</strong>
+          <span class="commit-message-pre">{{ record.componentPath }}</span>
+        </div>
+        <!-- <a-descriptions bordered size="small">
           <a-descriptions-item label="路由名称 (Name)">{{ record.name }}</a-descriptions-item>
           <a-descriptions-item label="菜单名称 (Title)">{{
             record.meta.title
@@ -33,9 +29,8 @@
               record.meta.keepAlive
             }}</a-tag>
           </a-descriptions-item>
-        </a-descriptions>
+        </a-descriptions> -->
       </template>
-
       <template #bodyCell="{ column, record }">
         <template v-if="column.key === 'isMenu'">
           <a-switch
@@ -51,9 +46,9 @@
         </template>
         <template v-if="column.key === 'action'">
           <a-space>
-            <a-button type="primary" size="small" @click="openEditModal(record)">编辑</a-button>
+            <a-button type="link" size="small" @click="openEditModal(record)">编辑</a-button>
             <a-popconfirm title="确定删除此路由吗?" @confirm="handleDelete(record.name)">
-              <a-button type="danger" size="small">删除</a-button>
+              <a-button danger type="link" size="small">删除</a-button>
             </a-popconfirm>
           </a-space>
         </template>
@@ -75,7 +70,6 @@ import { storeToRefs } from 'pinia'
 import { useRoutesStore, RouteRecord } from '@/stores/routesStore'
 import EditRouteDialog from './EditRouteDialog.vue'
 import { message } from 'ant-design-vue'
-import { RightOutlined, DownOutlined } from '@ant-design/icons-vue'
 
 const routesStore = useRoutesStore()
 const { routes } = storeToRefs(routesStore)
@@ -109,26 +103,43 @@ const handleUpdate = (updatedRoute: RouteRecord) => {
 }
 
 const onFieldChange = (record: RouteRecord, field: string, value: any) => {
-  const updatedRecord = { ...record };
+  const updatedRecord = { ...record }
   if (field === 'isMenu') {
-    updatedRecord.isMenu = value;
+    updatedRecord.isMenu = value
   } else if (field === 'keepAlive') {
-    updatedRecord.meta = { ...updatedRecord.meta, keepAlive: value };
+    updatedRecord.meta = { ...updatedRecord.meta, keepAlive: value }
   } else if (field === 'menuOrder') {
-    if (value === null) return; // Do not update if value is cleared
-    updatedRecord.menuOrder = value;
+    if (value === null) return // Do not update if value is cleared
+    updatedRecord.menuOrder = value
   }
-  routesStore.updateRoute(record.name, updatedRecord);
-  message.success('设置已更新');
+  routesStore.updateRoute(record.name, updatedRecord)
+  message.success('设置已更新')
 }
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .routes-view-container {
 }
 .page-title {
   font-size: 24px;
   font-weight: bold;
   margin-bottom: 20px;
+}
+.expanded-row-content {
+  background-color: #f9f9f9;
+  padding-left: 20px;
+
+  strong {
+    margin-right: 5px;
+  }
+}
+.commit-message-pre {
+  white-space: pre-wrap;
+  word-break: break-all;
+  font-family: monospace;
+  font-size: 12px;
+  background-color: #eee;
+  padding: 5px;
+  border-radius: 3px;
 }
 </style>
