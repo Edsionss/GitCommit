@@ -22,44 +22,30 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted, computed } from 'vue'
+import { computed, onMounted } from 'vue'
+import { storeToRefs } from 'pinia'
+import { useSettingsStore } from '@/stores/settingsStore'
 import TheSidebar from './TheSidebar.vue'
 import TheHeader from './TheHeader.vue'
 import { useTheme } from '@composables/useTheme'
 
-const { currentTheme } = useTheme()
+// Initialize theme composable
+useTheme()
 
-const sidebarPosition = ref('left')
+const settingsStore = useSettingsStore()
+const { appSettings } = storeToRefs(settingsStore)
+
+const sidebarPosition = computed(() => appSettings.value?.appearance?.sidebarPosition || 'left')
 
 const layoutClasses = computed(() => ({
   'sidebar-right': sidebarPosition.value === 'right'
 }))
 
-const updateSidebarPosition = () => {
-  try {
-    const settings = JSON.parse(localStorage.getItem('appSettings') || '{}')
-    sidebarPosition.value = settings?.appearance?.sidebarPosition || 'left'
-  } catch (e) {
-    console.error('Failed to parse settings for sidebar position:', e)
-    sidebarPosition.value = 'left'
-  }
-}
-
 onMounted(() => {
-  // Ensure theme is applied to body
-  const dataTheme = document.documentElement.getAttribute('data-theme')
-  if (dataTheme) {
-    document.body.setAttribute('data-theme', dataTheme)
-  }
-
-  // Handle sidebar position
-  updateSidebarPosition()
-  window.addEventListener('storage', updateSidebarPosition)
+  // Ensure theme is applied to body, which is handled by useTheme now
+  // The store loads initial state, and watchers in composables handle the rest.
 })
 
-onUnmounted(() => {
-  window.removeEventListener('storage', updateSidebarPosition)
-})
 </script>
 
 <style scoped>

@@ -30,7 +30,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, computed } from 'vue'
+import { ref, reactive } from 'vue'
 import { message } from 'ant-design-vue'
 import { gitService } from '@services/GitService'
 import { useRouter } from 'vue-router'
@@ -38,8 +38,10 @@ import dayjs from 'dayjs'
 import SettingsForm from '@components/BasicSettings/SettingsForm.vue'
 import LogPanel from '@components/BasicSettings/LogPanel.vue'
 import ActionPanel from '@components/BasicSettings/ActionPanel.vue'
+import { useSettingsStore } from '@/stores/settingsStore'
 
 const router = useRouter()
+const settingsStore = useSettingsStore()
 
 const defaultFormState = {
   selectedFields: ['repository', 'commitId', 'shortHash', 'author', 'date', 'message'],
@@ -141,13 +143,11 @@ const startScan = async () => {
     // 跳转到扫描记录页面
     router.push({ name: 'ScanHistory' })
 
-    const savedSettings = localStorage.getItem('appSettings')
-    if (savedSettings) {
-      const parsedSettings = JSON.parse(savedSettings)
-      if (parsedSettings.system?.clearScanConfigOnFinish) {
-        resetForm()
-      }
+    const appSettings = settingsStore.appSettings
+    if (appSettings.system?.clearScanConfigOnFinish) {
+      resetForm()
     }
+
   } catch (error) {
     const errorMsg = error instanceof Error ? error.message : String(error)
     addLog(`扫描失败: ${errorMsg}`, 'error')

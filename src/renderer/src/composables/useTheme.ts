@@ -1,11 +1,10 @@
-import { ref } from 'vue'
-
-type Theme = 'light' | 'dark'
-type ThemeMode = 'light' | 'dark' | 'system'
+import { watch, onMounted } from 'vue'
+import { storeToRefs } from 'pinia'
+import { useSettingsStore, type Theme, type ThemeMode } from '@/stores/settingsStore'
 
 export function useTheme() {
-  const currentTheme = ref<Theme>('light')
-  const themeMode = ref<ThemeMode>('light')
+  const settingsStore = useSettingsStore()
+  const { theme: currentTheme, themeMode } = storeToRefs(settingsStore)
 
   // 应用主题到DOM
   const applyTheme = (theme: Theme) => {
@@ -22,54 +21,20 @@ export function useTheme() {
       meta.content = metaContent
       document.head.appendChild(meta)
     }
-
-    currentTheme.value = theme
-    localStorage.setItem('theme', theme)
-    console.log(`主题已应用: ${theme}`)
+    // 更新 store 中的 theme，但不直接在这里做，而是通过 action
+    if (settingsStore.theme !== theme) {
+      settingsStore.setTheme(theme)
+    }
   }
 
-  // 设置主题模式
+  // 包装 store 的 action
   const setThemeMode = (mode: ThemeMode) => {
-    console.log(`设置主题模式: ${mode}`)
-    themeMode.value = mode
-    localStorage.setItem('themeMode', mode)
-
-    if (mode === 'system') {
-      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches
-      applyTheme(prefersDark ? 'dark' : 'light')
-    } else {
-      applyTheme(mode as Theme)
-    }
+    settingsStore.setThemeMode(mode)
   }
 
   // 获取系统主题
   const getSystemTheme = (): Theme => {
     return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
-  }
-
-  // 初始化主题
-  const initTheme = () => {
-    document.documentElement.style.removeProperty('background-color')
-    document.body.style.removeProperty('background-color')
-
-    const savedThemeMode = localStorage.getItem('themeMode') as ThemeMode | null
-    if (savedThemeMode) {
-      themeMode.value = savedThemeMode
-      if (savedThemeMode === 'system') {
-        applyTheme(getSystemTheme())
-      } else {
-        applyTheme(savedThemeMode as Theme)
-      }
-    } else {
-      const savedTheme = localStorage.getItem('theme') as Theme | null
-      if (savedTheme) {
-        themeMode.value = savedTheme
-        applyTheme(savedTheme)
-        localStorage.setItem('themeMode', savedTheme)
-      } else {
-        setThemeMode('light')
-      }
-    }
   }
 
   // 切换明暗主题
@@ -85,18 +50,30 @@ export function useTheme() {
     setThemeMode(newMode)
   }
 
+  // 监听 store 中的 themeMode 变化
+  watch(themeMode, (newMode) => {
+    if (newMode === 'system') {
+      applyTheme(getSystemTheme())
+    } else {
+      applyTheme(newMode as Theme)
+    }
+  }, { immediate: true })
+
   // 监听系统主题变化
   const setupSystemThemeListener = () => {
     window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
-      if (localStorage.getItem('themeMode') === 'system') {
+      if (settingsStore.themeMode === 'system') {
         applyTheme(e.matches ? 'dark' : 'light')
       }
     })
   }
 
-  // 初始化
-  initTheme()
-  setupSystemThemeListener()
+  onMounted(() => {
+    // 初始化时，store 已经从 localStorage 加载了状态
+    // watch 的 immediate: true 会立即执行一次，所以主题已经应用
+    // 只需要设置系统监听器
+    setupSystemThemeListener()
+  })
 
   return {
     currentTheme,

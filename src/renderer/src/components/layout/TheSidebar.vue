@@ -39,8 +39,10 @@
 
 <script setup lang="ts">
 import logoFull from '@/assets/img/logo/LOGO1.png'
-import { ref, computed } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
+import { computed, watch } from 'vue'
+import { useRoute } from 'vue-router'
+import { storeToRefs } from 'pinia'
+import { useSettingsStore } from '@/stores/settingsStore'
 import {
   HomeOutlined,
   FileTextOutlined,
@@ -55,23 +57,23 @@ import {
   RobotOutlined
 } from '@ant-design/icons-vue'
 
-const isExpanded = ref(true)
+const settingsStore = useSettingsStore()
+const { isSidebarExpanded } = storeToRefs(settingsStore)
 const route = useRoute()
 
 const toggleSidebar = () => {
-  isExpanded.value = !isExpanded.value
-  localStorage.setItem('sidebarExpanded', isExpanded.value.toString())
+  settingsStore.toggleSidebar()
+}
 
-  // 通知父组件侧边栏状态
-  document.documentElement.dataset.sidebarExpanded = isExpanded.value.toString()
-
-  // 全局事件分发
+// 监听侧边栏状态变化，并更新DOM和分发事件
+watch(isSidebarExpanded, (expanded) => {
+  document.documentElement.dataset.sidebarExpanded = expanded.toString()
   window.dispatchEvent(
     new CustomEvent('sidebar-state-change', {
-      detail: { expanded: isExpanded.value }
+      detail: { expanded }
     })
   )
-}
+}, { immediate: true })
 
 const menuItems = [
   { path: '/', label: '概览', icon: HomeOutlined },
@@ -91,26 +93,9 @@ const isActive = (path: string): boolean => {
   return route.path === path
 }
 
-// 组件初始化时读取侧边栏状态
-const initSidebar = () => {
-  const savedState = localStorage.getItem('sidebarExpanded')
-  if (savedState !== null) {
-    isExpanded.value = savedState === 'true'
-  }
+// isExpanded is now a ref from the store, so we rename it to avoid conflict
+const isExpanded = isSidebarExpanded
 
-  // 通知父组件侧边栏状态
-  document.documentElement.dataset.sidebarExpanded = isExpanded.value.toString()
-
-  // 全局事件分发
-  window.dispatchEvent(
-    new CustomEvent('sidebar-state-change', {
-      detail: { expanded: isExpanded.value }
-    })
-  )
-}
-
-// 组件初始化时读取侧边栏状态
-initSidebar()
 </script>
 
 <style scoped>

@@ -72,21 +72,12 @@
 </template>
 
 <script setup lang="ts">
-import { reactive } from 'vue'
-import { message } from 'ant-design-vue' // Changed from ElMessage
+import { reactive, onMounted, watch } from 'vue'
+import { message } from 'ant-design-vue'
 import { SettingOutlined, FolderOutlined } from '@ant-design/icons-vue'
-import {
-  Card,
-  Form,
-  FormItem,
-  RadioGroup,
-  Radio,
-  Select,
-  SelectOption,
-  Input,
-  Button,
-  Textarea
-} from 'ant-design-vue'
+import { useSettingsStore } from '@/stores/settingsStore'
+
+const settingsStore = useSettingsStore()
 
 const form = reactive({
   outputFormat: 'csv',
@@ -96,6 +87,21 @@ const form = reactive({
   logLevel: 'info'
 })
 
+// Load settings from the store when the component is mounted
+onMounted(() => {
+  const advancedSettings = settingsStore.appSettings.advanced
+  if (advancedSettings) {
+    Object.assign(form, advancedSettings)
+  }
+})
+
+// Watch for changes in the store and update the form
+watch(() => settingsStore.appSettings.advanced, (newSettings) => {
+  if (newSettings) {
+    Object.assign(form, newSettings)
+  }
+}, { deep: true })
+
 const selectOutputDir = async () => {
   try {
     const result = await window.api.selectDirectory()
@@ -104,25 +110,32 @@ const selectOutputDir = async () => {
     }
   } catch (error) {
     console.error('选择目录失败:', error)
-    message.error('选择目录失败') // Changed from ElMessage
+    message.error('选择目录失败')
   }
 }
 
 const saveSettings = () => {
-  // 将设置保存到localStorage
-  localStorage.setItem('appSettings', JSON.stringify(form))
-  message.success('设置已保存') // Changed from ElMessage
+  // Merge advanced settings into the main settings object
+  const currentSettings = JSON.parse(JSON.stringify(settingsStore.appSettings))
+  currentSettings.advanced = form
+  settingsStore.saveAppSettings(currentSettings)
+  message.success('设置已保存')
 }
 
 const resetSettings = () => {
+  // Reset form to default values
   form.outputFormat = 'csv'
   form.dateFormat = 'YYYY-MM-DD'
   form.encoding = 'utf8'
   form.outputDir = ''
   form.logLevel = 'info'
-  // 清除保存的设置
-  localStorage.removeItem('appSettings')
-  message.info('设置已重置') // Changed from ElMessage
+  
+  // Save the reset state to the store
+  const currentSettings = JSON.parse(JSON.stringify(settingsStore.appSettings))
+  currentSettings.advanced = form
+  settingsStore.saveAppSettings(currentSettings)
+  
+  message.info('设置已重置')
 }
 </script>
 

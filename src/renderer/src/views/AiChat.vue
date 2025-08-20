@@ -46,6 +46,7 @@
 <script setup lang="ts">
 import { ref, nextTick, onMounted } from 'vue'
 import { message as antMessage } from 'ant-design-vue'
+import { useSettingsStore } from '@/stores/settingsStore'
 
 interface Message {
   sender: 'user' | 'ai'
@@ -57,6 +58,7 @@ const userInput = ref('')
 const isLoading = ref(false)
 const messages = ref<Message[]>([])
 const chatHistoryRef = ref<HTMLElement | null>(null)
+const settingsStore = useSettingsStore()
 
 const scrollToBottom = () => {
   nextTick(() => {
@@ -85,12 +87,11 @@ const sendMessage = async () => {
   scrollToBottom()
 
   try {
-    const appSettings = localStorage.getItem('appSettings')
+    const appSettings = settingsStore.appSettings
     if (!appSettings) {
       throw new Error('AI settings not found. Please configure them first in the Settings page.')
     }
-    const parsedAppSettings = JSON.parse(appSettings)
-    const aiConfig = parsedAppSettings.ai
+    const aiConfig = appSettings.ai
 
     if (!aiConfig || !aiConfig.provider || !aiConfig.apiKey) {
       throw new Error(

@@ -48,8 +48,10 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, onMounted, watch } from 'vue'
+import { reactive, onMounted, watch } from 'vue'
 import { message, Modal } from 'ant-design-vue'
+import { storeToRefs } from 'pinia'
+import { useSettingsStore, type AppSettings } from '@/stores/settingsStore'
 import AppearanceSettings from '@/components/SettingsView/AppearanceSettings.vue'
 import LocaleSettings from '@/components/SettingsView/LocaleSettings.vue'
 import GitSettings from '@/components/SettingsView/GitSettings.vue'
@@ -57,10 +59,14 @@ import SystemSettings from '@/components/SettingsView/SystemSettings.vue'
 import AiSettings from '@/components/SettingsView/AiSettings.vue'
 import { useTheme } from '@composables/useTheme'
 
-// 使用主题组合式函数
-const { setThemeMode, currentTheme } = useTheme()
+// 使用 Pinia Store
+const settingsStore = useSettingsStore()
+const { appSettings, themeMode } = storeToRefs(settingsStore)
 
-// 设置状态
+// 使用主题组合式函数
+const { setThemeMode } = useTheme()
+
+// 本地响应式状态，用于表单绑定
 const settings = reactive({
   appearance: {
     theme: 'light',
@@ -104,41 +110,27 @@ const applyAnimations = (enabled: boolean) => {
   document.documentElement.classList.toggle('no-animations', !enabled)
 }
 
-// 读取设置
-const loadSettings = () => {
-  // 先读取主题模式以确保UI状态与存储一致
-  const savedThemeMode = localStorage.getItem('themeMode') || 'light'
-  settings.appearance.theme = savedThemeMode
-
-  const savedSettings = localStorage.getItem('appSettings')
-  if (savedSettings) {
-    try {
-      const parsedSettings = JSON.parse(savedSettings)
-
-      // 合并设置以保留新增的设置项
-      Object.keys(settings).forEach((category) => {
-        if (parsedSettings[category]) {
-          settings[category] = { ...settings[category], ...parsedSettings[category] }
-        }
-      })
-
-      // 确保主题设置始终优先使用themeMode而不是从appSettings读取
-      settings.appearance.theme = savedThemeMode
-
-      message.success('设置已加载')
-    } catch (error) {
-      console.error('Failed to parse settings:', error)
-      message.error('设置加载失败')
-    }
+// 从 Store 加载设置到本地状态
+const loadSettingsFromStore = () => {
+  const storedSettings = appSettings.value
+  if (storedSettings) {
+    // 合并设置以保留新增的设置项
+    Object.keys(settings).forEach((category) => {
+      if (storedSettings[category]) {
+        settings[category] = { ...settings[category], ...storedSettings[category] }
+      }
+    })
   }
+  // 确保主题设置与 store 同步
+  settings.appearance.theme = themeMode.value
 }
 
-// 保存设置
+// 保存设置到 Store
 const saveSettings = () => {
-  localStorage.setItem('appSettings', JSON.stringify(settings))
+  settingsStore.saveAppSettings(settings as AppSettings)
   message.success('设置已保存')
   setTimeout(() => {
-    location.reload()
+    location.reload() // 保留重载以应用某些全局设置
   }, 500)
 }
 
@@ -150,50 +142,58 @@ const resetSettings = () => {
     okText: '确定',
     cancelText: '取消',
     onOk() {
-      settings.appearance.theme = 'light'
-      settings.appearance.sidebarPosition = 'left'
-      settings.appearance.zoom = '1'
+      // 创建一个默认设置对象
+      const defaultSettings = {
+        appearance: {
+          theme: 'light',
+          sidebarPosition: 'left',
+          zoom: '1',
+          animations: true
+        },
+        locale: {
+          language: 'zh-CN',
+          dateFormat: 'YYYY-MM-DD',
+          timeFormat: '24'
+        },
+        git: {
+          defaultAuthor: '',
+          defaultEmail: '',
+          repositoryPath: '',
+          refreshInterval: '300000'
+        },
+        system: {
+          startWithSystem: false,
+          notifications: true,
+          autoUpdate: true,
+          telemetry: true,
+          clearScanConfigOnFinish: true
+        },
+        ai: {
+          provider: null,
+          apiKey: '',
+          endpoint: '',
+          model: ''
+        }
+      }
+      // 更新本地状态
+      Object.assign(settings, defaultSettings)
+
+      // 应用视觉效果
       applyZoom('1')
-      settings.appearance.animations = true
       applyAnimations(true)
-
-      settings.locale.language = 'zh-CN'
-      settings.locale.dateFormat = 'YYYY-MM-DD'
-      settings.locale.timeFormat = '24'
-
-      settings.git.defaultAuthor = ''
-      settings.git.defaultEmail = ''
-      settings.git.repositoryPath = ''
-      settings.git.refreshInterval = '300000'
-
-      settings.system.startWithSystem = false
-      settings.system.notifications = true
-      settings.system.autoUpdate = true
-      settings.system.telemetry = true
-      settings.system.clearScanConfigOnFinish = true
-
-      settings.ai.provider = null
-      settings.ai.apiKey = ''
-      settings.ai.endpoint = ''
-      settings.ai.model = ''
-
-      // 应用默认主题
       updateTheme('light')
 
-      // 保存默认设置
-      saveSettings()
+      // 保存到 store
+      settingsStore.saveAppSettings(defaultSettings as AppSettings)
 
       message.success('设置已重置为默认值')
-    },
-    onCancel() {
-      // 用户取消操作
+      setTimeout(() => location.reload(), 500)
     }
   })
 }
 
 // 更新主题
 const updateTheme = (theme: string) => {
-  console.log('设置页面更新主题:', theme)
   settings.appearance.theme = theme
   setThemeMode(theme as 'light' | 'dark' | 'system')
 }
@@ -216,33 +216,22 @@ const selectDirectory = async () => {
 
 // 组件挂载时加载设置
 onMounted(() => {
-  loadSettings()
-
-  // 读取当前主题设置，确保UI正确显示
-  const themeMode = localStorage.getItem('themeMode') || 'light'
-  settings.appearance.theme = themeMode
-  console.log('设置页面加载时的主题模式:', themeMode)
+  loadSettingsFromStore()
 
   // 应用初始设置
   applyZoom(settings.appearance.zoom)
   applyAnimations(settings.appearance.animations)
 })
 
-// 监听缩放设置变化
-watch(
-  () => settings.appearance.zoom,
-  (newZoom) => {
-    applyZoom(newZoom)
-  }
-)
+// 监听 store 中 appSettings 的变化，同步到本地
+watch(appSettings, (newSettings) => {
+  loadSettingsFromStore()
+}, { deep: true })
 
-// 监听动画设置变化
-watch(
-  () => settings.appearance.animations,
-  (enabled) => {
-    applyAnimations(enabled)
-  }
-)
+// 监听本地 zoom 和 animations 的变化以应用效果
+watch(() => settings.appearance.zoom, applyZoom)
+watch(() => settings.appearance.animations, applyAnimations)
+
 </script>
 
 <style scoped>
