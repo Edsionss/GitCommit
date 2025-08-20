@@ -1,0 +1,112 @@
+.config-column {
+  flex: 3;
+  min-width: 0;
+  overflow-y: auto;
+}
+.settings-card {
+  margin-bottom: 20px;
+}
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.recent-paths {
+  margin-top: 12px;
+  border: 1px solid #d9d9d9;
+  border-radius: 4px;
+}
+.recent-paths-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 12px;
+  border-bottom: 1px solid #d9d9d9;
+  background-color: #fafafa;
+}
+.recent-paths-list {
+  max-height: 150px;
+  overflow-y: auto;
+}
+.recent-path-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 12px;
+  cursor: pointer;
+  border-bottom: 1px solid #f0f0f0;
+}
+.recent-path-item:hover {
+  background-color: #f5f5f5;
+}
+.recent-path-item:last-child {
+  border-bottom: none;
+}
+.path-info {
+  flex: 1;
+  overflow: hidden;
+}
+.path-text {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.path-time {
+  font-size: 12px;
+  color: #888;
+}
+.sub-actions {
+  display: flex;
+  justify-content: flex-start;
+  gap: 8px;
+  margin-top: 8px;
+}
+.date-range-selector {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.hint {
+  margin-left: 12px;
+  font-size: 12px;
+  color: #888;
+}
+.clear-icon {
+  cursor: pointer;
+  color: #aaa;
+}
+.clear-icon:hover {
+  color: #888;
+}
+.form-row {
+  display: flex;
+  align-items: center;
+  margin-bottom: 24px;
+}
+.form-row-label {
+  width: 150px;
+  text-align: right;
+  margin-right: 8px;
+  color: rgba(0, 0, 0, 0.88);
+  font-size: 14px;
+}
+.form-row-label::after {
+  content: ':';
+  position: relative;
+  top: -0.5px;
+  margin-inline-start: 2px;
+  margin-inline-end: 8px;
+}
+.form-row-inline {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+}
+.form-row-inline :deep(.ant-form-item-label) {
+  width: auto;
+  padding-bottom: 0;
+}
+.form-row-inline :deep(.ant-form-item-control) {
+  flex-grow: 1;
+}
