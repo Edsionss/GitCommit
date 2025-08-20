@@ -1,59 +1,79 @@
 <template>
-  <div class="ai-chat-container">
-    <div class="toolbar">123</div>
-    <div class="chat-history" ref="chatHistoryRef">
-      <a-list :data-source="messages" item-layout="horizontal">
-        <template #renderItem="{ item }">
-          <a-list-item :class="['chat-message', item.sender]">
-            <a-list-item-meta>
-              <template #avatar>
-                <a-avatar>
-                  {{ item.sender === 'user' ? 'You' : 'AI' }}
-                </a-avatar>
-              </template>
-              <template #title>
-                <span>{{ item.sender === 'user' ? 'You' : 'AI Assistant' }}</span>
-              </template>
-              <template #description>
-                <div class="message-content">
-                  <div v-if="item.isLoading"><a-spin /></div>
-                  <div
-                    v-else-if="item.sender === 'ai'"
-                    v-html="renderMarkdown(item.text)"
-                    class="markdown-body"
-                  ></div>
-                  <div v-else>{{ item.text }}</div>
-                </div>
-              </template>
-            </a-list-item-meta>
-          </a-list-item>
-        </template>
-      </a-list>
-    </div>
-    <div class="chat-input-area">
-      <a-textarea
-        v-model:value="userInput"
-        placeholder="在这里输入您的问题..."
-        :auto-size="{ maxRows: 6 }"
-        @pressEnter="sendMessage"
+  <div class="ai-chat-page">
+    <!-- Left Sidebar for Chat History -->
+    <ChatHistorySidebar :is-visible="isSidebarVisible" />
+
+    <!-- Main Chat Area -->
+    <div class="main-chat-area">
+      <!-- Top Toolbar -->
+      <ChatToolbar
+        @toggle-sidebar="isSidebarVisible = !isSidebarVisible"
+        @save-session="saveCurrentSession"
       />
-      <a-button
-        type="primary"
-        @click="sendMessage"
-        :loading="isLoading"
-        :disabled="!userInput.trim()"
-      >
-        发送
-      </a-button>
+
+      <!-- Chat History -->
+      <div class="chat-history" ref="chatHistoryRef" :style="borderStyle">
+        <a-list :data-source="messages" item-layout="horizontal">
+          <template #renderItem="{ item }">
+            <a-list-item :class="['chat-message', item.sender]">
+              <a-list-item-meta>
+                <template #avatar>
+                  <a-avatar>
+                    {{ item.sender === 'user' ? 'You' : 'AI' }}
+                  </a-avatar>
+                </template>
+                <template #title>
+                  <span>{{
+                    item.sender === 'user'
+                      ? 'You'
+                      : settingsStore?.appSettings?.ai?.model || 'AI Assistant'
+                  }}</span>
+                </template>
+                <template #description>
+                  <div class="message-content">
+                    <div v-if="item.isLoading"><a-spin /></div>
+                    <div
+                      v-else-if="item.sender === 'ai'"
+                      v-html="renderMarkdown(item.text)"
+                      class="markdown-body"
+                    ></div>
+                    <div v-else>{{ item.text }}</div>
+                  </div>
+                </template>
+              </a-list-item-meta>
+            </a-list-item>
+          </template>
+        </a-list>
+      </div>
+
+      <!-- Chat Input -->
+      <div class="chat-input-area">
+        <a-textarea
+          v-model:value="userInput"
+          placeholder="在这里输入您的问题..."
+          :auto-size="{ maxRows: 6 }"
+          @pressEnter="sendMessage"
+        />
+        <a-button
+          type="primary"
+          @click="sendMessage"
+          :loading="isLoading"
+          :disabled="!userInput.trim()"
+        >
+          发送
+        </a-button>
+      </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, nextTick, onMounted } from 'vue'
+import { ref, nextTick, onMounted, computed } from 'vue'
 import { message as antMessage } from 'ant-design-vue'
 import { useSettingsStore } from '@/stores/settingsStore'
 import { marked } from 'marked'
+import ChatHistorySidebar from '@/components/AiChat/ChatHistorySidebar.vue'
+import ChatToolbar from '@/components/AiChat/ChatToolbar.vue'
 
 interface Message {
   sender: 'user' | 'ai'
@@ -66,6 +86,16 @@ const isLoading = ref(false)
 const messages = ref<Message[]>([])
 const chatHistoryRef = ref<HTMLElement | null>(null)
 const settingsStore = useSettingsStore()
+const isSidebarVisible = ref(true)
+
+const borderStyle = computed(() => {
+  if (!isSidebarVisible.value) {
+    return {
+      borderLeft: '1px solid var(--color-border)'
+    }
+  }
+  return { borderLeft: 'none' }
+})
 
 const renderMarkdown = (text: string) => {
   return marked.parse(text, { gfm: true, breaks: true })
@@ -79,6 +109,11 @@ const scrollToBottom = () => {
   })
 }
 
+const saveCurrentSession = () => {
+  antMessage.info('功能开发中：保存当前会话')
+  // Later, this will save the `messages` array to the chat store.
+}
+
 onMounted(() => {
   messages.value.push({ sender: 'ai', text: '您好！有什么可以帮助您的吗？' })
 })
@@ -87,12 +122,10 @@ const sendMessage = async () => {
   const text = userInput.value.trim()
   if (!text || isLoading.value) return
 
-  // Add user message to history
   messages.value.push({ sender: 'user', text })
   userInput.value = ''
   scrollToBottom()
 
-  // Add AI loading message
   messages.value.push({ sender: 'ai', text: '', isLoading: true })
   isLoading.value = true
   scrollToBottom()
@@ -104,13 +137,11 @@ const sendMessage = async () => {
     }
 
     const aiConfig = appSettings.ai
-
     if (!aiConfig.provider || !aiConfig.apiKey) {
       throw new Error('请设置AI源和API密钥')
     }
 
     const plainAiConfig = JSON.parse(JSON.stringify(aiConfig))
-
     const result = await window.api.aiChat(text, plainAiConfig)
 
     messages.value.pop()
@@ -135,54 +166,38 @@ const sendMessage = async () => {
 }
 </script>
 
-<style scoped lang="scss">
-:deep(.ant-list-item) {
-  border-bottom: none;
+<style scoped>
+.ai-chat-page {
+  display: flex;
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+  border-radius: 0.5rem;
 }
 
-.ai-chat-container {
+.main-chat-area {
+  flex: 1;
   display: flex;
   flex-direction: column;
-  height: 100%;
-  user-select: text;
-  position: relative;
-  .toolbar {
-    position: fixed;
-    background-color: red;
-    height: 50px;
-    width: 100%;
-    z-index: 100;
-  }
+  min-width: 0; /* Important for flex children */
 }
 
 .chat-history {
   flex-grow: 1;
   overflow-y: auto;
-  border-radius: 4px;
+  padding: 16px;
+  background-color: var(--color-background-soft);
+  border-right: 1px solid var(--color-border);
+}
+
+.chat-message {
   margin-bottom: 16px;
-  background-color: #fff;
-  border-radius: 0.5rem;
-  padding: 10px;
-}
-
-.chat-message.user {
-  text-align: right;
-}
-
-.chat-message.user .ant-list-item-meta {
-  flex-direction: row-reverse;
-  gap: 10px;
-}
-
-.chat-message.user .ant-list-item-meta-content {
-  text-align: right;
 }
 
 .message-content {
   display: inline-block;
-  padding: 8px 12px;
+  padding: 10px 14px;
   border-radius: 8px;
-  background: #fff;
   text-align: left;
   max-width: 100%;
 }
@@ -190,20 +205,21 @@ const sendMessage = async () => {
 .chat-message.user .message-content {
   background: #1890ff;
   color: #fff;
-  white-space: pre-wrap;
-  word-break: break-word;
 }
 
 .chat-message.ai .message-content {
-  background: var(--color-background-soft);
+  background: var(--color-background);
   color: var(--color-text);
+  border: 1px solid var(--color-border);
 }
 
 .chat-input-area {
+  padding: 16px;
+  border-top: 1px solid var(--color-border);
   display: flex;
   gap: 8px;
   align-items: flex-end;
-  margin-bottom: 10px;
+  background-color: var(--color-background);
 }
 
 /* Scoped styles for rendered markdown */
@@ -212,8 +228,8 @@ const sendMessage = async () => {
   word-break: normal;
 }
 
-:deep(.markdown-body p) {
-  margin-bottom: 1em;
+:deep(.markdown-body p:last-child) {
+  margin-bottom: 0;
 }
 
 :deep(
