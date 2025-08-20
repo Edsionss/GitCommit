@@ -35,6 +35,11 @@
       @update:clearScanConfigOnFinish="settings.system.clearScanConfigOnFinish = $event"
     />
 
+    <AiSettings
+      :settings="settings.ai"
+      @update:settings="settings.ai = $event"
+    />
+
     <div class="settings-actions">
       <a-button type="primary" @click="saveSettings">保存设置</a-button>
       <a-button @click="resetSettings">重置设置</a-button>
@@ -49,6 +54,7 @@ import AppearanceSettings from '@/components/SettingsView/AppearanceSettings.vue
 import LocaleSettings from '@/components/SettingsView/LocaleSettings.vue'
 import GitSettings from '@/components/SettingsView/GitSettings.vue'
 import SystemSettings from '@/components/SettingsView/SystemSettings.vue'
+import AiSettings from '@/components/SettingsView/AiSettings.vue'
 import { useTheme } from '@composables/useTheme'
 
 // 使用主题组合式函数
@@ -79,6 +85,12 @@ const settings = reactive({
     autoUpdate: true,
     telemetry: true,
     clearScanConfigOnFinish: true
+  },
+  ai: {
+    provider: null,
+    apiKey: '',
+    endpoint: '',
+    model: ''
   }
 })
 
