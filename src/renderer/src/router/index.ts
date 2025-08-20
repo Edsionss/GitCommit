@@ -13,8 +13,7 @@ const componentMap = {
   '../views/Settings.vue': () => import('../views/Settings.vue'),
   '../views/BasicSettings.vue': () => import('../views/BasicSettings.vue'),
   '@views/TableView.vue': () => import('@views/TableView.vue'),
-  '@views/ScanHistory.vue': () => import('@views/ScanHistory.vue'),
-  '../views/RoutesView.vue': () => import('../views/RoutesView.vue')
+  '@views/ScanHistory.vue': () => import('@views/ScanHistory.vue')
 }
 
 const router = createRouter({

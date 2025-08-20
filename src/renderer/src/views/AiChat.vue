@@ -15,8 +15,9 @@
               </template>
               <template #description>
                 <div class="message-content">
-                  <div v-if="!item.isLoading">{{ item.text }}</div>
-                  <a-spin v-else />
+                  <div v-if="item.isLoading"><a-spin /></div>
+                  <div v-else-if="item.sender === 'ai'" v-html="renderMarkdown(item.text)" class="markdown-body"></div>
+                  <div v-else>{{ item.text }}</div>
                 </div>
               </template>
             </a-list-item-meta>
@@ -47,6 +48,7 @@
 import { ref, nextTick, onMounted } from 'vue'
 import { message as antMessage } from 'ant-design-vue'
 import { useSettingsStore } from '@/stores/settingsStore'
+import { marked } from 'marked'
 
 interface Message {
   sender: 'user' | 'ai'
@@ -59,6 +61,10 @@ const isLoading = ref(false)
 const messages = ref<Message[]>([])
 const chatHistoryRef = ref<HTMLElement | null>(null)
 const settingsStore = useSettingsStore()
+
+const renderMarkdown = (text: string) => {
+  return marked.parse(text, { gfm: true, breaks: true });
+}
 
 const scrollToBottom = () => {
   nextTick(() => {
@@ -98,12 +104,10 @@ const sendMessage = async () => {
       throw new Error('请设置AI源和API密钥')
     }
 
-    // FIX: Convert reactive object to a plain JS object before sending
     const plainAiConfig = JSON.parse(JSON.stringify(aiConfig))
 
     const result = await window.api.aiChat(text, plainAiConfig)
 
-    // Remove loading indicator
     messages.value.pop()
 
     if (result.success) {
@@ -114,7 +118,6 @@ const sendMessage = async () => {
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred.'
     antMessage.error(errorMessage)
-    // Remove loading indicator on error
     const lastMessage = messages.value[messages.value.length - 1]
     if (lastMessage?.isLoading) {
       messages.value.pop()
@@ -139,10 +142,6 @@ const sendMessage = async () => {
   user-select: text;
 }
 
-.page-title {
-  margin-bottom: 16px;
-}
-
 .chat-history {
   flex-grow: 1;
   overflow-y: auto;
@@ -150,6 +149,7 @@ const sendMessage = async () => {
   margin-bottom: 16px;
   background-color: #fff;
   border-radius: 0.5rem;
+  padding: 10px;
 }
 
 .chat-message.user {
@@ -171,18 +171,19 @@ const sendMessage = async () => {
   border-radius: 8px;
   background: #fff;
   text-align: left;
-  white-space: pre-wrap;
-  word-break: break-word;
+  max-width: 100%;
 }
 
 .chat-message.user .message-content {
   background: #1890ff;
   color: #fff;
+  white-space: pre-wrap;
+  word-break: break-word;
 }
 
 .chat-message.ai .message-content {
-  background: var(--color-success);
-  color: #fff;
+  background: var(--color-background-soft);
+  color: var(--color-text);
 }
 
 .chat-input-area {
@@ -190,5 +191,70 @@ const sendMessage = async () => {
   gap: 8px;
   align-items: flex-end;
   margin-bottom: 10px;
+}
+
+/* Scoped styles for rendered markdown */
+.markdown-body {
+  white-space: normal;
+  word-break: normal;
+}
+
+:deep(.markdown-body p) {
+  margin-bottom: 1em;
+}
+
+:deep(.markdown-body h1, .markdown-body h2, .markdown-body h3, .markdown-body h4, .markdown-body h5) {
+  margin-top: 1.5em;
+  margin-bottom: 1em;
+  font-weight: 600;
+}
+
+:deep(.markdown-body ul, .markdown-body ol) {
+  padding-left: 2em;
+  margin-bottom: 1em;
+}
+
+:deep(.markdown-body pre) {
+  background-color: #2d2d2d;
+  color: #f8f8f2;
+  padding: 1em;
+  border-radius: 6px;
+  margin-bottom: 1em;
+  overflow-x: auto;
+}
+
+:deep(.markdown-body code) {
+  background-color: #2d2d2d;
+  color: #f8f8f2;
+  padding: 0.2em 0.4em;
+  border-radius: 3px;
+  font-family: 'Courier New', Courier, monospace;
+}
+
+:deep(.markdown-body pre code) {
+  padding: 0;
+  background-color: transparent;
+}
+
+:deep(.markdown-body blockquote) {
+  border-left: 4px solid #ccc;
+  padding-left: 1em;
+  margin-left: 0;
+  color: #666;
+}
+
+:deep(.markdown-body table) {
+  border-collapse: collapse;
+  width: 100%;
+  margin-bottom: 1em;
+}
+
+:deep(.markdown-body th, .markdown-body td) {
+  border: 1px solid #ddd;
+  padding: 8px;
+}
+
+:deep(.markdown-body th) {
+  background-color: #f2f2f2;
 }
 </style>

@@ -24,6 +24,7 @@
     "@electron-toolkit/utils": "^4.0.0",
     "@google/genai": "^1.15.0",
     "@imengyu/vue3-context-menu": "^1.5.2",
+    "@types/marked": "^6.0.0",
     "ant-design-vue": "^4.2.3",
     "chart.js": "^4.4.3",
     "dayjs": "^1.11.10",
