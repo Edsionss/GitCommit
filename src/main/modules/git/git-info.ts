@@ -16,7 +16,7 @@ export function registerGitInfoHandlers() {
 
       while ((match = regex.exec(result)) !== null) {
         if (match[1] && match[2]) {
-          authors.push(`${match[1]} <${match[2]}>`)
+          authors.push(match[1])
         }
       }
 

@@ -6,9 +6,9 @@
           <span>字段与统计配置</span>
         </div>
       </template>
-      <a-form :model="form" layout="vertical">
+      <a-form :model="localForm" layout="vertical">
         <a-form-item label="字段选择">
-          <a-checkbox-group v-model:value="form.selectedFields">
+          <a-checkbox-group v-model:value="localForm.selectedFields">
             <a-checkbox value="repository">仓库名称</a-checkbox>
             <a-checkbox value="repoPath">仓库完整路径</a-checkbox>
             <a-checkbox value="commitId">完整提交ID</a-checkbox>
@@ -27,7 +27,7 @@
         <div class="form-row">
           <label class="form-row-label">统计选项</label>
           <a-select
-            v-model:value="form.statsDimension"
+            v-model:value="localForm.statsDimension"
             placeholder="选择统计维度"
             style="width: 200px"
           >
@@ -46,19 +46,19 @@
           <span>仓库与过滤配置</span>
         </div>
       </template>
-      <a-form :model="form" layout="vertical">
+      <a-form :model="localForm" layout="vertical">
         <a-form-item label="仓库路径">
           <a-input
-            v-model:value="form.repoPath"
+            v-model:value="localForm.repoPath"
             placeholder="请输入Git仓库路径"
             @change="validateRepoPath"
           >
             <template #prefix>
               <CheckCircleFilled v-if="isValidRepo" style="color: green" />
-              <CloseCircleFilled v-else-if="form.repoPath" style="color: red" />
+              <CloseCircleFilled v-else-if="localForm.repoPath" style="color: red" />
             </template>
             <template #suffix>
-              <CloseCircleFilled v-if="form.repoPath" class="clear-icon" @click="clearRepoPath" />
+              <CloseCircleFilled v-if="localForm.repoPath" class="clear-icon" @click="clearRepoPath" />
             </template>
             <template #addonAfter>
               <span @click="selectRepoPath" style="cursor: pointer">
@@ -102,26 +102,26 @@
 
         <div class="form-row">
           <label class="form-row-label">自动扫描子文件夹</label>
-          <a-switch v-model:checked="form.scanSubfolders" />
+          <a-switch v-model:checked="localForm.scanSubfolders" />
         </div>
 
         <a-form-item label="选择仓库">
           <a-input-group compact>
             <a-select
-              v-model:value="form.selectedRepos"
+              v-model:value="localForm.selectedRepos"
               mode="multiple"
               style="width: calc(100% - 110px)"
-              :disabled="!form.scanSubfolders || !form.repoPath"
+              :disabled="!localForm.scanSubfolders || !localForm.repoPath"
               placeholder="请先选择父目录并扫描子仓库"
               :options="
-                subRepos.map((repo) => ({ value: repo, label: repo.replace(form.repoPath, '') }))
+                subRepos.map((repo) => ({ value: repo, label: repo.replace(localForm.repoPath, '') }))
               "
             />
             <a-button
               style="width: 110px"
               @click="discoverSubRepos"
               :loading="isDiscoveringRepos"
-              :disabled="!form.scanSubfolders || !form.repoPath"
+              :disabled="!localForm.scanSubfolders || !localForm.repoPath"
             >
               扫描子仓库
             </a-button>
@@ -131,7 +131,7 @@
               type="link"
               @click="selectAllRepos"
               :disabled="
-                !form.scanSubfolders || !form.repoPath || !form.scanSubfolders || !form.repoPath
+                !localForm.scanSubfolders || !localForm.repoPath || !localForm.scanSubfolders || !localForm.repoPath
               "
             >
               <template #icon><CheckSquareOutlined /></template> 全选
@@ -140,7 +140,7 @@
               type="link"
               @click="clearAllRepos"
               :disabled="
-                !form.scanSubfolders || !form.repoPath || !form.scanSubfolders || !form.repoPath
+                !localForm.scanSubfolders || !localForm.repoPath || !localForm.scanSubfolders || !localForm.repoPath
               "
             >
               <template #icon><ClearOutlined /></template> 清空
@@ -151,7 +151,7 @@
         <a-form-item label="分支选择">
           <a-input-group compact>
             <a-select
-              v-model:value="form.branches"
+              v-model:value="localForm.branches"
               mode="multiple"
               show-search
               placeholder="默认为当前分支 (HEAD)，可搜索"
@@ -167,7 +167,7 @@
               style="width: 110px"
               @click="loadBranches"
               :loading="branchesLoading"
-              :disabled="!isValidRepo && !form.scanSubfolders"
+              :disabled="!isValidRepo && !localForm.scanSubfolders"
             >
               扫描分支
             </a-button>
@@ -182,8 +182,8 @@
             </a-button>
             <a-button
               type="link"
-              @click="form.branches = []"
-              :disabled="!form.branches || form.branches.length === 0"
+              @click="localForm.branches = []"
+              :disabled="!localForm.branches || localForm.branches.length === 0"
             >
               <template #icon><ClearOutlined /></template> 清空
             </a-button>
@@ -191,13 +191,13 @@
         </a-form-item>
 
         <a-form-item label="最大提交数" class="form-row-inline">
-          <a-input-number v-model:value="form.maxCommits" :min="0" :max="10000" />
+          <a-input-number v-model:value="localForm.maxCommits" :min="0" :max="10000" />
           <span class="hint">0表示不限制</span>
         </a-form-item>
 
         <a-form-item label="作者过滤">
           <a-select
-            v-model:value="form.authorFilter"
+            v-model:value="localForm.authorFilter"
             mode="tags"
             placeholder="选择或输入作者名称/邮箱"
             style="width: 100%"
@@ -209,7 +209,7 @@
               type="link"
               @click="loadAuthors"
               :loading="authorsLoading"
-              :disabled="!isValidRepo || form.scanSubfolders"
+              :disabled="!isValidRepo || localForm.scanSubfolders"
             >
               <template #icon><SyncOutlined /></template> 扫描作者
             </a-button>
@@ -222,8 +222,8 @@
             </a-button>
             <a-button
               type="link"
-              @click="form.authorFilter = []"
-              :disabled="!form.authorFilter || form.authorFilter.length === 0"
+              @click="localForm.authorFilter = []"
+              :disabled="!localForm.authorFilter || localForm.authorFilter.length === 0"
             >
               <template #icon><ClearOutlined /></template> 清空
             </a-button>
@@ -239,7 +239,7 @@
               <a-radio-button value="自定义">自定义</a-radio-button>
             </a-radio-group>
             <a-range-picker
-              v-model:value="form.dateRange"
+              v-model:value="localForm.dateRange"
               show-time
               format="YYYY-MM-DD HH:mm"
               value-format="YYYY-MM-DD HH:mm:ss"
@@ -250,7 +250,7 @@
         </a-form-item>
 
         <a-form-item label="输出格式">
-          <a-select v-model:value="form.outputFormat" placeholder="选择输出格式">
+          <a-select v-model:value="localForm.outputFormat" placeholder="选择输出格式">
             <a-select-option value="json">JSON</a-select-option>
             <a-select-option value="csv">CSV</a-select-option>
             <a-select-option value="excel">Excel</a-select-option>

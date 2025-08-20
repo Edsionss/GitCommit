@@ -95,16 +95,20 @@ const startScan = async () => {
 
   addLog(`开始扫描仓库: ${form.repoPath}`)
 
+  const scanOptions = {
+    authorFilter: [...form.authorFilter],
+    dateRange: form.dateRange.map((d) => d.format('YYYY-MM-DD HH:mm:ss')) as [string, string],
+    selectedFields: [...form.selectedFields],
+    maxCommits: form.maxCommits || undefined,
+    branches: form.branches.join(','),
+    scanSubfolders: form.scanSubfolders,
+    selectedRepos: [...form.selectedRepos]
+  }
+
+  addLog(`扫描选项: ${JSON.stringify(scanOptions, null, 2)}`, 'info')
+
   try {
-    const commits = await window.api.scanGitRepo(form.repoPath, {
-      authorFilter: form.authorFilter.join(','),
-      dateRange: form.dateRange.map((d) => d.format('YYYY-MM-DD HH:mm:ss')) as [string, string],
-      selectedFields: [...form.selectedFields],
-      maxCommits: form.maxCommits || undefined,
-      branches: form.branches.join(','),
-      scanSubfolders: form.scanSubfolders,
-      selectedRepos: [...form.selectedRepos]
-    })
+    const commits = await window.api.scanGitRepo(form.repoPath, scanOptions)
 
     addLog(`扫描完成，共找到 ${commits.length} 条提交记录`, 'success')
     hasResults.value = true
@@ -140,25 +144,6 @@ const startScan = async () => {
     const errorMsg = error instanceof Error ? error.message : String(error)
     addLog(`扫描失败: ${errorMsg}`, 'error')
     message.error(`扫描失败: ${errorMsg}`)
-
-    // --- FIX START: 保存失败记录到扫描历史 ---
-    const history = JSON.parse(localStorage.getItem('scanHistory') || '[]')
-    const newRecord = {
-      id: dayjs().valueOf().toString(),
-      repoPath: form.repoPath || '未知仓库',
-      scanTime: dayjs().toISOString(),
-      status: 'failed',
-      totalCommits: 0,
-      scanOptions: { ...form },
-      log: [...currentLogs.value],
-      results: []
-    }
-    history.unshift(newRecord)
-    localStorage.setItem('scanHistory', JSON.stringify(history))
-    // --- FIX END ---
-
-    // 跳转到扫描记录页面
-    router.push({ name: 'ScanHistory' })
   }
 }
 

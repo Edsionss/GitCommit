@@ -27,8 +27,8 @@
       <template #expandedRowRender="{ record }">
         <div class="expanded-row-content">
           <p><strong>完整提交ID:</strong> <a-typography-paragraph copyable style="display: inline;">{{ record.commitId }}</a-typography-paragraph></p>
-          <p><strong>消息:</strong> <pre class="commit-message-pre">{{ record.message }}</pre></p>
-          <p v-if="record.body"><strong>详细描述:</strong> <pre class="commit-message-pre">{{ record.body }}</pre></p>
+          <div><strong>消息:</strong> <pre class="commit-message-pre">{{ record.message }}</pre></div>
+          <div v-if="record.body"><strong>详细描述:</strong> <pre class="commit-message-pre">{{ record.body }}</pre></div>
           <p>
             <strong>邮箱:</strong> {{ record.email }}
             <a-divider type="vertical" />

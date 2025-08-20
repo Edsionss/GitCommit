@@ -21,7 +21,7 @@ export interface GitCommit {
 
 // Git扫描选项
 export interface GitScanOptions {
-  authorFilter?: string
+  authorFilter?: string[]
   dateRange?: [string, string]
   selectedFields: string[]
   maxCommits?: number
@@ -81,6 +81,7 @@ export function registerGitScanHandlers() {
         const git: SimpleGit = simpleGit(currentRepoPath)
 
         const logOptions: LogOptions = {
+          '-i': null, // 忽略大小写
           '--no-merges': null,
           '--date': 'iso',
           '--pretty': 'format:%H|%h|%an|%ae|%ad|%s|%b',
@@ -93,12 +94,7 @@ export function registerGitScanHandlers() {
         if (options?.maxCommits && options.maxCommits > 0) {
           logOptions['-n'] = options.maxCommits;
         }
-        if (options?.authorFilter) {
-          const authors = options.authorFilter.split(',').map((a) => a.trim()).filter(a => a);
-          if (authors.length > 0) {
-            logOptions['--author'] = authors;
-          }
-        }
+        
         if (options?.dateRange && options.dateRange[0] && options.dateRange[1]) {
           logOptions['--after'] = `"${options.dateRange[0]}"`;
           logOptions['--before'] = `"${options.dateRange[1]}"`;
