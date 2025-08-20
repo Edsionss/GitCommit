@@ -95,12 +95,12 @@ const sendMessage = async () => {
 
     if (!aiConfig || !aiConfig.provider || !aiConfig.apiKey) {
       throw new Error(
-        'AI settings are incomplete. Please configure provider and API key in Settings.'
+        // 'AI settings are incomplete. Please configure provider and API key in Settings.'
+        '请设置AI源和API密钥'
       )
     }
 
     const result = await window.api.aiChat(text, aiConfig)
-
     // Remove loading indicator
     messages.value.pop()
 
