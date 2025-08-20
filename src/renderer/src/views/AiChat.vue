@@ -288,6 +288,10 @@ const sendMessage = async () => {
   margin-bottom: 1em;
 }
 
+:deep(.markdown-body li) {
+  list-style-position: inside;
+}
+
 :deep(.markdown-body pre) {
   background-color: #2d2d2d;
   color: #f8f8f2;
