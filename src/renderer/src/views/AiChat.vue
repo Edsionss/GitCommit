@@ -88,19 +88,21 @@ const sendMessage = async () => {
 
   try {
     const appSettings = settingsStore.appSettings
-    if (!appSettings) {
-      throw new Error('AI settings not found. Please configure them first in the Settings page.')
+    if (!appSettings || !appSettings.ai) {
+      throw new Error('请在设置页面中配置AI设置。')
     }
+    
     const aiConfig = appSettings.ai
 
-    if (!aiConfig || !aiConfig.provider || !aiConfig.apiKey) {
-      throw new Error(
-        // 'AI settings are incomplete. Please configure provider and API key in Settings.'
-        '请设置AI源和API密钥'
-      )
+    if (!aiConfig.provider || !aiConfig.apiKey) {
+      throw new Error('请设置AI源和API密钥')
     }
 
-    const result = await window.api.aiChat(text, aiConfig)
+    // FIX: Convert reactive object to a plain JS object before sending
+    const plainAiConfig = JSON.parse(JSON.stringify(aiConfig))
+
+    const result = await window.api.aiChat(text, plainAiConfig)
+
     // Remove loading indicator
     messages.value.pop()
 
@@ -113,8 +115,11 @@ const sendMessage = async () => {
     const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred.'
     antMessage.error(errorMessage)
     // Remove loading indicator on error
-    messages.value.pop()
-    messages.value.push({ sender: 'ai', text: `Error: ${errorMessage}` })
+    const lastMessage = messages.value[messages.value.length - 1]
+    if (lastMessage?.isLoading) {
+      messages.value.pop()
+    }
+    messages.value.push({ sender: 'ai', text: `错误: ${errorMessage}` })
   } finally {
     isLoading.value = false
     scrollToBottom()
