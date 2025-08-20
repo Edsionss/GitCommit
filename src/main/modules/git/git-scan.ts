@@ -100,6 +100,10 @@ export function registerGitScanHandlers() {
           logOptions['--before'] = `"${options.dateRange[1]}"`;
         }
 
+        if (options?.authorFilter && options.authorFilter.length > 0) {
+          logOptions['--author'] = options.authorFilter.join('|');
+        }
+
         sendProgress(`${progressPrefix} - 获取提交历史`, 20 + (i / totalRepos) * 80)
         const logResult = await git.log(logOptions)
 
