@@ -31,10 +31,12 @@
       </a-form-item>
 
       <a-form-item label="启用会话记忆">
-        <template #extra>
-          开启后，AI 将记住之前的对话内容。但这会消耗更多的 Token。
-        </template>
+        <template #extra> 开启后，AI 将记住之前的对话内容。但这会消耗更多的 Token。 </template>
         <a-switch v-model:checked="form.enableAiHistory" />
+      </a-form-item>
+      <a-form-item label="自动保存会话">
+        <template #extra> 开启后，AI 将自动保存会话，不需要手动保存。 </template>
+        <a-switch v-model:checked="form.enableAutoSave" />
       </a-form-item>
     </a-form>
   </a-card>
@@ -49,6 +51,7 @@ interface AiSettings {
   endpoint?: string
   model?: string
   enableAiHistory?: boolean
+  enableAutoSave?: boolean
 }
 
 const props = defineProps({

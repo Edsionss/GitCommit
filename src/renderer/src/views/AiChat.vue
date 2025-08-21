@@ -25,9 +25,7 @@
                 </template>
                 <template #title>
                   <span>{{
-                    item.sender === 'user'
-                      ? 'You'
-                      : settingsStore?.appSettings?.ai?.model || 'AI Assistant'
+                    item.sender === 'user' ? 'You' : appSettings?.ai?.model || 'AI Assistant'
                   }}</span>
                 </template>
                 <template #description>
@@ -88,6 +86,8 @@ const settingsStore = useSettingsStore()
 const chatStore = useChatStore()
 const { activeSession } = storeToRefs(chatStore)
 
+const { appSettings } = storeToRefs(settingsStore)
+
 const isSidebarVisible = ref(true)
 
 const borderStyle = computed(() => {
@@ -114,7 +114,7 @@ const scrollToBottom = () => {
 watch(activeSession, () => scrollToBottom(), { deep: true, immediate: true })
 
 const saveCurrentSession = () => {
-  // The store saves automatically, so this is just for user feedback.
+  chatStore._saveToLocalStorage()
   antMessage.success('会话保存成功！')
 }
 
@@ -135,17 +135,17 @@ const sendMessage = async () => {
   if (!text || isLoading.value) return
   userInput.value = ''
   const userMessage = { sender: 'user' as const, text }
-  chatStore.addMessageToActiveSession(userMessage)
+  chatStore.addMessageToActiveSession(userMessage, appSettings.value.ai.enableAutoSave)
   chatStore.ThinkIngLoading(true)
   scrollToBottom()
   isLoading.value = true
   try {
-    const appSettings = settingsStore.appSettings
-    if (!appSettings || !appSettings.ai) {
+    // const appSettings = settingsStore.appSettings
+    if (!appSettings.value || !appSettings.value.ai) {
       throw new Error('请在设置页面中配置AI设置。')
     }
 
-    const aiConfig = appSettings.ai
+    const aiConfig = appSettings.value.ai
     if (!aiConfig.provider || !aiConfig.apiKey) {
       throw new Error('请设置AI源和API密钥')
     }
@@ -166,14 +166,20 @@ const sendMessage = async () => {
     chatStore.ThinkIngLoading(false)
 
     if (result.success) {
-      chatStore.addMessageToActiveSession({ sender: 'ai', text: result.message })
+      chatStore.addMessageToActiveSession(
+        { sender: 'ai', text: result.message },
+        aiConfig.enableAutoSave
+      )
     } else {
       throw new Error(result.error)
     }
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred.'
     antMessage.error(errorMessage)
-    chatStore.addMessageToActiveSession({ sender: 'ai', text: `错误: ${errorMessage}` })
+    chatStore.addMessageToActiveSession(
+      { sender: 'ai', text: `错误: ${errorMessage}` },
+      appSettings.value.ai.enableAutoSave
+    )
   } finally {
     isLoading.value = false
     scrollToBottom()

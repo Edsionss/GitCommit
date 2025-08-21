@@ -59,7 +59,7 @@ const { sessionHistory, activeSessionId } = storeToRefs(chatStore)
 }
 
 .sidebar-header {
-  padding: 16px;
+  padding: 11.5px;
   border-bottom: 1px solid var(--color-border);
   display: flex;
   justify-content: space-between;

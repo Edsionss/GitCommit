@@ -76,7 +76,7 @@ export const useChatStore = defineStore('chat', () => {
     }
   }
 
-  function addMessageToActiveSession(message: Omit<Message, 'isLoading'>) {
+  function addMessageToActiveSession(message: Omit<Message, 'isLoading'>, isSave: boolean) {
     if (!activeSession.value) return
 
     // If this is the first user message, update the session name
@@ -85,7 +85,9 @@ export const useChatStore = defineStore('chat', () => {
     }
 
     activeSession.value.messages.push(message)
-    _saveToLocalStorage()
+    console.log(isSave)
+
+    isSave && _saveToLocalStorage()
   }
 
   function deleteSession(sessionId: string) {
@@ -124,6 +126,7 @@ export const useChatStore = defineStore('chat', () => {
     setActiveSession,
     addMessageToActiveSession,
     deleteSession,
-    ThinkIngLoading
+    ThinkIngLoading,
+    _saveToLocalStorage
   }
 })

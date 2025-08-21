@@ -1,7 +1,6 @@
 <template>
   <div class="settings-container page-container">
-    <h2 class="page-title">设置</h2>
-
+    <!-- <h2 class="page-title">设置</h2> -->
     <AppearanceSettings
       :settings="settings.appearance"
       @update:theme="updateTheme($event)"
@@ -54,7 +53,6 @@
         <template #tooltip><div>重置设置</div></template>
       </a-float-button>
     </a-float-button-group>
-
   </div>
 </template>
 
