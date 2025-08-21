@@ -32,7 +32,9 @@
                 </template>
                 <template #description>
                   <div class="message-content">
-                    <div v-if="item.isLoading"><a-spin /></div>
+                    <div v-if="item.isLoading">
+                      <Loading></Loading>
+                    </div>
                     <div
                       v-else-if="item.sender === 'ai'"
                       v-html="renderMarkdown(item.text)"
@@ -45,11 +47,7 @@
             </a-list-item>
           </template>
         </a-list>
-        <!-- <div v-if="isLoading" class="loading-spinner">
-          <a-spin tip="AI 正在思考中..."></a-spin>
-        </div> -->
       </div>
-
       <div class="chat-input-area">
         <a-textarea
           v-model:value="userInput"
@@ -80,6 +78,7 @@ import { storeToRefs } from 'pinia'
 import { marked } from 'marked'
 import ChatHistorySidebar from '@/components/AiChat/ChatHistorySidebar.vue'
 import ChatToolbar from '@/components/AiChat/ChatToolbar.vue'
+import Loading from '@/components/Loading/index.vue'
 
 const userInput = ref('')
 const isLoading = ref(false)
@@ -134,13 +133,12 @@ const deleteSession = (sessionId: string) => {
 const sendMessage = async () => {
   const text = userInput.value.trim()
   if (!text || isLoading.value) return
-
-  const userMessage = { sender: 'user' as const, text }
   userInput.value = ''
+  const userMessage = { sender: 'user' as const, text }
   chatStore.addMessageToActiveSession(userMessage)
+  chatStore.ThinkIngLoading(true)
   scrollToBottom()
   isLoading.value = true
-
   try {
     const appSettings = settingsStore.appSettings
     if (!appSettings || !appSettings.ai) {
@@ -165,6 +163,7 @@ const sendMessage = async () => {
     }
 
     const result = await window.api.aiChat(text, plainAiConfig, history)
+    chatStore.ThinkIngLoading(false)
 
     if (result.success) {
       chatStore.addMessageToActiveSession({ sender: 'ai', text: result.message })

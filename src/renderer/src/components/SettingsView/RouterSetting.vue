@@ -1,6 +1,5 @@
 <template>
   <div class="routes-view-container">
-    <h2 class="page-title">菜单与路由管理</h2>
     <a-table :columns="columns" :data-source="routes" :row-key="'name'" :pagination="false">
       <template #expandedRowRender="{ record }">
         <div class="expanded-row-content">

@@ -29,7 +29,9 @@ export const useChatStore = defineStore('chat', () => {
   })
 
   const sessionHistory = computed(() => {
-    return sessions.value.map(({ id, name, startTime }) => ({ id, name, startTime })).sort((a, b) => new Date(b.startTime).getTime() - new Date(a.startTime).getTime());
+    return sessions.value
+      .map(({ id, name, startTime }) => ({ id, name, startTime }))
+      .sort((a, b) => new Date(b.startTime).getTime() - new Date(a.startTime).getTime())
   })
 
   // Actions
@@ -43,10 +45,12 @@ export const useChatStore = defineStore('chat', () => {
       sessions.value = JSON.parse(savedSessions)
       if (sessions.value.length > 0) {
         // Make the most recent session active
-        const sorted = [...sessions.value].sort((a, b) => new Date(b.startTime).getTime() - new Date(a.startTime).getTime());
-        activeSessionId.value = sorted[0].id;
+        const sorted = [...sessions.value].sort(
+          (a, b) => new Date(b.startTime).getTime() - new Date(a.startTime).getTime()
+        )
+        activeSessionId.value = sorted[0].id
       } else {
-        createNewSession();
+        createNewSession()
       }
     } else {
       createNewSession()
@@ -63,11 +67,11 @@ export const useChatStore = defineStore('chat', () => {
     sessions.value.unshift(newSession) // Add to the beginning
     activeSessionId.value = newSession.id
     _saveToLocalStorage()
-    return newSession.id;
+    return newSession.id
   }
 
   function setActiveSession(sessionId: string) {
-    if (sessions.value.some(s => s.id === sessionId)) {
+    if (sessions.value.some((s) => s.id === sessionId)) {
       activeSessionId.value = sessionId
     }
   }
@@ -77,7 +81,7 @@ export const useChatStore = defineStore('chat', () => {
 
     // If this is the first user message, update the session name
     if (activeSession.value.name === '新会话' && message.sender === 'user') {
-        activeSession.value.name = message.text.substring(0, 30); // Use first 30 chars as name
+      activeSession.value.name = message.text.substring(0, 30) // Use first 30 chars as name
     }
 
     activeSession.value.messages.push(message)
@@ -85,15 +89,26 @@ export const useChatStore = defineStore('chat', () => {
   }
 
   function deleteSession(sessionId: string) {
-    sessions.value = sessions.value.filter(s => s.id !== sessionId);
+    sessions.value = sessions.value.filter((s) => s.id !== sessionId)
     if (activeSessionId.value === sessionId) {
-        if (sessions.value.length > 0) {
-            setActiveSession(sessions.value[0].id);
-        } else {
-            createNewSession();
-        }
+      if (sessions.value.length > 0) {
+        setActiveSession(sessions.value[0].id)
+      } else {
+        createNewSession()
+      }
     }
-    _saveToLocalStorage();
+    _saveToLocalStorage()
+  }
+
+  function ThinkIngLoading(isLoading: boolean) {
+    if (!activeSession.value) return
+    if (isLoading) {
+      activeSession.value.messages.push({ sender: 'ai' as const, text: '', isLoading: true })
+    } else {
+      activeSession.value.messages = activeSession.value.messages.filter(
+        (item) => item.isLoading !== true
+      )
+    }
   }
 
   // Initial load
@@ -108,6 +123,7 @@ export const useChatStore = defineStore('chat', () => {
     createNewSession,
     setActiveSession,
     addMessageToActiveSession,
-    deleteSession
+    deleteSession,
+    ThinkIngLoading
   }
 })
