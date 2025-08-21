@@ -65,6 +65,8 @@ const api = {
   // AI Chat
   aiChat: (prompt: string, aiConfig: any, history?: ChatMessage[]): Promise<any> =>
     ipcRenderer.invoke('ai:chat', prompt, aiConfig, history),
+  onChatStreamChunk: (callback: (chunk: string) => void) =>
+    ipcRenderer.on('ai:chatStream:chunk', (_, chunk) => callback(chunk)),
 
   // 监听事件
   onScanProgress: (callback: (data: any) => void) => {

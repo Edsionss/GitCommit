@@ -83,11 +83,9 @@ export const useChatStore = defineStore('chat', () => {
     if (activeSession.value.name === '新会话' && message.sender === 'user') {
       activeSession.value.name = message.text.substring(0, 30) // Use first 30 chars as name
     }
-
     activeSession.value.messages.push(message)
-    console.log(isSave)
-
     isSave && _saveToLocalStorage()
+    return activeSession.value.messages[activeSession.value.messages.length - 1]
   }
 
   function deleteSession(sessionId: string) {

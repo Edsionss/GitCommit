@@ -23,7 +23,7 @@
       </div>
 
       <a-form-item label="使用模型">
-        <a-select v-model:value="form.model" placeholder="请选择模型">
+        <a-select v-model:value="form.model" placeholder="请选择模型" mode="combobox">
           <a-select-option :value="model.value" v-for="model in modelOption">{{
             model.label
           }}</a-select-option>
@@ -37,6 +37,11 @@
       <a-form-item label="自动保存会话">
         <template #extra> 开启后，AI 将自动保存会话，不需要手动保存。 </template>
         <a-switch v-model:checked="form.enableAutoSave" />
+      </a-form-item>
+
+      <a-form-item label="流式传输">
+        <template #extra> 开启后，AI 将进行流式渲染，否则是阻塞渲染。 </template>
+        <a-switch v-model:checked="form.enableStreaming" />
       </a-form-item>
     </a-form>
   </a-card>
@@ -52,6 +57,7 @@ interface AiSettings {
   model?: string
   enableAiHistory?: boolean
   enableAutoSave?: boolean
+  enableStreaming?: boolean
 }
 
 const props = defineProps({

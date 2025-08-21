@@ -17,44 +17,49 @@ interface SelectDirectoryResult {
 }
 
 interface GetSubReposResult {
-  success: boolean;
-  repos?: string[];
-  error?: string;
+  success: boolean
+  repos?: string[]
+  error?: string
 }
 
 interface AiConfig {
-  provider: 'openai' | 'gemini' | 'anthropic' | 'custom' | null;
-  apiKey: string;
-  endpoint?: string;
-  model?: string;
+  provider: 'openai' | 'gemini' | 'anthropic' | 'custom' | null
+  apiKey: string
+  endpoint?: string
+  model?: string
 }
 
 interface AiChatResponse {
-  success: boolean;
-  message?: string;
-  error?: string;
+  success: boolean
+  message?: string
+  error?: string
 }
 
 interface ChatMessage {
-  sender: 'user' | 'ai';
-  text: string;
+  sender: 'user' | 'ai'
+  text: string
 }
 
 // Define the shape of the API object
 interface ExposedAPI {
-  selectDirectory: () => Promise<SelectDirectoryResult | null>;
-  validateRepoPath: (path: string) => Promise<boolean>;
-  getRepoAuthors: (repoPaths: string[]) => Promise<string[]>;
-  getRepoBranches: (repoPath: string) => Promise<string[]>;
-  getSubRepos: (repoPath: string) => Promise<GetSubReposResult>;
-  scanGitRepo: (repoPath: string, options?: GitScanOptions) => Promise<any>;
-  saveFile: (options: any) => Promise<string | null>;
-  cancelScan: () => void;
-  aiChat: (prompt: string, aiConfig: AiConfig, history?: ChatMessage[]) => Promise<AiChatResponse>;
-  onScanProgress: (callback: (data: any) => void) => () => void;
-  onScanError: (callback: (data: any) => void) => () => void;
-  onScanCancelled: (callback: () => void) => () => void;
-  onAddLog: (callback: (message: string, type: string) => void) => () => void;
+  selectDirectory: () => Promise<SelectDirectoryResult | null>
+  validateRepoPath: (path: string) => Promise<boolean>
+  getRepoAuthors: (repoPaths: string[]) => Promise<string[]>
+  getRepoBranches: (repoPath: string) => Promise<string[]>
+  getSubRepos: (repoPath: string) => Promise<GetSubReposResult>
+  scanGitRepo: (repoPath: string, options?: GitScanOptions) => Promise<any>
+  saveFile: (options: any) => Promise<string | null>
+  cancelScan: () => void
+  aiChat: (
+    prompt: string,
+    aiConfig: AiConfig,
+    history?: ChatMessage[],
+    isStream?: boolean
+  ) => Promise<AiChatResponse>
+  onScanProgress: (callback: (data: any) => void) => () => void
+  onScanError: (callback: (data: any) => void) => () => void
+  onScanCancelled: (callback: () => void) => () => void
+  onAddLog: (callback: (message: string, type: string) => void) => () => void
 }
 
 declare global {
