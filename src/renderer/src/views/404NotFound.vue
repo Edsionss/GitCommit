@@ -73,11 +73,20 @@
 /* Design Inspired by one of Stefan Devai's Design on Dribble */
 
 .main_wrapper {
-  display: flex;
+  /* display: flex;
   align-items: center;
   justify-content: center;
   width: 30em;
-  height: 30em;
+  height: 30em; */
+
+  top: 50%;
+  left: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 50em;
+  height: 50em;
+  transform: translate(-50%, -50%);
 }
 
 .main {
