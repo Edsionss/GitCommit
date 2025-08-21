@@ -16,9 +16,9 @@ export interface RouteRecord {
 
 const defaultRoutes: RouteRecord[] = [
   {
-    path: '',
+    path: '/',
     name: 'Dashboard',
-    componentPath: '../views/Dashboard.vue',
+    componentPath: '@views/Dashboard.vue',
     meta: { title: '仪表盘', keepAlive: true },
     isMenu: true,
     menuOrder: 0
@@ -26,7 +26,7 @@ const defaultRoutes: RouteRecord[] = [
   {
     path: 'scan',
     name: 'Scan',
-    componentPath: '../views/BasicSettings.vue',
+    componentPath: '@views/BasicSettings.vue',
     meta: { title: '开始扫描', keepAlive: false },
     isMenu: true,
     menuOrder: 10
@@ -42,23 +42,23 @@ const defaultRoutes: RouteRecord[] = [
   {
     path: 'commits',
     name: 'Commits',
-    componentPath: '../views/CommitsView.vue',
+    componentPath: '@views/CommitsView.vue',
     meta: { title: '提交记录', keepAlive: true },
     isMenu: true,
     menuOrder: 30
   },
   {
     path: 'branches',
-    name: 'BranchesView',
-    componentPath: '../views/BranchesView.vue',
+    name: 'Branches',
+    componentPath: '@views/BranchesView.vue',
     meta: { title: '分支管理', keepAlive: true },
     isMenu: true,
     menuOrder: 40
   },
   {
     path: 'analysis',
-    name: 'CodeAnalysis',
-    componentPath: '../views/CodeAnalysis.vue',
+    name: 'Analysis',
+    componentPath: '@views/CodeAnalysis.vue',
     meta: { title: '代码分析', keepAlive: true },
     isMenu: true,
     menuOrder: 50
@@ -66,15 +66,15 @@ const defaultRoutes: RouteRecord[] = [
   {
     path: 'reports',
     name: 'Reports',
-    componentPath: '../views/Reports.vue',
+    componentPath: '@views/Reports.vue',
     meta: { title: '报告生成', keepAlive: true },
     isMenu: true,
     menuOrder: 60
   },
   {
-    path: 'ai-chat',
+    path: 'aiChat',
     name: 'AiChat',
-    componentPath: '../views/AiChat.vue',
+    componentPath: '@views/AiChat.vue',
     meta: { title: 'AI Chat', keepAlive: false },
     isMenu: true,
     menuOrder: 70
@@ -90,10 +90,18 @@ const defaultRoutes: RouteRecord[] = [
   {
     path: 'routes',
     name: 'RoutesView',
-    componentPath: '../views/RoutesView.vue',
+    componentPath: '@views/RoutesView.vue',
     meta: { title: '路由管理', keepAlive: false },
     isMenu: false,
     menuOrder: 999
+  },
+  {
+    path: 'settings',
+    name: 'Settings',
+    componentPath: '@views/Settings.vue',
+    meta: { title: '设置', keepAlive: false },
+    isMenu: false,
+    menuOrder: 1000
   }
 ]
 
