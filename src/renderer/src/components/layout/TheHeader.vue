@@ -69,19 +69,8 @@ import {
 const router = useRouter()
 const route = useRoute()
 
-// 页面标题
-const pageMap = {
-  '/': '仪表盘',
-  '/commits': '提交记录',
-  '/branches': '分支管理',
-  '/analysis': '代码分析',
-  '/reports': '报告生成',
-  '/settings': '设置'
-}
-
 const currentPageTitle = computed(() => {
-  const path = route.path
-  return pageMap[path] || '页面'
+  return route.meta.title || ''
 })
 
 // 仓库列表

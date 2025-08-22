@@ -172,6 +172,7 @@ const filterScanHistory = () => {
 // 方法：选择扫描记录
 const selectScanRecord = (record: ScanRecord) => {
   selectedRecord.value = record
+  console.log('选择扫描记录：', record)
 }
 
 // 方法：导出扫描结果
@@ -196,7 +197,6 @@ onMounted(() => {
 })
 
 // 暴露给外部的方法，用于从BasicSettings页面接收扫描结果
-
 </script>
 
 <style scoped>

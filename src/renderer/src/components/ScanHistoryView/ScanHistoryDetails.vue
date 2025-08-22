@@ -21,6 +21,9 @@
         <a-tab-pane key="results" tab="扫描结果">
           <ScanResultsTable :results="record.results" class="detail-item" />
         </a-tab-pane>
+        <a-tab-pane key="analysis" tab="AI分析">
+          <ScanAnalysis @analysis="onAnalysis"></ScanAnalysis>
+        </a-tab-pane>
       </a-tabs>
     </div>
     <a-empty v-else description="请选择一条扫描记录查看详情" />
@@ -32,7 +35,13 @@ import { ref, PropType } from 'vue'
 import ScanParametersTab from './ScanParametersTab.vue'
 import ScanResultsTable from './ScanResultsTable.vue'
 import ScanLogTab from './ScanLogTab.vue'
+import ScanAnalysis from './ScanAnalysis.vue'
 import { GitCommit, GitScanOptions } from '@services/GitService'
+import { useDataStore } from '@/stores/dataStore'
+import { useRouter } from 'vue-router'
+
+const dataStore = useDataStore()
+const router = useRouter()
 
 interface ScanRecord {
   id: string
@@ -45,7 +54,7 @@ interface ScanRecord {
   results: GitCommit[]
 }
 
-defineProps({
+const props = defineProps({
   record: { type: Object as PropType<ScanRecord | null>, default: null },
   loading: { type: Boolean, default: false }
 })
@@ -53,6 +62,12 @@ defineProps({
 defineEmits(['exportResults'])
 
 const activeTab = ref('parameters')
+
+const onAnalysis = () => {
+  dataStore.setScanResultList(props.record?.results)
+  dataStore.setScanId(props.record?.id)
+  router.push({ path: '/aiChat', query: { id: props.record?.id } })
+}
 </script>
 
 <style scoped>

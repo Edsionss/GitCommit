@@ -10,34 +10,29 @@
       <a-descriptions-item label="最大提交数">{{
         record.scanOptions.maxCommits || '无限制'
       }}</a-descriptions-item>
+      <a-descriptions-item label="日期范围">{{
+        (record?.scanOptions?.dateRange && formatDateRange(record?.scanOptions?.dateRange)) || ''
+      }}</a-descriptions-item>
       <a-descriptions-item label="选择字段" :span="2">{{
         record.scanOptions.selectedFields.join(', ')
       }}</a-descriptions-item>
       <a-descriptions-item label="扫描子文件夹">{{
         record.scanOptions.scanSubfolders ? '是' : '否'
       }}</a-descriptions-item>
-      <a-descriptions-item v-if="record.scanOptions.branch" label="分支">{{
-        record.scanOptions.branch
-      }}</a-descriptions-item>
+      <a-descriptions-item label="分支">{{ record.scanOptions.branch }}</a-descriptions-item>
 
-      <a-descriptions-item v-if="record.scanOptions.authorFilter" label="作者过滤" :span="2">{{
+      <a-descriptions-item label="作者过滤" :span="2">{{
         record.scanOptions.authorFilter
       }}</a-descriptions-item>
-      <a-descriptions-item
-        v-if="record.scanOptions.dateRange && record.scanOptions.dateRange.length === 2"
-        label="日期范围"
-        :span="2"
-        >{{ formatDateRange(record.scanOptions.dateRange) }}</a-descriptions-item
-      >
-      <a-descriptions-item
-        v-if="record.scanOptions.selectedRepos && record.scanOptions.selectedRepos.length > 0"
-        label="选择的子仓库"
-        :span="2"
-      >
-        <div v-for="(repo, index) in record.scanOptions.selectedRepos" style="margin-bottom: 5px">
+
+      <a-descriptions-item label="选择的子仓库" :span="2">
+        <div
+          v-if="record.scanOptions.selectedRepos && record.scanOptions.selectedRepos.length > 0"
+          v-for="(repo, index) in record.scanOptions.selectedRepos"
+          style="margin-bottom: 5px"
+        >
           <a-tag :key="repo + index" color="blue">{{ repo }}</a-tag>
         </div>
-
         <!-- {{ record.scanOptions.selectedRepos.join(', ') }} -->
       </a-descriptions-item>
     </a-descriptions>

@@ -88,6 +88,9 @@ import { storeToRefs } from 'pinia'
 import { marked } from 'marked'
 import Loading from '@/components/Loading/index.vue'
 import { message as antMessage } from 'ant-design-vue'
+import { useRoute } from 'vue-router'
+import { useDataStore } from '@/stores/dataStore'
+
 const props = defineProps<{
   isSidebarVisible: boolean
 }>()
@@ -128,9 +131,9 @@ const renderMarkdown = (text: string) => {
   return marked.parse(text, { gfm: true, breaks: true })
 }
 
-const sendMessage = async () => {
+const sendMessage = async (input?: string) => {
   startSend.value = true
-  const text = userInput.value.trim()
+  const text = input?.trim() || userInput.value.trim()
   if (!text || isLoading.value) return
   userInput.value = ''
   const userMessage = { sender: 'user' as const, text }
@@ -188,6 +191,20 @@ const sendMessage = async () => {
   } finally {
     isLoading.value = false
     scrollToBottom()
+  }
+}
+
+const route = useRoute()
+
+const dataStore = useDataStore()
+
+autoAnalysisScanRecord(route.query, dataStore.getScanResultList)
+
+function autoAnalysisScanRecord(query: any, record: any[]) {
+  if (query?.id && record && record.length) {
+    chatStore.createNewSession()
+    const resultInput = `请按照如下规则:${'1.根据这段提交记录的日期先得到其中的工作日 2.根据提交内容和提交代码行数以及提交信息进行综合分析 3.总结出与工作日相对应的人天信息，综合分配每个任务的人天 '}对这段git提交记录进行分析${JSON.stringify(record)}`
+    sendMessage(resultInput)
   }
 }
 </script>
