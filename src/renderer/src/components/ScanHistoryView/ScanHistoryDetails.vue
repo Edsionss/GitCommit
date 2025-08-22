@@ -22,7 +22,7 @@
           <ScanResultsTable :results="record.results" class="detail-item" />
         </a-tab-pane>
         <a-tab-pane key="analysis" tab="AI分析">
-          <ScanAnalysis @analysis="onAnalysis"></ScanAnalysis>
+          <ScanAnalysis :record="record" @analysis="onAnalysis"></ScanAnalysis>
         </a-tab-pane>
       </a-tabs>
     </div>
@@ -66,7 +66,8 @@ const activeTab = ref('parameters')
 const onAnalysis = () => {
   dataStore.setScanResultList(props.record?.results)
   dataStore.setScanId(props.record?.id)
-  router.push({ path: '/aiChat', query: { id: props.record?.id } })
+  // router.push({ path: '/aiChat', query: { id: props.record?.id } })
+  router.push({ path: '/aiChat' })
 }
 </script>
 

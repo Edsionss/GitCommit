@@ -24,7 +24,7 @@
                   v-html="renderMarkdown(item.text)"
                   class="markdown-body"
                 ></div>
-                <div v-else>{{ item.text }}</div>
+                <div v-else v-html="renderMarkdown(item.text)" class="markdown-body"></div>
               </div>
             </template>
           </a-list-item-meta>
@@ -81,15 +81,30 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, nextTick, watch } from 'vue'
+import { ref, computed, nextTick, watch, onMounted } from 'vue'
 import { useChatStore } from '@/stores/chatStore'
 import { useSettingsStore } from '@/stores/settingsStore'
 import { storeToRefs } from 'pinia'
 import { marked } from 'marked'
 import Loading from '@/components/Loading/index.vue'
 import { message as antMessage } from 'ant-design-vue'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { useDataStore } from '@/stores/dataStore'
+import { useScanStore } from '@/stores/scanStore'
+
+const route = useRoute()
+const router = useRouter()
+
+const renderer = new marked.Renderer()
+renderer.link = ({ href, title, text }) => {
+  // 如果 href 是空的，就当作“内部路由占位符”
+  if (!href) {
+    return `<a role="link" class="fake-link" data-router-link>${text}</a>`
+  }
+  return `<a href="${href}" target="_blank" rel="noopener">${text}</a>`
+}
+
+marked.setOptions({ renderer })
 
 const props = defineProps<{
   isSidebarVisible: boolean
@@ -128,18 +143,21 @@ const scrollToBottom = () => {
 watch(activeSession, () => scrollToBottom(), { deep: true, immediate: true })
 
 const renderMarkdown = (text: string) => {
+  if (!text) {
+    return ''
+  }
   return marked.parse(text, { gfm: true, breaks: true })
 }
 
-const sendMessage = async (input?: string) => {
+const sendMessage = async ({ input, userContent, success }: any) => {
   startSend.value = true
-  let text = userInput.value.trim()
-  if (typeof input === 'string') {
-    text = (input && input?.trim()) || userInput.value.trim()
-  }
+  let text = input?.trim() || userInput.value.trim()
+  // if (typeof input === 'string') {
+  //   text = (input && input?.trim()) || userInput.value.trim()
+  // }
   if (!text || isLoading.value) return
   userInput.value = ''
-  const userMessage = { sender: 'user' as const, text }
+  const userMessage = { sender: 'user' as const, text: userContent || text }
   chatStore.addMessageToActiveSession(userMessage, appSettings.value.ai.enableAutoSave)
   // chatStore.ThinkIngLoading(true)
   isLoading.value = true
@@ -179,6 +197,7 @@ const sendMessage = async (input?: string) => {
         { sender: 'ai', text: result.message },
         aiConfig.enableAutoSave
       )
+      success && success(result.message)
       startSend.value = false
       streamingMessage.value = ''
     } else {
@@ -197,19 +216,27 @@ const sendMessage = async (input?: string) => {
   }
 }
 
-const route = useRoute()
-
 const dataStore = useDataStore()
-
-autoAnalysisScanRecord(route.query, dataStore.getScanResultList)
-
-function autoAnalysisScanRecord(query: any, record: any[]) {
-  if (query?.id && record && record.length) {
+const scanStore = useScanStore()
+function autoAnalysisScanRecord(id: string, record: any[]) {
+  if (id && record && record.length) {
     chatStore.createNewSession()
-    const resultInput = `请按照如下规则:${'1.根据这段提交记录的日期先得到其中的工作日 2.根据提交内容和提交代码行数以及提交信息进行综合分析 3.总结出与工作日相对应的人天信息，综合分配每个任务的人天 '}对这段git提交记录进行分析${JSON.stringify(record)}`
-    sendMessage(resultInput)
+    const resultInput = `请按照如下规则:${'1.根据这段提交记录的日期先得到其中的工作日 2.根据提交内容和提交代码行数以及提交信息进行综合分析 3.总结出与工作日相对应的人天信息，综合分配每个任务的人天 4.只需要50字'}对这段git提交记录进行分析${JSON.stringify(record)}`
+    sendMessage({
+      input: resultInput,
+      // userContent: '``` 扫描ID:' + query.id + '```[提交记录分析]()'
+      userContent: '[提交记录分析]()',
+      success: (result) => {
+        scanStore.setScanRecordById(id, { analysisResult: result })
+        antMessage.success('分析完成，结果已保存到扫描记录中')
+      }
+    })
   }
 }
+onMounted(() => {
+  autoAnalysisScanRecord(dataStore.getScanId, dataStore.getScanResultList)
+  dataStore.delScanResultList()
+})
 </script>
 
 <style scoped>
@@ -268,12 +295,8 @@ function autoAnalysisScanRecord(query: any, record: any[]) {
   max-width: 100%;
 }
 
+.chat-message.ai .message-content,
 .chat-message.user .message-content {
-  background: #1890ff;
-  color: #fff;
-}
-
-.chat-message.ai .message-content {
   background: #fff;
   color: var(--color-text);
 }

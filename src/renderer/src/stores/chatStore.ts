@@ -66,7 +66,7 @@ export const useChatStore = defineStore('chat', () => {
     }
     sessions.value.unshift(newSession) // Add to the beginning
     activeSessionId.value = newSession.id
-    _saveToLocalStorage()
+    // _saveToLocalStorage()
     return newSession.id
   }
 
@@ -84,6 +84,8 @@ export const useChatStore = defineStore('chat', () => {
       activeSession.value.name = message.text.substring(0, 30) // Use first 30 chars as name
     }
     activeSession.value.messages.push(message)
+    console.log(isSave)
+
     isSave && _saveToLocalStorage()
     return activeSession.value.messages[activeSession.value.messages.length - 1]
   }

@@ -1,22 +1,29 @@
 <template>
   <div class="analysis-container">
-    <div v-if="!AnalysisResult" class="empty-content">
+    <div v-if="!record.analysisResult" class="empty-content">
       <a-empty description="暂无分析结果" />
       <a-button type="primary" @click="analysis"> <AlertOutlined />立即分析 </a-button>
     </div>
-    <pre>
-      {{ AnalysisResult }}
-    </pre>
+    <div v-else v-html="renderMarkdown(record.analysisResult)"></div>
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, reactive, onMounted } from 'vue'
 import { AlertOutlined } from '@ant-design/icons-vue'
+import { marked } from 'marked'
+defineProps({
+  record: { type: Object, default: null }
+})
 const AnalysisResult = ref<any>(null)
 
 const emit = defineEmits(['analysis'])
-
+const renderMarkdown = (text: string) => {
+  if (!text) {
+    return ''
+  }
+  return marked.parse(text, { gfm: true, breaks: true })
+}
 const analysis = () => {
   emit('analysis')
 }

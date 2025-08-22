@@ -16,6 +16,12 @@ export const useDataStore = defineStore('data', () => {
   function setScanId(val: any) {
     scanId.value = val
   }
+
+  const delScanResultList = () => {
+    scanResultList.value = []
+    scanId.value = ''
+  }
+
   // Initial load
 
   return {
@@ -27,6 +33,7 @@ export const useDataStore = defineStore('data', () => {
     getScanId,
     //actions
     setScanResultList,
-    setScanId
+    setScanId,
+    delScanResultList
   }
 })
