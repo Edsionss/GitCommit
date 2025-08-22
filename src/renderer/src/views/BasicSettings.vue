@@ -39,10 +39,12 @@ import SettingsForm from '@components/BasicSettings/SettingsForm.vue'
 import LogPanel from '@components/BasicSettings/LogPanel.vue'
 import ActionPanel from '@components/BasicSettings/ActionPanel.vue'
 import { useSettingsStore } from '@/stores/settingsStore'
-
+import { useScanStore } from '@/stores/scanStore'
+import { storeToRefs } from 'pinia'
+const scanStore = useScanStore()
 const router = useRouter()
 const settingsStore = useSettingsStore()
-
+const { getGitCommits } = storeToRefs(scanStore)
 const defaultFormState = {
   selectedFields: ['repository', 'commitId', 'shortHash', 'author', 'date', 'message'],
   statsDimension: 'none',
@@ -119,15 +121,10 @@ const startScan = async () => {
 
   try {
     const commits = await window.api.scanGitRepo(form.repoPath, scanOptions)
-
     addLog(`扫描完成，共找到 ${commits.length} 条提交记录`, 'success')
     hasResults.value = true
-    localStorage.setItem('gitCommits', JSON.stringify(commits)) // 保留这个用于“保存结果”功能
-
-    // --- FIX START: 直接保存到扫描历史 ---
-    const history = JSON.parse(localStorage.getItem('scanHistory') || '[]')
+    scanStore.setGitCommits(commits)
     const newRecord = {
-      id: dayjs().valueOf().toString(),
       repoPath: form.repoPath || '未知仓库',
       scanTime: dayjs().toISOString(),
       status: 'success',
@@ -136,18 +133,15 @@ const startScan = async () => {
       log: [...currentLogs.value],
       results: commits
     }
-    history.unshift(newRecord)
-    localStorage.setItem('scanHistory', JSON.stringify(history))
-    // --- FIX END ---
-
+    scanStore.setScanRecordList(newRecord)
     // 跳转到扫描记录页面
-    router.push({ name: 'ScanHistory' })
-
-    const appSettings = settingsStore.appSettings
-    if (appSettings.system?.clearScanConfigOnFinish) {
-      resetForm()
+    if (commits && commits.length) {
+      router.push({ name: 'ScanHistory' })
+      const appSettings = settingsStore.appSettings
+      if (appSettings.system?.clearScanConfigOnFinish) {
+        resetForm()
+      }
     }
-
   } catch (error) {
     const errorMsg = error instanceof Error ? error.message : String(error)
     addLog(`扫描失败: ${errorMsg}`, 'error')
@@ -164,9 +158,8 @@ const stopScan = () => {
 
 const saveResults = async () => {
   try {
-    const commits = JSON.parse(localStorage.getItem('gitCommits') || '[]')
+    const commits = getGitCommits.value
     if (commits.length === 0) return message.warning('没有可保存的结果')
-
     const result = await gitService.exportData(commits, form.outputFormat, form.repoPath)
     if (result) {
       addLog(`结果已保存到: ${result}`, 'success')

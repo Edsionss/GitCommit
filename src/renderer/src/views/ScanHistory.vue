@@ -38,9 +38,12 @@ import ScanHistoryList from '@components/ScanHistoryView/ScanHistoryList.vue'
 import ScanHistoryDetails from '@components/ScanHistoryView/ScanHistoryDetails.vue'
 import { GitCommit, GitScanOptions } from '@services/GitService'
 import { useRouter } from 'vue-router'
+import { useScanStore } from '@/stores/scanStore'
+import { storeToRefs } from 'pinia'
 
+const scanStore = useScanStore()
 const router = useRouter() // 导入GitCommit和GitScanOptions接口
-
+const { getScanRecordList, getFirstRecord } = storeToRefs(scanStore)
 // 定义扫描记录接口
 interface ScanRecord {
   id: string
@@ -65,18 +68,17 @@ const selectedRepo = ref('all')
 const dateRange = ref<[Dayjs, Dayjs] | null>(null)
 
 // 扫描记录数据
-const scanRecords = ref<ScanRecord[]>([])
+const scanRecords = computed<ScanRecord[]>(() => getScanRecordList.value)
+const selectedRecord = ref<ScanRecord | null>(getFirstRecord.value)
+
 const loading = ref(false)
-const selectedRecord = ref<ScanRecord | null>(null)
 
 // 计算属性：过滤后的扫描记录
 const filteredScanRecords = computed(() => {
   let records = [...scanRecords.value]
-
   if (selectedRepo.value !== 'all') {
     records = records.filter((record) => record.repoPath.includes(selectedRepo.value))
   }
-
   if (dateRange.value && dateRange.value.length === 2) {
     const [startDate, endDate] = dateRange.value.map((d) => d.startOf('day'))
     records = records.filter((record) => {
@@ -87,42 +89,8 @@ const filteredScanRecords = computed(() => {
       )
     })
   }
-
   return records.sort((a, b) => dayjs(b.scanTime).valueOf() - dayjs(a.scanTime).valueOf())
 })
-
-// 方法：加载扫描历史
-const loadScanHistory = () => {
-  loading.value = true
-  try {
-    const history = localStorage.getItem('scanHistory')
-    if (history) {
-      const historyData = JSON.parse(history)
-      // 对每条记录的results进行排序
-      historyData.forEach((record) => {
-        if (record.results && Array.isArray(record.results)) {
-          record.results.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
-        }
-      })
-      scanRecords.value = historyData
-      if (scanRecords.value.length > 0) {
-        selectedRecord.value = scanRecords.value[0] // 默认选中最新一条
-      }
-    }
-  } catch (error) {
-    console.error('加载扫描历史失败:', error)
-    message.error('加载扫描历史失败')
-  } finally {
-    loading.value = false
-  }
-}
-
-// 方法：保存扫描记录
-const saveScanRecord = (record: ScanRecord) => {
-  scanRecords.value.unshift(record) // 添加到最前面
-  localStorage.setItem('scanHistory', JSON.stringify(scanRecords.value))
-  selectedRecord.value = record // 选中新添加的记录
-}
 
 // 方法：删除单条扫描记录
 const deleteScanRecord = (recordId: string) => {
@@ -133,15 +101,11 @@ const deleteScanRecord = (recordId: string) => {
     okType: 'danger',
     cancelText: '取消',
     onOk: () => {
-      const index = scanRecords.value.findIndex((r) => r.id === recordId)
-      if (index > -1) {
-        scanRecords.value.splice(index, 1)
-        localStorage.setItem('scanHistory', JSON.stringify(scanRecords.value))
-        if (selectedRecord.value && selectedRecord.value.id === recordId) {
-          selectedRecord.value = scanRecords.value.length > 0 ? scanRecords.value[0] : null
-        }
-        message.success('扫描记录已删除')
+      scanStore.delScanRecordById(recordId)
+      if (selectedRecord.value && selectedRecord.value.id === recordId) {
+        selectedRecord.value = getFirstRecord.value
       }
+      message.success('扫描记录已删除')
     }
   })
 }
@@ -155,8 +119,7 @@ const deleteAllScanRecords = () => {
     okType: 'danger',
     cancelText: '取消',
     onOk: () => {
-      scanRecords.value = []
-      localStorage.removeItem('scanHistory')
+      scanStore.delAllScanRecord()
       selectedRecord.value = null
       message.success('所有扫描记录已清空')
     }
@@ -189,12 +152,6 @@ const exportScanResults = (format: string) => {
     message.success('导出成功！')
   }, 1000)
 }
-
-// 生命周期钩子
-// 生命周期钩子
-onMounted(() => {
-  loadScanHistory()
-})
 
 // 暴露给外部的方法，用于从BasicSettings页面接收扫描结果
 </script>
