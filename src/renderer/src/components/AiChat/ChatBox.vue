@@ -133,7 +133,10 @@ const renderMarkdown = (text: string) => {
 
 const sendMessage = async (input?: string) => {
   startSend.value = true
-  const text = input?.trim() || userInput.value.trim()
+  let text = userInput.value.trim()
+  if (typeof input === 'string') {
+    text = (input && input?.trim()) || userInput.value.trim()
+  }
   if (!text || isLoading.value) return
   userInput.value = ''
   const userMessage = { sender: 'user' as const, text }
