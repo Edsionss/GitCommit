@@ -6,7 +6,8 @@
     "types": ["electron-vite/node"],
     "paths": {
       "@main/*": ["src/main/*"],
-      "@preload/*": ["src/preload/*"]
+      "@preload/*": ["src/preload/*"],
+      "@shared/*": ["src/shared/*"]
     }
   }
 }

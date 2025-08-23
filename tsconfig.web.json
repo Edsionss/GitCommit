@@ -17,7 +17,8 @@
       "@assets/*": ["src/renderer/src/assets/*"],
       "@composables/*": ["src/renderer/src/composables/*"],
       "@router/*": ["src/renderer/src/router/*"],
-      "@services/*": ["src/services/*"]
+      "@services/*": ["src/services/*"],
+      "@shared/*": ["src/shared/*"]
     }
   }
 }
