@@ -59,7 +59,6 @@ export async function generateChatResponse(
   switch (aiConfig.provider) {
     case 'openai':
       return await callOpenAI(_, prompt, aiConfig.apiKey, aiConfig.model, history, isStream)
-    // Add cases for other providers here
     case 'gemini':
       return await callGemini(_, prompt, aiConfig.apiKey, aiConfig.model, history, isStream)
     case 'kimi':
