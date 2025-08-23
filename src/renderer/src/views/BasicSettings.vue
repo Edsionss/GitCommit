@@ -55,7 +55,8 @@ const defaultFormState = {
   maxCommits: 0,
   authorFilter: [],
   dateRange: [dayjs().startOf('month'), dayjs()],
-  outputFormat: 'json'
+  outputFormat: 'json',
+  AutoAiAnalysis: true
 }
 
 const form = reactive({ ...defaultFormState })
@@ -121,7 +122,9 @@ const startScan = async () => {
 
   try {
     const commits = await window.api.scanGitRepo(form.repoPath, scanOptions)
+
     addLog(`扫描完成，共找到 ${commits.length} 条提交记录`, 'success')
+    return
     hasResults.value = true
     scanStore.setGitCommits(commits)
     const newRecord = {
