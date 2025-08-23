@@ -33,6 +33,7 @@
     "exceljs": "^4.4.0",
     "jspdf": "^2.5.2",
     "jspdf-autotable": "^3.8.4",
+    "lodash": "^4.17.21",
     "marked": "^15.0.8",
     "openai": "^5.13.1",
     "pinia": "^2.2.0",

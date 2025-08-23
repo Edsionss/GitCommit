@@ -12,6 +12,7 @@
       />
       <LogPanel
         ref="logPanelRef"
+        :scanOptions="scanOptionsRef"
         :scanning="scanning"
         @stop-scan="stopScan"
         @scan-started="scanning = true"
@@ -56,10 +57,16 @@ const defaultFormState = {
   authorFilter: [],
   dateRange: [dayjs().startOf('month'), dayjs()],
   outputFormat: 'json',
-  AutoAiAnalysis: true
+  AutoAiAnalysis: true,
+  analysisRules: `
+    1.根据这段提交记录的日期先得到其中的工作日 
+    2.根据提交内容和提交代码行数以及提交信息进行综合分析 
+    3.总结出与工作日相对应的人天信息，综合分配每个任务的人天 
+    4.只需要50字`
 }
 
 const form = reactive({ ...defaultFormState })
+const scanOptionsRef = ref<any>(null)
 
 const scanning = ref(false)
 const hasResults = ref(false)
@@ -115,16 +122,17 @@ const startScan = async () => {
     maxCommits: form.maxCommits || undefined,
     branches: [...form.branches],
     scanSubfolders: form.scanSubfolders,
-    selectedRepos: [...form.selectedRepos]
+    selectedRepos: [...form.selectedRepos],
+    AutoAiAnalysis: !!form.AutoAiAnalysis,
+    analysisRules: form.analysisRules
   }
-
+  scanOptionsRef.value = scanOptions
   addLog(`扫描选项: ${JSON.stringify(scanOptions, null, 2)}`, 'info')
 
   try {
     const commits = await window.api.scanGitRepo(form.repoPath, scanOptions)
 
     addLog(`扫描完成，共找到 ${commits.length} 条提交记录`, 'success')
-    return
     hasResults.value = true
     scanStore.setGitCommits(commits)
     const newRecord = {

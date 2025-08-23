@@ -2,7 +2,6 @@ import { ipcMain, BrowserWindow } from 'electron'
 import simpleGit, { SimpleGit, LogOptions } from 'simple-git'
 import * as path from 'path'
 import { isValidGitRepo, findGitRepos } from '@main/modules/git/git-utils'
-
 // Git提交记录接口
 export interface GitCommit {
   repository: string
@@ -29,6 +28,7 @@ export interface GitScanOptions {
   branches?: string[]
   scanSubfolders?: boolean
   selectedRepos?: string[]
+  AutoAiAnalysis?: boolean
 }
 
 let cancelScanFlag = false
@@ -38,11 +38,11 @@ export function registerGitScanHandlers() {
   ipcMain.handle('scan-git-repo', async (_, repoPath: string, options?: GitScanOptions) => {
     console.log('scan-git-repo options:', JSON.stringify(options, null, 2))
     const mainWindow = BrowserWindow.getAllWindows()[0]
-    const sendProgress = (phase: string, percentage: number) => {
+    const sendProgress = (phase: string, percentage: number, commits?: GitCommit[]) => {
       if (cancelScanFlag) {
         throw new Error('操作已取消')
       }
-      mainWindow?.webContents.send('scan-progress', { phase, percentage })
+      mainWindow?.webContents.send('scan-progress', { phase, percentage, commits })
     }
 
     try {
@@ -167,7 +167,8 @@ export function registerGitScanHandlers() {
         `Returning ${allCommits.length} commits. Sample:`,
         JSON.stringify(allCommits.slice(0, 2), null, 2)
       )
-      sendProgress('完成', 100)
+      sendProgress('完成', 100, allCommits)
+
       return allCommits
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : String(error)

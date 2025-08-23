@@ -26,7 +26,7 @@ export function registerAiHandlers() {
 
   ipcMain.handle(
     'ai:chat',
-    async (_, prompt: string, aiConfig: AiConfig, history: ChatMessage[], isStream: boolean) => {
+    async (_, prompt: string, aiConfig: AiConfig, history?: ChatMessage[], isStream?: boolean) => {
       try {
         const message = await generateChatResponse(_, prompt, aiConfig, history, isStream)
         return { success: true, message }
