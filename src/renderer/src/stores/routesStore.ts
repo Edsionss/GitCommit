@@ -39,14 +39,7 @@ const defaultRoutes: RouteRecord[] = [
     isMenu: true,
     menuOrder: 20
   },
-  {
-    path: 'commits',
-    name: 'Commits',
-    componentPath: '@views/CommitsView.vue',
-    meta: { title: '提交记录', keepAlive: true },
-    isMenu: true,
-    menuOrder: 30
-  },
+
   {
     path: 'branches',
     name: 'Branches',
