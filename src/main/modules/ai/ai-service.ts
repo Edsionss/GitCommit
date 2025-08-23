@@ -27,7 +27,7 @@ export interface ChatMessage {
  * @returns The generated commit message.
  */
 export async function generateCommitMessage(
-  _,
+  _: any = null,
   prompt: string,
   aiConfig: AiConfig,
   isStream: boolean
@@ -46,7 +46,7 @@ export async function generateCommitMessage(
  * @returns The generated commit message.
  */
 export async function generateChatResponse(
-  _,
+  _: any = null,
   prompt: string,
   aiConfig: AiConfig,
   history: ChatMessage[] = [],
@@ -81,7 +81,7 @@ export async function generateChatResponse(
  * @returns The generated text.
  */
 async function callOpenAI(
-  _,
+  _: any = null,
   prompt: string,
   apiKey: string,
   model = 'gpt-3.5-turbo',
@@ -112,7 +112,7 @@ async function callOpenAI(
 }
 
 async function callKiMi(
-  _,
+  _: any = null,
   prompt: string,
   apiKey: string,
   model = 'gpt-3.5-turbo',
@@ -133,7 +133,7 @@ async function callKiMi(
     temperature: 0.6,
     stream: isStream
   })
-  if (isStream) {
+  if (isStream && _) {
     // streaming  流式传输
     let text = ''
     for await (const chunk of response as Stream<ChatCompletionChunk>) {
@@ -154,7 +154,7 @@ async function callKiMi(
 }
 
 async function callGemini(
-  _,
+  _: any = null,
   prompt: string,
   apiKey: string,
   model = 'gemini-2.5-flash',
@@ -168,14 +168,12 @@ async function callGemini(
     model,
     contents: messages
   })
-  if (isStream) {
+  if (isStream && _) {
     // streaming  流式传输
     let text = ''
     for await (const chunk of response) {
       text += chunk.text
-      // setTimeout(() => {
       _.sender.send('ai:chatStream:chunk', chunk.text)
-      // }, 1000)
     }
     return text as string
   } else {

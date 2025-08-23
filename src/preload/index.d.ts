@@ -47,7 +47,7 @@ interface ExposedAPI {
   getRepoAuthors: (repoPaths: string[]) => Promise<string[]>
   getRepoBranches: (repoPath: string) => Promise<string[]>
   getSubRepos: (repoPath: string) => Promise<GetSubReposResult>
-  scanGitRepo: (repoPath: string, options?: GitScanOptions) => Promise<any>
+  scanGitRepo: (repoPath: string, options?: GitScanOptions, aiConfig?: AiConfig) => Promise<any>
   saveFile: (options: any) => Promise<string | null>
   cancelScan: () => void
   aiChat: (

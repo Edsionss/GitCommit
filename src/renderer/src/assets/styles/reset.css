@@ -55,16 +55,9 @@ ul,
 ol {
   list-style: none;
 }
-
 a {
   text-decoration: none;
   color: inherit;
-}
-
-img,
-svg {
-  display: block;
-  max-width: 100%;
 }
 
 input,

@@ -31,6 +31,7 @@
 </template>
 
 <script setup lang="ts">
+import _ from 'lodash'
 import { ref, reactive } from 'vue'
 import { message } from 'ant-design-vue'
 import { gitService } from '@services/GitService'
@@ -59,9 +60,9 @@ const defaultFormState = {
   outputFormat: 'json',
   AutoAiAnalysis: true,
   analysisRules: `
-    1.根据这段提交记录的日期先得到其中的工作日 
-    2.根据提交内容和提交代码行数以及提交信息进行综合分析 
-    3.总结出与工作日相对应的人天信息，综合分配每个任务的人天 
+    1.根据这段提交记录的日期先得到其中的工作日
+    2.根据提交内容和提交代码行数以及提交信息进行综合分析
+    3.总结出与工作日相对应的人天信息，综合分配每个任务的人天
     4.只需要50字`
 }
 
@@ -130,8 +131,12 @@ const startScan = async () => {
   addLog(`扫描选项: ${JSON.stringify(scanOptions, null, 2)}`, 'info')
 
   try {
-    const commits = await window.api.scanGitRepo(form.repoPath, scanOptions)
-
+    addLog(`已开始扫描${scanOptions.analysisRules ? '和进行AI分析' : ''}`, 'info')
+    const { commits, analysisResult } = await window.api.scanGitRepo(
+      form.repoPath,
+      scanOptions,
+      JSON.parse(JSON.stringify(settingsStore?.appSettings?.ai || null))
+    )
     addLog(`扫描完成，共找到 ${commits.length} 条提交记录`, 'success')
     hasResults.value = true
     scanStore.setGitCommits(commits)
@@ -142,7 +147,8 @@ const startScan = async () => {
       totalCommits: commits.length,
       scanOptions: { ...form },
       log: [...currentLogs.value],
-      results: commits
+      results: commits,
+      analysisResult
     }
     scanStore.setScanRecordList(newRecord)
     // 跳转到扫描记录页面

@@ -30,6 +30,13 @@ interface ChatMessage {
   text: string
 }
 
+export interface AiConfig {
+  provider: 'openai' | 'gemini' | 'anthropic' | 'kimi' | 'custom' | null
+  apiKey: string
+  endpoint?: string
+  model?: string
+}
+
 // 暴露给渲染进程的API
 const api = {
   // 选择目录
@@ -53,8 +60,8 @@ const api = {
     ipcRenderer.invoke('get-sub-repos', repoPath),
 
   // 扫描Git仓库
-  scanGitRepo: (repoPath: string, options?: GitScanOptions): Promise<any> =>
-    ipcRenderer.invoke('scan-git-repo', repoPath, options),
+  scanGitRepo: (repoPath: string, options?: GitScanOptions, aiConfig?: AiConfig): Promise<any> =>
+    ipcRenderer.invoke('scan-git-repo', repoPath, options, aiConfig),
 
   // 保存文件
   saveFile: (options: any): Promise<string | null> => ipcRenderer.invoke('save-file', options),
@@ -63,7 +70,7 @@ const api = {
   cancelScan: () => ipcRenderer.send('cancel-scan'),
 
   // AI Chat
-  aiChat: (prompt: string, aiConfig: any, history?: ChatMessage[]): Promise<any> =>
+  aiChat: (prompt: string, aiConfig: AiConfig, history?: ChatMessage[]): Promise<any> =>
     ipcRenderer.invoke('ai:chat', prompt, aiConfig, history),
   onChatStreamChunk: (callback: (chunk: string) => void) =>
     ipcRenderer.on('ai:chatStream:chunk', (_, chunk) => callback(chunk)),
