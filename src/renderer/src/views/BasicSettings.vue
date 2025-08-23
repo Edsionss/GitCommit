@@ -177,7 +177,7 @@ const saveResults = async () => {
   try {
     const commits = getGitCommits.value
     if (commits.length === 0) return message.warning('没有可保存的结果')
-    const result = await gitService.exportData(commits, form.outputFormat, form.repoPath)
+    const result = await exportApi.exportCommits(commits, form.outputFormat)
     if (result) {
       addLog(`结果已保存到: ${result}`, 'success')
       message.success('保存成功')

@@ -63,8 +63,6 @@ const api = {
   scanGitRepo: (repoPath: string, options?: GitScanOptions, aiConfig?: AiConfig): Promise<any> =>
     ipcRenderer.invoke('scan-git-repo', repoPath, options, aiConfig),
 
-  
-
   // 取消扫描
   cancelScan: () => ipcRenderer.send('cancel-scan'),
 
@@ -73,6 +71,15 @@ const api = {
     ipcRenderer.invoke('ai:chat', prompt, aiConfig, history),
   onChatStreamChunk: (callback: (chunk: string) => void) =>
     ipcRenderer.on('ai:chatStream:chunk', (_, chunk) => callback(chunk)),
+
+  // History API
+  getHistory: () => ipcRenderer.invoke('history:get'),
+  addHistory: (repoPath: string) => ipcRenderer.invoke('history:add', repoPath),
+  removeHistory: (repoPath: string) => ipcRenderer.invoke('history:remove', repoPath),
+  clearHistory: () => ipcRenderer.invoke('history:clear'),
+
+  // Export API
+  exportCommits: (commits, format) => ipcRenderer.invoke('export:commits', commits, format),
 
   // 监听事件
   onScanProgress: (callback: (data: any) => void) => {

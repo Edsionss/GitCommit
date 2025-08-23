@@ -36,7 +36,7 @@ import dayjs, { Dayjs } from 'dayjs'
 import ScanHistoryToolbar from '@components/ScanHistoryView/ScanHistoryToolbar.vue'
 import ScanHistoryList from '@components/ScanHistoryView/ScanHistoryList.vue'
 import ScanHistoryDetails from '@components/ScanHistoryView/ScanHistoryDetails.vue'
-import { GitCommit, GitScanOptions } from '@services/GitService'
+import type { GitCommit, GitScanOptions } from '@shared/types/dtos/git.dto'
 import { useRouter } from 'vue-router'
 import { useScanStore } from '@/stores/scanStore'
 import { storeToRefs } from 'pinia'
@@ -139,18 +139,23 @@ const selectScanRecord = (record: ScanRecord) => {
 }
 
 // 方法：导出扫描结果
-const exportScanResults = (format: string) => {
+const exportScanResults = async (format: 'json' | 'csv') => {
   if (!selectedRecord.value || selectedRecord.value.results.length === 0) {
     message.warning('没有可导出的扫描结果')
     return
   }
   message.info(`正在导出 ${selectedRecord.value.repoPath} 的扫描结果为 ${format} 格式...`)
-  // 实际导出逻辑需要调用主进程或GitService
-  // 例如：gitService.exportData(selectedRecord.value.results, format, 'outputPath', 'fileName')
-  // 这里仅作模拟
-  setTimeout(() => {
-    message.success('导出成功！')
-  }, 1000)
+  try {
+    const filePath = await exportApi.exportCommits(selectedRecord.value.results, format);
+    if (filePath) {
+      message.success(`导出成功！文件保存至: ${filePath}`)
+    } else {
+      message.info('导出已取消或未保存文件。')
+    }
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    message.error(`导出失败: ${errorMessage}`)
+  }
 }
 
 // 暴露给外部的方法，用于从BasicSettings页面接收扫描结果

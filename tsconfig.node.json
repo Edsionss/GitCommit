@@ -4,9 +4,16 @@
   "compilerOptions": {
     "composite": true,
     "types": ["electron-vite/node"],
+    "baseUrl": ".",
     "paths": {
-      "@main/*": ["src/main/*"],
-      "@preload/*": ["src/preload/*"],
+      "@renderer/*": ["src/renderer/src/*"],
+      "@/*": ["src/renderer/src/*"],
+      "@components/*": ["src/renderer/src/components/*"],
+      "@views/*": ["src/renderer/src/views/*"],
+      "@assets/*": ["src/renderer/src/assets/*"],
+      "@composables/*": ["src/renderer/src/composables/*"],
+      "@router/*": ["src/renderer/src/router/*"],
+      
       "@shared/*": ["src/shared/*"]
     }
   }

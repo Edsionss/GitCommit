@@ -61,7 +61,7 @@
 <script setup lang="ts">
 import { PropType } from 'vue'
 import dayjs from 'dayjs'
-import { GitCommit } from '@services/GitService'
+import type { GitCommit } from '@shared/types/dtos/git.dto'
 
 defineProps({
   results: { type: Array as PropType<GitCommit[]>, required: true }

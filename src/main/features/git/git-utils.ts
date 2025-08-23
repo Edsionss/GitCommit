@@ -1,9 +1,7 @@
 import { ipcMain } from 'electron'
-import { isValidGitRepo, getSubRepos } from '@main/modules/git/git-utils'
-import { registerGitInfoHandlers } from './git/git-info'
-import { registerGitScanHandlers } from './git/git-scan'
+import { isValidGitRepo, findGitRepos } from './git-utils-service'
 
-export function registerGitHandlers() {
+export function registerGitUtilsHandlers() {
   // 验证路径
   ipcMain.handle('validate-repo-path', async (_, repoPath: string) => {
     return await isValidGitRepo(repoPath)
@@ -21,7 +19,4 @@ export function registerGitHandlers() {
       return { success: false, error: errorMessage };
     }
   })
-
-  registerGitInfoHandlers()
-  registerGitScanHandlers()
 }

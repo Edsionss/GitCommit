@@ -1,4 +1,3 @@
-'''
 <template>
   <div class="config-column">
     <a-card class="settings-card">

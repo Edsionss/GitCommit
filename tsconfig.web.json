@@ -5,7 +5,7 @@
     "src/renderer/src/**/*",
     "src/renderer/src/**/*.vue",
     "src/preload/*.d.ts"
-, "src/services"  ],
+  ],
   "compilerOptions": {
     "composite": true,
     "baseUrl": ".",
@@ -17,7 +17,7 @@
       "@assets/*": ["src/renderer/src/assets/*"],
       "@composables/*": ["src/renderer/src/composables/*"],
       "@router/*": ["src/renderer/src/router/*"],
-      "@services/*": ["src/services/*"],
+      
       "@shared/*": ["src/shared/*"]
     }
   }

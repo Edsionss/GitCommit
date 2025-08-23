@@ -1,7 +1,10 @@
-import { ref, watch, reactive, computed, ToRefs } from 'vue'
+import { ref, watch, reactive, computed, ToRefs, onMounted } from 'vue'
 import { message } from 'ant-design-vue'
-import { gitService } from '@services/GitService'
 import dayjs, { Dayjs } from 'dayjs'
+import type { RepoHistoryItem } from '@preload/index.d.ts'
+import { gitApi } from '@renderer/api/git';
+import { historyApi } from '@renderer/api/history';
+import { fileSystemApi } from '@renderer/api/fileSystem';
 
 interface FormState {
   repoPath: string
@@ -32,7 +35,7 @@ export function useSettingsForm(
 
   const subRepos = ref<SubRepo[]>([])
   const isDiscoveringRepos = ref(false)
-  const repoHistory = ref(gitService.getRepoHistory())
+  const repoHistory = ref<RepoHistoryItem[]>([])
   const availableAuthors = ref<string[]>([])
   const authorsLoading = ref(false)
   const branchesLoading = ref(false)
@@ -46,6 +49,16 @@ export function useSettingsForm(
     }
     return repoStatus.value !== 'valid'
   })
+
+  const loadRepoHistory = async () => {
+    try {
+      repoHistory.value = await historyApi.getHistory();
+    } catch (error) {
+      message.error('加载历史记录失败');
+    }
+  };
+
+  onMounted(loadRepoHistory);
 
   watch(
     () => localForm.scanSubfolders,
@@ -99,7 +112,7 @@ export function useSettingsForm(
     branchesLoading.value = true
     try {
       emit('add-log', `加载分支列表: ${localForm.repoPath}`, 'info')
-      const branches = await window.api.getRepoBranches(localForm.repoPath)
+      const branches = await gitApi.getRepoBranches(localForm.repoPath)
       availableBranches.value = branches
       if (branches.length > 0) {
         emit('add-log', `成功加载 ${branches.length} 个分支`, 'success')
@@ -127,13 +140,12 @@ export function useSettingsForm(
   const selectRepoPath = async () => {
     isSelectingPath.value = true
     try {
-      const result = await window.api.selectDirectory()
+      const result = await fileSystemApi.selectDirectory()
       if (result) {
         const { path } = result
         localForm.repoPath = path
         emit('validate-repo-path', path)
-        gitService.addToHistory(path)
-        repoHistory.value = gitService.getRepoHistory()
+        repoHistory.value = await historyApi.addHistory(path);
 
         if (localForm.scanSubfolders) {
           message.success(`已选择目录，请点击“扫描子仓库”按钮: ${path}`)
@@ -148,11 +160,10 @@ export function useSettingsForm(
     }
   }
 
-  const validateRepoPath = () => {
+  const validateRepoPath = async () => {
     emit('validate-repo-path', localForm.repoPath)
     if (localForm.repoPath) {
-      gitService.addToHistory(localForm.repoPath)
-      repoHistory.value = gitService.getRepoHistory()
+      repoHistory.value = await historyApi.addHistory(localForm.repoPath);
     }
   }
 
@@ -167,7 +178,7 @@ export function useSettingsForm(
         ? [...localForm.selectedRepos]
         : [localForm.repoPath]
       emit('add-log', `加载作者列表于: ${reposToScan.join(', ')}`)
-      const authors = await window.api.getRepoAuthors(reposToScan)
+      const authors = await gitApi.getRepoAuthors(reposToScan)
       const uniqueAuthors = [...new Set(authors)]
       availableAuthors.value = uniqueAuthors
       emit('add-log', `找到 ${uniqueAuthors.length} 个独立作者`, 'success')
@@ -195,14 +206,12 @@ export function useSettingsForm(
     validateRepoPath()
   }
 
-  const removeRepoFromHistory = (path: string) => {
-    gitService.removeFromHistory(path)
-    repoHistory.value = gitService.getRepoHistory()
+  const removeRepoFromHistory = async (path: string) => {
+    repoHistory.value = await historyApi.removeHistory(path);
   }
 
-  const clearRepoHistory = () => {
-    repoHistory.value.forEach((item) => gitService.removeFromHistory(item.path))
-    repoHistory.value = []
+  const clearRepoHistory = async () => {
+    repoHistory.value = await historyApi.clearHistory();
   }
 
   const discoverSubRepos = async () => {
@@ -213,7 +222,7 @@ export function useSettingsForm(
     isDiscoveringRepos.value = true
     emit('add-log', `正在扫描子仓库: ${localForm.repoPath}`, 'info')
     try {
-      const result = await window.api.getSubRepos(localForm.repoPath)
+      const result = await gitApi.getSubRepos(localForm.repoPath)
       if (result.success && result.repos) {
         subRepos.value = result.repos
         if (result.repos.length > 0) {
