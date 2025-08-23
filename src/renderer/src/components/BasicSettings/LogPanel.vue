@@ -11,7 +11,7 @@
       <div class="progress">
         <div class="progress-info">
           <span>{{ scanPhase }}</span>
-          <span>{{ scanPercentage }}%</span>
+          <!-- <span>{{ scanPercentage }}%</span> -->
         </div>
         <a-progress
           :percent="scanPercentage"

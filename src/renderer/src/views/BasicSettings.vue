@@ -131,7 +131,7 @@ const startScan = async () => {
   addLog(`扫描选项: ${JSON.stringify(scanOptions, null, 2)}`, 'info')
 
   try {
-    addLog(`已开始扫描${scanOptions.analysisRules ? '和进行AI分析' : ''}`, 'info')
+    addLog(`已开始扫描${scanOptions.AutoAiAnalysis ? '和进行AI分析' : ''}`, 'info')
     const { commits, analysisResult } = await window.api.scanGitRepo(
       form.repoPath,
       scanOptions,
