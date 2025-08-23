@@ -16,7 +16,7 @@ export interface RouteRecord {
 
 const defaultRoutes: RouteRecord[] = [
   {
-    path: '/',
+    path: 'dashboard',
     name: 'Dashboard',
     componentPath: '@views/Dashboard.vue',
     meta: { title: '仪表盘', keepAlive: true },

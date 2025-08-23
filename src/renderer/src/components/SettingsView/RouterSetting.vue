@@ -11,24 +11,6 @@
           <strong>组件路径:</strong>
           <span class="commit-message-pre">{{ record.componentPath }}</span>
         </div>
-        <!-- <a-descriptions bordered size="small">
-          <a-descriptions-item label="路由名称 (Name)">{{ record.name }}</a-descriptions-item>
-          <a-descriptions-item label="菜单名称 (Title)">{{
-            record.meta.title
-          }}</a-descriptions-item>
-          <a-descriptions-item label="路由路径 (Path)">{{ record.path }}</a-descriptions-item>
-          <a-descriptions-item label="组件路径 (Component)">{{
-            record.componentPath
-          }}</a-descriptions-item>
-          <a-descriptions-item label="设为菜单 (isMenu)">
-            <a-tag :color="record.isMenu ? 'green' : 'red'">{{ record.isMenu }}</a-tag>
-          </a-descriptions-item>
-          <a-descriptions-item label="缓存页面 (keepAlive)">
-            <a-tag :color="record.meta.keepAlive ? 'green' : 'red'">{{
-              record.meta.keepAlive
-            }}</a-tag>
-          </a-descriptions-item>
-        </a-descriptions> -->
       </template>
       <template #bodyCell="{ column, record }">
         <template v-if="column.key === 'isMenu'">

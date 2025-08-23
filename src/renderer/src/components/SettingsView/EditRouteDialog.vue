@@ -26,12 +26,6 @@
       <a-form-item label="组件路径">
         <a-input v-model:value="editableRoute.componentPath" />
       </a-form-item>
-      <!-- <a-form-item label="设为菜单">
-        <a-switch v-model:checked="editableRoute.isMenu" />
-      </a-form-item>
-      <a-form-item label="缓存页面">
-        <a-switch v-model:checked="editableRoute.meta.keepAlive" />
-      </a-form-item> -->
     </a-form>
   </a-modal>
 </template>

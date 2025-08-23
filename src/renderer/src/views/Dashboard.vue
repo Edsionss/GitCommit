@@ -1,9 +1,5 @@
 <template>
   <div class="dashboard-container">
-    <div class="dashboard-header">
-      <h2 class="page-title">数据概览</h2>
-    </div>
-
     <StatsCards :stats="stats" :format-number="formatNumber" />
 
     <div class="chart-section">

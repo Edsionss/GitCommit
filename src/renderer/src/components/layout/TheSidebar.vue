@@ -83,21 +83,25 @@ const toggleSidebar = () => {
 }
 
 // Watch for sidebar state changes to dispatch events
-watch(isSidebarExpanded, (expanded) => {
-  document.documentElement.dataset.sidebarExpanded = expanded.toString()
-  window.dispatchEvent(
-    new CustomEvent('sidebar-state-change', {
-      detail: { expanded }
-    })
-  )
-}, { immediate: true })
+watch(
+  isSidebarExpanded,
+  (expanded) => {
+    document.documentElement.dataset.sidebarExpanded = expanded.toString()
+    window.dispatchEvent(
+      new CustomEvent('sidebar-state-change', {
+        detail: { expanded }
+      })
+    )
+  },
+  { immediate: true }
+)
 
 // Dynamically generate menu items from the routes store
 const menuItems = computed(() => {
   return routes.value
-    .filter(r => r.isMenu)
+    .filter((r) => r.isMenu)
     .sort((a, b) => a.menuOrder - b.menuOrder)
-    .map(r => ({
+    .map((r) => ({
       path: r.path === '' ? '/' : `/${r.path}`,
       label: r.meta.title,
       icon: iconMap[r.name] || FileTextOutlined // Fallback icon
@@ -113,7 +117,6 @@ const isActive = (path: string): boolean => {
 
 // isExpanded is now a ref from the store
 const isExpanded = isSidebarExpanded
-
 </script>
 
 <style scoped>
@@ -137,7 +140,7 @@ const isExpanded = isSidebarExpanded
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 16px;
+  padding: 19.5px;
   border-bottom: 1px solid var(--border-color);
   position: relative;
   z-index: 30;
