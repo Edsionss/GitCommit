@@ -119,23 +119,6 @@ export class GitService {
     }
   }
 
-  // async scanRepository(repoPath: string, options: GitScanOptions): Promise<GitCommit[]> {
-  //   try {
-  //     const { commits, analysisRules } = await window.api.scanGitRepo(repoPath, options)
-
-  //     // 更新历史记录
-  //     if (commits.length > 0) {
-  //       const uniqueAuthors = [...new Set(commits.map((commit) => commit.author))]
-  //       this.addToHistory(repoPath, uniqueAuthors)
-  //     }
-
-  //     return { commits, analysisRules }
-  //   } catch (error) {
-  //     console.error('扫描仓库失败:', error)
-  //     throw error
-  //   }
-  // }
-
   private filterCommits(commits: GitCommit[], options: GitScanOptions): GitCommit[] {
     let filtered = [...commits]
 
