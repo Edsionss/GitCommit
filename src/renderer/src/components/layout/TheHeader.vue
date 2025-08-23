@@ -3,6 +3,7 @@
     <div class="header-title">
       <h1 class="app-title">GitCommit</h1>
       <span class="page-title">{{ currentPageTitle }}</span>
+      <span class="code-container">{{ route.fullPath }}</span>
     </div>
     <div class="header-actions">
       <div class="repo-selector">

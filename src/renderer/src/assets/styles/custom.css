@@ -1,0 +1,9 @@
+.code-container {
+  white-space: pre-wrap;
+  word-break: break-all;
+  font-family: monospace;
+  font-size: 12px;
+  background-color: #eee;
+  padding: 5px;
+  border-radius: 3px;
+}
