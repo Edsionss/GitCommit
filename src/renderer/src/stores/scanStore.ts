@@ -14,7 +14,7 @@ export const useScanStore = defineStore('scan', () => {
     return scanRecordList.value
   })
   const getFirstRecord = computed(() => {
-    return scanRecordList.value?.[0] || null
+    return scanRecordList.value?.[scanRecordList.value.length - 1] || null
   })
   const _savaScanRecord = () => {
     localStorage.removeItem('scanRecord')
