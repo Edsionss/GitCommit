@@ -9,14 +9,14 @@ export function registerGitUtilsHandlers() {
 
   // 获取子目录中的Git仓库
   ipcMain.handle('get-sub-repos', async (_, repoPath: string) => {
-    if (!repoPath) return { success: true, repos: [] };
+    if (!repoPath) return { success: true, repos: [] }
     try {
-      const repos = await findGitRepos(repoPath);
-      return { success: true, repos };
+      const repos = await findGitRepos(repoPath)
+      return { success: true, repos }
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : String(error);
-      console.error('查找子仓库失败:', errorMessage);
-      return { success: false, error: errorMessage };
+      const errorMessage = error instanceof Error ? error.message : String(error)
+      console.error('查找子仓库失败:', errorMessage)
+      return { success: false, error: errorMessage }
     }
   })
 }

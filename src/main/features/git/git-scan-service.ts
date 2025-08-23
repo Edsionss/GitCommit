@@ -161,16 +161,13 @@ export async function scanGitRepository(
       } catch (repoError) {
         const errorMsg = repoError instanceof Error ? repoError.message : String(repoError)
         console.error(`扫描仓库 ${currentRepoPath} 失败: ${errorMsg}`)
-        mainWindow?.webContents.send(
-          'add-log', `扫描仓库 ${repoName} 失败: ${errorMsg}`,
-          'error'
-        )
+        mainWindow?.webContents.send('add-log', `扫描仓库 ${repoName} 失败: ${errorMsg}`, 'error')
         // Continue to the next repo
       }
     }
 
     console.log(
-      `Returning ${allCommits.length} commits. Sample:`, 
+      `Returning ${allCommits.length} commits. Sample:`,
       JSON.stringify(allCommits.slice(0, 2), null, 2)
     )
     let analysisResult: any = ''
@@ -190,5 +187,5 @@ export async function scanGitRepository(
 }
 
 export function setCancelScanFlag(value: boolean) {
-  cancelScanFlag = value;
+  cancelScanFlag = value
 }

@@ -7,11 +7,7 @@
         placeholder="选择仓库"
         class="filter-item"
       >
-        <a-select-option
-          v-for="repo in repositories"
-          :key="repo.id"
-          :value="repo.id"
-        >
+        <a-select-option v-for="repo in repositories" :key="repo.id" :value="repo.id">
           {{ repo.name }}
         </a-select-option>
       </a-select>

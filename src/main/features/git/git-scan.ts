@@ -9,7 +9,7 @@ export function registerGitScanHandlers() {
     async (_, repoPath: string, options?: GitScanOptions, aiConfig?: AiConfig) => {
       console.log('scan-git-repo options:', JSON.stringify(options, null, 2))
       try {
-        return await scanGitRepository(repoPath, options, aiConfig);
+        return await scanGitRepository(repoPath, options, aiConfig)
       } catch (error) {
         const errorMessage = error instanceof Error ? error.message : String(error)
         BrowserWindow.getAllWindows()[0]?.webContents.send('scan-error', { message: errorMessage })
@@ -20,7 +20,7 @@ export function registerGitScanHandlers() {
 
   // 处理取消扫描请求
   ipcMain.on('cancel-scan', () => {
-    setCancelScanFlag(true);
+    setCancelScanFlag(true)
     BrowserWindow.getAllWindows()[0]?.webContents.send('scan-cancelled')
   })
 }

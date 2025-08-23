@@ -1,21 +1,21 @@
-import { ref } from 'vue';
+import { ref } from 'vue'
 
 export function useScanTracker() {
-  const scanProgress = ref(0);
-  const scanStatus = ref('准备中');
-  const scanning = ref(false);
+  const scanProgress = ref(0)
+  const scanStatus = ref('准备中')
+  const scanning = ref(false)
 
   const setScanProgress = (progress: number) => {
-    scanProgress.value = progress;
-  };
+    scanProgress.value = progress
+  }
 
   const setScanStatus = (status: string) => {
-    scanStatus.value = status;
-  };
+    scanStatus.value = status
+  }
 
   const setScanningState = (state: boolean) => {
-    scanning.value = state;
-  };
+    scanning.value = state
+  }
 
   return {
     scanProgress,
@@ -23,6 +23,6 @@ export function useScanTracker() {
     scanning,
     setScanProgress,
     setScanStatus,
-    setScanningState,
-  };
+    setScanningState
+  }
 }

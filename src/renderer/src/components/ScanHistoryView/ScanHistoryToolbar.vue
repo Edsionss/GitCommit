@@ -25,7 +25,7 @@
         />
       </div>
 
-            <a-button type="primary" @click="$emit('filter')">
+      <a-button type="primary" @click="$emit('filter')">
         <template #icon><SearchOutlined /></template>
         查询
       </a-button>
@@ -46,7 +46,7 @@ interface Repository {
 defineProps({
   repositories: { type: Array as PropType<Repository[]>, required: true },
   selectedRepo: { type: String, required: true },
-  dateRange: { type: Array as PropType<[Dayjs, Dayjs] | null>, default: null },
+  dateRange: { type: Array as PropType<[Dayjs, Dayjs] | null>, default: null }
 })
 
 defineEmits(['update:selectedRepo', 'update:dateRange', 'filter'])

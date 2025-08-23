@@ -2,7 +2,12 @@
   <div class="code-analysis-header">
     <h2 class="page-title">代码分析</h2>
     <div class="code-analysis-actions">
-      <a-select v-model:value="internalSelectedRepo" placeholder="选择仓库" class="filter-item" show-search>
+      <a-select
+        v-model:value="internalSelectedRepo"
+        placeholder="选择仓库"
+        class="filter-item"
+        show-search
+      >
         <a-select-option v-for="repo in repositories" :key="repo.id" :value="repo.id">{{
           repo.name
         }}</a-select-option>
@@ -21,8 +26,8 @@ import { BarChartOutlined } from '@ant-design/icons-vue'
 import type { PropType } from 'vue'
 
 interface Repository {
-  id: number;
-  name: string;
+  id: number
+  name: string
 }
 
 const props = defineProps({
@@ -38,9 +43,12 @@ watch(internalSelectedRepo, (newVal) => {
   emit('update:modelValue', newVal)
 })
 
-watch(() => props.modelValue, (newVal) => {
-  internalSelectedRepo.value = newVal
-})
+watch(
+  () => props.modelValue,
+  (newVal) => {
+    internalSelectedRepo.value = newVal
+  }
+)
 </script>
 
 <style scoped>

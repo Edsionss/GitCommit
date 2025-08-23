@@ -43,7 +43,7 @@ import { ref, watch, reactive, computed } from 'vue'
 import type { PropType } from 'vue'
 
 interface Branch {
-  name: string;
+  name: string
 }
 
 const props = defineProps({

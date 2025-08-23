@@ -51,13 +51,17 @@ export function useTheme() {
   }
 
   // 监听 store 中的 themeMode 变化
-  watch(themeMode, (newMode) => {
-    if (newMode === 'system') {
-      applyTheme(getSystemTheme())
-    } else {
-      applyTheme(newMode as Theme)
-    }
-  }, { immediate: true })
+  watch(
+    themeMode,
+    (newMode) => {
+      if (newMode === 'system') {
+        applyTheme(getSystemTheme())
+      } else {
+        applyTheme(newMode as Theme)
+      }
+    },
+    { immediate: true }
+  )
 
   // 监听系统主题变化
   const setupSystemThemeListener = () => {

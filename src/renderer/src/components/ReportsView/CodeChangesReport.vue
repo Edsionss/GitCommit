@@ -54,19 +54,41 @@ defineProps({
 defineEmits(['exportReport'])
 
 const columns = [
-    { title: '文件路径', dataIndex: 'path', key: 'path', minWidth: 300 },
-    { title: '变更次数', dataIndex: 'changes', key: 'changes', sorter: (a, b) => a.changes - b.changes, width: 120 },
-    { title: '添加行数', dataIndex: 'additions', key: 'additions', sorter: (a, b) => a.additions - b.additions, width: 120 },
-    { title: '删除行数', dataIndex: 'deletions', key: 'deletions', sorter: (a, b) => a.deletions - b.deletions, width: 120 },
-    { title: '变更频率', dataIndex: 'changeFrequency', key: 'changeFrequency', width: 150 },
-];
+  { title: '文件路径', dataIndex: 'path', key: 'path', minWidth: 300 },
+  {
+    title: '变更次数',
+    dataIndex: 'changes',
+    key: 'changes',
+    sorter: (a, b) => a.changes - b.changes,
+    width: 120
+  },
+  {
+    title: '添加行数',
+    dataIndex: 'additions',
+    key: 'additions',
+    sorter: (a, b) => a.additions - b.additions,
+    width: 120
+  },
+  {
+    title: '删除行数',
+    dataIndex: 'deletions',
+    key: 'deletions',
+    sorter: (a, b) => a.deletions - b.deletions,
+    width: 120
+  },
+  { title: '变更频率', dataIndex: 'changeFrequency', key: 'changeFrequency', width: 150 }
+]
 
 const getChangeFrequencyColor = (frequency: string) => {
   switch (frequency) {
-    case '高频': return 'error';
-    case '中频': return 'warning';
-    case '低频': return 'processing';
-    default: return 'default';
+    case '高频':
+      return 'error'
+    case '中频':
+      return 'warning'
+    case '低频':
+      return 'processing'
+    default:
+      return 'default'
   }
 }
 
@@ -82,22 +104,22 @@ const dailyActivityData = computed(() => ({
 }))
 
 const changesTrendData = computed(() => {
-    const labels = [];
-    const additions = [];
-    const deletions = [];
-    for (let i = 29; i >= 0; i--) {
-        labels.push(dayjs().subtract(i, 'day').format('MM-DD'));
-        additions.push(Math.round(Math.random() * 300 + 100));
-        deletions.push(Math.round(Math.random() * 200 + 50));
-    }
-    return {
-        labels,
-        datasets: [
-            { label: '增加', backgroundColor: '#52c41a', data: additions },
-            { label: '删除', backgroundColor: '#f5222d', data: deletions },
-        ]
-    }
-});
+  const labels = []
+  const additions = []
+  const deletions = []
+  for (let i = 29; i >= 0; i--) {
+    labels.push(dayjs().subtract(i, 'day').format('MM-DD'))
+    additions.push(Math.round(Math.random() * 300 + 100))
+    deletions.push(Math.round(Math.random() * 200 + 50))
+  }
+  return {
+    labels,
+    datasets: [
+      { label: '增加', backgroundColor: '#52c41a', data: additions },
+      { label: '删除', backgroundColor: '#f5222d', data: deletions }
+    ]
+  }
+})
 </script>
 
 <style scoped>

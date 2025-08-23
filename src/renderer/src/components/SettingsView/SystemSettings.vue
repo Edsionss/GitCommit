@@ -89,7 +89,13 @@ defineProps({
   settings: { type: Object, required: true }
 })
 
-defineEmits(['update:startWithSystem', 'update:notifications', 'update:autoUpdate', 'update:telemetry', 'update:clearScanConfigOnFinish'])
+defineEmits([
+  'update:startWithSystem',
+  'update:notifications',
+  'update:autoUpdate',
+  'update:telemetry',
+  'update:clearScanConfigOnFinish'
+])
 </script>
 
 <style scoped>

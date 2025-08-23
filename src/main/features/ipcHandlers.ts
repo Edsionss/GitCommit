@@ -4,8 +4,8 @@ import { registerGitScanHandlers } from './git/git-scan'
 import { registerGitUtilsHandlers } from './git/git-utils'
 import { isValidGitRepo } from './git/git-utils-service'
 import { registerFileSystemHandlers } from '@main/features/fileSystem'
-import { registerHistoryHandlers } from './history/history-handlers';
-import { registerExportHandlers } from './export/export-handlers';
+import { registerHistoryHandlers } from './history/history-handlers'
+import { registerExportHandlers } from './export/export-handlers'
 
 export function registerIpcHandlers() {
   // Register handlers from other modules
@@ -13,6 +13,6 @@ export function registerIpcHandlers() {
   registerGitScanHandlers()
   registerGitUtilsHandlers()
   registerFileSystemHandlers(isValidGitRepo)
-  registerHistoryHandlers();
-  registerExportHandlers();
+  registerHistoryHandlers()
+  registerExportHandlers()
 }

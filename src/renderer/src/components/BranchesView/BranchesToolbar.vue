@@ -2,7 +2,12 @@
   <div class="branches-header">
     <h2 class="page-title">分支管理</h2>
     <div class="branches-actions">
-      <a-select v-model:value="internalSelectedRepo" placeholder="选择仓库" class="filter-item" show-search>
+      <a-select
+        v-model:value="internalSelectedRepo"
+        placeholder="选择仓库"
+        class="filter-item"
+        show-search
+      >
         <a-select-option v-for="repo in repositories" :key="repo.id" :value="repo.id">{{
           repo.name
         }}</a-select-option>
@@ -25,8 +30,8 @@ import { ReloadOutlined, PlusOutlined } from '@ant-design/icons-vue'
 import type { PropType } from 'vue'
 
 interface Repository {
-  id: number;
-  name: string;
+  id: number
+  name: string
 }
 
 const props = defineProps({
@@ -42,9 +47,12 @@ watch(internalSelectedRepo, (newVal) => {
   emit('update:selectedRepo', newVal)
 })
 
-watch(() => props.selectedRepo, (newVal) => {
-  internalSelectedRepo.value = newVal
-})
+watch(
+  () => props.selectedRepo,
+  (newVal) => {
+    internalSelectedRepo.value = newVal
+  }
+)
 </script>
 
 <style scoped>

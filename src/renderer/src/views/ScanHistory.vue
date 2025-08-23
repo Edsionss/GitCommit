@@ -146,14 +146,14 @@ const exportScanResults = async (format: 'json' | 'csv') => {
   }
   message.info(`正在导出 ${selectedRecord.value.repoPath} 的扫描结果为 ${format} 格式...`)
   try {
-    const filePath = await exportApi.exportCommits(selectedRecord.value.results, format);
+    const filePath = await exportApi.exportCommits(selectedRecord.value.results, format)
     if (filePath) {
       message.success(`导出成功！文件保存至: ${filePath}`)
     } else {
       message.info('导出已取消或未保存文件。')
     }
   } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : String(error);
+    const errorMessage = error instanceof Error ? error.message : String(error)
     message.error(`导出失败: ${errorMessage}`)
   }
 }

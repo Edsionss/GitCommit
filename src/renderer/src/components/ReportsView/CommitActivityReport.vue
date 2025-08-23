@@ -30,12 +30,20 @@
     <a-descriptions :column="4" bordered size="small">
       <a-descriptions-item label="总提交数">{{ commitStats.totalCommits }}</a-descriptions-item>
       <a-descriptions-item label="最活跃日期">{{ commitStats.mostActiveDay }}</a-descriptions-item>
-      <a-descriptions-item label="平均每日提交">{{ commitStats.avgCommitsPerDay }}</a-descriptions-item>
-      <a-descriptions-item label="贡献者数量">{{ commitStats.contributorsCount }}</a-descriptions-item>
+      <a-descriptions-item label="平均每日提交">{{
+        commitStats.avgCommitsPerDay
+      }}</a-descriptions-item>
+      <a-descriptions-item label="贡献者数量">{{
+        commitStats.contributorsCount
+      }}</a-descriptions-item>
       <a-descriptions-item label="添加的行数">{{ commitStats.addedLines }}</a-descriptions-item>
       <a-descriptions-item label="删除的行数">{{ commitStats.deletedLines }}</a-descriptions-item>
-      <a-descriptions-item label="修改的文件数">{{ commitStats.modifiedFiles }}</a-descriptions-item>
-      <a-descriptions-item label="平均提交大小">{{ commitStats.avgCommitSize }}</a-descriptions-item>
+      <a-descriptions-item label="修改的文件数">{{
+        commitStats.modifiedFiles
+      }}</a-descriptions-item>
+      <a-descriptions-item label="平均提交大小">{{
+        commitStats.avgCommitSize
+      }}</a-descriptions-item>
     </a-descriptions>
 
     <h3 class="section-title">贡献者排名</h3>
@@ -65,12 +73,36 @@ defineProps({
 defineEmits(['exportReport'])
 
 const columns = [
-  { title: '排名', dataIndex: 'rank', key: 'rank', customRender: ({ index }) => index + 1, width: 60 },
+  {
+    title: '排名',
+    dataIndex: 'rank',
+    key: 'rank',
+    customRender: ({ index }) => index + 1,
+    width: 60
+  },
   { title: '贡献者', dataIndex: 'name', key: 'name', minWidth: 140 },
   { title: '邮箱', dataIndex: 'email', key: 'email', minWidth: 200 },
-  { title: '提交数', dataIndex: 'commits', key: 'commits', sorter: (a, b) => a.commits - b.commits, width: 100 },
-  { title: '添加行数', dataIndex: 'additions', key: 'additions', sorter: (a, b) => a.additions - b.additions, width: 120 },
-  { title: '删除行数', dataIndex: 'deletions', key: 'deletions', sorter: (a, b) => a.deletions - b.deletions, width: 120 },
+  {
+    title: '提交数',
+    dataIndex: 'commits',
+    key: 'commits',
+    sorter: (a, b) => a.commits - b.commits,
+    width: 100
+  },
+  {
+    title: '添加行数',
+    dataIndex: 'additions',
+    key: 'additions',
+    sorter: (a, b) => a.additions - b.additions,
+    width: 120
+  },
+  {
+    title: '删除行数',
+    dataIndex: 'deletions',
+    key: 'deletions',
+    sorter: (a, b) => a.deletions - b.deletions,
+    width: 120
+  },
   { title: '贡献占比', dataIndex: 'percentage', key: 'percentage', width: 150 }
 ]
 

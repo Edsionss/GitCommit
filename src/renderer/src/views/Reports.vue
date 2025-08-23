@@ -64,10 +64,7 @@ const milestones = ref(reportsMilestonesData)
 const selectedRepo = ref(1)
 const activeTab = ref('commit-activity')
 const loading = ref(false)
-const dateRange = ref<[Dayjs, Dayjs]>([
-  dayjs().subtract(30, 'day'),
-  dayjs()
-])
+const dateRange = ref<[Dayjs, Dayjs]>([dayjs().subtract(30, 'day'), dayjs()])
 
 // 生成报告预览
 const generatePreview = () => {

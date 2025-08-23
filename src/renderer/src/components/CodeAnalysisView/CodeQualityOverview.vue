@@ -74,23 +74,28 @@
 
 <script setup lang="ts">
 import { ref, computed, PropType } from 'vue'
-import { FileTextOutlined, BranchesOutlined, WarningOutlined, StarOutlined } from '@ant-design/icons-vue'
+import {
+  FileTextOutlined,
+  BranchesOutlined,
+  WarningOutlined,
+  StarOutlined
+} from '@ant-design/icons-vue'
 import ChartContainer from '../charts/ChartContainer.vue'
 import BasePieChart from '../charts/BasePieChart.vue'
 
 interface CodeStats {
-  totalFiles: number;
-  avgComplexity: number;
-  issues: number;
-  qualityScore: number;
+  totalFiles: number
+  avgComplexity: number
+  issues: number
+  qualityScore: number
 }
 
 interface CodeIssue {
-  file: string;
-  line: number;
-  type: string;
-  message: string;
-  severity: string;
+  file: string
+  line: number
+  type: string
+  message: string
+  severity: string
 }
 
 defineProps({
@@ -101,19 +106,27 @@ defineProps({
 
 const getIssueTypeColor = (type: string) => {
   switch (type) {
-    case '错误': return 'error';
-    case '警告': return 'warning';
-    case '信息': return 'processing';
-    default: return 'default';
+    case '错误':
+      return 'error'
+    case '警告':
+      return 'warning'
+    case '信息':
+      return 'processing'
+    default:
+      return 'default'
   }
 }
 
 const getIssueSeverityColor = (severity: string) => {
   switch (severity) {
-    case '高': return 'error';
-    case '中': return 'warning';
-    case '低': return 'default';
-    default: return 'default';
+    case '高':
+      return 'error'
+    case '中':
+      return 'warning'
+    case '低':
+      return 'default'
+    default:
+      return 'default'
   }
 }
 
@@ -128,12 +141,12 @@ const chartData = computed(() => ({
 }))
 
 const columns = ref([
-    { title: '文件', dataIndex: 'file', key: 'file', width: 180 },
-    { title: '行号', dataIndex: 'line', key: 'line', width: 80 },
-    { title: '类型', dataIndex: 'type', key: 'type', width: 120 },
-    { title: '问题描述', dataIndex: 'message', key: 'message', width: 250 },
-    { title: '严重程度', dataIndex: 'severity', key: 'severity', width: 120 },
-]);
+  { title: '文件', dataIndex: 'file', key: 'file', width: 180 },
+  { title: '行号', dataIndex: 'line', key: 'line', width: 80 },
+  { title: '类型', dataIndex: 'type', key: 'type', width: 120 },
+  { title: '问题描述', dataIndex: 'message', key: 'message', width: 250 },
+  { title: '严重程度', dataIndex: 'severity', key: 'severity', width: 120 }
+])
 </script>
 
 <style scoped>

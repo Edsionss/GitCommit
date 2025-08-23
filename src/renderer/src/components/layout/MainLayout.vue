@@ -45,7 +45,6 @@ onMounted(() => {
   // Ensure theme is applied to body, which is handled by useTheme now
   // The store loads initial state, and watchers in composables handle the rest.
 })
-
 </script>
 
 <style scoped>

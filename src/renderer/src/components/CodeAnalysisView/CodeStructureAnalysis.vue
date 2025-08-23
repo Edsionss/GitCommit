@@ -19,12 +19,12 @@
 
     <h3 class="section-title">代码依赖关系</h3>
     <div class="dependency-chart">
-      <div style="text-align: center; padding: 20px;">依赖关系图 (待实现)</div>
+      <div style="text-align: center; padding: 20px">依赖关系图 (待实现)</div>
     </div>
 
     <h3 class="section-title">模块大小</h3>
     <div class="module-chart">
-      <div style="text-align: center; padding: 20px;">模块大小图 (待实现)</div>
+      <div style="text-align: center; padding: 20px">模块大小图 (待实现)</div>
     </div>
   </a-card>
 </template>
@@ -32,7 +32,16 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { Doughnut, Bar } from 'vue-chartjs'
-import { Chart as ChartJS, Title, Tooltip, Legend, ArcElement, CategoryScale, LinearScale, BarElement } from 'chart.js'
+import {
+  Chart as ChartJS,
+  Title,
+  Tooltip,
+  Legend,
+  ArcElement,
+  CategoryScale,
+  LinearScale,
+  BarElement
+} from 'chart.js'
 
 ChartJS.register(Title, Tooltip, Legend, ArcElement, CategoryScale, LinearScale, BarElement)
 

@@ -57,18 +57,32 @@ defineEmits(['exportReport'])
 
 const getMilestoneColor = (status: string) => {
   switch (status) {
-    case 'completed': return 'green';
-    case 'in-progress': return 'blue';
-    case 'pending': return 'gray';
-    default: return 'gray';
+    case 'completed':
+      return 'green'
+    case 'in-progress':
+      return 'blue'
+    case 'pending':
+      return 'gray'
+    default:
+      return 'gray'
   }
 }
 
 const progressChartData = computed(() => ({
   labels: ['功能开发', '界面设计', '后端API', '数据库', '测试', '文档'],
   datasets: [
-    { label: '计划进度', backgroundColor: '#91d5ff', data: [90, 95, 85, 80, 70, 60], type: 'bar' as const },
-    { label: '实际进度', backgroundColor: '#1890ff', data: [95, 90, 80, 85, 60, 50], type: 'bar' as const }
+    {
+      label: '计划进度',
+      backgroundColor: '#91d5ff',
+      data: [90, 95, 85, 80, 70, 60],
+      type: 'bar' as const
+    },
+    {
+      label: '实际进度',
+      backgroundColor: '#1890ff',
+      data: [95, 90, 80, 85, 60, 50],
+      type: 'bar' as const
+    }
   ]
 }))
 

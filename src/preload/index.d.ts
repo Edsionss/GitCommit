@@ -1,5 +1,5 @@
 import { ElectronAPI } from '@electron-toolkit/preload'
-import type { GitCommit } from '@shared/types/dtos/git.dto';
+import type { GitCommit } from '@shared/types/dtos/git.dto'
 
 // Define interfaces for the data structures used in the API
 interface GitScanOptions {
@@ -42,8 +42,8 @@ interface ChatMessage {
 }
 
 interface RepoHistoryItem {
-  path: string;
-  lastAccessed: string;
+  path: string
+  lastAccessed: string
 }
 
 // Define the shape of the API object
@@ -66,13 +66,13 @@ interface ExposedAPI {
   onScanCancelled: (callback: () => void) => () => void
 
   // History API
-  getHistory: () => Promise<RepoHistoryItem[]>;
-  addHistory: (repoPath: string) => Promise<RepoHistoryItem[]>;
-  removeHistory: (repoPath: string) => Promise<RepoHistoryItem[]>;
-  clearHistory: () => Promise<RepoHistoryItem[]>;
+  getHistory: () => Promise<RepoHistoryItem[]>
+  addHistory: (repoPath: string) => Promise<RepoHistoryItem[]>
+  removeHistory: (repoPath: string) => Promise<RepoHistoryItem[]>
+  clearHistory: () => Promise<RepoHistoryItem[]>
 
   // Export API
-  exportCommits: (commits: GitCommit[], format: 'json' | 'csv') => Promise<string | null>;
+  exportCommits: (commits: GitCommit[], format: 'json' | 'csv') => Promise<string | null>
 }
 
 declare global {
