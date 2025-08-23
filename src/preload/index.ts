@@ -63,8 +63,7 @@ const api = {
   scanGitRepo: (repoPath: string, options?: GitScanOptions, aiConfig?: AiConfig): Promise<any> =>
     ipcRenderer.invoke('scan-git-repo', repoPath, options, aiConfig),
 
-  // 保存文件
-  saveFile: (options: any): Promise<string | null> => ipcRenderer.invoke('save-file', options),
+  
 
   // 取消扫描
   cancelScan: () => ipcRenderer.send('cancel-scan'),

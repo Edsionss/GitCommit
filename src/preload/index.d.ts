@@ -59,7 +59,7 @@ interface ExposedAPI {
   onScanProgress: (callback: (data: any) => void) => () => void
   onScanError: (callback: (data: any) => void) => () => void
   onScanCancelled: (callback: () => void) => () => void
-  onAddLog: (callback: (message: string, type: string) => void) => () => void
+  
 }
 
 declare global {
