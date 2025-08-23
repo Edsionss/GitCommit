@@ -80,14 +80,6 @@ const defaultRoutes: RouteRecord[] = [
     menuOrder: 70
   },
   {
-    path: 'tableView',
-    name: 'TableView',
-    componentPath: '@views/TableView.vue',
-    meta: { title: '提交详情', keepAlive: true },
-    isMenu: false,
-    menuOrder: 998
-  },
-  {
     path: 'routes',
     name: 'RoutesView',
     componentPath: '@views/RoutesView.vue',
