@@ -5,8 +5,8 @@ import icon from '../../resources/icon.png?asset'
 import { promises as fs } from 'fs'
 import * as path from 'path'
 
-import { registerIpcHandlers } from '@main/features/ipcHandlers'
-import { registerAiHandlers } from '@main/features/ai/ai'
+import { registerIpcHandlers } from '@features/ipcHandlers'
+import { registerAiHandlers } from '@features/ai/ai'
 
 function createWindow(): void {
   // Create the browser window.
