@@ -1,5 +1,5 @@
 import { ipcMain } from 'electron'
-import { isValidGitRepo, findGitRepos } from './git-utils-service'
+import { isValidGitRepo, findGitRepos } from '@services/git/git-utils'
 
 export function registerGitUtilsHandlers() {
   // 验证路径

@@ -14,11 +14,13 @@
       "@/*": ["src/renderer/src/*"],
       "@components/*": ["src/renderer/src/components/*"],
       "@views/*": ["src/renderer/src/views/*"],
+      "@api/*": ["src/renderer/src/api/*"],
       "@assets/*": ["src/renderer/src/assets/*"],
       "@composables/*": ["src/renderer/src/composables/*"],
       "@router/*": ["src/renderer/src/router/*"],
-      
-      "@shared/*": ["src/shared/*"]
+      "@features":["src/main/features"],
+      "@shared/*": ["src/shared/*"],
+      "@services":["src/main/services"],
     }
   }
 }

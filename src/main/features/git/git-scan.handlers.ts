@@ -1,5 +1,5 @@
 import { ipcMain, BrowserWindow } from 'electron'
-import { scanGitRepository, setCancelScanFlag } from './git-scan-service'
+import { scanGitRepository, setCancelScanFlag } from '@services/git/git-scan'
 import type { GitScanOptions, AiConfig, ProgressCallback } from '@shared/types/dtos/git.dto'
 
 export function registerGitScanHandlers() {

@@ -1,5 +1,10 @@
 import { ipcMain } from 'electron'
-import { getHistory, addToHistory, removeFromHistory, clearHistory } from '../history'
+import {
+  getHistory,
+  addToHistory,
+  removeFromHistory,
+  clearHistory
+} from '@services/history/history'
 
 export function registerHistoryHandlers() {
   ipcMain.handle('history:get', getHistory)

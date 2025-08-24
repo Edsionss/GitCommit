@@ -6,7 +6,9 @@ export default defineConfig({
   main: {
     resolve: {
       alias: {
-        '@main': resolve('src/main')
+        '@main': resolve('src/main'),
+        '@features': resolve('src/main/features'),
+        '@services': resolve('src/main/services')
       }
     },
     plugins: [externalizeDepsPlugin()]
@@ -26,11 +28,12 @@ export default defineConfig({
         '@': resolve('src/renderer/src'),
         '@components': resolve('src/renderer/src/components'),
         '@views': resolve('src/renderer/src/views'),
+        '@api': resolve('src/renderer/src/api'),
         '@assets': resolve('src/renderer/src/assets'),
         '@composables': resolve('src/renderer/src/composables'),
         '@router': resolve('src/renderer/src/router'),
-        '@services': resolve('src/services'),
-        '@mock': resolve('src/renderer/src/mock')
+        '@mock': resolve('src/renderer/src/mock'),
+        '@shared': resolve('src/shared')
       }
     },
     plugins: [vue()]

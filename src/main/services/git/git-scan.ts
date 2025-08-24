@@ -1,7 +1,9 @@
 import simpleGit, { SimpleGit, LogOptions } from 'simple-git'
 import * as path from 'path'
-import { isValidGitRepo, findGitRepos } from './git-utils-service'
-import { generateChatResponse } from '../ai/ai-service'
+// import { isValidGitRepo, findGitRepos } from './git-utils-service'
+import { isValidGitRepo, findGitRepos } from '@services/git/git-utils'
+// import { generateChatResponse } from '../ai/ai-service'
+import { generateChatResponse } from '@services/ai/ai'
 import type {
   GitCommit,
   GitScanOptions,
@@ -137,7 +139,10 @@ export async function scanGitRepository(
         })
         const logResult = await git.log(logOptions)
 
-        sendProgress({ phase: `${progressPrefix} - 解析提交数据`, percentage: 50 + (i / totalRepos) * 80 })
+        sendProgress({
+          phase: `${progressPrefix} - 解析提交数据`,
+          percentage: 50 + (i / totalRepos) * 80
+        })
 
         for (const commit of logResult.all) {
           if (cancelScanFlag) throw new Error('操作已取消')
