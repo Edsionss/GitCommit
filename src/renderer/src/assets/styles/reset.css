@@ -75,12 +75,12 @@ select {
 
 ::-webkit-scrollbar-track {
   background: #f1f1f1;
-  border-radius: var(--radius-sm);
+  border-radius: 8px;
 }
 
 ::-webkit-scrollbar-thumb {
   background: #cccccc;
-  border-radius: var(--radius-sm);
+  border-radius: 8px;
   transition: background-color var(--transition-fast);
 }
 
