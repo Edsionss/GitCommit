@@ -1,18 +1,24 @@
 import { ipcMain, BrowserWindow } from 'electron'
 import { scanGitRepository, setCancelScanFlag } from './git-scan-service'
-import type { GitScanOptions, AiConfig } from '@shared/types/dtos/git.dto'
+import type { GitScanOptions, AiConfig, ProgressCallback } from '@shared/types/dtos/git.dto'
 
 export function registerGitScanHandlers() {
   // Git操作 - 扫描仓库
   ipcMain.handle(
     'scan-git-repo',
     async (_, repoPath: string, options?: GitScanOptions, aiConfig?: AiConfig) => {
-      console.log('scan-git-repo options:', JSON.stringify(options, null, 2))
+      const mainWindow = BrowserWindow.getAllWindows()[0]
+
+      const progressCallback: ProgressCallback = (progress) => {
+        mainWindow?.webContents.send('scan-progress', progress)
+      }
+
       try {
-        return await scanGitRepository(repoPath, options, aiConfig)
+        return await scanGitRepository(repoPath, options, aiConfig, progressCallback)
       } catch (error) {
         const errorMessage = error instanceof Error ? error.message : String(error)
-        BrowserWindow.getAllWindows()[0]?.webContents.send('scan-error', { message: errorMessage })
+        mainWindow?.webContents.send('scan-error', { message: errorMessage })
+        // 重新抛出错误，让前端的 await 调用失败
         throw new Error(errorMessage)
       }
     }

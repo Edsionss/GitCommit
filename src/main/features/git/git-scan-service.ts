@@ -1,9 +1,14 @@
-import { BrowserWindow } from 'electron'
 import simpleGit, { SimpleGit, LogOptions } from 'simple-git'
 import * as path from 'path'
 import { isValidGitRepo, findGitRepos } from './git-utils-service'
 import { generateChatResponse } from '../ai/ai-service'
-import type { GitCommit, GitScanOptions, AiConfig } from '@shared/types/dtos/git.dto'
+import type {
+  GitCommit,
+  GitScanOptions,
+  AiConfig,
+  ProgressCallback,
+  ScanProgress
+} from '@shared/types/dtos/git.dto'
 
 let cancelScanFlag = false
 
@@ -38,14 +43,14 @@ const aiAnalysisCommits = async (
 export async function scanGitRepository(
   repoPath: string,
   options?: GitScanOptions,
-  aiConfig?: AiConfig
+  aiConfig?: AiConfig,
+  onProgress?: ProgressCallback
 ): Promise<{ commits: GitCommit[]; analysisResult: any }> {
-  const mainWindow = BrowserWindow.getAllWindows()[0]
-  const sendProgress = (phase: string, percentage: number, commits?: GitCommit[]) => {
+  const sendProgress = (progress: ScanProgress) => {
     if (cancelScanFlag) {
       throw new Error('操作已取消')
     }
-    mainWindow?.webContents.send('scan-progress', { phase, percentage, commits })
+    onProgress?.(progress)
   }
 
   try {
@@ -58,7 +63,7 @@ export async function scanGitRepository(
       if (options.selectedRepos && options.selectedRepos.length > 0) {
         reposToScan = options.selectedRepos
       } else {
-        sendProgress('正在查找子目录中的Git仓库...', 5)
+        sendProgress({ phase: '正在查找子目录中的Git仓库...', percentage: 5 })
         const foundRepos = await findGitRepos(repoPath)
         reposToScan = foundRepos.map((r) => r.path)
       }
@@ -83,7 +88,10 @@ export async function scanGitRepository(
       const progressPrefix = totalRepos > 1 ? `(${i + 1}/${totalRepos}) ${repoName}` : ''
 
       try {
-        sendProgress(`${progressPrefix} - 初始化仓库`, 10 + (i / totalRepos) * 80)
+        sendProgress({
+          phase: `${progressPrefix} - 初始化仓库`,
+          percentage: 10 + (i / totalRepos) * 80
+        })
         const git: SimpleGit = simpleGit(currentRepoPath)
 
         const branchSummary = await git.branchLocal()
@@ -93,7 +101,7 @@ export async function scanGitRepository(
         const latestLog = await git.log(['-1']).catch(() => null)
         if (!latestLog) {
           console.warn(`Skipping empty repository (no commits): ${currentRepoPath}`)
-          mainWindow?.webContents.send('add-log', `跳过空仓库 (无提交): ${repoName}`, 'warning')
+          // mainWindow?.webContents.send('add-log', `跳过空仓库 (无提交): ${repoName}`, 'warning')
           continue
         }
 
@@ -123,10 +131,13 @@ export async function scanGitRepository(
           logOptions['--author'] = options.authorFilter.join('|')
         }
 
-        sendProgress(`${progressPrefix} - 获取提交历史`, 20 + (i / totalRepos) * 80)
+        sendProgress({
+          phase: `${progressPrefix} - 获取提交历史`,
+          percentage: 20 + (i / totalRepos) * 80
+        })
         const logResult = await git.log(logOptions)
 
-        sendProgress(`${progressPrefix} - 解析提交数据`, 50 + (i / totalRepos) * 80)
+        sendProgress({ phase: `${progressPrefix} - 解析提交数据`, percentage: 50 + (i / totalRepos) * 80 })
 
         for (const commit of logResult.all) {
           if (cancelScanFlag) throw new Error('操作已取消')
@@ -161,7 +172,7 @@ export async function scanGitRepository(
       } catch (repoError) {
         const errorMsg = repoError instanceof Error ? repoError.message : String(repoError)
         console.error(`扫描仓库 ${currentRepoPath} 失败: ${errorMsg}`)
-        mainWindow?.webContents.send('add-log', `扫描仓库 ${repoName} 失败: ${errorMsg}`, 'error')
+        // mainWindow?.webContents.send('add-log', `扫描仓库 ${repoName} 失败: ${errorMsg}`, 'error')
         // Continue to the next repo
       }
     }
@@ -172,16 +183,16 @@ export async function scanGitRepository(
     )
     let analysisResult: any = ''
     if (options?.AutoAiAnalysis && options?.analysisRules && aiConfig) {
-      sendProgress(` -  AI分析结果中`, 90)
+      sendProgress({ phase: ` -  AI分析结果中`, percentage: 90 })
       analysisResult = await aiAnalysisCommits(aiConfig, allCommits, options.analysisRules)
-      sendProgress(` -  AI分析结果: ${analysisResult}`, 95)
+      sendProgress({ phase: ` -  AI分析结果: ${analysisResult}`, percentage: 95 })
     }
-    sendProgress('完成', 100, allCommits)
+    sendProgress({ phase: '完成', percentage: 100, commits: allCommits })
 
     return { commits: allCommits, analysisResult }
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error)
-    BrowserWindow.getAllWindows()[0]?.webContents.send('scan-error', { message: errorMessage })
+    // BrowserWindow.getAllWindows()[0]?.webContents.send('scan-error', { message: errorMessage })
     throw new Error(errorMessage)
   }
 }

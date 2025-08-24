@@ -34,3 +34,11 @@ export interface AiConfig {
   endpoint?: string
   model?: string
 }
+
+// 扫描进度回调接口
+export interface ScanProgress {
+  phase: string
+  percentage: number
+  commits?: GitCommit[]
+}
+export type ProgressCallback = (progress: ScanProgress) => void
