@@ -18,10 +18,7 @@
       "@assets/*": ["src/renderer/src/assets/*"],
       "@composables/*": ["src/renderer/src/composables/*"],
       "@router/*": ["src/renderer/src/router/*"],
-      "@features":["src/main/features"],
-      "@shared/*": ["src/shared/*"],
-      "@services":["src/main/services"],
-      "@amin":["src/main"],
+      "@shared/*": ["src/shared/*"]
     }
   }
 }
