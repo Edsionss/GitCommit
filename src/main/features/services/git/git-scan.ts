@@ -188,9 +188,13 @@ export async function scanGitRepository(
     )
     let analysisResult: any = ''
     if (options?.AutoAiAnalysis && options?.analysisRules && aiConfig) {
-      sendProgress({ phase: ` -  AI分析结果中`, percentage: 90 })
-      analysisResult = await aiAnalysisCommits(aiConfig, allCommits, options.analysisRules)
-      sendProgress({ phase: ` -  AI分析结果: ${analysisResult}`, percentage: 95 })
+      if (allCommits.length) {
+        sendProgress({ phase: ` -  AI分析结果中`, percentage: 90 })
+        analysisResult = await aiAnalysisCommits(aiConfig, allCommits, options.analysisRules)
+        sendProgress({ phase: ` -  AI分析完成`, percentage: 95 })
+      } else {
+        analysisResult = '没有提交记录可供分析'
+      }
     }
     sendProgress({ phase: '完成', percentage: 100, commits: allCommits })
 

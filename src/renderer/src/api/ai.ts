@@ -6,5 +6,8 @@ export const aiApi = {
     config: AiConfig,
     history?: ChatMessage[],
     isStream?: boolean
-  ): Promise<any> => window.api.aiChat(prompt, config, history, isStream)
+  ): Promise<any> => window.api.aiChat(prompt, config, history, isStream),
+  onChatStreamChunk: (callback: (chunk: string) => void) => {
+    window.api.onChatStreamChunk(callback)
+  }
 }

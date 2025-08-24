@@ -160,7 +160,7 @@ const sendMessage = async ({ input, userContent, success }: any) => {
   chatStore.addMessageToActiveSession(userMessage, appSettings.value.ai.enableAutoSave)
   // chatStore.ThinkIngLoading(true)
   isLoading.value = true
-  const { sendAiMessage } = useAi()
+  const { sendAiMessage, onChatStreamChunk } = useAi()
   const aiConfig = appSettings.value.ai
   let history: Array<{ sender: 'user' | 'ai'; text: string }> = []
   if (aiConfig.enableAiHistory && activeSession.value) {
@@ -171,10 +171,14 @@ const sendMessage = async ({ input, userContent, success }: any) => {
     }))
   }
   aiConfig.enableStreaming &&
-    window.api.onChatStreamChunk((chunk) => {
+    onChatStreamChunk((chunk) => {
       streamingMessage.value += chunk
       scrollToBottom()
     })
+  // window.api.onChatStreamChunk((chunk) => {
+  //   streamingMessage.value += chunk
+  //   scrollToBottom()
+  // })
   sendAiMessage({
     prompt: text,
     history: history,

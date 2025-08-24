@@ -57,8 +57,12 @@ export function useAi() {
       return 'end'
     }
   }
+  const onChatStreamChunk = (callback: (chunk: string) => void) => {
+    aiApi.onChatStreamChunk(callback)
+  }
 
   return {
-    sendAiMessage
+    sendAiMessage,
+    onChatStreamChunk
   }
 }
