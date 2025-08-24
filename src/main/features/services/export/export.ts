@@ -2,7 +2,7 @@ import { dialog } from 'electron'
 import { promises as fs } from 'fs'
 import * as path from 'path'
 import dayjs from 'dayjs'
-import type { GitCommit } from '@shared/types/dtos/git.dto'
+import type { GitCommit } from '@shared/types/dtos/git'
 
 // import { createExcelFile } from '../excel' // 导入 createExcelFile
 import { createExcelFile } from '@services/excel/excel' // 导入 createExcelFile

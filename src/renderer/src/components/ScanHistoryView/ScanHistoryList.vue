@@ -31,7 +31,7 @@
 <script setup lang="ts">
 import { PropType, h } from 'vue'
 import dayjs from 'dayjs'
-import type { GitCommit, GitScanOptions } from '@shared/types/dtos/git.dto'
+import type { GitCommit, GitScanOptions } from '@shared/types/dtos/git'
 import ContextMenu from '@imengyu/vue3-context-menu'
 import { useTheme } from '@/composables/useTheme'
 import { DeleteOutlined, ClearOutlined } from '@ant-design/icons-vue'

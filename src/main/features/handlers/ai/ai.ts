@@ -4,8 +4,8 @@
  */
 
 import { ipcMain } from 'electron'
-import { generateCommitMessage, generateChatResponse, AiConfig, ChatMessage } from '@services/ai/ai'
-
+import { generateCommitMessage, generateChatResponse } from '@services/ai/ai'
+import type { AiConfig, ChatMessage } from '@shared/types/dtos/ai'
 /**
  * Registers all AI-related IPC handlers.
  */

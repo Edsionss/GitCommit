@@ -1,5 +1,6 @@
 import { contextBridge, ipcRenderer } from 'electron'
 import { electronAPI } from '@electron-toolkit/preload'
+import type { AiConfig } from '@shared/types/dtos/ai'
 
 // Git扫描选项
 interface GitScanOptions {
@@ -28,13 +29,6 @@ interface GetSubReposResult {
 interface ChatMessage {
   sender: 'user' | 'ai'
   text: string
-}
-
-export interface AiConfig {
-  provider: 'openai' | 'gemini' | 'anthropic' | 'kimi' | 'custom' | null
-  apiKey: string
-  endpoint?: string
-  model?: string
 }
 
 // 暴露给渲染进程的API

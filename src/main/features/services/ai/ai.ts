@@ -2,22 +2,12 @@ import { GoogleGenAI } from '@google/genai'
 import { OpenAI } from 'openai'
 import { Stream } from 'openai/streaming'
 import type { ChatCompletionChunk } from 'openai/resources/chat/completions'
+import type { AiConfig, ChatMessage } from '@allTypes/ai'
 /**
  * @file AI Service
  * @description Handles interactions with various AI providers.
  */
 // Define a common interface for AI configuration that the frontend will pass
-export interface AiConfig {
-  provider: 'openai' | 'gemini' | 'anthropic' | 'kimi' | 'custom' | null
-  apiKey: string
-  endpoint?: string
-  model?: string
-}
-
-export interface ChatMessage {
-  sender: 'user' | 'ai'
-  text: string
-}
 
 /**
  * Generates a commit message using the configured AI provider.

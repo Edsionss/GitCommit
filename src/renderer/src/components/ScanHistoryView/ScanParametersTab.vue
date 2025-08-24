@@ -42,7 +42,7 @@
 <script setup lang="ts">
 import { PropType } from 'vue'
 import dayjs from 'dayjs'
-import type { GitScanOptions } from '@shared/types/dtos/git.dto'
+import type { GitScanOptions } from '@shared/types/dtos/git'
 
 interface ScanRecord {
   id: string

@@ -28,13 +28,6 @@ export interface GitScanOptions {
   analysisRules?: string
 }
 
-export interface AiConfig {
-  provider: 'openai' | 'gemini' | 'anthropic' | 'kimi' | 'custom' | null
-  apiKey: string
-  endpoint?: string
-  model?: string
-}
-
 // 扫描进度回调接口
 export interface ScanProgress {
   phase: string

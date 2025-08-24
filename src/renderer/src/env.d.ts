@@ -1,4 +1,5 @@
 /// <reference types="vite/client" />
+import type { AiConfig } from '@shared/types/dtos/ai'
 
 declare module '*.vue' {
   import type { DefineComponent } from 'vue'
@@ -44,12 +45,12 @@ interface GitCommitResult {
   analysisResult: any
 }
 
-export interface AiConfig {
-  provider: 'openai' | 'gemini' | 'anthropic' | 'kimi' | 'custom' | null
-  apiKey: string
-  endpoint?: string
-  model?: string
-}
+// export interface AiConfig {
+//   provider: 'openai' | 'gemini' | 'anthropic' | 'kimi' | 'custom' | null
+//   apiKey: string
+//   endpoint?: string
+//   model?: string
+// }
 
 // 定义window对象上的API接口
 interface Window {

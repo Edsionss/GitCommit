@@ -7,10 +7,10 @@ import { generateChatResponse } from '@services/ai/ai'
 import type {
   GitCommit,
   GitScanOptions,
-  AiConfig,
   ProgressCallback,
   ScanProgress
-} from '@shared/types/dtos/git.dto'
+} from '@shared/types/dtos/git'
+import type { AiConfig } from '@shared/types/dtos/ai'
 
 let cancelScanFlag = false
 

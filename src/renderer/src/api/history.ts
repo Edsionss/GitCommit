@@ -1,4 +1,4 @@
-import type { RepoHistoryItem } from '@shared/types/dtos/git.dto'
+import type { RepoHistoryItem } from '@shared/types/dtos/git'
 
 export const historyApi = {
   getHistory: (): Promise<RepoHistoryItem[]> => window.api.getHistory(),

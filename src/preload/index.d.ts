@@ -1,5 +1,6 @@
 import { ElectronAPI } from '@electron-toolkit/preload'
-import type { GitCommit, RepoHistoryItem } from '@shared/types/dtos/git.dto'
+import type { GitCommit, RepoHistoryItem } from '@shared/types/dtos/git'
+import type { AiConfig } from '@shared/types/dtos/ai'
 
 // Define interfaces for the data structures used in the API
 interface GitScanOptions {
@@ -21,13 +22,6 @@ interface GetSubReposResult {
   success: boolean
   repos?: string[]
   error?: string
-}
-
-interface AiConfig {
-  provider: 'openai' | 'gemini' | 'anthropic' | 'custom' | null
-  apiKey: string
-  endpoint?: string
-  model?: string
 }
 
 interface AiChatResponse {
