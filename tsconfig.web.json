@@ -21,6 +21,7 @@
       "@features":["src/main/features"],
       "@shared/*": ["src/shared/*"],
       "@services":["src/main/services"],
+      "@amin":["src/main"],
     }
   }
 }
