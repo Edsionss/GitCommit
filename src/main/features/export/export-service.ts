@@ -3,7 +3,7 @@ import { promises as fs } from 'fs'
 import * as path from 'path'
 import dayjs from 'dayjs'
 import type { GitCommit } from '@shared/types/dtos/git.dto'
-import { createExcelFile } from './excel' // 导入 createExcelFile
+import { createExcelFile } from '../excel' // 导入 createExcelFile
 
 async function saveFile(defaultName: string, content: string | Buffer): Promise<string | null> {
   const { canceled, filePath } = await dialog.showSaveDialog({
