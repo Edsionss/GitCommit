@@ -41,4 +41,9 @@ export interface ScanProgress {
   percentage: number
   commits?: GitCommit[]
 }
+
+export interface RepoHistoryItem {
+  path: string
+  lastAccessed: string
+}
 export type ProgressCallback = (progress: ScanProgress) => void

@@ -1,11 +1,13 @@
 import { ref, watch, reactive, computed, ToRefs, onMounted } from 'vue'
 import { message } from 'ant-design-vue'
 import dayjs, { Dayjs } from 'dayjs'
-import type { RepoHistoryItem } from '@preload/index.d.ts'
-import { gitApi } from '@renderer/api/git'
-import { historyApi } from '@renderer/api/history'
-import { fileSystemApi } from '@renderer/api/fileSystem'
+import type { RepoHistoryItem } from '@shared/types/dtos/git.dto'
 
+import { gitApi } from '@renderer/api/git'
+// import { historyApi } from '@renderer/api/history'
+import { fileSystemApi } from '@renderer/api/fileSystem'
+import { useScanStore } from '@renderer/stores/scanStore'
+import { storeToRefs } from 'pinia'
 interface FormState {
   repoPath: string
   scanSubfolders: boolean
@@ -33,9 +35,13 @@ export function useSettingsForm(
     自定义: 'custom'
   }
 
+  const scanStore = useScanStore()
+  const { getGitRepos } = storeToRefs(scanStore)
+
   const subRepos = ref<SubRepo[]>([])
   const isDiscoveringRepos = ref(false)
-  const repoHistory = ref<RepoHistoryItem[]>([])
+  const repoHistory = computed<RepoHistoryItem[]>(() => getGitRepos.value)
+  // const repoHistory = ref<RepoHistoryItem[]>([])
   const availableAuthors = ref<string[]>([])
   const authorsLoading = ref(false)
   const branchesLoading = ref(false)
@@ -49,16 +55,6 @@ export function useSettingsForm(
     }
     return repoStatus.value !== 'valid'
   })
-
-  const loadRepoHistory = async () => {
-    try {
-      repoHistory.value = await historyApi.getHistory()
-    } catch (error) {
-      message.error('加载历史记录失败')
-    }
-  }
-
-  onMounted(loadRepoHistory)
 
   watch(
     () => localForm.scanSubfolders,
@@ -145,7 +141,7 @@ export function useSettingsForm(
         const { path } = result
         localForm.repoPath = path
         emit('validate-repo-path', path)
-        repoHistory.value = await historyApi.addHistory(path)
+        scanStore.addGitRepo(path)
 
         if (localForm.scanSubfolders) {
           message.success(`已选择目录，请点击“扫描子仓库”按钮: ${path}`)
@@ -163,7 +159,7 @@ export function useSettingsForm(
   const validateRepoPath = async () => {
     emit('validate-repo-path', localForm.repoPath)
     if (localForm.repoPath) {
-      repoHistory.value = await historyApi.addHistory(localForm.repoPath)
+      scanStore.addGitRepo(localForm.repoPath)
     }
   }
 
@@ -207,11 +203,11 @@ export function useSettingsForm(
   }
 
   const removeRepoFromHistory = async (path: string) => {
-    repoHistory.value = await historyApi.removeHistory(path)
+    scanStore.delGitRepo(path)
   }
 
   const clearRepoHistory = async () => {
-    repoHistory.value = await historyApi.clearHistory()
+    scanStore.delAllGitRepos()
   }
 
   const discoverSubRepos = async () => {

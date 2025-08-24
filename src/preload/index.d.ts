@@ -1,5 +1,5 @@
 import { ElectronAPI } from '@electron-toolkit/preload'
-import type { GitCommit } from '@shared/types/dtos/git.dto'
+import type { GitCommit, RepoHistoryItem } from '@shared/types/dtos/git.dto'
 
 // Define interfaces for the data structures used in the API
 interface GitScanOptions {
@@ -39,11 +39,6 @@ interface AiChatResponse {
 interface ChatMessage {
   sender: 'user' | 'ai'
   text: string
-}
-
-interface RepoHistoryItem {
-  path: string
-  lastAccessed: string
 }
 
 // Define the shape of the API object
