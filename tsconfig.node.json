@@ -16,7 +16,8 @@
       "@features/*": ["src/main/features/*"],
       "@handlers/*": ["src/main/features/handlers/*"],
       "@services/*": ["src/main/features/services/*"],
-      "@main/*": ["src/main/*"]
+      "@main/*": ["src/main/*"],
+      "@preload/*": ["src/preload/*"]
     }
   }
 }
