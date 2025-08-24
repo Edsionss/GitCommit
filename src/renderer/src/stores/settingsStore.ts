@@ -76,6 +76,7 @@ export const useSettingsStore = defineStore('settings', () => {
 
   // Getters (使用 computed)
   const getAppSettings = computed(() => appSettings.value)
+  const getAiConfig = computed(() => appSettings.value.ai)
   const getCurrentTheme = computed(() => theme.value)
   const getThemeMode = computed(() => themeMode.value)
   const getIsSidebarExpanded = computed(() => isSidebarExpanded.value)
@@ -97,6 +98,7 @@ export const useSettingsStore = defineStore('settings', () => {
     toggleSidebar,
     // Getters
     getAppSettings,
+    getAiConfig,
     getCurrentTheme,
     getThemeMode,
     getIsSidebarExpanded

@@ -91,7 +91,6 @@ import { message as antMessage } from 'ant-design-vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useDataStore } from '@/stores/dataStore'
 import { useScanStore } from '@/stores/scanStore'
-import { aiApi } from '@/api/ai'
 import { useAi } from '@/composables/ai'
 
 const route = useRoute()
@@ -124,7 +123,7 @@ const borderStyle = computed(() => {
 const chatStore = useChatStore()
 const { activeSession } = storeToRefs(chatStore)
 const settingsStore = useSettingsStore()
-const { appSettings } = storeToRefs(settingsStore)
+const { appSettings, getAiConfig } = storeToRefs(settingsStore)
 
 const userInput = ref('')
 
@@ -152,16 +151,16 @@ const renderMarkdown = (text: string) => {
 }
 
 const sendMessage = async ({ input, userContent, success }: any) => {
-  startSend.value = true
   let text = input?.trim() || userInput.value.trim()
-  if (!text || isLoading.value) return
   userInput.value = ''
+  startSend.value = true
+  const aiConfig = getAiConfig.value
+  if (!text || isLoading.value) return
   const userMessage = { sender: 'user' as const, text: userContent || text }
-  chatStore.addMessageToActiveSession(userMessage, appSettings.value.ai.enableAutoSave)
+  chatStore.addMessageToActiveSession(userMessage, aiConfig.enableAutoSave)
   // chatStore.ThinkIngLoading(true)
   isLoading.value = true
   const { sendAiMessage, onChatStreamChunk } = useAi()
-  const aiConfig = appSettings.value.ai
   let history: Array<{ sender: 'user' | 'ai'; text: string }> = []
   if (aiConfig.enableAiHistory && activeSession.value) {
     // Exclude the last message, which is the one we are currently sending
@@ -175,15 +174,9 @@ const sendMessage = async ({ input, userContent, success }: any) => {
       streamingMessage.value += chunk
       scrollToBottom()
     })
-  // window.api.onChatStreamChunk((chunk) => {
-  //   streamingMessage.value += chunk
-  //   scrollToBottom()
-  // })
   sendAiMessage({
     prompt: text,
     history: history,
-    // config: appSettings.value.ai,
-    // Stream: appSettings.value.ai.enableStreaming,
     successFn: (message) => {
       chatStore.addMessageToActiveSession({ sender: 'ai', text: message }, aiConfig.enableAutoSave)
       success && success(message)
