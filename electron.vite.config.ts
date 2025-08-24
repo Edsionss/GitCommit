@@ -8,7 +8,9 @@ export default defineConfig({
       alias: {
         '@main': resolve('src/main'),
         '@features': resolve('src/main/features'),
-        '@services': resolve('src/main/services')
+        '@handlers': resolve('src/main/features/handlers'),
+        '@services': resolve('src/main/features/services'),
+        '@shared': resolve('src/shared')
       }
     },
     plugins: [externalizeDepsPlugin()]
