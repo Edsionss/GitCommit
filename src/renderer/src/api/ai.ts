@@ -1,6 +1,10 @@
 import type { AiConfig, ChatMessage } from '@shared/types/dtos/ai'
 
 export const aiApi = {
-  exportCommits: (commits: GitCommit[], format: 'json' | 'csv'): Promise<string | null> =>
-    window.api.exportCommits(commits, format)
+  aiChat: (
+    prompt: string,
+    config: AiConfig,
+    history?: ChatMessage[],
+    isStream?: boolean
+  ): Promise<any> => window.api.aiChat(prompt, config, history, isStream)
 }

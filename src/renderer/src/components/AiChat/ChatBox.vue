@@ -91,6 +91,8 @@ import { message as antMessage } from 'ant-design-vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useDataStore } from '@/stores/dataStore'
 import { useScanStore } from '@/stores/scanStore'
+import { aiApi } from '@/api/ai'
+import { useAi } from '@/composables/ai'
 
 const route = useRoute()
 const router = useRouter()
@@ -152,66 +154,50 @@ const renderMarkdown = (text: string) => {
 const sendMessage = async ({ input, userContent, success }: any) => {
   startSend.value = true
   let text = input?.trim() || userInput.value.trim()
-
   if (!text || isLoading.value) return
   userInput.value = ''
   const userMessage = { sender: 'user' as const, text: userContent || text }
   chatStore.addMessageToActiveSession(userMessage, appSettings.value.ai.enableAutoSave)
   // chatStore.ThinkIngLoading(true)
   isLoading.value = true
-  try {
-    // const appSettings = settingsStore.appSettings
-    if (!appSettings.value || !appSettings.value.ai) {
-      throw new Error('请在设置页面中配置AI设置。')
-    }
-
-    const aiConfig = appSettings.value.ai
-    if (!aiConfig.provider || !aiConfig.apiKey) {
-      throw new Error('请设置AI源和API密钥')
-    }
-
-    const plainAiConfig = JSON.parse(JSON.stringify(aiConfig))
-
-    // Prepare history if enabled
-    let history: Array<{ sender: 'user' | 'ai'; text: string }> = []
-    if (aiConfig.enableAiHistory && activeSession.value) {
-      // Exclude the last message, which is the one we are currently sending
-      history = activeSession.value.messages.slice(0, -1).map((msg) => ({
-        sender: msg.sender,
-        text: msg.text
-      }))
-    }
-
-    aiConfig.enableStreaming &&
-      window.api.onChatStreamChunk((chunk) => {
-        streamingMessage.value += chunk
-        scrollToBottom()
-      })
-
-    const result = await window.api.aiChat(text, plainAiConfig, history, !!aiConfig.enableStreaming)
-    // chatStore.ThinkIngLoading(false)
-    if (result.success) {
-      chatStore.addMessageToActiveSession(
-        { sender: 'ai', text: result.message },
-        aiConfig.enableAutoSave
-      )
-      success && success(result.message)
+  const { sendAiMessage } = useAi()
+  const aiConfig = appSettings.value.ai
+  let history: Array<{ sender: 'user' | 'ai'; text: string }> = []
+  if (aiConfig.enableAiHistory && activeSession.value) {
+    // Exclude the last message, which is the one we are currently sending
+    history = activeSession.value.messages.slice(0, -1).map((msg) => ({
+      sender: msg.sender,
+      text: msg.text
+    }))
+  }
+  aiConfig.enableStreaming &&
+    window.api.onChatStreamChunk((chunk) => {
+      streamingMessage.value += chunk
+      scrollToBottom()
+    })
+  sendAiMessage({
+    prompt: text,
+    history: history,
+    // config: appSettings.value.ai,
+    // Stream: appSettings.value.ai.enableStreaming,
+    successFn: (message) => {
+      chatStore.addMessageToActiveSession({ sender: 'ai', text: message }, aiConfig.enableAutoSave)
+      success && success(message)
       startSend.value = false
       streamingMessage.value = ''
-    } else {
-      throw new Error(result.error)
+      scrollToBottom()
+    },
+    errorFn: (errorMessage) => {
+      chatStore.addMessageToActiveSession(
+        { sender: 'ai', text: `错误: ${errorMessage}` },
+        aiConfig.enableAutoSave
+      )
+    },
+    finallyFn: () => {
+      isLoading.value = false
+      scrollToBottom()
     }
-  } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred.'
-    antMessage.error(errorMessage)
-    chatStore.addMessageToActiveSession(
-      { sender: 'ai', text: `错误: ${errorMessage}` },
-      appSettings.value.ai.enableAutoSave
-    )
-  } finally {
-    isLoading.value = false
-    scrollToBottom()
-  }
+  })
 }
 
 const dataStore = useDataStore()
@@ -219,10 +205,16 @@ const scanStore = useScanStore()
 function autoAnalysisScanRecord(id: string, record: any[]) {
   if (id && record && record.length) {
     chatStore.createNewSession()
-    const resultInput = `请按照如下规则:${'1.根据这段提交记录的日期先得到其中的工作日 2.根据提交内容和提交代码行数以及提交信息进行综合分析 3.总结出与工作日相对应的人天信息，综合分配每个任务的人天 4.只需要50字'}对这段git提交记录进行分析${JSON.stringify(record)}`
+    const resultInput = `
+    请按照如下规则:
+    1.根据这段提交记录的日期先得到其中的工作日 
+    2.根据提交内容和提交代码行数以及提交信息进行综合分析 
+    3.总结出与工作日相对应的人天信息，综合分配每个任务的人天 
+    4.只需要50字}对这段git提交记录进行分析
+    ${JSON.stringify(record)}
+    `
     sendMessage({
       input: resultInput,
-      // userContent: '``` 扫描ID:' + query.id + '```[提交记录分析]()'
       userContent: '[提交记录分析]()',
       success: (result) => {
         scanStore.setScanRecordById(id, { analysisResult: result })
