@@ -3,13 +3,11 @@ import { ref, computed, watch } from 'vue'
 
 // 定义设置对象的类型
 export interface AppSettings {
-  language: string
-  aiSource: string
-  openAiKey: string
-  openAiProxy: string
-  geminiApiKey: string
-  geminiProxyUrl: string
-  enableAiHistory: boolean
+  SystemConfig: any // 系统配置
+  AiConfig: any // AI配置
+  DisplayConfig: any // 显示配置
+  GitConfig: any // Git配置
+  Preferences: any // 用户偏好
   // 可以根据需要添加其他设置字段
 }
 

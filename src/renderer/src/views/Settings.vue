@@ -158,36 +158,6 @@ const resetSettings = () => {
     onOk() {
       // 创建一个默认设置对象
       const defaultSettings = {
-        // appearance: {
-        //   theme: 'light',
-        //   sidebarPosition: 'left',
-        //   zoom: '1',
-        //   animations: true
-        // },
-        // locale: {
-        //   language: 'zh-CN',
-        //   dateFormat: 'YYYY-MM-DD',
-        //   timeFormat: '24'
-        // },
-        // git: {
-        //   defaultAuthor: '',
-        //   defaultEmail: '',
-        //   repositoryPath: '',
-        //   refreshInterval: '300000'
-        // },
-        // system: {
-        //   startWithSystem: false,
-        //   notifications: true,
-        //   autoUpdate: true,
-        //   telemetry: true,
-        //   clearScanConfigOnFinish: true
-        // },
-        // ai: {
-        //   provider: null,
-        //   apiKey: '',
-        //   endpoint: '',
-        //   model: ''
-        // }
         ...settings
       }
       // 更新本地状态
