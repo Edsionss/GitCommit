@@ -35,9 +35,9 @@
         <div class="setting-control">
           <a-input v-model:value="GitConfig.repositoryPath" placeholder="选择一个目录">
             <template #addonAfter>
-              <a-button @click="selectDirectory">
+              <span @click="selectDirectory" style="cursor: pointer">
                 <FolderOutlined />
-              </a-button>
+              </span>
             </template>
           </a-input>
         </div>
