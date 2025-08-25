@@ -1,5 +1,4 @@
 import _ from 'lodash'
-import { ref, computed } from 'vue'
 import { useSettingsStore } from '@/stores/settingsStore'
 import { storeToRefs } from 'pinia'
 import { message as antMessage } from 'ant-design-vue'
@@ -18,25 +17,24 @@ interface SendAiMessageParams {
 
 export function useAi() {
   const settingsStore = useSettingsStore()
-  const { getAiConfig } = storeToRefs(settingsStore)
-  const aiConfig = computed(() => getAiConfig.value || null)
+  const { AiConfig } = storeToRefs(settingsStore)
   const sendAiMessage = async ({
     prompt,
     history,
     config,
-    Stream = aiConfig.value?.enableStreaming,
+    Stream = AiConfig.value?.enableStreaming,
     successFn,
     errorFn,
     finallyFn
   }: SendAiMessageParams) => {
     try {
-      if (!aiConfig.value.provider || !aiConfig.value.apiKey) {
+      if (!AiConfig.value.provider || !AiConfig.value.apiKey) {
         antMessage.error('请设置AI源和API密钥')
         return
       }
       const result = await aiApi.aiChat(
         prompt,
-        _.cloneDeep(config || aiConfig.value),
+        _.cloneDeep(config || AiConfig.value),
         history,
         Stream
       )

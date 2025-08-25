@@ -45,8 +45,8 @@ import { storeToRefs } from 'pinia'
 const scanStore = useScanStore()
 const router = useRouter()
 const settingsStore = useSettingsStore()
-const { getAiConfig, getGitConfig } = storeToRefs(settingsStore)
-const clearScanConfigOnFinish = computed(() => getGitConfig.value.clearScanConfigOnFinish)
+const { AiConfig, GitConfig } = storeToRefs(settingsStore)
+const clearScanConfigOnFinish = computed(() => GitConfig.value.clearScanConfigOnFinish)
 
 const { getGitCommits } = storeToRefs(scanStore)
 const defaultFormState = {
@@ -137,7 +137,7 @@ const startScan = async () => {
     const { commits, analysisResult } = await window.api.scanGitRepo(
       form.repoPath,
       scanOptions,
-      JSON.parse(JSON.stringify(getAiConfig.value || null))
+      JSON.parse(JSON.stringify(AiConfig.value || null))
     )
     addLog(`扫描完成，共找到 ${commits.length} 条提交记录`, 'success')
     hasResults.value = true
