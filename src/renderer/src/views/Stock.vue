@@ -1,16 +1,17 @@
+
 <template>
   <div class="stock-view">
     <a-layout style="height: 100%">
       <!-- 顶部工具栏 -->
       <a-layout-header class="toolbar">
-        <a-button type="primary" @click="showAddStockModal">添加自选</a-button>
+        <a-button type="primary" @click="showAddStockWizard">添加自选</a-button>
       </a-layout-header>
 
       <!-- 主体内容 -->
       <a-layout>
         <!-- 左侧自选列表 -->
-        <a-layout-sider width="25%" class="watchList-panel">
-          <WatchList @stock-selected="handleStockSelected" />
+        <a-layout-sider width="25%" class="watchlist-panel">
+          <Watchlist @stock-selected="handleStockSelected" />
         </a-layout-sider>
 
         <!-- 右侧详情 -->
@@ -23,15 +24,8 @@
       </a-layout>
     </a-layout>
 
-    <!-- 添加自选弹窗 -->
-    <a-modal
-      v-model:visible="isModalVisible"
-      title="添加自选股"
-      @ok="handleAddStock"
-      @cancel="handleCancel"
-    >
-      <a-input v-model:value="newStockName" placeholder="请输入股票名称或代码" />
-    </a-modal>
+    <!-- 添加自选步骤条 -->
+    <AddStockWizard v-model:visible="isWizardVisible" @finish="onWizardFinish" />
   </div>
 </template>
 
@@ -39,49 +33,34 @@
 import { ref, computed } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useStockStore } from '@/stores/stock'
-import WatchList from '@renderer/components/stock/WatchList.vue'
+import Watchlist from '@/components/stock/Watchlist.vue'
 import StockDetail from '@/components/stock/StockDetail.vue'
-import {
-  Modal as AModal,
-  Input as AInput,
-  Button as AButton,
-  Layout as ALayout
-} from 'ant-design-vue'
+import AddStockWizard from '@/components/stock/AddStockWizard.vue'
+import { Button as AButton, Layout as ALayout } from 'ant-design-vue'
 
 const stockStore = useStockStore()
-const { activeStockCode, watchList } = storeToRefs(stockStore)
+const { activeStockCode, watchlist } = storeToRefs(stockStore)
 
-const isModalVisible = ref(false)
-const newStockName = ref('')
+const isWizardVisible = ref(false)
 
 // 获取当前选中股票的完整数据
 const activeStockData = computed(() => {
   if (activeStockCode.value) {
-    return watchList.value.get(activeStockCode.value)
+    return watchlist.value.get(activeStockCode.value)
   }
   return null
 })
 
-const showAddStockModal = () => {
-  isModalVisible.value = true
+const showAddStockWizard = () => {
+  isWizardVisible.value = true
 }
 
-const handleAddStock = async () => {
-  if (newStockName.value.trim()) {
-    await stockStore.addStock(newStockName.value.trim())
-    newStockName.value = ''
-    isModalVisible.value = false
-  } else {
-    AModal.warning({ title: '提示', content: '股票名称或代码不能为空' })
-  }
+const onWizardFinish = () => {
+  // 可以选择性地刷新列表或执行其他操作
+  console.log('Wizard finished')
 }
 
-const handleCancel = () => {
-  isModalVisible.value = false
-  newStockName.value = ''
-}
-
-// 处理从WatchList组件传来的事件
+// 处理从Watchlist组件传来的事件
 const handleStockSelected = (stockCode: string) => {
   stockStore.setActiveStock(stockCode)
 }
@@ -89,20 +68,18 @@ const handleStockSelected = (stockCode: string) => {
 
 <style scoped lang="scss">
 .stock-view {
-  // height: 100vh;
-  height: 100%;
+  height: 100vh;
   display: flex;
   flex-direction: column;
-  border-radius: 0.54rem;
 }
 
 .toolbar {
   background-color: #fff;
-  // padding: 10px 20px;
+  padding: 10px 20px;
   border-bottom: 1px solid #f0f0f0;
 }
 
-.watchList-panel {
+.watchlist-panel {
   background: #fdfdfd;
   border-right: 1px solid #f0f0f0;
   padding: 10px;
@@ -122,3 +99,4 @@ const handleStockSelected = (stockCode: string) => {
   color: #999;
 }
 </style>
+
