@@ -85,123 +85,116 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, defineEmits, defineProps } from 'vue'
+import { ref, reactive, defineEmits, defineProps } from 'vue';
 import {
-  Modal as AModal,
-  Steps as ASteps,
-  Step as AStep,
-  InputSearch as AInputSearch,
-  List as AList,
-  ListItem as AListItem,
-  Form as AForm,
-  FormItem as AFormItem,
-  Select as ASelect,
-  SelectOption as ASelectOption,
-  CheckboxGroup as ACheckboxGroup,
-  Checkbox as ACheckbox,
-  Switch as ASwitch,
-  Button as AButton,
-  Spin as ASpin,
-  Result as AResult
-} from 'ant-design-vue'
-import { useStockStore } from '@/stores/stock'
+  Modal as AModal, Steps as ASteps, Step as AStep, InputSearch as AInputSearch,
+  List as AList, ListItem as AListItem, Form as AForm, FormItem as AFormItem,
+  Select as ASelect, SelectOption as ASelectOption, CheckboxGroup as ACheckboxGroup,
+  Checkbox as ACheckbox, Switch as ASwitch, Button as AButton, Spin as ASpin, Result as AResult, message
+} from 'ant-design-vue';
+import { useStockStore } from '@/stores/stock';
+import { StockData } from '@/shared/types/dtos/stock';
 
-const props = defineProps({ visible: Boolean })
-const emit = defineEmits(['update:visible', 'finish'])
+const props = defineProps({ visible: Boolean });
+const emit = defineEmits(['update:visible', 'finish']);
 
-const stockStore = useStockStore()
+const stockStore = useStockStore();
 
-const currentStep = ref(0)
-const searchQuery = ref('')
-const searching = ref(false)
-const searchResults = ref<{ code: string; name: string }[]>([])
-const selectedStock = ref<{ code: string; name: string } | null>(null)
+const currentStep = ref(0);
+const searchQuery = ref('');
+const searching = ref(false);
+const searchResults = ref<{ code: string; name: string }[]>([]);
+const selectedStock = ref<{ code: string; name: string } | null>(null);
 
 const config = reactive({
   klineDays: 100,
   maLines: [5, 10, 20],
   indicators: ['macd', 'volume'],
-  fetchNews: true
-})
+  fetchNews: true,
+});
 
-const isFetching = ref(false)
-const fetchSuccess = ref(false)
+const isFetching = ref(false);
+const fetchSuccess = ref(false);
 
 const onSearch = async () => {
-  if (!searchQuery.value) return
-  searching.value = true
-  // 模拟搜索
-  setTimeout(() => {
-    searchResults.value = [
-      { name: `${searchQuery.value}公司A`, code: 'sh600001' },
-      { name: `${searchQuery.value}公司B`, code: 'sz000001' }
-    ]
-    searching.value = false
-  }, 1000)
-}
+  if (!searchQuery.value) return;
+  searching.value = true;
+  try {
+    searchResults.value = await window.api.invoke('stock:search', searchQuery.value);
+  } catch (error) {
+    message.error('搜索失败');
+  } finally {
+    searching.value = false;
+  }
+};
 
 const selectStock = (stock: { code: string; name: string }) => {
-  selectedStock.value = stock
-}
+  selectedStock.value = stock;
+};
 
 const nextStep = () => {
-  currentStep.value++
-}
+  currentStep.value++;
+};
 
 const prevStep = () => {
-  currentStep.value--
-}
+  currentStep.value--;
+};
 
 const startFetching = async () => {
-  currentStep.value++
-  isFetching.value = true
-  fetchSuccess.value = false
+  if (!selectedStock.value) return;
+  currentStep.value++;
+  isFetching.value = true;
+  fetchSuccess.value = false;
 
-  // 模拟爬取数据
   try {
-    // 在这里，您会调用一个IPC或API来获取数据
-    // await window.api.invoke('stock:fetch-advanced', selectedStock.value.code, config);
-    console.log('Fetching with config:', config)
-    await new Promise((resolve) => setTimeout(resolve, 2000)) // 模拟网络延迟
+    const fetchedData = await window.api.invoke('stock:fetch-advanced', selectedStock.value.code, config);
+    
+    if (fetchedData) {
+        const fullStockData: StockData = {
+            ...selectedStock.value,
+            ...fetchedData,
+            analysisHistory: [], // Initialize with empty history
+        };
+        await stockStore.addStockWithOptions(fullStockData);
+        fetchSuccess.value = true;
+    } else {
+        throw new Error('Failed to fetch data from main process');
+    }
 
-    // 假设成功，直接调用 store 的 action
-    // 注意：这里的 addStock 需要修改或创建一个新的 action 来接收详细配置
-    await stockStore.addStock(selectedStock.value.name) // 暂时用旧的
-
-    fetchSuccess.value = true
   } catch (error) {
-    console.error('Failed to fetch stock data:', error)
-    fetchSuccess.value = false
+    console.error('Failed to fetch stock data:', error);
+    fetchSuccess.value = false;
   } finally {
-    isFetching.value = false
+    isFetching.value = false;
   }
-}
+};
 
 const handleCancel = () => {
-  resetWizard()
-  emit('update:visible', false)
-}
+  resetWizard();
+  emit('update:visible', false);
+};
 
 const handleFinish = () => {
-  resetWizard()
-  emit('update:visible', false)
-  emit('finish')
-}
+  resetWizard();
+  emit('update:visible', false);
+  emit('finish');
+};
 
 const resetWizard = () => {
-  currentStep.value = 0
-  searchQuery.value = ''
-  searchResults.value = []
-  selectedStock.value = null
-  isFetching.value = false
-  fetchSuccess.value = false
+  currentStep.value = 0;
+  searchQuery.value = '';
+  searchResults.value = [];
+  selectedStock.value = null;
+  isFetching.value = false;
+  fetchSuccess.value = false;
   Object.assign(config, {
     klineDays: 100,
     maLines: [5, 10, 20],
     indicators: ['macd', 'volume'],
-    fetchNews: true
-  })
-}
+    fetchNews: true,
+  });
+};
+
 </script>
 
 <style scoped>

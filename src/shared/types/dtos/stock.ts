@@ -1,21 +1,33 @@
-// K线数据单元
-export interface KlineData {
-  date: string
-  open: number
-  high: number
-  low: number
-  close: number
-  volume: number
-}
+// K线数据单元 (v-chart format)
+export type KlineDataItem = [string, number, number, number, number, number]; // [时间, 开, 高, 低, 收, 成交量]
 
 // 技术指标
 export interface TechnicalIndicators {
-  macd: any[] // 具体类型取决于库的返回
-  kdj: any[]
-  rsi: any
-  boll: any[]
-  movingAverages: { ma5: number[]; ma10: number[]; ma20: number[] }
+  [key: string]: any; // Allow flexible keys like macd, rsi, etc.
+  movingAverages?: {
+      [key: string]: number[]; // Allow flexible keys like ma5, ma10
+  }
 }
+
+// 从前端wizard传来的配置
+export interface StockFetchConfig {
+    klineDays: number;
+    maLines: number[];
+    indicators: string[];
+    fetchNews: boolean;
+}
+
+// 完整的股票数据结构
+export interface StockData {
+  code: string
+  name: string
+  kline: KlineDataItem[]
+  indicators: TechnicalIndicators
+  news: string[]
+  lastUpdateTime: string
+  analysisHistory: { prompt: string; report: string; time: Date }[]
+}
+
 
 // AI分析结果
 export interface AnalysisResult {

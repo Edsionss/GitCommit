@@ -7,6 +7,7 @@ import * as path from 'path'
 
 import { registerIpcHandlers } from '@handlers/ipcHandlers'
 import { registerAiHandlers } from '@handlers/ai/ai'
+import { initializeStockHandlers } from '@handlers/stock/stock';
 
 function createWindow(): void {
   // Create the browser window.
@@ -59,6 +60,7 @@ app.whenReady().then(() => {
   // IPC test
   registerIpcHandlers()
   registerAiHandlers()
+  initializeStockHandlers()
 
   createWindow()
 

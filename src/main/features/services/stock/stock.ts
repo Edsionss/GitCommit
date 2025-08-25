@@ -1,8 +1,8 @@
 // stock-analysis.service.ts
 import yahooFinance from 'yahoo-finance2'
 import * as ti from 'technicalindicators'
-import { AIService } from '../ai/ai-service' // 假设你的AI服务路径
-import { KlineData, TechnicalIndicators, AnalysisResult } from '@sharedType/stock'
+import { AIService } from '../ai/ai.ts' // 假设你的AI服务路径
+import { KlineData, TechnicalIndicators, AnalysisResult, StockFetchConfig, StockData } from '@/shared/types/dtos/stock.ts'
 
 export class StockAnalysisService {
   private aiService: AIService
@@ -10,6 +10,24 @@ export class StockAnalysisService {
   constructor() {
     // 实例化或获取已有的AI服务实例
     this.aiService = new AIService()
+  }
+
+  public async searchStocks(query: string) {
+    const searchResults = await yahooFinance.search(query);
+    return searchResults.quotes.filter(q => q.symbol && q.longname).map(q => ({ code: q.symbol, name: q.longname }));
+  }
+
+  public async fetchStockDataWithOptions(code: string, config: StockFetchConfig): Promise<Partial<StockData>> {
+    const klineData = await this.fetchKLineData(code, config.klineDays + 60); // Fetch more for indicator calculation
+    const indicators = this.calculateIndicators(klineData, config);
+    const news = config.fetchNews ? await this.fetchNews(code) : [];
+
+    return {
+        kline: klineData.slice(-config.klineDays),
+        indicators,
+        news,
+        lastUpdateTime: new Date().toISOString(),
+    };
   }
 
   // 主分析函数
@@ -22,17 +40,17 @@ export class StockAnalysisService {
     const klineData = await this.fetchKLineData(stockCode, 40) // 获取更多数据以计算指标
 
     // 3. 计算技术指标
-    const indicators = this.calculateIndicators(klineData)
+    const indicators = this.calculateIndicators(klineData, { indicators: ['macd'], maLines: [5, 10, 20], klineDays: 20, fetchNews: true })
 
     // 4. 获取新闻和公告 (此部分实现可能较复杂，可先用占位符)
-    const news = '近期市场热点为人工智能领域，该公司发布了新的AI芯片公告...'
+    const newsData = await this.fetchNews(stockCode);
 
     // 5. 生成总结文档 (关键！)
     const summaryDocument = this.generateSummaryPrompt(
       stockCode,
       klineData.slice(-20),
       indicators,
-      news
+      newsData.join('\n')
     )
 
     // 6. 调用AI进行分析
@@ -71,7 +89,7 @@ export class StockAnalysisService {
     return searchResults.quotes[0]?.symbol || null
   }
 
-  private async fetchKLineData(code: string, days: number): Promise<KlineData[]> {
+  private async fetchKLineData(code: string, days: number): Promise<any[]> {
     const endDate = new Date()
     const startDate = new Date()
     startDate.setDate(endDate.getDate() - days)
@@ -80,33 +98,56 @@ export class StockAnalysisService {
       period1: startDate,
       period2: endDate
     })
-    return results.map((r) => ({ ...r, date: r.date.toISOString().split('T')[0] }))
+    return results.map((r) => ([r.date.toISOString().split('T')[0], r.open, r.high, r.low, r.close, r.volume]))
   }
 
-  private calculateIndicators(data: KlineData[]): TechnicalIndicators {
-    const closes = data.map((d) => d.close)
-    const highs = data.map((d) => d.high)
-    const lows = data.map((d) => d.low)
+  private async fetchNews(code: string): Promise<string[]> {
+      const results = await yahooFinance.search(code);
+      return results.news.slice(0, 5).map(n => n.title);
+  }
 
-    const macd = new ti.MACD({
-      values: closes,
-      fastPeriod: 12,
-      slowPeriod: 26,
-      signalPeriod: 9,
-      SimpleMAOscillator: false,
-      SimpleMASignal: false
-    }).getResult()
-    // ... 计算 KDJ, RSI, BOLL 等
+  private calculateIndicators(data: any[], config: StockFetchConfig): TechnicalIndicators {
+    const closes = data.map((d) => d[4])
+    const highs = data.map((d) => d[2])
+    const lows = data.map((d) => d[3])
+    const volumes = data.map(d => d[5]);
 
-    return {
-      macd: macd.slice(-20),
-      // ... 其他指标
-      movingAverages: {
-        ma5: ti.SMA.calculate({ period: 5, values: closes }).slice(-20),
-        ma10: ti.SMA.calculate({ period: 10, values: closes }).slice(-20),
-        ma20: ti.SMA.calculate({ period: 20, values: closes }).slice(-20)
-      }
+    const indicators: TechnicalIndicators = {};
+
+    if (config.indicators.includes('macd')) {
+        indicators.macd = new ti.MACD({
+            values: closes,
+            fastPeriod: 12,
+            slowPeriod: 26,
+            signalPeriod: 9,
+            SimpleMAOscillator: false,
+            SimpleMASignal: false
+        }).getResult()
     }
+    if (config.indicators.includes('rsi')) {
+        indicators.rsi = new ti.RSI({ values: closes, period: 14 }).getResult();
+    }
+    if (config.indicators.includes('boll')) {
+        indicators.boll = new ti.BollingerBands({ values: closes, period: 20, stdDev: 2 }).getResult();
+    }
+    if (config.indicators.includes('kdj')) {
+        indicators.kdj = new ti.Stochastic({
+            high: highs,
+            low: lows,
+            close: closes,
+            period: 14,
+            signalPeriod: 3
+        }).getResult();
+    }
+
+    if (config.maLines && config.maLines.length > 0) {
+        indicators.movingAverages = {};
+        for (const period of config.maLines) {
+            indicators.movingAverages[`ma${period}`] = ti.SMA.calculate({ period, values: closes });
+        }
+    }
+
+    return indicators;
   }
 
   private generateSummaryPrompt(
@@ -125,8 +166,8 @@ export class StockAnalysisService {
       ${JSON.stringify(kline, null, 2)}
 
       **核心技术指标:**
-      - **MACD**: ${JSON.stringify(indicators.macd.slice(-5))}
-      - **均线**: 最近一日 MA5: ${indicators.movingAverages.ma5.slice(-1)[0]}, MA10: ${indicators.movingAverages.ma10.slice(-1)[0]}, MA20: ${indicators.movingAverages.ma20.slice(-1)[0]}
+      - **MACD**: ${JSON.stringify(indicators.macd?.slice(-5))}
+      - **均线**: 最近一日 MA5: ${indicators.movingAverages?.ma5?.slice(-1)[0]}, MA10: ${indicators.movingAverages?.ma10?.slice(-1)[0]}, MA20: ${indicators.movingAverages?.ma20?.slice(-1)[0]}
       
       请从以下几个方面进行分析：
       1. 当前股价趋势和关键支撑/压力位。
