@@ -1,23 +1,19 @@
 <template>
-  <a-card class="settings-card">
+  <a-card class="setting-card">
     <template #title>
       <div class="card-header">
         <span>区域与语言</span>
         <GlobalOutlined />
       </div>
     </template>
-    <div class="settings-section">
+    <div class="setting-section">
       <div class="setting-item">
         <div class="setting-label">
           <TranslationOutlined />
           <span>语言</span>
         </div>
         <div class="setting-control">
-          <a-select
-            :value="settings.language"
-            @change="(value) => $emit('update:language', value)"
-            style="width: 120px"
-          >
+          <a-select v-model:value="Preferences.language" style="width: 120px">
             <a-select-option value="zh-CN">简体中文</a-select-option>
             <a-select-option value="en-US">English</a-select-option>
           </a-select>
@@ -30,11 +26,7 @@
           <span>日期格式</span>
         </div>
         <div class="setting-control">
-          <a-select
-            :value="settings.dateFormat"
-            @change="(value) => $emit('update:dateFormat', value)"
-            style="width: 150px"
-          >
+          <a-select v-model:value="Preferences.dateFormat" style="width: 150px">
             <a-select-option value="YYYY-MM-DD">YYYY-MM-DD</a-select-option>
             <a-select-option value="DD/MM/YYYY">DD/MM/YYYY</a-select-option>
             <a-select-option value="MM/DD/YYYY">MM/DD/YYYY</a-select-option>
@@ -48,10 +40,7 @@
           <span>时间格式</span>
         </div>
         <div class="setting-control">
-          <a-radio-group
-            :value="settings.timeFormat"
-            @change="(e) => $emit('update:timeFormat', e.target.value)"
-          >
+          <a-radio-group v-model:value="Preferences.timeFormat">
             <a-radio-button value="24">24 小时</a-radio-button>
             <a-radio-button value="12">12 小时</a-radio-button>
           </a-radio-group>
@@ -68,16 +57,14 @@ import {
   CalendarOutlined,
   ClockCircleOutlined
 } from '@ant-design/icons-vue'
-
-defineProps({
-  settings: { type: Object, required: true }
-})
-
-defineEmits(['update:language', 'update:dateFormat', 'update:timeFormat'])
+import { useSettingsStore } from '@/stores/settingsStore'
+import { storeToRefs } from 'pinia'
+const settingStore = useSettingsStore()
+const { Preferences } = storeToRefs(settingStore)
 </script>
 
 <style scoped>
-.settings-card {
+.setting-card {
   margin-bottom: 20px;
 }
 
@@ -89,7 +76,7 @@ defineEmits(['update:language', 'update:dateFormat', 'update:timeFormat'])
   font-size: 16px;
 }
 
-.settings-section {
+.setting-section {
   display: flex;
   flex-direction: column;
   gap: 20px;

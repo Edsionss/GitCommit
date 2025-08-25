@@ -1,23 +1,19 @@
 <template>
-  <a-card class="settings-card">
+  <a-card class="setting-card">
     <template #title>
       <div class="card-header">
         <span>外观</span>
         <EyeOutlined />
       </div>
     </template>
-    <div class="settings-section">
+    <div class="setting-section">
       <div class="setting-item">
         <div class="setting-label">
           <SkinOutlined />
           <span>主题模式</span>
         </div>
         <div class="setting-control">
-          <a-radio-group
-            :value="settings.theme"
-            @change="(e) => $emit('update:theme', e.target.value)"
-            button-style="solid"
-          >
+          <a-radio-group v-model:value="DisplayConfig.theme" button-style="solid">
             <a-radio-button value="light">明亮</a-radio-button>
             <a-radio-button value="dark">暗黑</a-radio-button>
             <a-radio-button value="system">跟随系统</a-radio-button>
@@ -31,10 +27,7 @@
           <span>侧边栏位置</span>
         </div>
         <div class="setting-control">
-          <a-radio-group
-            :value="settings.sidebarPosition"
-            @change="(e) => $emit('update:sidebarPosition', e.target.value)"
-          >
+          <a-radio-group v-model:value="DisplayConfig.sidebarPosition">
             <a-radio-button value="left">左侧</a-radio-button>
             <a-radio-button value="right">右侧</a-radio-button>
           </a-radio-group>
@@ -48,14 +41,13 @@
         </div>
         <div class="setting-control">
           <a-slider
-            :value="Number(settings.zoom)"
-            @change="(value) => $emit('update:zoom', String(value))"
+            v-model:value="DisplayConfig.zoom"
             :min="0.8"
             :max="1.5"
             :step="0.1"
             style="width: 150px"
           />
-          <span>{{ Math.round(Number(settings.zoom) * 100) }}%</span>
+          <span>{{ Math.round(Number(DisplayConfig.zoom) * 100) }}%</span>
         </div>
       </div>
 
@@ -65,10 +57,7 @@
           <span>启用动画</span>
         </div>
         <div class="setting-control">
-          <a-switch
-            :checked="settings.animations"
-            @change="(checked) => $emit('update:animations', checked)"
-          />
+          <a-switch v-model:checked="DisplayConfig.animations" />
         </div>
       </div>
     </div>
@@ -83,16 +72,14 @@ import {
   ZoomInOutlined,
   PlaySquareOutlined
 } from '@ant-design/icons-vue'
-
-defineProps({
-  settings: { type: Object, required: true }
-})
-
-defineEmits(['update:theme', 'update:sidebarPosition', 'update:zoom', 'update:animations'])
+import { useSettingsStore } from '@/stores/settingsStore'
+import { storeToRefs } from 'pinia'
+const settingStore = useSettingsStore()
+const { DisplayConfig } = storeToRefs(settingStore)
 </script>
 
 <style scoped>
-.settings-card {
+.setting-card {
   margin-bottom: 20px;
 }
 
@@ -104,7 +91,7 @@ defineEmits(['update:theme', 'update:sidebarPosition', 'update:zoom', 'update:an
   font-size: 16px;
 }
 
-.settings-section {
+.setting-section {
   display: flex;
   flex-direction: column;
   gap: 20px;

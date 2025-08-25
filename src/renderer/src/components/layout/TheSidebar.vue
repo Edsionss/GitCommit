@@ -39,10 +39,9 @@
 
 <script setup lang="ts">
 import logoFull from '@/assets/img/logo/LOGO1.png'
-import { computed, watch, h } from 'vue'
+import { computed, watch, h, ref } from 'vue'
 import { useRoute } from 'vue-router'
 import { storeToRefs } from 'pinia'
-import { useSettingsStore } from '@/stores/settingsStore'
 import { useRoutesStore } from '@/stores/routesStore'
 import {
   HomeOutlined,
@@ -58,12 +57,12 @@ import {
   RobotOutlined
 } from '@ant-design/icons-vue'
 
-const settingsStore = useSettingsStore()
 const routesStore = useRoutesStore()
 
-const { getDisplayConfig } = storeToRefs(settingsStore)
 const { routes } = storeToRefs(routesStore)
 const route = useRoute()
+
+const isExpanded = ref(true)
 
 // Map route names to icons
 const iconMap = {
@@ -79,12 +78,12 @@ const iconMap = {
 }
 
 const toggleSidebar = () => {
-  settingsStore.toggleSidebar()
+  isExpanded.value = !isExpanded.value
 }
 
 // Watch for sidebar state changes to dispatch events
 watch(
-  getDisplayConfig.isSidebarExpanded,
+  isExpanded,
   (expanded) => {
     document.documentElement.dataset.sidebarExpanded = expanded.toString()
     window.dispatchEvent(
@@ -114,9 +113,6 @@ const isActive = (path: string): boolean => {
   }
   return route.path === path
 }
-
-// isExpanded is now a ref from the store
-const isExpanded = getDisplayConfig.isSidebarExpanded
 </script>
 
 <style scoped>

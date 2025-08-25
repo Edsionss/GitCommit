@@ -10,9 +10,7 @@
               </a-avatar>
             </template>
             <template #title>
-              <span>{{
-                item.sender === 'user' ? 'You' : getAiConfig.model || 'AI Assistant'
-              }}</span>
+              <span>{{ item.sender === 'user' ? 'You' : AiConfig.model || 'AI Assistant' }}</span>
             </template>
             <template #description>
               <div class="message-content">
@@ -42,7 +40,7 @@
               </a-avatar>
             </template>
             <template #title>
-              <span>{{ getAiConfig.model || 'AI Assistant' }}</span>
+              <span>{{ AiConfig.model || 'AI Assistant' }}</span>
             </template>
             <template #description>
               <div class="message-content">
@@ -123,7 +121,7 @@ const borderStyle = computed(() => {
 const chatStore = useChatStore()
 const { activeSession } = storeToRefs(chatStore)
 const settingsStore = useSettingsStore()
-const { getAiConfig } = storeToRefs(settingsStore)
+const { AiConfig } = storeToRefs(settingsStore)
 
 const userInput = ref('')
 
@@ -154,7 +152,7 @@ const sendMessage = async ({ input, userContent, success }: any) => {
   let text = input?.trim() || userInput.value.trim()
   userInput.value = ''
   startSend.value = true
-  const aiConfig = getAiConfig.value
+  const aiConfig = AiConfig.value
   if (!text || isLoading.value) return
   const userMessage = { sender: 'user' as const, text: userContent || text }
   chatStore.addMessageToActiveSession(userMessage, aiConfig.enableAutoSave)

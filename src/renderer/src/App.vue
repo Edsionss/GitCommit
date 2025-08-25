@@ -9,12 +9,12 @@ import { computed, watchEffect } from 'vue'
 import { theme as antTheme } from 'ant-design-vue'
 import { useTheme } from './composables/useTheme'
 
-const { currentTheme } = useTheme()
+const { effectiveTheme } = useTheme()
 const { token } = antTheme.useToken()
 
 // 动态配置ConfigProvider的主题算法
 const themeConfig = computed(() => ({
-  algorithm: currentTheme.value === 'dark' ? antTheme.darkAlgorithm : antTheme.defaultAlgorithm
+  algorithm: effectiveTheme.value === 'dark' ? antTheme.darkAlgorithm : antTheme.defaultAlgorithm
 }))
 
 // 监听Ant Design的Token变化，并将其应用为CSS变量

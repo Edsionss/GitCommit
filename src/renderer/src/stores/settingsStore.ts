@@ -1,185 +1,95 @@
 import { defineStore } from 'pinia'
-import { ref, computed, watch } from 'vue'
+import { ref } from 'vue'
+import type {
+  AppSettings,
+  DisplayConfig,
+  Preferences,
+  GitConfig,
+  SystemConfig,
+  AiConfig
+} from '@type/setting'
+import _ from 'lodash' // 引入 lodash 用于深层合并
 
-// 定义设置对象的类型
-// export interface AppSettings {
-//   DisplayConfig: {
-//     theme: 'light' | 'dark'
-//     sidebarPosition: 'left' | 'right'
-//     zoom: string
-//     animations: boolean
-//   }
-//   Preferences: {
-//     language: string
-//     dateFormat: string
-//     timeFormat: '12' | '24'
-//   }
-//   GitConfig: {
-//     defaultAuthor: string
-//     defaultEmail: string
-//     repositoryPath: string
-//     refreshInterval: string
-//     clearScanConfigOnFinish: boolean
-//   }
-//   SystemConfig: {
-//     startWithSystem: boolean
-//     notifications: boolean
-//     autoUpdate: boolean
-//     telemetry: boolean
-//   }
-//   AiConfig: {
-//     provider: string | null
-//     apiKey: string
-//     endpoint: string
-//     model: string
-//     enableAiHistory: boolean
-//     enableAutoSave: boolean
-//     enableStreaming: boolean
-//   }
-// }
-
-interface DisplayConfig {
-  theme: 'light' | 'dark'
-  sidebarPosition: 'left' | 'right'
-  zoom: string
-  animations: boolean
+// 默认设置对象保持不变，它作为初始值和重置的依据
+const DefaultSetting: AppSettings = {
+  // ... 你的默认设置对象 ...
+  DisplayConfig: { theme: 'light', sidebarPosition: 'left', zoom: '1', animations: true },
+  Preferences: { language: 'zh-CN', dateFormat: 'YYYY-MM-DD', timeFormat: '24' },
+  GitConfig: {
+    defaultAuthor: '',
+    defaultEmail: '',
+    repositoryPath: '',
+    refreshInterval: '300000',
+    clearScanConfigOnFinish: true
+  },
+  SystemConfig: { startWithSystem: false, notifications: true, autoUpdate: true, telemetry: true },
+  AiConfig: {
+    provider: null,
+    apiKey: '',
+    endpoint: '',
+    model: '',
+    enableAiHistory: false,
+    enableAutoSave: false,
+    enableStreaming: true
+  }
 }
-
-interface Preferences {
-  language: string
-  dateFormat: string
-  timeFormat: '12' | '24'
-}
-
-interface GitConfig {
-  defaultAuthor: string
-  defaultEmail: string
-  repositoryPath: string
-  refreshInterval: string
-  clearScanConfigOnFinish: boolean
-}
-
-interface SystemConfig {
-  startWithSystem: boolean
-  notifications: boolean
-  autoUpdate: boolean
-  telemetry: boolean
-}
-
-interface AiConfig {
-  provider: string | null
-  apiKey: string
-  endpoint: string
-  model: string
-  enableAiHistory: boolean
-  enableAutoSave: boolean
-  enableStreaming: boolean
-}
-
-interface AppSettings {
-  DisplayConfig: DisplayConfig
-  Preferences: Preferences
-  GitConfig: GitConfig
-  SystemConfig: SystemConfig
-  AiConfig: AiConfig
-}
-
-export type Theme = 'light' | 'dark'
-export type ThemeMode = 'light' | 'dark' | 'system'
 
 export const useSettingsStore = defineStore('settings', () => {
-  // State
-  const appSettings = ref<Partial<AppSettings>>({})
-  const theme = ref<Theme>('light')
-  const themeMode = ref<ThemeMode>('system')
-  const isSidebarExpanded = ref(true)
+  // 1. 将一个大的 ref 拆分成多个小的、独立的 ref
+  const DisplayConfig = ref<DisplayConfig>({ ...DefaultSetting.DisplayConfig })
+  const Preferences = ref<Preferences>({ ...DefaultSetting.Preferences })
+  const GitConfig = ref<GitConfig>({ ...DefaultSetting.GitConfig })
+  const SystemConfig = ref<SystemConfig>({ ...DefaultSetting.SystemConfig })
+  const AiConfig = ref<AiConfig>({ ...DefaultSetting.AiConfig })
 
-  // Actions
-  function loadInitialState() {
-    // 加载 AppSettings
-    const savedSettings = localStorage.getItem('appSettings')
-    if (savedSettings) {
-      appSettings.value = JSON.parse(savedSettings)
-    }
-
-    // 加载主题
-    const savedTheme = localStorage.getItem('theme') as Theme | null
-    if (savedTheme) {
-      theme.value = savedTheme
-    }
-
-    // 加载主题模式
-    const savedThemeMode = localStorage.getItem('themeMode') as ThemeMode | null
-    if (savedThemeMode) {
-      themeMode.value = savedThemeMode
-    } else if (savedTheme) {
-      // 兼容旧版，如果只存了 theme，则将 themeMode 设置为该值
-      themeMode.value = savedTheme
-      localStorage.setItem('themeMode', savedTheme)
-    }
-
-    // 加载侧边栏状态
-    const savedSidebarState = localStorage.getItem('sidebarExpanded')
-    if (savedSidebarState) {
-      isSidebarExpanded.value = savedSidebarState === 'true'
+  // 2. 初始化时，从 localStorage 加载并分别赋值
+  const savedSettingsJSON = localStorage.getItem('AppSettings')
+  if (savedSettingsJSON) {
+    try {
+      const savedSettings: Partial<AppSettings> = JSON.parse(savedSettingsJSON)
+      // 使用深层合并（_.merge）来安全地加载设置，防止因版本更新导致字段丢失
+      DisplayConfig.value = _.merge({}, DefaultSetting.DisplayConfig, savedSettings.DisplayConfig)
+      Preferences.value = _.merge({}, DefaultSetting.Preferences, savedSettings.Preferences)
+      GitConfig.value = _.merge({}, DefaultSetting.GitConfig, savedSettings.GitConfig)
+      SystemConfig.value = _.merge({}, DefaultSetting.SystemConfig, savedSettings.SystemConfig)
+      AiConfig.value = _.merge({}, DefaultSetting.AiConfig, savedSettings.AiConfig)
+    } catch (e) {
+      console.error('Failed to parse settings from localStorage', e)
     }
   }
 
-  function saveAppSettings(newSettings: Partial<AppSettings>) {
-    appSettings.value = { ...appSettings.value, ...newSettings }
-    localStorage.setItem('appSettings', JSON.stringify(appSettings.value))
+  // 内部函数，用于将分散的 state 重新组合成一个对象以便保存
+  const reassembleAppSettings = (): AppSettings => ({
+    DisplayConfig: DisplayConfig.value,
+    Preferences: Preferences.value,
+    GitConfig: GitConfig.value,
+    SystemConfig: SystemConfig.value,
+    AiConfig: AiConfig.value
+  })
+
+  // 3. Action 现在负责保存完整的设置对象
+  function saveSettings() {
+    localStorage.setItem('AppSettings', JSON.stringify(reassembleAppSettings()))
   }
 
-  function setTheme(newTheme: Theme) {
-    theme.value = newTheme
-    localStorage.setItem('theme', newTheme)
+  // 4. 重置 Action
+  function resetSettings() {
+    DisplayConfig.value = { ...DefaultSetting.DisplayConfig }
+    Preferences.value = { ...DefaultSetting.Preferences }
+    GitConfig.value = { ...DefaultSetting.GitConfig }
+    SystemConfig.value = { ...DefaultSetting.SystemConfig }
+    AiConfig.value = { ...DefaultSetting.AiConfig }
+    saveSettings() // 重置后也保存
   }
 
-  function setThemeMode(newMode: ThemeMode) {
-    themeMode.value = newMode
-    localStorage.setItem('themeMode', newMode)
-  }
-
-  function toggleSidebar() {
-    isSidebarExpanded.value = !isSidebarExpanded.value
-    localStorage.setItem('sidebarExpanded', isSidebarExpanded.value.toString())
-  }
-
-  // Getters (使用 computed)
-  const getAppSettings = computed(() => appSettings.value)
-  const getAiConfig = computed(() => appSettings.value.AiConfig)
-  const getSystemConfig = computed(() => appSettings.value.SystemConfig)
-  const getDisplayConfig = computed(() => appSettings.value.DisplayConfig)
-  const getGitConfig = computed(() => appSettings.value.GitConfig)
-  const getPreferences = computed(() => appSettings.value.Preferences)
-  const getCurrentTheme = computed(() => theme.value)
-  const getThemeMode = computed(() => themeMode.value)
-  const getIsSidebarExpanded = computed(() => isSidebarExpanded.value)
-
-  // 立即加载初始状态
-  loadInitialState()
-
+  // 5. 返回所有拆分后的 state 和 actions
   return {
-    // State
-    appSettings,
-    theme,
-    themeMode,
-    isSidebarExpanded,
-    // Actions
-    loadInitialState,
-    saveAppSettings,
-    setTheme,
-    setThemeMode,
-    toggleSidebar,
-    // Getters
-    getAppSettings, //获取应用配置
-    getAiConfig, //获取AI配置
-    getSystemConfig, //获取系统配置
-    getDisplayConfig, //获取显示配置
-    getGitConfig, //获取Git配置
-    getPreferences, //获取用户偏好
-    getCurrentTheme,
-    getThemeMode,
-    getIsSidebarExpanded
+    DisplayConfig,
+    Preferences,
+    GitConfig,
+    SystemConfig,
+    AiConfig,
+    saveSettings,
+    resetSettings
   }
 })

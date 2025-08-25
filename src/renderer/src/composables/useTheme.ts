@@ -1,17 +1,15 @@
-import { watch, onMounted, computed } from 'vue'
+import { watch, computed } from 'vue'
 import { storeToRefs } from 'pinia'
-import { useSettingsStore, type Theme, type ThemeMode } from '@/stores/settingsStore'
+import { useSettingsStore } from '@/stores/settingsStore'
+import type { ThemeMode } from '@type/setting'
 
 export function useTheme() {
   const settingsStore = useSettingsStore()
-  const { getDisplayConfig } = storeToRefs(settingsStore)
-  const themeMode = computed(() => getDisplayConfig.value.themeMode || 'light')
-  const currentTheme = computed(() => getDisplayConfig.value.theme || 'light')
+  const { DisplayConfig } = storeToRefs(settingsStore)
   // 应用主题到DOM
-  const applyTheme = (theme: Theme) => {
+  const applyTheme = (theme: ThemeMode) => {
     document.documentElement.setAttribute('data-theme', theme)
     document.body.setAttribute('data-theme', theme)
-
     const metaThemeColor = document.querySelector('meta[name="theme-color"]')
     const metaContent = theme === 'dark' ? '#141414' : '#ffffff'
     if (metaThemeColor) {
@@ -22,68 +20,79 @@ export function useTheme() {
       meta.content = metaContent
       document.head.appendChild(meta)
     }
-    // 更新 store 中的 theme，但不直接在这里做，而是通过 action
-    if (settingsStore.theme !== theme) {
-      settingsStore.setTheme(theme)
-    }
-  }
-
-  // 包装 store 的 action
-  const setThemeMode = (mode: ThemeMode) => {
-    settingsStore.setThemeMode(mode)
   }
 
   // 获取系统主题
-  const getSystemTheme = (): Theme => {
+  const getSystemTheme = (): ThemeMode => {
     return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
   }
 
-  // 切换明暗主题
-  const toggleTheme = () => {
-    const newMode =
-      themeMode.value === 'system'
-        ? currentTheme.value === 'light'
-          ? 'dark'
-          : 'light'
-        : themeMode.value === 'light'
-          ? 'dark'
-          : 'light'
-    setThemeMode(newMode)
-  }
-
-  // 监听 store 中的 themeMode 变化
-  watch(
-    themeMode,
-    (newMode) => {
-      if (newMode === 'system') {
-        applyTheme(getSystemTheme())
-      } else {
-        applyTheme(newMode as Theme)
-      }
-    },
-    { immediate: true }
-  )
-
   // 监听系统主题变化
+  let systemListenerInit = false
   const setupSystemThemeListener = () => {
+    if (systemListenerInit) return
+    systemListenerInit = true
     window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
-      if (settingsStore.themeMode === 'system') {
+      if (DisplayConfig.value?.theme === 'system') {
         applyTheme(e.matches ? 'dark' : 'light')
       }
     })
   }
 
-  onMounted(() => {
-    // 初始化时，store 已经从 localStorage 加载了状态
-    // watch 的 immediate: true 会立即执行一次，所以主题已经应用
-    // 只需要设置系统监听器
-    setupSystemThemeListener()
-  })
+  // 获取主题值
+  const getThemeMode = (themeMode: ThemeMode) => {
+    if (themeMode === 'system') {
+      return getSystemTheme()
+    }
+    return themeMode
+  }
+
+  // 应用动画设置
+  const applyAnimations = (enabled: boolean) => {
+    document.documentElement.classList.toggle('no-animations', !enabled)
+  }
+
+  // 应用缩放
+  const applyZoom = (zoomValue: string | number) => {
+    document.documentElement.style.zoom = String(zoomValue)
+  }
+
+  const settingEffects = {
+    theme: (themeValue) => {
+      applyTheme(getThemeMode(themeValue))
+      setupSystemThemeListener()
+    },
+    animations: (animationsValue) => {
+      applyAnimations(animationsValue)
+    },
+    zoom: (zoomValue) => {
+      applyZoom(zoomValue)
+    }
+    // ✨ 未来添加新设置，只需要在这里加一行！✨
+  }
+
+  watch(
+    DisplayConfig,
+    (newConfig, oldConfig) => {
+      if (!newConfig) return
+      const isInitialRun = !oldConfig
+
+      // 遍历副作用映射对象
+      for (const key in settingEffects) {
+        const effectFn = settingEffects[key]
+        const newValue = newConfig[key]
+        const oldValue = oldConfig?.[key]
+
+        // 如果是首次运行，或新旧值不同，则执行副作用
+        if (isInitialRun || newValue !== oldValue) {
+          effectFn(newValue)
+        }
+      }
+    },
+    { deep: true, immediate: true }
+  )
 
   return {
-    currentTheme,
-    themeMode,
-    setThemeMode,
-    toggleTheme
+    effectiveTheme: computed(() => getThemeMode(DisplayConfig.value?.theme || 'light'))
   }
 }

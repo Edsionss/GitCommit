@@ -27,15 +27,11 @@ import { storeToRefs } from 'pinia'
 import { useSettingsStore } from '@/stores/settingsStore'
 import TheSidebar from './TheSidebar.vue'
 import TheHeader from './TheHeader.vue'
-import { useTheme } from '@composables/useTheme'
-
-// Initialize theme composable
-useTheme()
 
 const settingsStore = useSettingsStore()
-const { getDisplayConfig } = storeToRefs(settingsStore)
+const { DisplayConfig } = storeToRefs(settingsStore)
 
-const sidebarPosition = computed(() => getDisplayConfig.value.sidebarPosition || 'left')
+const sidebarPosition = computed(() => DisplayConfig?.value?.sidebarPosition || 'left')
 
 const layoutClasses = computed(() => ({
   'sidebar-right': sidebarPosition.value === 'right'
