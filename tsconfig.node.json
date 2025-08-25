@@ -12,7 +12,7 @@
     "baseUrl": ".",
     "paths": {
       "@shared/*": ["src/shared/*"],
-      "@allTypes/*": ["src/shared/types/dtos/*"],
+      "@sharedType/*": ["src/shared/types/dtos/*"],
       "@features/*": ["src/main/features/*"],
       "@handlers/*": ["src/main/features/handlers/*"],
       "@services/*": ["src/main/features/services/*"],

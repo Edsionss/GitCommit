@@ -36,7 +36,7 @@ import ScanParametersTab from './ScanParametersTab.vue'
 import ScanResultsTable from './ScanResultsTable.vue'
 import ScanLogTab from './ScanLogTab.vue'
 import ScanAnalysis from './ScanAnalysis.vue'
-import type { GitCommit, GitScanOptions } from '@allTypes/git.dto'
+import type { GitCommit, GitScanOptions } from '@sharedType/git.dto'
 import { useDataStore } from '@/stores/dataStore'
 import { useRouter } from 'vue-router'
 

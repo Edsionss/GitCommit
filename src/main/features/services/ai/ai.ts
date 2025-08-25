@@ -2,7 +2,7 @@ import { GoogleGenAI } from '@google/genai'
 import { OpenAI } from 'openai'
 import { Stream } from 'openai/streaming'
 import type { ChatCompletionChunk } from 'openai/resources/chat/completions'
-import type { AiConfig, ChatMessage } from '@allTypes/ai'
+import type { AiConfig, ChatMessage } from '@sharedType/ai'
 /**
  * @file AI Service
  * @description Handles interactions with various AI providers.

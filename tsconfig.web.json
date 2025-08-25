@@ -20,7 +20,7 @@
       "@composables/*": ["src/renderer/src/composables/*"],
       "@router/*": ["src/renderer/src/router/*"],
       "@shared/*": ["src/shared/*"],
-      "@allTypes/*": ["src/shared/types/dtos/*"],
+      "@sharedType/*": ["src/shared/types/dtos/*"],
       "@type/*": ["src/renderer/src/types/*"],
     }
   }
