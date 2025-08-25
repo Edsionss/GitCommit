@@ -20,7 +20,7 @@
 2.  **文件结构**:
 
     - 视图组件应创建在 `src/renderer/src/views/Stock.vue`。
-    - 子组件可以创建在 `src/renderer/src/components/stock/` 目录下 (例如 `Watchlist.vue`, `StockChart.vue`)。
+    - 子组件可以创建在 `src/renderer/src/components/stock/` 目录下 (例如 `WatchList.vue`, `StockChart.vue`)。
     - Pinia Store 文件应创建在 `src/renderer/src/stores/stock.ts`。
 
 ---
@@ -33,7 +33,7 @@
 
 1.  **State**:
 
-    - `watchlist`: 一个 `Map<string, StockData>` 结构，`key` 为股票代码，`value` 为该股票的详细数据对象。
+    - `watchList`: 一个 `Map<string, StockData>` 结构，`key` 为股票代码，`value` 为该股票的详细数据对象。
     - `activeStockCode`: 当前在右侧区域展示的股票代码，类型为 `string | null`。
 
 2.  **StockData 类型定义**:
@@ -53,14 +53,14 @@
 3.  **Actions**:
     - `addStock(stockName: string)`:
       - 调用 后台接口 获取股票代码和基本信息。
-      - 如果股票已在 `watchlist` 中，则提示用户，否则将其添加到 `watchlist`。
-      - **数据持久化**: 使用 `localStorage` 将 `watchlist` 的代码和名称列表持久化。
-    - `removeStock(stockCode: string)`: 从 `watchlist` 中删除指定股票，并更新持久化数据。
+      - 如果股票已在 `watchList` 中，则提示用户，否则将其添加到 `watchList`。
+      - **数据持久化**: 使用 `localStorage` 将 `watchList` 的代码和名称列表持久化。
+    - `removeStock(stockCode: string)`: 从 `watchList` 中删除指定股票，并更新持久化数据。
     - `setActiveStock(stockCode: string)`: 设置 `activeStockCode`。
     - `fetchLatestData(stockCode: string)`:
       - 这是一个异步 Action，用于更新指定股票的最新信息。
       - 依次调用 `stock:fetch-data` 和 `stock:calculate-indicators`。
-      - 将获取到的 `kline` 和 `indicators` 更新到 `watchlist` 中对应股票的 state。
+      - 将获取到的 `kline` 和 `indicators` 更新到 `watchList` 中对应股票的 state。
       - 更新 `lastUpdateTime`。
     - `runAIAnalysis(stockCode: string)`: (这个 Action 可以先留空，具体逻辑放在组件中处理，因为它是多步骤的)
 
@@ -73,15 +73,15 @@
 
 2.  **左侧面板 (25% 宽度)**:
 
-    - 渲染一个子组件 `Watchlist.vue`。
+    - 渲染一个子组件 `WatchList.vue`。
 
 3.  **右侧面板 (75% 宽度)**:
     - 如果 `activeStockCode` 为空，显示一个提示信息，如 "请从左侧选择一支股票查看详情"。
     - 如果 `activeStockCode` 不为空，则渲染一个子组件 `StockDetail.vue`，并将当前选中的股票数据传递给它。
 
-**任务 3: 创建左侧自选列表组件 (`components/stock/Watchlist.vue`)**
+**任务 3: 创建左侧自选列表组件 (`components/stock/WatchList.vue`)**
 
-1.  **数据**: 从 `stockStore` 中获取 `watchlist` 和 `activeStockCode`。
+1.  **数据**: 从 `stockStore` 中获取 `watchList` 和 `activeStockCode`。
 2.  **显示**:
     - 组件，显示股票名称 (`name`) 和代码 (`code`)的。
     - 当用户点击某一行时，调用 store 的 `setActiveStock` action，并给当前选中行添加高亮样式。

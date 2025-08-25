@@ -73,6 +73,14 @@ const defaultRoutes: RouteRecord[] = [
     menuOrder: 70
   },
   {
+    path: 'stock',
+    name: 'Stock',
+    componentPath: '@views/Stock.vue',
+    meta: { title: '股票分析', keepAlive: true },
+    isMenu: true,
+    menuOrder: 80
+  },
+  {
     path: 'routes',
     name: 'RoutesView',
     componentPath: '@views/RoutesView.vue',
