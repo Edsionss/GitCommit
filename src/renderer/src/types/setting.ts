@@ -3,7 +3,7 @@ export type ThemeMode = 'light' | 'dark' | 'system'
 export interface DisplayConfig {
   theme: ThemeMode
   sidebarPosition: 'left' | 'right'
-  zoom: string
+  zoom: number
   animations: boolean
 }
 

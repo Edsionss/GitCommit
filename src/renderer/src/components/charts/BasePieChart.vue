@@ -11,7 +11,7 @@ import type { ChartData } from 'chart.js'
 
 ChartJS.register(Title, Tooltip, Legend, ArcElement)
 
-const { currentTheme } = useTheme()
+const { effectiveTheme } = useTheme()
 
 const props = defineProps({
   chartData: {
@@ -33,7 +33,7 @@ const chartOptions = computed(() => ({
     legend: {
       position: 'top',
       labels: {
-        color: currentTheme.value === 'dark' ? '#f0f0f0' : '#666'
+        color: effectiveTheme.value === 'dark' ? '#f0f0f0' : '#666'
       }
     }
   }

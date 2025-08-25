@@ -13,7 +13,7 @@ import _ from 'lodash' // 引入 lodash 用于深层合并
 // 默认设置对象保持不变，它作为初始值和重置的依据
 const DefaultSetting: AppSettings = {
   // ... 你的默认设置对象 ...
-  DisplayConfig: { theme: 'light', sidebarPosition: 'left', zoom: '1', animations: true },
+  DisplayConfig: { theme: 'light', sidebarPosition: 'left', zoom: 1, animations: true },
   Preferences: { language: 'zh-CN', dateFormat: 'YYYY-MM-DD', timeFormat: '24' },
   GitConfig: {
     defaultAuthor: '',

@@ -55,7 +55,7 @@ const props = defineProps({
 
 const emit = defineEmits(['selectRecord', 'deleteRecord', 'deleteAllRecords'])
 
-const { currentTheme } = useTheme()
+const { effectiveTheme } = useTheme()
 
 const onContextMenu = (e: MouseEvent, record: ScanRecord | null) => {
   if (record) {
@@ -87,7 +87,7 @@ const onContextMenu = (e: MouseEvent, record: ScanRecord | null) => {
       x: e.x,
       y: e.y,
       items: items,
-      theme: currentTheme.value,
+      theme: effectiveTheme.value,
       customClass: 'context-menu-custom'
     })
   }
