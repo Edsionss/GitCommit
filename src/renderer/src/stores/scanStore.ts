@@ -94,8 +94,11 @@ export const useScanStore = defineStore('scan', () => {
     if (!path) {
       return
     }
-    gitRepos.value.push({ path, lastAccessed: new Date().toISOString() })
-    _savaGitRepos()
+    const isExist = gitRepos.value.filter((r) => r.path === path).length
+    if (!isExist) {
+      gitRepos.value.push({ path, lastAccessed: new Date().toISOString() })
+      _savaGitRepos()
+    }
   }
 
   const delGitRepo = (path: string) => {
