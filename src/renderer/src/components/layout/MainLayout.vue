@@ -33,9 +33,9 @@ import { useTheme } from '@composables/useTheme'
 useTheme()
 
 const settingsStore = useSettingsStore()
-const { appSettings } = storeToRefs(settingsStore)
+const { getDisplayConfig } = storeToRefs(settingsStore)
 
-const sidebarPosition = computed(() => appSettings.value?.appearance?.sidebarPosition || 'left')
+const sidebarPosition = computed(() => getDisplayConfig.value.sidebarPosition || 'left')
 
 const layoutClasses = computed(() => ({
   'sidebar-right': sidebarPosition.value === 'right'

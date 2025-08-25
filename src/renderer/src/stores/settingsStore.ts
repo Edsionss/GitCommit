@@ -2,13 +2,86 @@ import { defineStore } from 'pinia'
 import { ref, computed, watch } from 'vue'
 
 // 定义设置对象的类型
-export interface AppSettings {
-  SystemConfig: any // 系统配置
-  AiConfig: any // AI配置
-  DisplayConfig: any // 显示配置
-  GitConfig: any // Git配置
-  Preferences: any // 用户偏好
-  // 可以根据需要添加其他设置字段
+// export interface AppSettings {
+//   DisplayConfig: {
+//     theme: 'light' | 'dark'
+//     sidebarPosition: 'left' | 'right'
+//     zoom: string
+//     animations: boolean
+//   }
+//   Preferences: {
+//     language: string
+//     dateFormat: string
+//     timeFormat: '12' | '24'
+//   }
+//   GitConfig: {
+//     defaultAuthor: string
+//     defaultEmail: string
+//     repositoryPath: string
+//     refreshInterval: string
+//     clearScanConfigOnFinish: boolean
+//   }
+//   SystemConfig: {
+//     startWithSystem: boolean
+//     notifications: boolean
+//     autoUpdate: boolean
+//     telemetry: boolean
+//   }
+//   AiConfig: {
+//     provider: string | null
+//     apiKey: string
+//     endpoint: string
+//     model: string
+//     enableAiHistory: boolean
+//     enableAutoSave: boolean
+//     enableStreaming: boolean
+//   }
+// }
+
+interface DisplayConfig {
+  theme: 'light' | 'dark'
+  sidebarPosition: 'left' | 'right'
+  zoom: string
+  animations: boolean
+}
+
+interface Preferences {
+  language: string
+  dateFormat: string
+  timeFormat: '12' | '24'
+}
+
+interface GitConfig {
+  defaultAuthor: string
+  defaultEmail: string
+  repositoryPath: string
+  refreshInterval: string
+  clearScanConfigOnFinish: boolean
+}
+
+interface SystemConfig {
+  startWithSystem: boolean
+  notifications: boolean
+  autoUpdate: boolean
+  telemetry: boolean
+}
+
+interface AiConfig {
+  provider: string | null
+  apiKey: string
+  endpoint: string
+  model: string
+  enableAiHistory: boolean
+  enableAutoSave: boolean
+  enableStreaming: boolean
+}
+
+interface AppSettings {
+  DisplayConfig: DisplayConfig
+  Preferences: Preferences
+  GitConfig: GitConfig
+  SystemConfig: SystemConfig
+  AiConfig: AiConfig
 }
 
 export type Theme = 'light' | 'dark'
@@ -74,7 +147,11 @@ export const useSettingsStore = defineStore('settings', () => {
 
   // Getters (使用 computed)
   const getAppSettings = computed(() => appSettings.value)
-  const getAiConfig = computed(() => appSettings.value.ai)
+  const getAiConfig = computed(() => appSettings.value.AiConfig)
+  const getSystemConfig = computed(() => appSettings.value.SystemConfig)
+  const getDisplayConfig = computed(() => appSettings.value.DisplayConfig)
+  const getGitConfig = computed(() => appSettings.value.GitConfig)
+  const getPreferences = computed(() => appSettings.value.Preferences)
   const getCurrentTheme = computed(() => theme.value)
   const getThemeMode = computed(() => themeMode.value)
   const getIsSidebarExpanded = computed(() => isSidebarExpanded.value)
@@ -95,8 +172,12 @@ export const useSettingsStore = defineStore('settings', () => {
     setThemeMode,
     toggleSidebar,
     // Getters
-    getAppSettings,
-    getAiConfig,
+    getAppSettings, //获取应用配置
+    getAiConfig, //获取AI配置
+    getSystemConfig, //获取系统配置
+    getDisplayConfig, //获取显示配置
+    getGitConfig, //获取Git配置
+    getPreferences, //获取用户偏好
     getCurrentTheme,
     getThemeMode,
     getIsSidebarExpanded

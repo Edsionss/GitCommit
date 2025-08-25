@@ -32,9 +32,8 @@
 
 <script setup lang="ts">
 import _ from 'lodash'
-import { ref, reactive } from 'vue'
+import { ref, reactive, computed } from 'vue'
 import { message } from 'ant-design-vue'
-import { gitService } from '@services/GitService'
 import { useRouter } from 'vue-router'
 import dayjs from 'dayjs'
 import SettingsForm from '@components/BasicSettings/SettingsForm.vue'
@@ -46,6 +45,9 @@ import { storeToRefs } from 'pinia'
 const scanStore = useScanStore()
 const router = useRouter()
 const settingsStore = useSettingsStore()
+const { getAiConfig, getGitConfig } = storeToRefs(settingsStore)
+const clearScanConfigOnFinish = computed(() => getGitConfig.value.clearScanConfigOnFinish)
+
 const { getGitCommits } = storeToRefs(scanStore)
 const defaultFormState = {
   selectedFields: ['repository', 'commitId', 'shortHash', 'author', 'date', 'message'],
@@ -135,7 +137,7 @@ const startScan = async () => {
     const { commits, analysisResult } = await window.api.scanGitRepo(
       form.repoPath,
       scanOptions,
-      JSON.parse(JSON.stringify(settingsStore?.appSettings?.ai || null))
+      JSON.parse(JSON.stringify(getAiConfig.value || null))
     )
     addLog(`扫描完成，共找到 ${commits.length} 条提交记录`, 'success')
     hasResults.value = true
@@ -154,8 +156,7 @@ const startScan = async () => {
     // 跳转到扫描记录页面
     if (commits && commits.length) {
       router.push({ name: 'ScanHistory' })
-      const appSettings = settingsStore.appSettings
-      if (appSettings.system?.clearScanConfigOnFinish) {
+      if (clearScanConfigOnFinish.value) {
         resetForm()
       }
     }

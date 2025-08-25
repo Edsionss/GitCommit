@@ -18,7 +18,7 @@ interface SendAiMessageParams {
 
 export function useAi() {
   const settingsStore = useSettingsStore()
-  const { appSettings, getAiConfig } = storeToRefs(settingsStore)
+  const { getAiConfig } = storeToRefs(settingsStore)
   const aiConfig = computed(() => getAiConfig.value || null)
   const sendAiMessage = async ({
     prompt,

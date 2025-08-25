@@ -1,7 +1,7 @@
 import { ref, watch, readonly } from 'vue'
 import dayjs from 'dayjs'
 import { useSettingsStore } from '@/stores/settingsStore'
-
+import { storeToRefs } from 'pinia'
 // Create reactive refs for the formats
 const dateFormat = ref('YYYY-MM-DD')
 const timeFormat = ref('24')
@@ -11,12 +11,13 @@ const timeFormat = ref('24')
  */
 export function useFormatters() {
   const settingsStore = useSettingsStore()
+  const { getPreferences } = storeToRefs(settingsStore)
 
   // Function to update formats from the store
   const updateFormatsFromStore = () => {
     const settings = settingsStore.appSettings
-    dateFormat.value = settings?.locale?.dateFormat || 'YYYY-MM-DD'
-    timeFormat.value = settings?.locale?.timeFormat || '24'
+    dateFormat.value = getPreferences.dateFormat || 'YYYY-MM-DD'
+    timeFormat.value = getPreferences.timeFormat || '24'
   }
 
   // Initial load from store
@@ -26,8 +27,8 @@ export function useFormatters() {
   watch(
     () => settingsStore.appSettings,
     (newSettings) => {
-      dateFormat.value = newSettings?.locale?.dateFormat || 'YYYY-MM-DD'
-      timeFormat.value = newSettings?.locale?.timeFormat || '24'
+      dateFormat.value = getPreferences.dateFormat || 'YYYY-MM-DD'
+      timeFormat.value = getPreferences.timeFormat || '24'
     },
     { deep: true }
   )

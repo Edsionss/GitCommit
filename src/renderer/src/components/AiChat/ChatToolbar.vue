@@ -3,8 +3,8 @@
     <a-button @click="$emit('toggleSidebar')" type="text">
       <template #icon><MenuOutlined /></template>
     </a-button>
-    <div class="toolbar-title">{{ appSettings.ai.model || 'AI 助手' }}</div>
-    <a-button @click="$emit('saveSession')" v-if="!appSettings.ai.enableAutoSave">
+    <div class="toolbar-title">{{ getAiConfig.model || 'AI 助手' }}</div>
+    <a-button @click="$emit('saveSession')" v-if="!getAiConfig.enableAutoSave">
       <template #icon><SaveOutlined /></template>
       保存会话
     </a-button>
@@ -16,7 +16,7 @@ import { storeToRefs } from 'pinia'
 import { useSettingsStore } from '@/stores/settingsStore'
 import { MenuOutlined, SaveOutlined } from '@ant-design/icons-vue'
 const settingsStore = useSettingsStore()
-const { appSettings } = storeToRefs(settingsStore)
+const { getAiConfig } = storeToRefs(settingsStore)
 
 defineEmits(['toggleSidebar', 'saveSession'])
 </script>

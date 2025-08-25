@@ -1,37 +1,37 @@
 <template>
   <div class="settings-container page-container">
     <!-- <h2 class="page-title">设置</h2> -->
-    <AppearanceSettings
-      :settings="settings.appearance"
+    <DisplayConfig
+      :settings="getDisplayConfig"
       @update:theme="updateTheme($event)"
-      @update:sidebarPosition="settings.appearance.sidebarPosition = $event"
-      @update:zoom="settings.appearance.zoom = $event"
-      @update:animations="settings.appearance.animations = $event"
+      @update:sidebarPosition="getDisplayConfig.sidebarPosition = $event"
+      @update:zoom="getDisplayConfig.zoom = $event"
+      @update:animations="getDisplayConfig.animations = $event"
     />
 
-    <LocaleSettings
-      :settings="settings.locale"
-      @update:language="settings.locale.language = $event"
-      @update:dateFormat="settings.locale.dateFormat = $event"
-      @update:timeFormat="settings.locale.timeFormat = $event"
+    <Preferences
+      :settings="getPreferences"
+      @update:language="getPreferences.language = $event"
+      @update:dateFormat="getPreferences.dateFormat = $event"
+      @update:timeFormat="getPreferences.timeFormat = $event"
     />
 
-    <GitSettings
-      :settings="settings.git"
-      @update:defaultAuthor="settings.git.defaultAuthor = $event"
-      @update:defaultEmail="settings.git.defaultEmail = $event"
-      @update:repositoryPath="settings.git.repositoryPath = $event"
-      @update:refreshInterval="settings.git.refreshInterval = $event"
+    <GitConfig
+      :settings="getGitConfig"
+      @update:defaultAuthor="getGitConfig.defaultAuthor = $event"
+      @update:defaultEmail="getGitConfig.defaultEmail = $event"
+      @update:repositoryPath="getGitConfig.repositoryPath = $event"
+      @update:refreshInterval="getGitConfig.refreshInterval = $event"
       @selectDirectory="selectDirectory"
     />
 
-    <SystemSettings
-      :settings="settings.system"
-      @update:startWithSystem="settings.system.startWithSystem = $event"
-      @update:notifications="settings.system.notifications = $event"
-      @update:autoUpdate="settings.system.autoUpdate = $event"
-      @update:telemetry="settings.system.telemetry = $event"
-      @update:clearScanConfigOnFinish="settings.system.clearScanConfigOnFinish = $event"
+    <SystemConfig
+      :settings="getSystemConfig"
+      @update:startWithSystem="getSystemConfig.startWithSystem = $event"
+      @update:notifications="getSystemConfig.notifications = $event"
+      @update:autoUpdate="getSystemConfig.autoUpdate = $event"
+      @update:telemetry="getSystemConfig.telemetry = $event"
+      @update:clearScanConfigOnFinish="getSystemConfig.clearScanConfigOnFinish = $event"
     />
 
     <AiSettings :settings="settings.ai" @update:settings="settings.ai = $event" />
@@ -61,10 +61,10 @@ import { reactive, onMounted, watch } from 'vue'
 import { message, Modal } from 'ant-design-vue'
 import { storeToRefs } from 'pinia'
 import { useSettingsStore, type AppSettings } from '@/stores/settingsStore'
-import AppearanceSettings from '@/components/SettingsView/AppearanceSettings.vue'
-import LocaleSettings from '@/components/SettingsView/LocaleSettings.vue'
-import GitSettings from '@/components/SettingsView/GitSettings.vue'
-import SystemSettings from '@/components/SettingsView/SystemSettings.vue'
+import DisplayConfig from '@/components/SettingsView/AppearanceSettings.vue'
+import Preferences from '@/components/SettingsView/LocaleSettings.vue'
+import GitConfig from '@/components/SettingsView/GitSettings.vue'
+import SystemConfig from '@/components/SettingsView/SystemSettings.vue'
 import AiSettings from '@/components/SettingsView/AiSettings.vue'
 import RouterSetting from '@/components/SettingsView/RouterSetting.vue'
 import { useTheme } from '@composables/useTheme'
@@ -72,38 +72,45 @@ import { SaveOutlined, RedoOutlined } from '@ant-design/icons-vue'
 
 // 使用 Pinia Store
 const settingsStore = useSettingsStore()
-const { appSettings, themeMode } = storeToRefs(settingsStore)
+const {
+  getAppSettings,
+  themeMode,
+  getDisplayConfig,
+  getPreferences,
+  getGitConfig,
+  getSystemConfig
+} = storeToRefs(settingsStore)
 
 // 使用主题组合式函数
 const { setThemeMode } = useTheme()
 
 // 本地响应式状态，用于表单绑定
-const settings = reactive({
-  appearance: {
+const settings = <AppSettings>reactive({
+  DisplayConfig: {
     theme: 'light',
     sidebarPosition: 'left',
     zoom: '1',
     animations: true
   },
-  locale: {
+  Preferences: {
     language: 'zh-CN',
     dateFormat: 'YYYY-MM-DD',
     timeFormat: '24'
   },
-  git: {
+  GitConfig: {
     defaultAuthor: '',
     defaultEmail: '',
     repositoryPath: '',
-    refreshInterval: '300000'
+    refreshInterval: '300000',
+    clearScanConfigOnFinish: true
   },
-  system: {
+  SystemConfig: {
     startWithSystem: false,
     notifications: true,
     autoUpdate: true,
-    telemetry: true,
-    clearScanConfigOnFinish: true
+    telemetry: true
   },
-  ai: {
+  AiConfig: {
     provider: null,
     apiKey: '',
     endpoint: '',
@@ -126,7 +133,7 @@ const applyAnimations = (enabled: boolean) => {
 
 // 从 Store 加载设置到本地状态
 const loadSettingsFromStore = () => {
-  const storedSettings = appSettings.value
+  const storedSettings = getAppSettings.value
   if (storedSettings) {
     // 合并设置以保留新增的设置项
     Object.keys(settings).forEach((category) => {
@@ -136,7 +143,7 @@ const loadSettingsFromStore = () => {
     })
   }
   // 确保主题设置与 store 同步
-  settings.appearance.theme = themeMode.value
+  settings.DisplayConfig.theme = themeMode.value
 }
 
 // 保存设置到 Store
@@ -210,7 +217,7 @@ onMounted(() => {
 
 // 监听 store 中 appSettings 的变化，同步到本地
 watch(
-  appSettings,
+  getAppSettings,
   (newSettings) => {
     loadSettingsFromStore()
   },

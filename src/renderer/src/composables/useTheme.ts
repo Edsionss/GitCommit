@@ -1,11 +1,12 @@
-import { watch, onMounted } from 'vue'
+import { watch, onMounted, computed } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useSettingsStore, type Theme, type ThemeMode } from '@/stores/settingsStore'
 
 export function useTheme() {
   const settingsStore = useSettingsStore()
-  const { theme: currentTheme, themeMode } = storeToRefs(settingsStore)
-
+  const { getDisplayConfig } = storeToRefs(settingsStore)
+  const themeMode = computed(() => getDisplayConfig.value.themeMode || 'light')
+  const currentTheme = computed(() => getDisplayConfig.value.theme || 'light')
   // 应用主题到DOM
   const applyTheme = (theme: Theme) => {
     document.documentElement.setAttribute('data-theme', theme)

@@ -61,7 +61,7 @@ import {
 const settingsStore = useSettingsStore()
 const routesStore = useRoutesStore()
 
-const { isSidebarExpanded } = storeToRefs(settingsStore)
+const { getDisplayConfig } = storeToRefs(settingsStore)
 const { routes } = storeToRefs(routesStore)
 const route = useRoute()
 
@@ -84,7 +84,7 @@ const toggleSidebar = () => {
 
 // Watch for sidebar state changes to dispatch events
 watch(
-  isSidebarExpanded,
+  getDisplayConfig.isSidebarExpanded,
   (expanded) => {
     document.documentElement.dataset.sidebarExpanded = expanded.toString()
     window.dispatchEvent(
@@ -116,7 +116,7 @@ const isActive = (path: string): boolean => {
 }
 
 // isExpanded is now a ref from the store
-const isExpanded = isSidebarExpanded
+const isExpanded = getDisplayConfig.isSidebarExpanded
 </script>
 
 <style scoped>

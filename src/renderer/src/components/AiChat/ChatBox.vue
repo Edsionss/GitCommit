@@ -11,7 +11,7 @@
             </template>
             <template #title>
               <span>{{
-                item.sender === 'user' ? 'You' : appSettings?.ai?.model || 'AI Assistant'
+                item.sender === 'user' ? 'You' : getAiConfig.model || 'AI Assistant'
               }}</span>
             </template>
             <template #description>
@@ -42,7 +42,7 @@
               </a-avatar>
             </template>
             <template #title>
-              <span>{{ appSettings?.ai?.model || 'AI Assistant' }}</span>
+              <span>{{ getAiConfig.model || 'AI Assistant' }}</span>
             </template>
             <template #description>
               <div class="message-content">
@@ -123,7 +123,7 @@ const borderStyle = computed(() => {
 const chatStore = useChatStore()
 const { activeSession } = storeToRefs(chatStore)
 const settingsStore = useSettingsStore()
-const { appSettings, getAiConfig } = storeToRefs(settingsStore)
+const { getAiConfig } = storeToRefs(settingsStore)
 
 const userInput = ref('')
 
