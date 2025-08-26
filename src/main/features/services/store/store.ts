@@ -1,7 +1,7 @@
 // src/main/services/StoreService.ts
 
-import Store from 'electron-store'
-
+import __Store from 'electron-store'
+const Store = __Store.default || __Store
 import { defaultData, type AppStore } from '@sharedType/store'
 // 为你的存储数据定义一个类型接口，以获得完整的类型提示
 // 这非常重要，能避免很多低级错误

@@ -4,13 +4,22 @@ import vue from '@vitejs/plugin-vue'
 
 export default defineConfig({
   main: {
+    build: {
+      rollupOptions: {
+        external: [
+          'electron',
+          'electron-store' // 将 electron-store 设为外部依赖
+        ]
+      }
+    },
     resolve: {
       alias: {
         '@main': resolve('src/main'),
         '@features': resolve('src/main/features'),
         '@handlers': resolve('src/main/features/handlers'),
         '@services': resolve('src/main/features/services'),
-        '@shared': resolve('src/shared')
+        '@shared': resolve('src/shared'),
+        '@sharedType': resolve('src/shared/types/dtos')
       }
     },
     plugins: [externalizeDepsPlugin()]
