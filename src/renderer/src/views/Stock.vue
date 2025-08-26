@@ -1,4 +1,3 @@
-
 <template>
   <div class="stock-view">
     <a-layout style="height: 100%">
@@ -10,8 +9,8 @@
       <!-- 主体内容 -->
       <a-layout>
         <!-- 左侧自选列表 -->
-        <a-layout-sider width="25%" class="watchlist-panel">
-          <Watchlist @stock-selected="handleStockSelected" />
+        <a-layout-sider width="25%" class="watchList-panel">
+          <WatchList @stock-selected="handleStockSelected" />
         </a-layout-sider>
 
         <!-- 右侧详情 -->
@@ -33,20 +32,20 @@
 import { ref, computed } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useStockStore } from '@/stores/stock'
-import Watchlist from '@/components/stock/Watchlist.vue'
+import WatchList from '@/components/stock/WatchList.vue'
 import StockDetail from '@/components/stock/StockDetail.vue'
 import AddStockWizard from '@/components/stock/AddStockWizard.vue'
 import { Button as AButton, Layout as ALayout } from 'ant-design-vue'
 
 const stockStore = useStockStore()
-const { activeStockCode, watchlist } = storeToRefs(stockStore)
+const { activeStockCode, watchList } = storeToRefs(stockStore)
 
 const isWizardVisible = ref(false)
 
 // 获取当前选中股票的完整数据
 const activeStockData = computed(() => {
   if (activeStockCode.value) {
-    return watchlist.value.get(activeStockCode.value)
+    return watchList.value.get(activeStockCode.value)
   }
   return null
 })
@@ -60,7 +59,7 @@ const onWizardFinish = () => {
   console.log('Wizard finished')
 }
 
-// 处理从Watchlist组件传来的事件
+// 处理从WatchList组件传来的事件
 const handleStockSelected = (stockCode: string) => {
   stockStore.setActiveStock(stockCode)
 }
@@ -79,7 +78,7 @@ const handleStockSelected = (stockCode: string) => {
   border-bottom: 1px solid #f0f0f0;
 }
 
-.watchlist-panel {
+.watchList-panel {
   background: #fdfdfd;
   border-right: 1px solid #f0f0f0;
   padding: 10px;
@@ -99,4 +98,3 @@ const handleStockSelected = (stockCode: string) => {
   color: #999;
 }
 </style>
-

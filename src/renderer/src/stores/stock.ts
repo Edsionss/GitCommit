@@ -1,18 +1,18 @@
 import { defineStore } from 'pinia'
 import { ref, reactive } from 'vue'
-import { StockData } from '@/shared/types/dtos/stock';
+import { StockData } from '@/shared/types/dtos/stock'
 
 // 从 localStorage 加载持久化的数据
-const loadWatchlistFromStorage = (): Map<string, StockData> => {
-  const stored = localStorage.getItem('stock_watchlist')
+const loadWatchListFromStorage = (): Map<string, StockData> => {
+  const stored = localStorage.getItem('stock_watchList')
   if (stored) {
     try {
       const parsed = JSON.parse(stored) as { code: string; name: string }[]
-      const watchlist = new Map<string, StockData>()
+      const watchList = new Map<string, StockData>()
       parsed.forEach((item) => {
         // For performance, only load basic info initially.
         // Detailed data will be fetched on demand.
-        watchlist.set(item.code, {
+        watchList.set(item.code, {
           ...item,
           kline: [],
           indicators: {},
@@ -21,25 +21,25 @@ const loadWatchlistFromStorage = (): Map<string, StockData> => {
           analysisHistory: []
         })
       })
-      return watchlist
+      return watchList
     } catch (error) {
-      console.error('Failed to parse watchlist from localStorage', error)
+      console.error('Failed to parse watchList from localStorage', error)
       return new Map()
     }
   }
   return new Map()
 }
 
-// 持久化 watchlist 到 localStorage
-const saveWatchlistToStorage = (watchlist: Map<string, StockData>) => {
+// 持久化 watchList 到 localStorage
+const saveWatchListToStorage = (watchList: Map<string, StockData>) => {
   // Persist only the identifiers, not the full data.
-  const simplified = Array.from(watchlist.values()).map(({ code, name }) => ({ code, name }))
-  localStorage.setItem('stock_watchlist', JSON.stringify(simplified))
+  const simplified = Array.from(watchList.values()).map(({ code, name }) => ({ code, name }))
+  localStorage.setItem('stock_watchList', JSON.stringify(simplified))
 }
 
 export const useStockStore = defineStore('stock', () => {
   // --- State ---
-  const watchlist = reactive<Map<string, StockData>>(loadWatchlistFromStorage())
+  const watchList = reactive<Map<string, StockData>>(loadWatchListFromStorage())
   const activeStockCode = ref<string | null>(null)
 
   // --- Actions ---
@@ -49,23 +49,22 @@ export const useStockStore = defineStore('stock', () => {
    * @param stockData - The complete stock data object from the wizard/backend.
    */
   const addStockWithOptions = async (stockData: StockData) => {
-    if (watchlist.has(stockData.code)) {
-      alert('该股票已在自选列表中');
-      return;
+    if (watchList.has(stockData.code)) {
+      alert('该股票已在自选列表中')
+      return
     }
-    watchlist.set(stockData.code, stockData);
-    saveWatchlistToStorage(watchlist);
-  };
-
+    watchList.set(stockData.code, stockData)
+    saveWatchListToStorage(watchList)
+  }
 
   /**
    * 从自选列表删除股票
    * @param stockCode - 股票代码
    */
   const removeStock = (stockCode: string) => {
-    if (watchlist.has(stockCode)) {
-      watchlist.delete(stockCode)
-      saveWatchlistToStorage(watchlist)
+    if (watchList.has(stockCode)) {
+      watchList.delete(stockCode)
+      saveWatchListToStorage(watchList)
       if (activeStockCode.value === stockCode) {
         activeStockCode.value = null
       }
@@ -77,10 +76,10 @@ export const useStockStore = defineStore('stock', () => {
    * @param stockCode - 股票代码
    */
   const setActiveStock = (stockCode: string) => {
-    if (watchlist.has(stockCode)) {
+    if (watchList.has(stockCode)) {
       activeStockCode.value = stockCode
       // If the detailed data hasn't been loaded yet, fetch it.
-      if (watchlist.get(stockCode)?.kline.length === 0) {
+      if (watchList.get(stockCode)?.kline.length === 0) {
         fetchLatestData(stockCode)
       }
     }
@@ -91,23 +90,27 @@ export const useStockStore = defineStore('stock', () => {
    * @param stockCode - 股票代码
    */
   const fetchLatestData = async (stockCode: string) => {
-    const stock = watchlist.get(stockCode)
+    const stock = watchList.get(stockCode)
     if (!stock) return
 
     try {
-        // Use the same advanced fetcher as the wizard, but with default options.
-        const defaultConfig = { klineDays: 100, maLines: [5, 10, 20], indicators: ['macd'], fetchNews: true };
-        const fetchedData = await window.api.invoke('stock:fetch-advanced', stockCode, defaultConfig);
-        
-        if (fetchedData) {
-            stock.kline = fetchedData.kline;
-            stock.indicators = fetchedData.indicators;
-            stock.news = fetchedData.news;
-            stock.lastUpdateTime = fetchedData.lastUpdateTime;
-        } else {
-            throw new Error('Received null data from main process');
-        }
+      // Use the same advanced fetcher as the wizard, but with default options.
+      const defaultConfig = {
+        klineDays: 100,
+        maLines: [5, 10, 20],
+        indicators: ['macd'],
+        fetchNews: true
+      }
+      const fetchedData = await window.api.invoke('stock:fetch-advanced', stockCode, defaultConfig)
 
+      if (fetchedData) {
+        stock.kline = fetchedData.kline
+        stock.indicators = fetchedData.indicators
+        stock.news = fetchedData.news
+        stock.lastUpdateTime = fetchedData.lastUpdateTime
+      } else {
+        throw new Error('Received null data from main process')
+      }
     } catch (error) {
       console.error(`Failed to fetch latest data for ${stockCode}:`, error)
       // Here you could add a user-facing error message.
@@ -124,7 +127,7 @@ export const useStockStore = defineStore('stock', () => {
   }
 
   return {
-    watchlist,
+    watchList,
     activeStockCode,
     addStockWithOptions,
     removeStock,

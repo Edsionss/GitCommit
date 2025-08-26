@@ -2,6 +2,7 @@ import { ElectronAPI } from '@electron-toolkit/preload'
 import type { GitCommit, RepoHistoryItem } from '@shared/types/dtos/git'
 import type { AiConfig } from '@shared/types/dtos/ai'
 
+import type { AppStore } from '@sharedType/store'
 // Define interfaces for the data structures used in the API
 interface GitScanOptions {
   authorFilter?: string
@@ -62,6 +63,11 @@ interface ExposedAPI {
 
   // Export API
   exportCommits: (commits: GitCommit[], format: 'json' | 'csv') => Promise<string | null>
+
+  // 使用泛型和 keyof 来实现完整的类型安全
+  get<K extends keyof AppStore>(key: K): Promise<AppStore[K]>
+  set<K extends keyof AppStore>(key: K, value: AppStore[K]): Promise<void>
+  delete(key: keyof AppStore): Promise<void>
 }
 
 declare global {

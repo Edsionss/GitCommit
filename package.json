@@ -29,6 +29,7 @@
     "ant-design-vue": "^4.2.3",
     "chart.js": "^4.4.3",
     "dayjs": "^1.11.10",
+    "electron-store": "^10.1.0",
     "electron-updater": "^6.3.9",
     "exceljs": "^4.4.0",
     "jspdf": "^2.5.2",

@@ -6,8 +6,6 @@ import { promises as fs } from 'fs'
 import * as path from 'path'
 
 import { registerIpcHandlers } from '@handlers/ipcHandlers'
-import { registerAiHandlers } from '@handlers/ai/ai'
-import { initializeStockHandlers } from '@handlers/stock/stock';
 
 function createWindow(): void {
   // Create the browser window.
@@ -34,8 +32,8 @@ function createWindow(): void {
     return { action: 'deny' }
   })
 
-  // HMR for renderer base on electron-vite cli.
-  // Load the remote URL for development or the local html file for production.
+  // HMR为基于电子-vite cli的渲染器。
+  //加载用于开发的远程URL或用于生产的本地html文件。
   if (is.dev && process.env['ELECTRON_RENDERER_URL']) {
     mainWindow.loadURL(process.env['ELECTRON_RENDERER_URL'])
   } else {
@@ -49,7 +47,6 @@ function createWindow(): void {
 app.whenReady().then(() => {
   // Set app user model id for windows
   electronApp.setAppUserModelId('com.electron')
-
   // Default open or close DevTools by F12 in development
   // and ignore CommandOrControl + R in production.
   // see https://github.com/alex8088/electron-toolkit/tree/master/packages/utils
@@ -59,11 +56,7 @@ app.whenReady().then(() => {
 
   // IPC test
   registerIpcHandlers()
-  registerAiHandlers()
-  initializeStockHandlers()
-
   createWindow()
-
   app.on('activate', function () {
     // On macOS it's common to re-create a window in the app when the
     // dock icon is clicked and there are no other windows open.

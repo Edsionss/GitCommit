@@ -90,7 +90,10 @@ const api = {
     const listener = () => callback()
     ipcRenderer.on('scan-cancelled', listener)
     return () => ipcRenderer.removeListener('scan-cancelled', listener)
-  }
+  },
+  storeGet: (key: string) => ipcRenderer.invoke('store:get', key),
+  storeSet: (key: string, value: any) => ipcRenderer.invoke('store:set', key, value),
+  storeDelete: (key: string) => ipcRenderer.invoke('store:delete', key)
 }
 
 // 暴露API
