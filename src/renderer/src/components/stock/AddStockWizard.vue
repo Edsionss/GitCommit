@@ -85,116 +85,131 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, defineEmits, defineProps } from 'vue';
+import { ref, reactive, defineEmits, defineProps } from 'vue'
 import {
-  Modal as AModal, Steps as ASteps, Step as AStep, InputSearch as AInputSearch,
-  List as AList, ListItem as AListItem, Form as AForm, FormItem as AFormItem,
-  Select as ASelect, SelectOption as ASelectOption, CheckboxGroup as ACheckboxGroup,
-  Checkbox as ACheckbox, Switch as ASwitch, Button as AButton, Spin as ASpin, Result as AResult, message
-} from 'ant-design-vue';
-import { useStockStore } from '@/stores/stock';
-import { StockData } from '@/shared/types/dtos/stock';
+  Modal as AModal,
+  Steps as ASteps,
+  Step as AStep,
+  InputSearch as AInputSearch,
+  List as AList,
+  ListItem as AListItem,
+  Form as AForm,
+  FormItem as AFormItem,
+  Select as ASelect,
+  SelectOption as ASelectOption,
+  CheckboxGroup as ACheckboxGroup,
+  Checkbox as ACheckbox,
+  Switch as ASwitch,
+  Button as AButton,
+  Spin as ASpin,
+  Result as AResult,
+  message
+} from 'ant-design-vue'
+import { useStockStore } from '@/stores/stock'
+import { StockData } from '@sharedType/stock'
 
-const props = defineProps({ visible: Boolean });
-const emit = defineEmits(['update:visible', 'finish']);
+const props = defineProps({ visible: Boolean })
+const emit = defineEmits(['update:visible', 'finish'])
 
-const stockStore = useStockStore();
+const stockStore = useStockStore()
 
-const currentStep = ref(0);
-const searchQuery = ref('');
-const searching = ref(false);
-const searchResults = ref<{ code: string; name: string }[]>([]);
-const selectedStock = ref<{ code: string; name: string } | null>(null);
+const currentStep = ref(0)
+const searchQuery = ref('')
+const searching = ref(false)
+const searchResults = ref<{ code: string; name: string }[]>([])
+const selectedStock = ref<{ code: string; name: string } | null>(null)
 
 const config = reactive({
   klineDays: 100,
   maLines: [5, 10, 20],
   indicators: ['macd', 'volume'],
-  fetchNews: true,
-});
+  fetchNews: true
+})
 
-const isFetching = ref(false);
-const fetchSuccess = ref(false);
+const isFetching = ref(false)
+const fetchSuccess = ref(false)
 
 const onSearch = async () => {
-  if (!searchQuery.value) return;
-  searching.value = true;
+  if (!searchQuery.value) return
+  searching.value = true
   try {
-    searchResults.value = await window.api.invoke('stock:search', searchQuery.value);
+    searchResults.value = await window.api.invoke('stock:search', searchQuery.value)
   } catch (error) {
-    message.error('搜索失败');
+    message.error('搜索失败')
   } finally {
-    searching.value = false;
+    searching.value = false
   }
-};
+}
 
 const selectStock = (stock: { code: string; name: string }) => {
-  selectedStock.value = stock;
-};
+  selectedStock.value = stock
+}
 
 const nextStep = () => {
-  currentStep.value++;
-};
+  currentStep.value++
+}
 
 const prevStep = () => {
-  currentStep.value--;
-};
+  currentStep.value--
+}
 
 const startFetching = async () => {
-  if (!selectedStock.value) return;
-  currentStep.value++;
-  isFetching.value = true;
-  fetchSuccess.value = false;
+  if (!selectedStock.value) return
+  currentStep.value++
+  isFetching.value = true
+  fetchSuccess.value = false
 
   try {
-    const fetchedData = await window.api.invoke('stock:fetch-advanced', selectedStock.value.code, config);
-    
-    if (fetchedData) {
-        const fullStockData: StockData = {
-            ...selectedStock.value,
-            ...fetchedData,
-            analysisHistory: [], // Initialize with empty history
-        };
-        await stockStore.addStockWithOptions(fullStockData);
-        fetchSuccess.value = true;
-    } else {
-        throw new Error('Failed to fetch data from main process');
-    }
+    const fetchedData = await window.api.invoke(
+      'stock:fetch-advanced',
+      selectedStock.value.code,
+      config
+    )
 
+    if (fetchedData) {
+      const fullStockData: StockData = {
+        ...selectedStock.value,
+        ...fetchedData,
+        analysisHistory: [] // Initialize with empty history
+      }
+      await stockStore.addStockWithOptions(fullStockData)
+      fetchSuccess.value = true
+    } else {
+      throw new Error('Failed to fetch data from main process')
+    }
   } catch (error) {
-    console.error('Failed to fetch stock data:', error);
-    fetchSuccess.value = false;
+    console.error('Failed to fetch stock data:', error)
+    fetchSuccess.value = false
   } finally {
-    isFetching.value = false;
+    isFetching.value = false
   }
-};
+}
 
 const handleCancel = () => {
-  resetWizard();
-  emit('update:visible', false);
-};
+  resetWizard()
+  emit('update:visible', false)
+}
 
 const handleFinish = () => {
-  resetWizard();
-  emit('update:visible', false);
-  emit('finish');
-};
+  resetWizard()
+  emit('update:visible', false)
+  emit('finish')
+}
 
 const resetWizard = () => {
-  currentStep.value = 0;
-  searchQuery.value = '';
-  searchResults.value = [];
-  selectedStock.value = null;
-  isFetching.value = false;
-  fetchSuccess.value = false;
+  currentStep.value = 0
+  searchQuery.value = ''
+  searchResults.value = []
+  selectedStock.value = null
+  isFetching.value = false
+  fetchSuccess.value = false
   Object.assign(config, {
     klineDays: 100,
     maLines: [5, 10, 20],
     indicators: ['macd', 'volume'],
-    fetchNews: true,
-  });
-};
-
+    fetchNews: true
+  })
+}
 </script>
 
 <style scoped>
