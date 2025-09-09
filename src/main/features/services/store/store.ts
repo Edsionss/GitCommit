@@ -28,7 +28,7 @@ export class StoreService {
    * @param key 键
    * @param value 值
    */
-  set(key: string): void {
+  set(key: string, value: any): void {
     this.store.set(key, value)
   }
 

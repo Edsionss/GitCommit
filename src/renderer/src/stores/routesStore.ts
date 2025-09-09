@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
-
+import { MergeArray } from '@/utils'
 export interface RouteRecord {
   path: string
   name: string
@@ -104,7 +104,8 @@ export const useRoutesStore = defineStore('routes', () => {
   function initRoutes() {
     const savedRoutes = localStorage.getItem('appRoutes')
     if (savedRoutes) {
-      routes.value = JSON.parse(savedRoutes)
+      const currentRoutes = JSON.parse(savedRoutes)
+      routes.value = MergeArray(defaultRoutes, currentRoutes, true, 'path')
     } else {
       routes.value = defaultRoutes
       localStorage.setItem('appRoutes', JSON.stringify(defaultRoutes))
