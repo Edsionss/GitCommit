@@ -7,13 +7,11 @@ import { defaultData, type AppStore } from '@sharedType/store'
 // 这非常重要，能避免很多低级错误
 
 export class StoreService {
-  private store: Store<AppStore>
+  private store = Store
 
   constructor() {
     // 初始化 electron-store，并传入类型和默认值
-    this.store = new Store<AppStore>({
-      defaults: defaultData
-    })
+    this.store = new Store<any>()
   }
 
   /**
@@ -21,7 +19,7 @@ export class StoreService {
    * @param key 键
    * @returns 对应的值
    */
-  get<K extends keyof AppStore>(key: K): AppStore[K] {
+  get(key: string): any {
     return this.store.get(key)
   }
 
@@ -30,7 +28,7 @@ export class StoreService {
    * @param key 键
    * @param value 值
    */
-  set<K extends keyof AppStore>(key: K, value: AppStore[K]): void {
+  set(key: string): void {
     this.store.set(key, value)
   }
 
@@ -38,7 +36,7 @@ export class StoreService {
    * [删] 删除一个键及其值
    * @param key 键
    */
-  delete(key: keyof AppStore): void {
+  delete(key: string): void {
     this.store.delete(key)
   }
 
