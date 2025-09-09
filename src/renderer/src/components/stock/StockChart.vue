@@ -1,4 +1,3 @@
-
 <template>
   <div class="chart-container">
     <Bar :data="chartData" :options="chartOptions" />
@@ -6,7 +5,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, defineProps } from 'vue'
+import { computed } from 'vue'
 import { Bar } from 'vue-chartjs'
 import {
   Chart as ChartJS,

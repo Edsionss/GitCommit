@@ -85,7 +85,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, defineEmits, defineProps } from 'vue'
+import { ref, reactive } from 'vue'
 import {
   Modal as AModal,
   Steps as ASteps,
