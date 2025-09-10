@@ -7,20 +7,20 @@ export const searchStock = async (keyword) => {
   // 东方财富的搜索建议接口 URL
   const url = `http://searchapi.eastmoney.com/api/suggest/get`
 
-  function getMarketName(marketType) {
-    switch (marketType) {
-      case 1:
-        return '深圳'
-      case 2:
-        return '上海'
-      case 4:
-        return '香港'
-      case 113:
-        return '美国'
-      default:
-        return '其他'
-    }
-  }
+  // function getMarketName(marketType) {
+  //   switch (marketType) {
+  //     case 1:
+  //       return '深圳'
+  //     case 2:
+  //       return '上海'
+  //     case 4:
+  //       return '香港'
+  //     case 113:
+  //       return '美国'
+  //     default:
+  //       return '其他'
+  //   }
+  // }
 
   try {
     const response = await axios.get(url, {
@@ -67,7 +67,7 @@ export const searchStock = async (keyword) => {
         .map((item) => ({
           code: item.Code,
           name: item.Name,
-          market: getMarketName(item.MarketType), // 将市场类型转换为可读名称
+          // market: getMarketName(item.MarketType), // 将市场类型转换为可读名称
           type: item.SecurityTypeName // e.g., "股票"
         }))
 
