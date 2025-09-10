@@ -45,7 +45,8 @@ export default defineConfig({
         '@router': resolve('src/renderer/src/router'),
         '@mock': resolve('src/renderer/src/mock'),
         '@shared': resolve('src/shared'),
-        '@type': resolve('src/renderer/src/types')
+        '@type': resolve('src/renderer/src/types'),
+        '@utils': resolve('src/renderer/src/utils')
       }
     },
     plugins: [vue()]

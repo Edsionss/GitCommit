@@ -107,6 +107,7 @@ import {
 } from 'ant-design-vue'
 import { useStockStore } from '@/stores/stock'
 import { StockData } from '@sharedType/stock'
+import { searchStock } from '@utils/index'
 
 const props = defineProps({ visible: Boolean })
 const emit = defineEmits(['update:visible', 'finish'])
@@ -130,15 +131,16 @@ const isFetching = ref(false)
 const fetchSuccess = ref(false)
 
 const onSearch = async () => {
-  if (!searchQuery.value) return
-  searching.value = true
-  try {
-    searchResults.value = await window.api.invoke('stock:search', searchQuery.value)
-  } catch (error) {
-    message.error('搜索失败')
-  } finally {
-    searching.value = false
-  }
+  searchResults.value = await searchStock(searchQuery.value)
+  // if (!searchQuery.value) return
+  // searching.value = true
+  // try {
+  //   searchResults.value = await window.api.invoke('stock:search', searchQuery.value)
+  // } catch (error) {
+  //   message.error('搜索失败')
+  // } finally {
+  //   searching.value = false
+  // }
 }
 
 const selectStock = (stock: { code: string; name: string }) => {
