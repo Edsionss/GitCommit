@@ -56,7 +56,10 @@ const { AiConfig } = storeToRefs(settingStore)
 
 const aiModelDict = {
   openai: [{ value: 'gpt-3.5-turbo', label: 'gpt-3.5-turbo' }],
-  gemini: [{ value: 'gemini-2.5-flash', label: 'gemini-2.5-flash' }],
+  gemini: [
+    { value: 'gemini-2.5-flash', label: 'gemini-2.5-flash' },
+    { value: 'gemini-2.5-pro', label: 'gemini-2.5-pro' }
+  ],
   kimi: [{ value: 'kimi-k2-0711-preview', label: 'kimi-k2-0711-preview' }]
 }
 
