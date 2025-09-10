@@ -68,6 +68,8 @@ interface ExposedAPI {
   get<K extends keyof AppStore>(key: K): Promise<AppStore[K]>
   set<K extends keyof AppStore>(key: K, value: AppStore[K]): Promise<void>
   delete(key: keyof AppStore): Promise<void>
+
+  searchStokes: (query: string) => Promise<any[]>
 }
 
 declare global {

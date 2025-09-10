@@ -18,5 +18,5 @@ export function registerIpcHandlers() {
   registerExportHandlers()
   registerAiHandlers()
   registerStoreHandlers()
-  // initializeStockHandlers()
+  initializeStockHandlers()
 }

@@ -93,7 +93,9 @@ const api = {
   },
   storeGet: (key: string) => ipcRenderer.invoke('store:get', key),
   storeSet: (key: string, value: any) => ipcRenderer.invoke('store:set', key, value),
-  storeDelete: (key: string) => ipcRenderer.invoke('store:delete', key)
+  storeDelete: (key: string) => ipcRenderer.invoke('store:delete', key),
+  // stock API
+  searchStokes: (query: string) => ipcRenderer.invoke('stock:search', query)
 }
 
 // 暴露API
