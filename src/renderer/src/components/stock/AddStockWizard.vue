@@ -39,7 +39,9 @@
       </a-spin>
       <!-- Step 2: Configure -->
       <div v-if="currentStep === 1">
-        <h4>配置获取选项 for {{ selectedStock?.name }}</h4>
+        <h4>
+          配置获取选项 - <a-tag color="processing">{{ selectedStock?.name }}</a-tag>
+        </h4>
         <a-form layout="vertical">
           <a-form-item label="K线天数">
             <a-select v-model:value="config.klineDays">
