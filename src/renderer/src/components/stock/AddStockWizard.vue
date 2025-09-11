@@ -1,5 +1,5 @@
 <template>
-  <a-modal title="添加自选股票" :visible="visible" @cancel="handleCancel" :footer="null">
+  <a-modal title="添加自选股票" :open="visible" @cancel="handleCancel" :footer="null" width="600px">
     <a-steps :current="currentStep">
       <a-step title="搜索股票" />
       <a-step title="配置选项" />
@@ -8,23 +8,35 @@
 
     <div class="steps-content">
       <!-- Step 1: Search -->
-      <div v-if="currentStep === 0">
-        <a-input-search
-          v-model:value="searchQuery"
-          placeholder="输入股票名称或代码"
-          enter-button="搜索"
-          @search="onSearch"
-          :loading="searching"
-        />
-        <a-list class="search-results" :data-source="searchResults" v-if="searchResults.length > 0">
-          <template #renderItem="{ item }">
-            <a-list-item @click="selectStock(item)">
-              {{ item.name }} ({{ item.code }})
-            </a-list-item>
-          </template>
-        </a-list>
-      </div>
+      <a-spin :spinning="searching">
+        <div v-if="currentStep === 0">
+          <div class="search-content">
+            <div class="search-input">
+              <a-input-search
+                v-model:value="searchQuery"
+                placeholder="输入股票名称或代码"
+                enter-button="搜索"
+                @search="onSearch"
+              />
+            </div>
+          </div>
 
+          <a-list
+            class="search-results"
+            :data-source="searchResults"
+            v-if="searchResults.length > 0"
+          >
+            <template #renderItem="{ item }">
+              <a-list-item
+                @click="selectStock(item)"
+                :class="{ active: item.code === selectedStock?.code }"
+              >
+                {{ item.name }}-{{ item.market }} ({{ item.code }})
+              </a-list-item>
+            </template>
+          </a-list>
+        </div>
+      </a-spin>
       <!-- Step 2: Configure -->
       <div v-if="currentStep === 1">
         <h4>配置获取选项 for {{ selectedStock?.name }}</h4>
@@ -116,8 +128,8 @@ const stockStore = useStockStore()
 const currentStep = ref(0)
 const searchQuery = ref('')
 const searching = ref(false)
-const searchResults = ref<{ code: string; name: string }[]>([])
-const selectedStock = ref<{ code: string; name: string } | null>(null)
+const searchResults = ref<any[]>([])
+const selectedStock = ref<any | null>(null)
 
 const config = reactive({
   klineDays: 100,
@@ -130,21 +142,18 @@ const isFetching = ref(false)
 const fetchSuccess = ref(false)
 
 const onSearch = async () => {
-  searchResults.value = await stockApi.searchStokes(searchQuery.value)
-  console.log(searchResults.value)
-
-  // if (!searchQuery.value) return
-  // searching.value = true
-  // try {
-  //   searchResults.value = await window.api.invoke('stock:search', searchQuery.value)
-  // } catch (error) {
-  //   message.error('搜索失败')
-  // } finally {
-  //   searching.value = false
-  // }
+  if (!searchQuery.value) return
+  searching.value = true
+  try {
+    searchResults.value = await stockApi.searchStokes(searchQuery.value)
+  } catch (error) {
+    message.error('搜索失败')
+  } finally {
+    searching.value = false
+  }
 }
 
-const selectStock = (stock: { code: string; name: string }) => {
+const selectStock = (stock: any) => {
   selectedStock.value = stock
 }
 
@@ -215,21 +224,42 @@ const resetWizard = () => {
 }
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .steps-content {
-  margin-top: 24px;
-  padding: 24px;
+  /* margin-top: 24px; */
+  padding: 15px;
   /* background-color: #fafafa; */
   /* border: 1px solid #e9e9e9; */
   border-radius: 2px;
   min-height: 300px;
+  max-height: 400px;
+  position: relative;
+  width: 100%;
+  .search-content {
+    height: 25px;
+    position: relative;
+    width: 100%;
+    margin-bottom: 20px;
+    .search-input {
+      width: 100%;
+    }
+  }
 }
 .steps-action {
   margin-top: 24px;
   text-align: right;
 }
+.search-results {
+  width: 100%;
+  overflow: auto;
+  height: 350px;
+}
 .search-results .ant-list-item {
   cursor: pointer;
+
+  &.active {
+    background-color: #e6f7ff;
+  }
 }
 .search-results .ant-list-item:hover {
   background-color: #e6f7ff;

@@ -61,16 +61,16 @@ export const searchStock = async (keyword) => {
       // SecurityTypeName = '深A'
       // TypeUS = '6'
       // UnifiedCode = '002370'
+
       // 过滤和格式化结果，我们只关心股票
       const result = stockList
         // .filter((item) => item.SecurityType === 1) // SecurityType: 1 代表股票
         .map((item) => ({
+          ...item,
           code: item.Code,
           name: item.Name,
-          // market: getMarketName(item.MarketType), // 将市场类型转换为可读名称
-          type: item.SecurityTypeName // e.g., "股票"
+          market: item.SecurityTypeName
         }))
-
       return result
     } else {
       return []
