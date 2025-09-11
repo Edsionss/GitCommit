@@ -197,7 +197,7 @@ export async function fetchNews(code: string, name: string) {
 
   // const url = `https://np-c-pc-api.eastmoney.com/api/NphInfolist/GetInfoList`
 
-  const url = `https://guba.eastmoney.com/interface/GetData.aspx`
+  const url = `https://search-api-web.eastmoney.com/search/jsonp`
 
   const cbName = `jQuery${Date.now()}${Math.floor(Math.random() * 10000000000000000)}`
 
