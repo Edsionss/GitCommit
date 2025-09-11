@@ -70,6 +70,7 @@ interface ExposedAPI {
   delete(key: keyof AppStore): Promise<void>
 
   searchStokes: (query: string) => Promise<any[]>
+  getStockInfoByCode: (code: string, name?: string) => Promise<any>
 }
 
 declare global {

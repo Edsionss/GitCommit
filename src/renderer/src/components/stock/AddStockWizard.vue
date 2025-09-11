@@ -169,6 +169,12 @@ const prevStep = () => {
 
 const startFetching = async () => {
   if (!selectedStock.value) return
+  const result = await stockApi.getStockInfoByCode(
+    selectedStock.value.code,
+    selectedStock.value.name
+  )
+  console.log(result)
+  return
   currentStep.value++
   isFetching.value = true
   fetchSuccess.value = false

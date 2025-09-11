@@ -1,7 +1,7 @@
 import { ipcMain } from 'electron'
 // import { StockAnalysisService } from '@services/stock/stock'
 import { StockFetchConfig } from '@shared/types/dtos/stock'
-import { searchStock } from '@services/stock/index'
+import { searchStock, getStockInfoByCode } from '@services/stock/index'
 export function initializeStockHandlers() {
   // const stockService = new StockAnalysisService()
 
@@ -14,14 +14,14 @@ export function initializeStockHandlers() {
     }
   })
 
-  // ipcMain.handle('stock:fetch-advanced', async (_, code: string, config: StockFetchConfig) => {
-  //   try {
-  //     return await stockService.fetchStockDataWithOptions(code, config)
-  //   } catch (error) {
-  //     console.error(`Error fetching advanced stock data for ${code}:`, error)
-  //     return null // Return null on error
-  //   }
-  // })
+  ipcMain.handle('stock:getStockInfoByCode', async (_, code: string, name?: string) => {
+    try {
+      return await getStockInfoByCode(code, name)
+    } catch (error) {
+      console.error(`Error fetching advanced stock data for ${code}:`, error)
+      return null // Return null on error
+    }
+  })
 
   // ipcMain.handle('stock:analyze', async (_, stockName: string) => {
   //   try {
