@@ -7,6 +7,9 @@ import * as path from 'path'
 
 import { registerIpcHandlers } from '@handlers/ipcHandlers'
 
+const DEBUG_PORT = '9222' // 选择一个未被占用的端口
+app.commandLine.appendSwitch('remote-debugging-port', DEBUG_PORT)
+
 function createWindow(): void {
   // Create the browser window.
   const mainWindow = new BrowserWindow({
@@ -37,6 +40,7 @@ function createWindow(): void {
   if (is.dev && process.env['ELECTRON_RENDERER_URL']) {
     mainWindow.loadURL(process.env['ELECTRON_RENDERER_URL'])
   } else {
+    mainWindow.webContents.openDevTools()
     mainWindow.loadFile(join(__dirname, '../renderer/index.html'))
   }
 }

@@ -1,5 +1,7 @@
 import axios from 'axios'
 import { SMA, MACD, RSI, BollingerBands, Stochastic } from 'technicalindicators'
+import { executeScrapingTask } from '@services/puppeteer'
+
 export const searchStock = async (keyword) => {
   if (!keyword) {
     console.error('请输入搜索关键字')
@@ -192,6 +194,11 @@ export function calculateIndicators(klineData: any[]) {
  * @returns {Promise<Array<object>>} 新闻列表
  */
 export async function fetchNews(code: string, name: string) {
+  const dom = executeScrapingTask(`https://www.cls.cn/telegraph`, (): any => {
+    console.log(window.document)
+    return window.document
+  })
+  return dom
   const marketCode = getMarketCode(code)
   const stockWithMarket = `${code}${marketCode === '1' ? 'SH' : 'SZ'}`
 
@@ -223,41 +230,23 @@ export async function fetchNews(code: string, name: string) {
 
   const encodedParam = encodeURIComponent(JSON.stringify(paramObj))
   try {
-    const response = await axios.get(url, {
-      // params: {
-      //   cb: cbName, // JSONP 回调函数名
-      //   param: encodedParam // URL 编码后的 param 字符串
-      // },
-      // // --- 修正点 2: 添加必要的请求头，伪装成浏览器 ---
-      // headers: {
-      //   'User-Agent':
-      //     'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
-      //   Referer: `https://so.eastmoney.com/news/s?keyword=%E4%BA%9A%E5%A4%AA%E8%8D%AF%E4%B8%9A`,
-      //   Accept:
-      //     'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
-      //   'Accept-Encoding': 'gzip, deflate, br',
-      //   'Accept-Language': 'zh-CN,zh;q=0.9,en;q=0.8',
-      //   Connection: 'keep-alive',
-      //   host: `search-api-web.eastmoney.com`,
-      //   'sec-ch-ua': `"Not;A=Brand";v="99", "Google Chrome";v="139", "Chromium";v="139"`,
-      //   cookie: `qgqp_b_id=79955565dc132ec92fb29b0313d07d3b; st_si=05284864865961; st_nvi=TgksOPSPkdp9xziGkMPfZ123d; nid=0b4c7e6efa9456893577745bb8bebfac; nid_create_time=1757571254985; gvi=dM6xd-xZ91NVGibyi0iVP4df4; gvi_create_time=1757571254985; fullscreengg=1; fullscreengg2=1; st_pvi=13900823792762; st_sp=2025-05-16%2017%3A36%3A19; st_inirUrl=https%3A%2F%2Fwww.bing.com%2F; st_sn=13; st_psi=20250911144039604-118000323474-2822543863; st_asi=20250911144039604-118000323474-2822543863-dfcfwss.ssh.ryq.fqdj-7`
-      // }
-      params: {
-        name: 'news',
-        code: stockWithMarket,
-        pagesize: 10,
-        page: 1,
-        cb: `jQuery_guba_${Date.now()}` // 动态生成cb
-      },
-      headers: {
-        'User-Agent':
-          'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
-        // 构造一个合法的Referer，这个URL是浏览器访问股吧新闻时的地址
-        Referer: `https://guba.eastmoney.com/list,${stockWithMarket},f.html`
-      }
-    })
+    // const response = await axios.get(url, {
+    //   params: {
+    //     name: 'news',
+    //     code: stockWithMarket,
+    //     pagesize: 10,
+    //     page: 1,
+    //     cb: `jQuery_guba_${Date.now()}` // 动态生成cb
+    //   },
+    //   headers: {
+    //     'User-Agent':
+    //       'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
+    //     // 构造一个合法的Referer，这个URL是浏览器访问股吧新闻时的地址
+    //     Referer: `https://guba.eastmoney.com/list,${stockWithMarket},f.html`
+    //   }
+    // })
 
-    return response
+    // return response
 
     // 返回的数据是 JSONP 格式 "callback({...})"，需要提取JSON部分
     const jsonData = JSON.parse(response.data.replace(/^callback\(|\)$/g, ''))

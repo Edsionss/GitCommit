@@ -7,6 +7,7 @@ import { registerHistoryHandlers } from './history/history'
 import { registerExportHandlers } from './export/export'
 import { registerAiHandlers } from '@handlers/ai/ai'
 import { initializeStockHandlers } from '@handlers/stock/stock'
+import { initializePuppeteerHandlers } from '@handlers/puppeteer/puppeteer'
 
 export function registerIpcHandlers() {
   // Register handlers from other modules
@@ -19,4 +20,5 @@ export function registerIpcHandlers() {
   registerAiHandlers()
   registerStoreHandlers()
   initializeStockHandlers()
+  initializePuppeteerHandlers()
 }
