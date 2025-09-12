@@ -45,7 +45,7 @@ const onTabClick = (key: string) => {
 }
 
 .tabs-bar {
-  width: 150px;
+  width: 170px;
   border-right: 1px solid #eee;
   padding: 10px 0;
   display: flex;
@@ -78,6 +78,8 @@ const onTabClick = (key: string) => {
 
 .tabs-content {
   flex-grow: 1;
-  padding: 20px;
+  padding: 15px;
+  height: 100%;
+  width: 100%;
 }
 </style>

@@ -3,7 +3,7 @@
     <Tabs v-model="activeTab" :tabs="tabItems">
       <template #default="{ activeTab }">
         <div v-show="activeTab === 'Telegraph'" class="content-panel">
-          <p>这里是新闻内容区。</p>
+          <Timeline></Timeline>
         </div>
         <div v-show="activeTab === 'jinShi'" class="content-panel">
           <p>这里是快讯内容区。</p>
@@ -15,6 +15,7 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
+import Timeline from '@components/common/Timeline.vue'
 import Tabs from '@components/common/Tabs.vue'
 
 const activeTab = ref('Telegraph')

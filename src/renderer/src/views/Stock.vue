@@ -13,7 +13,7 @@ import { ref, computed, reactive } from 'vue'
 import StockList from '@components/stock/StockList/index.vue'
 import MarketQuotation from '@components/stock/MarketQuotation/index.vue'
 import MarketNewsflash from '@components/stock/MarketNewsflash/index.vue'
-const paneKey = ref('stockList')
+const paneKey = ref('marketNewsflash')
 
 const stockTabs = reactive([
   {
