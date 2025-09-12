@@ -8,6 +8,8 @@
   ],
   "compilerOptions": {
     "composite": true,
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
     "esModuleInterop": true,
     "types": ["electron-vite/node"],
     "baseUrl": ".",
