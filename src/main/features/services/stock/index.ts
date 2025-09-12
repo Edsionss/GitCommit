@@ -196,7 +196,7 @@ export function calculateIndicators(klineData: any[]) {
 export async function fetchNews(code: string, name: string) {
   const dom = executeScrapingTask(`https://www.cls.cn/telegraph`, (): any => {
     console.log(window.document)
-    return window.document.innerText
+    return window.document.body.innerText
   })
   return dom
   const marketCode = getMarketCode(code)

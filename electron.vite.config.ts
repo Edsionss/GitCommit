@@ -5,6 +5,7 @@ import vue from '@vitejs/plugin-vue'
 export default defineConfig({
   main: {
     build: {
+      sourcemap: false,
       rollupOptions: {
         external: [
           'electron',
