@@ -5,6 +5,7 @@
       v-for="item in stockList"
       :key="item.code"
       @click="handleStockClick(item)"
+      :class="{ active: selectedStock?.code === item.code }"
     >
       <div class="stock-left">
         <div class="stock-name">
@@ -25,7 +26,7 @@
 </template>
 
 <script setup lang="ts">
-import { reactive } from 'vue'
+import { reactive, ref } from 'vue'
 
 const emit = defineEmits(['stock-selected'])
 
@@ -102,7 +103,10 @@ const stockList = reactive([
   }
 ])
 
+const selectedStock = ref(null)
+
 const handleStockClick = (stock) => {
+  selectedStock.value = stock
   emit('stock-selected', stock)
 }
 </script>
@@ -113,23 +117,27 @@ const handleStockClick = (stock) => {
   height: 100%;
   overflow-y: auto;
   padding: 10px;
+  color: #333;
 }
 
 .stock-item {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 12px 15px;
+  padding: 10px;
   border-bottom: 1px solid #f0f0f0;
   cursor: pointer;
   transition: background-color 0.3s ease;
+  border-radius: 0.5rem;
 
   &:hover {
-    background-color: #f9f9f9;
+    background-color: var(--primary-bg-hover);
+    color: var(--primary-color) !important;
   }
 
   &.active {
-    background-color: #e6f7ff;
+    background-color: var(--primary-bg-hover);
+    color: var(--primary-color) !important;
   }
 }
 
@@ -139,9 +147,8 @@ const handleStockClick = (stock) => {
 }
 
 .stock-name {
-  font-size: 16px;
+  font-size: 14px;
   font-weight: 500;
-  color: #333;
 }
 
 .stock-info {
@@ -162,7 +169,7 @@ const handleStockClick = (stock) => {
 
 .stock-center {
   .stock-price {
-    font-size: 18px;
+    font-size: 16px;
     font-weight: bold;
     color: #ff4d4f; // 红色表示价格，可以根据涨跌情况动态改变颜色
   }
