@@ -9,7 +9,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, reactive } from 'vue'
+import { ref, reactive, markRaw } from 'vue'
 import StockList from '@components/stock/StockList/index.vue'
 import MarketQuotation from '@components/stock/MarketQuotation/index.vue'
 import MarketNewsflash from '@components/stock/MarketNewsflash/index.vue'
@@ -19,17 +19,17 @@ const stockTabs = reactive([
   {
     key: 'marketNewsflash',
     label: '市场快讯',
-    component: MarketNewsflash
+    component: markRaw(MarketNewsflash)
   },
   {
     key: 'marketQuotation',
     label: '市场行情',
-    component: MarketQuotation
+    component: markRaw(MarketQuotation)
   },
   {
     key: 'stockList',
     label: '自选股票',
-    component: StockList
+    component: markRaw(StockList)
   }
 ])
 </script>
