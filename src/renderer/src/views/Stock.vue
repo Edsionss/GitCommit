@@ -11,18 +11,20 @@
 <script setup lang="ts">
 import { ref, computed, reactive } from 'vue'
 import StockList from '@components/stock/StockList/index.vue'
+import MarketQuotation from '@components/stock/MarketQuotation/index.vue'
+import MarketNewsflash from '@components/stock/MarketNewsflash/index.vue'
 const paneKey = ref('stockList')
 
 const stockTabs = reactive([
   {
     key: 'marketNewsflash',
     label: '市场快讯',
-    component: ''
+    component: MarketNewsflash
   },
   {
     key: 'marketQuotation',
     label: '市场行情',
-    component: ''
+    component: MarketQuotation
   },
   {
     key: 'stockList',
