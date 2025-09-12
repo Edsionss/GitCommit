@@ -1,25 +1,33 @@
 <template>
-  <div class="stockPool-container">
-    <div
-      class="stock-item"
-      v-for="item in stockList"
-      :key="item.code"
-      @click="handleStockClick(item)"
-      :class="{ active: selectedStock?.code === item.code }"
-    >
-      <div class="stock-left">
-        <div class="stock-name">
-          {{ item.name }}
-        </div>
-        <div class="stock-info">
-          <div class="stock-market">
-            {{ item.market }}
+  <div class="stock-pool-wrapper">
+    <div class="toolbar">
+      <a-input-search placeholder="搜索股票..." style="width: 100%" />
+      <a-button type="primary">
+        <template #icon><PlusOutlined /></template>
+      </a-button>
+    </div>
+    <div class="stockPool-container">
+      <div
+        class="stock-item"
+        v-for="item in stockList"
+        :key="item.code"
+        @click="handleStockClick(item)"
+        :class="{ active: selectedStock?.code === item.code }"
+      >
+        <div class="stock-left">
+          <div class="stock-name">
+            {{ item.name }}
           </div>
-          <div class="stock-code">{{ item.code }}</div>
+          <div class="stock-info">
+            <div class="stock-market">
+              {{ item.market }}
+            </div>
+            <div class="stock-code">{{ item.code }}</div>
+          </div>
         </div>
-      </div>
-      <div class="stock-center">
-        <div class="stock-price">{{ item.price }}</div>
+        <div class="stock-center">
+          <div class="stock-price">{{ item.price }}</div>
+        </div>
       </div>
     </div>
   </div>
@@ -27,6 +35,8 @@
 
 <script setup lang="ts">
 import { reactive, ref } from 'vue'
+import { InputSearch as AInputSearch, Button as AButton } from 'ant-design-vue'
+import { PlusOutlined } from '@ant-design/icons-vue'
 
 const emit = defineEmits(['stock-selected'])
 
@@ -112,10 +122,22 @@ const handleStockClick = (stock) => {
 </script>
 
 <style scoped lang="scss">
-.stockPool-container {
-  border-right: 1px solid #eee;
+.stock-pool-wrapper {
+  display: flex;
+  flex-direction: column;
   height: 100%;
+  border-right: 1px dashed#eee;
+}
 
+.toolbar {
+  display: flex;
+  padding: 10px;
+  gap: 10px;
+  border-bottom: 1px dashed#eee;
+}
+
+.stockPool-container {
+  flex-grow: 1;
   overflow-y: auto;
   padding: 10px;
   color: #333;
@@ -125,7 +147,7 @@ const handleStockClick = (stock) => {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 10px;
+  padding: 5px 10px;
   border-bottom: 1px solid #f0f0f0;
   cursor: pointer;
   transition: background-color 0.3s ease;
