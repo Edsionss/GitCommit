@@ -149,7 +149,6 @@ const handleStockClick = (stock) => {
   justify-content: space-between;
   align-items: center;
   padding: 5px 10px;
-  border-bottom: 1px solid #f0f0f0;
   cursor: pointer;
   transition: background-color 0.3s ease;
   border-radius: 0.5rem;
