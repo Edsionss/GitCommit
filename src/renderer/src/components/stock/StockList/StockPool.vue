@@ -144,6 +144,7 @@ const handleStockClick = (stock) => {
 }
 
 .stock-item {
+  margin-bottom: 5px;
   display: flex;
   justify-content: space-between;
   align-items: center;
