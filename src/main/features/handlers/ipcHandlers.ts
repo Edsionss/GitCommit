@@ -8,6 +8,7 @@ import { registerExportHandlers } from './export/export'
 import { registerAiHandlers } from '@handlers/ai/ai'
 import { initializeStockHandlers } from '@handlers/stock/stock'
 import { initializePuppeteerHandlers } from '@handlers/puppeteer/puppeteer'
+import { registerCheerioHandlers } from '@handlers/cheerio'
 
 export function registerIpcHandlers() {
   // Register handlers from other modules
@@ -21,4 +22,5 @@ export function registerIpcHandlers() {
   registerStoreHandlers()
   initializeStockHandlers()
   initializePuppeteerHandlers()
+  registerCheerioHandlers()
 }

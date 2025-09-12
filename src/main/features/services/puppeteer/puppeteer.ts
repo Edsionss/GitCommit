@@ -26,10 +26,8 @@ export async function scrapeData<T>(
       browserURL: 'http://localhost:9222'
     })
 
-    // ================== 核心修正 ==================
     // 轮询查找目标，直到找到或者超时
     const target = await findTarget(browser, options.targetUrl)
-    // ============================================
 
     if (!target) {
       throw new Error(`操，死活找不到 URL 为 "${options.targetUrl}" 的目标窗口。`)
