@@ -105,6 +105,7 @@ const getColor = (type: string) => {
   overflow: auto;
   width: 100%;
   .timeline-content {
+    font-size: 15px;
     padding: 10px;
     // background-color: #f5f5f5;
     border-bottom: 1px solid #eee;
