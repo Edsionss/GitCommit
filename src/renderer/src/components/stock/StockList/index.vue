@@ -20,11 +20,10 @@ import { ref, reactive, onMounted } from 'vue'
   width: 100%;
   display: flex;
   .stock-pool {
-    width: 25%;
-    padding: 10px;
+    flex: 1;
   }
   .stock-detail {
-    width: 25%;
+    flex: 2.5;
   }
 }
 </style>

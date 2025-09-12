@@ -1,6 +1,11 @@
 <template>
   <div class="stockPool-container">
-    <div class="stock-item" v-for="item in stockList" :key="item.code">
+    <div
+      class="stock-item"
+      v-for="item in stockList"
+      :key="item.code"
+      @click="handleStockClick(item)"
+    >
       <div class="stock-left">
         <div class="stock-name">
           {{ item.name }}
@@ -20,26 +25,29 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, onMounted } from 'vue'
+import { reactive } from 'vue'
+
+const emit = defineEmits(['stock-selected'])
+
 const stockList = reactive([
   {
-    id: 1, // 建议为每个数据项添加一个唯一ID，便于列表渲染（key）和操作
+    id: 1,
     name: '贵州茅台',
-    market: 'SH', // 上海证券交易所
+    market: 'SH',
     code: '600519',
     price: '1650.50'
   },
   {
     id: 2,
     name: '腾讯控股',
-    market: 'HK', // 香港交易所
+    market: 'HK',
     code: '00700',
     price: '380.20'
   },
   {
     id: 3,
     name: '宁德时代',
-    market: 'SZ', // 深圳证券交易所
+    market: 'SZ',
     code: '300750',
     price: '190.80'
   },
@@ -74,7 +82,7 @@ const stockList = reactive([
   {
     id: 8,
     name: '阿里巴巴',
-    market: 'US', // 美股
+    market: 'US',
     code: 'BABA',
     price: '85.32'
   },
@@ -93,10 +101,70 @@ const stockList = reactive([
     price: '195.05'
   }
 ])
+
+const handleStockClick = (stock) => {
+  emit('stock-selected', stock)
+}
 </script>
 
 <style scoped lang="scss">
 .stockPool-container {
   border-right: 1px solid #eee;
+  height: 100%;
+  overflow-y: auto;
+  padding: 10px;
+}
+
+.stock-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 15px;
+  border-bottom: 1px solid #f0f0f0;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+
+  &:hover {
+    background-color: #f9f9f9;
+  }
+
+  &.active {
+    background-color: #e6f7ff;
+  }
+}
+
+.stock-left {
+  display: flex;
+  flex-direction: column;
+}
+
+.stock-name {
+  font-size: 16px;
+  font-weight: 500;
+  color: #333;
+}
+
+.stock-info {
+  display: flex;
+  align-items: center;
+  margin-top: 4px;
+  font-size: 12px;
+  color: #999;
+}
+
+.stock-market {
+  margin-right: 5px;
+  padding: 2px 4px;
+  border-radius: 3px;
+  background-color: #f0f0f0;
+  font-size: 10px;
+}
+
+.stock-center {
+  .stock-price {
+    font-size: 18px;
+    font-weight: bold;
+    color: #ff4d4f; // 红色表示价格，可以根据涨跌情况动态改变颜色
+  }
 }
 </style>
