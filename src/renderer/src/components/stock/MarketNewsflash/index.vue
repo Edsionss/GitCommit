@@ -2,10 +2,10 @@
   <div class="market-newsflash-container">
     <Tabs v-model="activeTab" :tabs="tabItems">
       <template #default="{ activeTab }">
-        <div v-show="activeTab === 'news'" class="content-panel">
+        <div v-show="activeTab === 'Telegraph'" class="content-panel">
           <p>这里是新闻内容区。</p>
         </div>
-        <div v-show="activeTab === 'alerts'" class="content-panel">
+        <div v-show="activeTab === 'jinShi'" class="content-panel">
           <p>这里是快讯内容区。</p>
         </div>
       </template>
@@ -17,10 +17,10 @@
 import { ref } from 'vue'
 import Tabs from '@components/common/Tabs.vue'
 
-const activeTab = ref('news')
+const activeTab = ref('Telegraph')
 const tabItems = ref([
-  { key: 'news', title: '新闻' },
-  { key: 'alerts', title: '快讯' }
+  { key: 'Telegraph', title: '财联社' },
+  { key: 'jinShi', title: '金十数据' }
 ])
 </script>
 
