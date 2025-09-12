@@ -19,7 +19,8 @@ export default defineConfig({
         '@handlers': resolve('src/main/features/handlers'),
         '@services': resolve('src/main/features/services'),
         '@shared': resolve('src/shared'),
-        '@sharedType': resolve('src/shared/types/dtos')
+        '@sharedType': resolve('src/shared/types/dtos'),
+        '@nodeUtils': resolve('src/main/utils')
       }
     },
     plugins: [externalizeDepsPlugin()]

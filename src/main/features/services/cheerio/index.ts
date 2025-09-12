@@ -41,14 +41,5 @@ export class CheerioScrapingService {
     const $ = cheerio.load(html)
 
     return scrapingLogic($)
-    // const elements = $(selector)
-    // const results: T[] = []
-
-    // elements.each((index, element) => {
-    //   // 将DOM元素包装成Cheerio对象，方便使用API
-    //   const cheerioElement = $(element)
-    //   const extractedData = extractor(cheerioElement)
-    //   results.push(extractedData)
-    // })
   }
 }
