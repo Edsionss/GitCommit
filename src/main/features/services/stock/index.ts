@@ -198,6 +198,7 @@ export async function fetchNews(code: string, name: string) {
     console.log(window.document)
     return window.document.body.innerText
   })
+
   return dom
   const marketCode = getMarketCode(code)
   const stockWithMarket = `${code}${marketCode === '1' ? 'SH' : 'SZ'}`
@@ -276,7 +277,7 @@ export async function getStockInfoByCode(code: string, name?: string) {
   const dataWithIndicators = calculateIndicators(klineData)
 
   // 3. 获取新闻
-  const news = await fetchNews(code, name)
+  const news = await fetchNews(code, name || '')
 
   return { klineData, indicators: dataWithIndicators, news }
 }
