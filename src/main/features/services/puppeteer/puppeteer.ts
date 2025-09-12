@@ -16,7 +16,7 @@ export async function scrapeData<T>(
   options: ScrapeOptions
 ): Promise<any> {
   if (!options.targetUrl) {
-    throw new Error('操，必须提供 targetUrl 来识别窗口！')
+    throw new Error('must provide targetUrl for get window')
   }
 
   let browser: Browser | undefined
@@ -30,12 +30,14 @@ export async function scrapeData<T>(
     const target = await findTarget(browser, options.targetUrl)
 
     if (!target) {
-      throw new Error(`操，死活找不到 URL 为 "${options.targetUrl}" 的目标窗口。`)
+      throw new Error(`not found  URL:  "${options.targetUrl}"  window`)
     }
 
     const page = await target.page()
     if (!page) {
-      throw new Error(`操，找到了窗口但附加不到页面上。`)
+      throw new Error(
+        `found  URL:  "${options.targetUrl}"  window, but no page associated with it。`
+      )
     }
 
     // 后续逻辑不变...
@@ -48,7 +50,7 @@ export async function scrapeData<T>(
 
     return data
   } catch (error) {
-    console.error(`[Puppeteer Util] 爬取时发生错误:`, error)
+    console.error(`[Puppeteer Util] scraping to error :`, error)
     throw error
   } finally {
     if (browser) {

@@ -22,7 +22,7 @@ export async function executeScrapingTask<T>(url: string, scrapingLogic: () => T
     // await scrapeWindow.loadURL('about:blank'); // 旧方法
     await scrapeWindow.loadURL(targetUrl) // 新的、可靠的方法
 
-    console.log(`[Generic Service] 创建后台窗口，唯一URL: ${targetUrl}`)
+    console.log(`[Generic Service] cerate  window ，only URL: ${targetUrl}`)
 
     // 3. 将要爬取的 URL 和用于识别窗口的唯一 URL 都传给底层工具
     const data = await scrapeData<T>(url, scrapingLogic, {
