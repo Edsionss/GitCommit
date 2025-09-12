@@ -34,12 +34,18 @@ const stockTabs = reactive([
 
 <style scoped lang="scss">
 .stock-container {
-  height: 100vh;
+  height: 100%;
   display: flex;
   background-color: #fff;
   flex-direction: column;
   :deep(.ant-tabs-nav) {
     margin-bottom: 0;
+  }
+  :deep(.ant-tabs-content) {
+    height: 100%;
+  }
+  :deep(.ant-tabs) {
+    height: 100%;
   }
 }
 </style>

@@ -19,6 +19,7 @@ import { ref, reactive, onMounted } from 'vue'
 .stockList-container {
   width: 100%;
   display: flex;
+  height: 100%;
   .stock-pool {
     flex: 1;
   }

@@ -115,6 +115,7 @@ const handleStockClick = (stock) => {
 .stockPool-container {
   border-right: 1px solid #eee;
   height: 100%;
+
   overflow-y: auto;
   padding: 10px;
   color: #333;
