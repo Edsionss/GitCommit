@@ -37,7 +37,6 @@
               {{ sector.change.toFixed(2) }}%
             </span>
           </div>
-          <!-- Horizontal Details Row -->
           <div class="industry-details-row">
             <div class="detail-item">
               <span class="label">热度</span>
@@ -60,14 +59,24 @@
 
         <!-- Right Side: Leading Stock Data -->
         <div class="leading-stock-data">
-          <div class="stock-title">领涨股</div>
-          <div class="stock-name-line">
+          <div class="stock-badge">领涨股</div>
+          <div class="stock-header">
             <span class="stock-name">{{ sector.leadingStock.name }}</span>
-            <span class="stock-code">{{ sector.leadingStock.market }} {{ sector.leadingStock.code }}</span>
+            <a-button size="small" type="dashed">+自选</a-button>
           </div>
-          <div class="stock-price-line">
-            <span class="stock-price" :class="getChangeClass(sector.leadingStock.change)">{{ sector.leadingStock.price.toFixed(2) }}</span>
-            <span class="stock-change" :class="getChangeClass(sector.leadingStock.change)">{{ sector.leadingStock.change.toFixed(2) }}%</span>
+          <div class="stock-details">
+            <div class="price-item">
+              <span class="price-value" :class="getChangeClass(sector.leadingStock.change)">{{ sector.leadingStock.price.toFixed(2) }}</span>
+              <span class="price-label">现价</span>
+            </div>
+            <div class="price-item">
+              <span class="price-value" :class="getChangeClass(sector.leadingStock.change)">{{ sector.leadingStock.change.toFixed(2) }}%</span>
+              <span class="price-label">涨幅</span>
+            </div>
+            <div class="price-item">
+              <span class="price-value">{{ sector.leadingStock.openingPrice.toFixed(2) }}</span>
+              <span class="price-label">开盘</span>
+            </div>
           </div>
         </div>
       </div>
@@ -143,8 +152,8 @@ const getChangeClass = (value: number) => {
 };
 
 const getCardBackground = (change: number) => {
-    if (change > 0) return { backgroundColor: '#fff1f0' };
-    if (change < 0) return { backgroundColor: '#f6ffed' };
+    if (change > 0) return { backgroundColor: 'rgba(207, 19, 34, 0.04)' };
+    if (change < 0) return { backgroundColor: 'rgba(56, 158, 13, 0.04)' };
     return {};
 }
 
@@ -202,7 +211,7 @@ const formatCurrency = (value: number): string => {
 }
 
 .industry-data {
-  flex: 6; // Takes more space
+  flex: 6;
   display: flex;
   flex-direction: column;
   gap: 12px;
@@ -230,29 +239,47 @@ const formatCurrency = (value: number): string => {
 }
 
 .leading-stock-data {
-  flex: 4; // Takes less space
+  flex: 4;
   padding-left: 20px;
   border-left: 1px solid #f0f0f0;
   display: flex;
   flex-direction: column;
   justify-content: center;
   gap: 8px;
+  position: relative;
+}
 
-  .stock-title { font-size: 13px; color: #888; margin-bottom: 4px; }
-  .stock-name-line {
+.stock-badge {
+    position: absolute;
+    top: 0;
+    right: 0;
+    background-color: #fafafa;
+    color: #aaa;
+    font-size: 12px;
+    padding: 1px 6px;
+    border-bottom-left-radius: 6px;
+}
+
+.stock-header {
     display: flex;
-    align-items: baseline;
-    gap: 8px;
+    justify-content: space-between;
+    align-items: center;
     .stock-name { font-size: 16px; font-weight: 500; }
-    .stock-code { font-size: 12px; color: #aaa; }
-  }
-  .stock-price-line {
+}
+
+.stock-details {
     display: flex;
-    align-items: baseline;
-    gap: 8px;
-    .stock-price { font-size: 18px; font-weight: bold; }
-    .stock-change { font-size: 14px; }
-  }
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 8px;
+}
+
+.price-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    .price-value { font-size: 16px; font-weight: bold; }
+    .price-label { font-size: 12px; color: #888; margin-top: 2px; }
 }
 
 .is-up { color: #cf1322; }
