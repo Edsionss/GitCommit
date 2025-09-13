@@ -1,24 +1,40 @@
 <template>
   <div class="dragon-tiger-list-container">
+    <h1 class="page-title">龙虎榜单</h1>
     <div class="list-view">
       <div v-for="stock in stocks" :key="stock.code" class="stock-item">
         <!-- Top Row -->
         <div class="top-row">
+          <div class="price-summary">
+            <div class="current-price-group">
+              <span class="value price" :class="getPriceClass(stock.changePercent)">{{
+                stock.closePrice.toFixed(2)
+              }}</span>
+              <span class="value percent" :class="getPriceClass(stock.changePercent)"
+                >{{ stock.changePercent.toFixed(2) }}%</span
+              >
+            </div>
+            <div class="opening-price-group">
+              <span class="label">开</span>
+              <span class="value opening-price">{{ stock.openingPrice.toFixed(2) }}</span>
+            </div>
+          </div>
+
           <div class="stock-identity">
             <span class="stock-name">{{ stock.name }}</span>
-            <span class="stock-code-market">{{ stock.market }} | {{ stock.code }}</span>
+            <span class="stock-code-market">
+              <a href="#" @click.prevent class="market-tag">{{ stock.market }}</a>
+              <span>{{ stock.code }}</span>
+            </span>
           </div>
+
           <div class="reason-item">
-            <span class="label">上榜理由</span>
             <span class="value" :title="stock.reason">{{ stock.reason }}</span>
           </div>
-          <div class="price-summary">
-            <span class="value price" :class="getPriceClass(stock.changePercent)">{{
-              stock.closePrice.toFixed(2)
-            }}</span>
-            <span class="value percent" :class="getPriceClass(stock.changePercent)"
-              >{{ stock.changePercent.toFixed(2) }}%</span
-            >
+
+          <div class="action-buttons">
+            <button class="btn btn-detail">查看明细</button>
+            <button class="btn btn-add-watchlist">+自选</button>
           </div>
         </div>
 
@@ -53,7 +69,7 @@
 <script setup>
 import { ref } from 'vue'
 
-// 模拟的龙虎榜数据
+// 模拟的龙虎榜数据 (新增 openingPrice)
 const stocks = ref([
   {
     name: '贵州茅台',
@@ -66,7 +82,8 @@ const stocks = ref([
     turnoverRate: 2.5,
     floatMarketCap: 2100000000000,
     changePercent: 8.5,
-    closePrice: 1700.5
+    closePrice: 1700.5,
+    openingPrice: 1650.0
   },
   {
     name: '宁德时代',
@@ -79,7 +96,8 @@ const stocks = ref([
     turnoverRate: 5.8,
     floatMarketCap: 950000000000,
     changePercent: -4.2,
-    closePrice: 430.8
+    closePrice: 430.8,
+    openingPrice: 450.1
   },
   {
     name: '中信证券',
@@ -92,7 +110,8 @@ const stocks = ref([
     turnoverRate: 21.3,
     floatMarketCap: 350000000000,
     changePercent: 2.1,
-    closePrice: 25.15
+    closePrice: 25.15,
+    openingPrice: 24.8
   }
 ])
 
@@ -159,6 +178,7 @@ const getPriceClass = (change) => {
 
 .top-row {
   justify-content: space-between;
+  gap: 16px;
 }
 
 .bottom-row {
@@ -169,11 +189,51 @@ const getPriceClass = (change) => {
   margin-top: 8px;
 }
 
-.stock-identity {
+.price-summary {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
   flex-shrink: 0;
+}
+
+.current-price-group {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+}
+
+.price-summary .price {
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.price-summary .percent {
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.opening-price-group {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+  margin-top: 2px;
+}
+
+.opening-price-group .label {
+  font-size: 12px;
+  color: #888;
+}
+
+.value.opening-price {
+  font-size: 13px;
+  color: #333;
+  font-weight: 500;
+}
+
+.stock-identity {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
 }
 
 .stock-name {
@@ -185,47 +245,68 @@ const getPriceClass = (change) => {
 .stock-code-market {
   font-size: 12px;
   color: #888;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.market-tag {
+  text-decoration: none;
+  color: #4a6da7;
+  background-color: #eaf0f8;
+  font-weight: bold;
+  padding: 1px 4px;
+  border-radius: 3px;
+  font-size: 11px;
 }
 
 .reason-item {
   flex-grow: 1;
   text-align: center;
-  padding: 0 16px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
-.reason-item .label {
-  display: none; /* Hide label for a cleaner look */
-}
-
 .reason-item .value {
   font-size: 13px;
-  color: #666;
-  background-color: #f0f2f5;
-  padding: 2px 8px;
-  border-radius: 4px;
+  color: #3d5a80;
+  background-color: #e0e8f0;
+  padding: 3px 10px;
+  border-radius: 12px;
 }
 
-.price-summary {
+.action-buttons {
   display: flex;
-  align-items: center;
   gap: 8px;
-  min-width: 120px;
-  justify-content: flex-end;
+  flex-shrink: 0;
 }
 
-.price-summary .price {
-  font-size: 18px;
-  font-weight: bold;
-}
-
-.price-summary .percent {
-  font-size: 14px;
+.btn {
+  padding: 4px 10px;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 12px;
   font-weight: 500;
-  width: 60px;
-  text-align: right;
+  transition: all 0.2s ease;
+}
+
+.btn-detail {
+  background-color: #3d5a80;
+  color: white;
+}
+.btn-detail:hover {
+  background-color: #314866;
+}
+
+.btn-add-watchlist {
+  background-color: transparent;
+  color: #3d5a80;
+  border-color: #3d5a80;
+}
+.btn-add-watchlist:hover {
+  background-color: #e0e8f0;
 }
 
 .detail-item {
@@ -251,53 +332,13 @@ const getPriceClass = (change) => {
 .value.positive {
   color: #e53935;
 }
-
 .value.negative {
   color: #43a047;
 }
-
 .value.buy {
   color: #e53935;
 }
-
 .value.sell {
   color: #43a047;
-}
-
-/* Responsive adjustments */
-@media (max-width: 768px) {
-  .top-row {
-    flex-wrap: wrap;
-    gap: 8px;
-  }
-  .reason-item {
-    order: 3;
-    width: 100%;
-    text-align: left;
-    padding: 0;
-  }
-  .price-summary {
-    order: 2;
-  }
-  .stock-identity {
-    order: 1;
-  }
-  .bottom-row {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 8px;
-    padding: 8px;
-  }
-}
-
-@media (max-width: 480px) {
-  .bottom-row {
-    grid-template-columns: repeat(2, 1fr);
-  }
-  .price-summary {
-    flex-direction: column;
-    align-items: flex-end;
-    gap: 0;
-  }
 }
 </style>
