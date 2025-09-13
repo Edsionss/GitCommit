@@ -260,8 +260,8 @@ const getChangeClass = (value: number) => {
 }
 
 const getCardBackground = (change: number) => {
-  if (change > 0) return { background: 'linear-gradient(to right, rgba(207, 19, 34, 0.04), white)' }
-  if (change < 0) return { background: 'linear-gradient(to right, rgba(56, 158, 13, 0.04), white)' }
+  if (change > 0) return { background: 'var(--bg-gradient-red)' }
+  if (change < 0) return { background: 'var(--bg-gradient-green)' }
   return {}
 }
 
