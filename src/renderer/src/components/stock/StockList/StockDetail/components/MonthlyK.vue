@@ -52,10 +52,20 @@ onMounted(() => {
 }
 .chart-container {
   flex: 3;
+  display: flex;
+  min-height: 0;
 }
 .indicator-container {
   flex: 1;
   display: flex;
   flex-direction: column;
+  min-height: 0;
+}
+.chart-container > :deep(*) {
+  flex: 1;
+  min-width: 0;
+}
+.indicator-container > :deep(*) {
+  flex: 1;
 }
 </style>
