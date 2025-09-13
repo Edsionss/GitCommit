@@ -24,7 +24,7 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
-import Tabs from '@/components/common/Tabs.vue'
+import Tabs from '@components/common/Tabs.vue'
 import IndustrySector from './IndustrySector.vue'
 import DragonTigerList from './DragonTigerList.vue'
 import CapitalFlow from './CapitalFlow.vue'

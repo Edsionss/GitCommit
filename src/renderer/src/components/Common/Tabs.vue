@@ -18,8 +18,6 @@
 </template>
 
 <script setup lang="ts">
-import { defineProps, defineEmits } from 'vue'
-
 const props = defineProps({
   tabs: {
     type: Array as () => Array<{ key: string; title: string }>,
