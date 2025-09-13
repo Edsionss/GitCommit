@@ -111,6 +111,90 @@ const stocks = ref([
     changePercent: 2.1,
     closePrice: 25.15,
     openingPrice: 24.8
+  },
+  {
+    name: '中信证券',
+    code: '600030',
+    market: 'SH',
+    reason: '日换手率达到20%的证券',
+    netBuy: 87650000,
+    netSell: 98760000,
+    totalVolume: 432100000,
+    turnoverRate: 21.3,
+    floatMarketCap: 350000000000,
+    changePercent: 2.1,
+    closePrice: 25.15,
+    openingPrice: 24.8
+  },
+  {
+    name: '中信证券',
+    code: '600030',
+    market: 'SH',
+    reason: '日换手率达到20%的证券',
+    netBuy: 87650000,
+    netSell: 98760000,
+    totalVolume: 432100000,
+    turnoverRate: 21.3,
+    floatMarketCap: 350000000000,
+    changePercent: 2.1,
+    closePrice: 25.15,
+    openingPrice: 24.8
+  },
+  {
+    name: '中信证券',
+    code: '600030',
+    market: 'SH',
+    reason: '日换手率达到20%的证券',
+    netBuy: 87650000,
+    netSell: 98760000,
+    totalVolume: 432100000,
+    turnoverRate: 21.3,
+    floatMarketCap: 350000000000,
+    changePercent: 2.1,
+    closePrice: 25.15,
+    openingPrice: 24.8
+  },
+  {
+    name: '中信证券',
+    code: '600030',
+    market: 'SH',
+    reason: '日换手率达到20%的证券',
+    netBuy: 87650000,
+    netSell: 98760000,
+    totalVolume: 432100000,
+    turnoverRate: 21.3,
+    floatMarketCap: 350000000000,
+    changePercent: 2.1,
+    closePrice: 25.15,
+    openingPrice: 24.8
+  },
+  {
+    name: '中信证券',
+    code: '600030',
+    market: 'SH',
+    reason: '日换手率达到20%的证券',
+    netBuy: 87650000,
+    netSell: 98760000,
+    totalVolume: 432100000,
+    turnoverRate: 21.3,
+    floatMarketCap: 350000000000,
+    changePercent: 2.1,
+    closePrice: 25.15,
+    openingPrice: 24.8
+  },
+  {
+    name: '中信证券',
+    code: '600030',
+    market: 'SH',
+    reason: '日换手率达到20%的证券',
+    netBuy: 87650000,
+    netSell: 98760000,
+    totalVolume: 432100000,
+    turnoverRate: 21.3,
+    floatMarketCap: 350000000000,
+    changePercent: 2.1,
+    closePrice: 25.15,
+    openingPrice: 24.8
   }
 ])
 
@@ -136,6 +220,8 @@ const getPriceClass = (change) => {
 <style scoped>
 .dragon-tiger-list-container {
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  height: 100%;
+  overflow: auto;
 }
 
 .page-title {

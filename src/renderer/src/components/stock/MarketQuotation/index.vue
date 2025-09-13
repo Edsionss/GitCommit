@@ -2,21 +2,11 @@
   <div class="market-quotation-container">
     <Tabs v-model="activeTab" :tabs="tabItems">
       <template #default="{ activeTab }">
-        <div v-show="activeTab === 'industry-sector'">
-          <IndustrySector />
-        </div>
-        <div v-show="activeTab === 'dragon-tiger-list'">
-          <DragonTigerList />
-        </div>
-        <div v-show="activeTab === 'capital-flow'">
-          <CapitalFlow />
-        </div>
-        <div v-show="activeTab === 'global-markets'">
-          <GlobalMarkets />
-        </div>
-        <div v-show="activeTab === 'hot-stocks'">
-          <HotStocks />
-        </div>
+        <IndustrySector v-show="activeTab === 'industry-sector'" />
+        <DragonTigerList v-show="activeTab === 'dragon-tiger-list'" />
+        <CapitalFlow v-show="activeTab === 'capital-flow'" />
+        <GlobalMarkets v-show="activeTab === 'global-markets'" />
+        <HotStocks v-show="activeTab === 'hot-stocks'" />
       </template>
     </Tabs>
   </div>
