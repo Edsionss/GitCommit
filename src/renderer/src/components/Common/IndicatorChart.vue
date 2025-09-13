@@ -14,8 +14,10 @@ import {
   LineElement,
   Tooltip,
   Legend,
-  Filler
+  Filler,
+  TimeScale
 } from 'chart.js'
+import 'chartjs-adapter-date-fns'
 import { computed } from 'vue'
 
 ChartJS.register(
@@ -26,7 +28,8 @@ ChartJS.register(
   LineElement,
   Tooltip,
   Legend,
-  Filler
+  Filler,
+  TimeScale
 )
 
 const props = defineProps<{
@@ -43,8 +46,13 @@ const chartData = computed(() => {
           {
             label: '成交量',
             data: props.indicatorData.map((d) => d.v),
-            backgroundColor: (context) =>
-              context.raw.c >= context.raw.o ? 'rgba(207, 19, 34, 0.7)' : 'rgba(56, 158, 13, 0.7)'
+            backgroundColor: (context) => {
+              if (!props.indicatorData[context.dataIndex]) {
+                return 'rgba(128, 128, 128, 0.7)'
+              }
+              const { o, c } = props.indicatorData[context.dataIndex]
+              return c >= o ? 'rgba(207, 19, 34, 0.7)' : 'rgba(56, 158, 13, 0.7)'
+            }
           }
         ]
       }
@@ -87,6 +95,7 @@ const chartOptions = computed(() => ({
   maintainAspectRatio: false,
   scales: {
     x: {
+      type: 'time',
       display: false
     },
     y: {

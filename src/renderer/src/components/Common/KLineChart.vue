@@ -4,7 +4,8 @@
 
 <script setup lang="ts">
 import { Bar } from 'vue-chartjs'
-import { Chart as ChartJS, CategoryScale, LinearScale, Tooltip, Legend } from 'chart.js'
+import { Chart as ChartJS, CategoryScale, LinearScale, Tooltip, Legend, TimeScale } from 'chart.js'
+import 'chartjs-adapter-date-fns'
 import { CandlestickController, CandlestickElement } from 'chartjs-chart-financial'
 import { ref, computed } from 'vue'
 
@@ -14,7 +15,8 @@ ChartJS.register(
   Tooltip,
   Legend,
   CandlestickController,
-  CandlestickElement
+  CandlestickElement,
+  TimeScale
 )
 
 const props = defineProps<{
