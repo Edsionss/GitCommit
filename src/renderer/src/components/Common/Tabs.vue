@@ -76,7 +76,7 @@ const onTabClick = (key: string) => {
 
 .tabs-content {
   flex-grow: 1;
-  padding: 15px;
+  padding: 10px;
   height: 100%;
   width: 100%;
 }
