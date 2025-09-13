@@ -15,45 +15,32 @@
       </div>
     </div>
 
-    <a-menu
-      v-model:selectedKeys="selectedKeys"
-      :inline-collapsed="!isExpanded"
-      class="sidebar-menu"
-      theme="light"
-      mode="inline"
-      @click="handleMenuClick"
-    >
-      <a-menu-item v-for="item in menuItems" :key="item.path">
-        <template #icon>
-          <component :is="item.icon" />
-        </template>
-        <span>{{ item.label }}</span>
-      </a-menu-item>
-    </a-menu>
+    <div class="sidebar-menu">
+      <router-link
+        v-for="item in menuItems"
+        :key="item.path"
+        :to="item.path"
+        class="menu-item"
+        :class="{ active: isActive(item.path) }"
+      >
+        <component :is="item.icon" size="10" />
+        <span v-if="isExpanded" class="menu-label">{{ item.label }}</span>
+      </router-link>
+    </div>
 
     <div class="sidebar-footer">
-      <a-menu
-        v-model:selectedKeys="selectedKeys"
-        :inline-collapsed="!isExpanded"
-        theme="light"
-        mode="inline"
-        @click="handleMenuClick"
-      >
-        <a-menu-item key="/settings">
-          <template #icon>
-            <SettingOutlined />
-          </template>
-          <span>设置</span>
-        </a-menu-item>
-      </a-menu>
+      <router-link to="/settings" class="menu-item" :class="{ active: isActive('/settings') }">
+        <SettingOutlined />
+        <span v-if="isExpanded" class="menu-label">设置</span>
+      </router-link>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import logoFull from '@/assets/img/logo/LOGO1.png'
-import { computed, watch, ref } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
+import { computed, watch, h, ref } from 'vue'
+import { useRoute } from 'vue-router'
 import { storeToRefs } from 'pinia'
 import { useRoutesStore } from '@/stores/routesStore'
 import {
@@ -69,15 +56,13 @@ import {
   HistoryOutlined,
   RobotOutlined
 } from '@ant-design/icons-vue'
-import type { MenuProps } from 'ant-design-vue'
 
 const routesStore = useRoutesStore()
+
 const { routes } = storeToRefs(routesStore)
 const route = useRoute()
-const router = useRouter()
 
 const isExpanded = ref(true)
-const selectedKeys = ref<string[]>([route.path])
 
 // Map route names to icons
 const iconMap = {
@@ -95,15 +80,6 @@ const iconMap = {
 const toggleSidebar = () => {
   isExpanded.value = !isExpanded.value
 }
-
-// Watch for route changes to update selected keys
-watch(
-  () => route.path,
-  (newPath) => {
-    selectedKeys.value = [newPath]
-  },
-  { immediate: true }
-)
 
 // Watch for sidebar state changes to dispatch events
 watch(
@@ -131,8 +107,11 @@ const menuItems = computed(() => {
     }))
 })
 
-const handleMenuClick: MenuProps['onClick'] = (e) => {
-  router.push(e.key as string)
+const isActive = (path: string): boolean => {
+  if (path === '/') {
+    return route.path === '/'
+  }
+  return route.path === path
 }
 </script>
 
@@ -187,16 +166,37 @@ const handleMenuClick: MenuProps['onClick'] = (e) => {
 
 .sidebar-menu {
   flex: 1;
-  border-right: none !important;
+  display: flex;
+  flex-direction: column;
+  padding: 16px 0;
+  overflow-y: auto;
 }
 
 .sidebar-footer {
-  padding-bottom: 16px;
+  padding: 16px 0;
   border-top: 1px solid var(--border-color);
 }
 
-.sidebar-footer .ant-menu {
-  border-right: none !important;
+.menu-item {
+  display: flex;
+  align-items: center;
+  padding: 12px 16px;
+  color: var(--text-primary);
+  text-decoration: none;
+  margin: 4px 8px;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+}
+.menu-label {
+  padding-left: 8px;
+}
+.menu-item:hover {
+  background-color: var(--hover-bg);
+}
+
+.menu-item.active {
+  background-color: var(--primary-bg-hover);
+  color: var(--primary-color);
 }
 
 .anticon {
