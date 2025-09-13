@@ -1,7 +1,12 @@
 <template>
   <div class="dragon-tiger-list-container">
     <div class="list-view">
-      <div v-for="stock in stocks" :key="stock.code" class="stock-item">
+      <div
+        v-for="stock in stocks"
+        :key="stock.code"
+        class="stock-item"
+        :style="getCardBackgroundByChange(stock.changePercent)"
+      >
         <!-- Top Row -->
         <div class="top-row">
           <div class="stock-identity">
@@ -33,7 +38,7 @@
 
           <div class="action-buttons">
             <a-button type="primary" size="small">查看明细</a-button>
-            <a-button size="small">+自选</a-button>
+            <a-button size="small" type="dashed">+自选</a-button>
           </div>
         </div>
 
@@ -67,6 +72,7 @@
 
 <script setup>
 import { ref } from 'vue'
+import { getCardBackgroundByChange } from '@/utils'
 
 // 模拟的龙虎榜数据 (新增 openingPrice)
 const stocks = ref([
@@ -238,18 +244,17 @@ const getPriceClass = (change) => {
 }
 
 .stock-item {
+  cursor: pointer;
   border-radius: 8px;
   padding: 15px;
-  border: 1px #eee solid;
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
   display: flex;
   flex-direction: column;
   gap: 8px;
   transition: box-shadow 0.3s ease;
-}
-
-.stock-item:hover {
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  &:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  }
 }
 
 .top-row,
@@ -266,10 +271,8 @@ const getPriceClass = (change) => {
 
 .bottom-row {
   justify-content: space-around;
-  background-color: #fafafa;
   border-radius: 4px;
   padding: 8px 0;
-  margin-top: 8px;
 }
 
 .price-summary {

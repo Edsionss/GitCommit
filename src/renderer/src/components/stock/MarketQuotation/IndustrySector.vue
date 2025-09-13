@@ -25,7 +25,7 @@
         v-for="(sector, index) in sortedSectors"
         :key="sector.name"
         class="sector-card"
-        :style="getCardBackground(sector.change)"
+        :style="getCardBackgroundByChange(sector.change)"
       >
         <div class="ranking-number">{{ index + 1 }}</div>
 
@@ -35,6 +35,9 @@
             <span class="sector-name">{{ sector.name }}</span>
             <span class="sector-change" :class="getChangeClass(sector.change)">
               {{ sector.change.toFixed(2) }}%
+            </span>
+            <span class="sector-handel">
+              <a-button type="primary" size="small">查看明细</a-button>
             </span>
           </div>
           <div class="industry-details-row">
@@ -105,7 +108,7 @@
 <script setup lang="ts">
 import { reactive, computed } from 'vue'
 import { ArrowUpOutlined, ArrowDownOutlined } from '@ant-design/icons-vue'
-
+import { getCardBackgroundByChange } from '@/utils'
 interface LeadingStock {
   name: string
   market: string
@@ -259,12 +262,6 @@ const getChangeClass = (value: number) => {
   return { 'is-up': value > 0, 'is-down': value < 0 }
 }
 
-const getCardBackground = (change: number) => {
-  if (change > 0) return { background: 'var(--bg-gradient-red)' }
-  if (change < 0) return { background: 'var(--bg-gradient-green)' }
-  return {}
-}
-
 const formatCurrency = (value: number): string => {
   if (Math.abs(value) >= 1e8) return `${(value / 1e8).toFixed(2)}亿`
   if (Math.abs(value) >= 1e4) return `${(value / 1e4).toFixed(2)}万`
@@ -294,7 +291,7 @@ const formatCurrency = (value: number): string => {
 
 .sector-card {
   margin-bottom: 16px;
-
+  cursor: pointer;
   border-radius: 8px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
   display: flex;
@@ -303,6 +300,9 @@ const formatCurrency = (value: number): string => {
   padding-left: 24px; // Space for ranking number
   overflow: hidden;
   transition: background-color 0.3s ease;
+  &:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  }
 }
 
 .ranking-number {
@@ -326,15 +326,24 @@ const formatCurrency = (value: number): string => {
 
 .industry-header {
   display: flex;
-  align-items: baseline;
+  align-items: center;
   gap: 12px;
   .sector-name {
+    flex: 1;
     font-size: 18px;
     font-weight: 600;
   }
   .sector-change {
+    flex: 1;
+
     font-size: 20px;
     font-weight: bold;
+  }
+  .sector-handel {
+    flex: 2.5;
+    display: flex;
+    justify-content: end;
+    margin-right: 10px;
   }
 }
 
