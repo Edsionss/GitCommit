@@ -11,7 +11,7 @@
 
 <script setup lang="ts">
 import StockPool from './StockPool.vue'
-import StockDetail from './StockDetail.vue'
+import StockDetail from './StockDetail/index.vue'
 import { ref, reactive, onMounted } from 'vue'
 </script>
 

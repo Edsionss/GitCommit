@@ -29,6 +29,7 @@
 import { ref, computed, defineAsyncComponent } from 'vue'
 
 // 定义 props
+// 定义 props
 const props = defineProps({
   stockData: {
     type: Object,
@@ -65,22 +66,16 @@ const activeView = ref('TimeSharing')
 
 // 异步加载组件
 const components = {
-  TimeSharing: defineAsyncComponent(
-    () => import('./StockList/StockDetail/components/TimeSharing.vue')
-  ),
-  DailyK: defineAsyncComponent(() => import('./detail/DailyK.vue')),
-  WeeklyK: defineAsyncComponent(() => import('./StockList/StockDetail/components/WeeklyK.vue')),
-  MonthlyK: defineAsyncComponent(() => import('./StockList/StockDetail/components/MonthlyK.vue')),
-  FiveDay: defineAsyncComponent(() => import('./StockList/StockDetail/components/FiveDay.vue')),
-  Profile: defineAsyncComponent(() => import('./StockList/StockDetail/components/Profile.vue')),
-  Capital: defineAsyncComponent(() => import('./StockList/StockDetail/components/Capital.vue')),
-  Announcements: defineAsyncComponent(
-    () => import('./StockList/StockDetail/components/Announcements.vue')
-  ),
-  News: defineAsyncComponent(() => import('./StockList/StockDetail/components/News.vue')),
-  AiDiagnosis: defineAsyncComponent(
-    () => import('./StockList/StockDetail/components/AiDiagnosis.vue')
-  )
+  TimeSharing: defineAsyncComponent(() => import('./components/TimeSharing.vue')),
+  DailyK: defineAsyncComponent(() => import('./components/DailyK.vue')),
+  WeeklyK: defineAsyncComponent(() => import('./components/WeeklyK.vue')),
+  MonthlyK: defineAsyncComponent(() => import('./components/MonthlyK.vue')),
+  FiveDay: defineAsyncComponent(() => import('./components/FiveDay.vue')),
+  Profile: defineAsyncComponent(() => import('./components/Profile.vue')),
+  Capital: defineAsyncComponent(() => import('./components/Capital.vue')),
+  Announcements: defineAsyncComponent(() => import('./components/Announcements.vue')),
+  News: defineAsyncComponent(() => import('./components/News.vue')),
+  AiDiagnosis: defineAsyncComponent(() => import('./components/AiDiagnosis.vue'))
 }
 
 const activeComponent = computed(() => components[activeView.value])
@@ -100,7 +95,6 @@ const activeComponent = computed(() => components[activeView.value])
   justify-content: center;
   border-bottom: 1px solid #f0f0f0;
   margin-bottom: 16px;
-
   .ant-btn {
     &.active {
       color: #1890ff;
