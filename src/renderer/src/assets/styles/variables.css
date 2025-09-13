@@ -13,4 +13,6 @@
   --font-weight-medium: 500;
   --font-weight-semibold: 600;
   --font-weight-bold: 700;
+  --bg-gradient-red: linear-gradient(to right, rgba(207, 19, 34, 0.04), white);
+  --bg-gradient-green: linear-gradient(to right, rgba(56, 158, 13, 0.04), white);
 }

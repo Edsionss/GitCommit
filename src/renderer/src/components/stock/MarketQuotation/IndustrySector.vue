@@ -260,8 +260,8 @@ const getChangeClass = (value: number) => {
 }
 
 const getCardBackground = (change: number) => {
-  if (change > 0) return { backgroundColor: 'rgba(207, 19, 34, 0.04)' }
-  if (change < 0) return { backgroundColor: 'rgba(56, 158, 13, 0.04)' }
+  if (change > 0) return { background: 'linear-gradient(to right, rgba(207, 19, 34, 0.04), white)' }
+  if (change < 0) return { background: 'linear-gradient(to right, rgba(56, 158, 13, 0.04), white)' }
   return {}
 }
 
@@ -290,10 +290,6 @@ const formatCurrency = (value: number): string => {
 .sector-list {
   overflow-y: auto;
   height: calc(100% - 50px);
-  // margin-bottom: 16px;
-  // display: flex;
-  // flex-direction: column;
-  // gap: 16px;
 }
 
 .sector-card {
