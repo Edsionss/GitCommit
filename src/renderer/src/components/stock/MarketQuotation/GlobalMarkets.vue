@@ -1,13 +1,15 @@
 <template>
   <div class="global-markets-container">
-    <h3 class="title">全球股市</h3>
     <div class="market-list">
       <div v-for="market in markets" :key="market.name" class="market-item">
         <div class="market-info">
           <span class="market-name">{{ market.name }}</span>
           <span class="market-value">{{ market.value.toFixed(2) }}</span>
         </div>
-        <div class="market-change" :class="{ 'is-up': market.change > 0, 'is-down': market.change < 0 }">
+        <div
+          class="market-change"
+          :class="{ 'is-up': market.change > 0, 'is-down': market.change < 0 }"
+        >
           <span>{{ market.change.toFixed(2) }}</span>
           <span>{{ market.changePercent.toFixed(2) }}%</span>
         </div>
