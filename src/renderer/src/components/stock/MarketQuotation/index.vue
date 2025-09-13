@@ -6,7 +6,7 @@
         <DragonTigerList v-show="activeTab === 'dragon-tiger-list'" />
         <CapitalFlow v-show="activeTab === 'capital-flow'" />
         <GlobalMarkets v-show="activeTab === 'global-markets'" />
-        <HotStocks v-show="activeTab === 'hot-stocks'" />
+        <MarketHotspots v-show="activeTab === 'market-hotspots'" />
       </template>
     </Tabs>
   </div>
@@ -19,7 +19,7 @@ import IndustrySector from './IndustrySector.vue'
 import DragonTigerList from './DragonTigerList.vue'
 import CapitalFlow from './CapitalFlow.vue'
 import GlobalMarkets from './GlobalMarkets.vue'
-import HotStocks from './HotStocks.vue'
+import MarketHotspots from './MarketHotspots.vue'
 
 const activeTab = ref('industry-sector') // 默认选中第一个tab
 
@@ -28,7 +28,7 @@ const tabItems = ref([
   { key: 'dragon-tiger-list', title: '龙虎榜' },
   { key: 'capital-flow', title: '资金流向' },
   { key: 'global-markets', title: '全球股市' },
-  { key: 'hot-stocks', title: '热门股票' }
+  { key: 'market-hotspots', title: '市场热点' }
 ])
 </script>
 
