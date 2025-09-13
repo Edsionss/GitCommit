@@ -240,7 +240,7 @@ const getPriceClass = (change) => {
 .stock-item {
   border-radius: 8px;
   padding: 15px;
-  border: 2px #eee solid;
+  border: 1px #eee solid;
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
   display: flex;
   flex-direction: column;
