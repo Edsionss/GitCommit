@@ -1,6 +1,5 @@
 <template>
   <div class="dragon-tiger-list-container">
-    <h1 class="page-title">龙虎榜单</h1>
     <div class="list-view">
       <div v-for="stock in stocks" :key="stock.code" class="stock-item">
         <!-- Top Row -->
@@ -136,8 +135,6 @@ const getPriceClass = (change) => {
 
 <style scoped>
 .dragon-tiger-list-container {
-  padding: 16px;
-  background-color: #f0f2f5;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
@@ -155,9 +152,9 @@ const getPriceClass = (change) => {
 }
 
 .stock-item {
-  background-color: #ffffff;
-  border-radius: 6px;
-  padding: 12px 16px;
+  border-radius: 8px;
+  padding: 15px;
+  border: 2px #eee solid;
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
   display: flex;
   flex-direction: column;
@@ -245,11 +242,11 @@ const getPriceClass = (change) => {
 }
 
 .stock-code-market {
-  font-size: 12px;
+  font-size: 13px;
   color: #888;
   display: flex;
   align-items: center;
-  gap: 6px;
+  font-weight: bold;
 }
 
 .reason-item {
