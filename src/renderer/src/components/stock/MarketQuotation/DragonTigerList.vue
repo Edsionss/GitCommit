@@ -5,6 +5,14 @@
       <div v-for="stock in stocks" :key="stock.code" class="stock-item">
         <!-- Top Row -->
         <div class="top-row">
+          <div class="stock-identity">
+            <span class="stock-name">{{ stock.name }}</span>
+            <span class="stock-code-market">
+              <a-tag color="blue">{{ stock.market }}</a-tag>
+              <span>{{ stock.code }}</span>
+            </span>
+          </div>
+
           <div class="price-summary">
             <div class="current-price-group">
               <span class="value price" :class="getPriceClass(stock.changePercent)">{{
@@ -20,21 +28,13 @@
             </div>
           </div>
 
-          <div class="stock-identity">
-            <span class="stock-name">{{ stock.name }}</span>
-            <span class="stock-code-market">
-              <a href="#" @click.prevent class="market-tag">{{ stock.market }}</a>
-              <span>{{ stock.code }}</span>
-            </span>
-          </div>
-
           <div class="reason-item">
-            <span class="value" :title="stock.reason">{{ stock.reason }}</span>
+            <a-tag color="purple" :title="stock.reason">{{ stock.reason }}</a-tag>
           </div>
 
           <div class="action-buttons">
-            <button class="btn btn-detail">查看明细</button>
-            <button class="btn btn-add-watchlist">+自选</button>
+            <a-button type="primary" size="small">查看明细</a-button>
+            <a-button size="small">+自选</a-button>
           </div>
         </div>
 
@@ -194,6 +194,14 @@ const getPriceClass = (change) => {
   flex-direction: column;
   align-items: flex-start;
   flex-shrink: 0;
+  order: 2; /* 交换位置 */
+}
+
+.stock-identity {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  order: 1; /* 交换位置 */
 }
 
 .current-price-group {
@@ -230,12 +238,6 @@ const getPriceClass = (change) => {
   font-weight: 500;
 }
 
-.stock-identity {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-}
-
 .stock-name {
   font-size: 16px;
   font-weight: bold;
@@ -250,63 +252,20 @@ const getPriceClass = (change) => {
   gap: 6px;
 }
 
-.market-tag {
-  text-decoration: none;
-  color: #4a6da7;
-  background-color: #eaf0f8;
-  font-weight: bold;
-  padding: 1px 4px;
-  border-radius: 3px;
-  font-size: 11px;
-}
-
 .reason-item {
   flex-grow: 1;
   text-align: center;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-}
-
-.reason-item .value {
-  font-size: 13px;
-  color: #3d5a80;
-  background-color: #e0e8f0;
-  padding: 3px 10px;
-  border-radius: 12px;
+  order: 3;
 }
 
 .action-buttons {
   display: flex;
   gap: 8px;
   flex-shrink: 0;
-}
-
-.btn {
-  padding: 4px 10px;
-  border: 1px solid transparent;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 12px;
-  font-weight: 500;
-  transition: all 0.2s ease;
-}
-
-.btn-detail {
-  background-color: #3d5a80;
-  color: white;
-}
-.btn-detail:hover {
-  background-color: #314866;
-}
-
-.btn-add-watchlist {
-  background-color: transparent;
-  color: #3d5a80;
-  border-color: #3d5a80;
-}
-.btn-add-watchlist:hover {
-  background-color: #e0e8f0;
+  order: 4;
 }
 
 .detail-item {
