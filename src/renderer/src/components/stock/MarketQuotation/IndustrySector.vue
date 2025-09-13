@@ -5,7 +5,8 @@
         <a-button
           v-for="btn in sortOptions"
           :key="btn.key"
-          :type="sortState.key === btn.key ? 'primary' : 'default'"
+          type="text"
+          :class="{ 'active-sort': sortState.key === btn.key }"
           @click="handleSort(btn.key)"
         >
           {{ btn.label }}
@@ -17,49 +18,49 @@
       </a-space>
     </div>
 
-    <div class="sector-grid">
-      <div v-for="sector in sortedSectors" :key="sector.name" class="sector-card">
-        <div class="card-header">
-          <span class="sector-name">{{ sector.name }}</span>
-          <span class="sector-change" :class="getChangeClass(sector.change)">
-            {{ sector.change.toFixed(2) }}%
-          </span>
+    <div class="sector-list">
+      <div v-for="(sector, index) in sortedSectors" :key="sector.name" class="sector-card">
+        <div class="ranking-number">{{ index + 1 }}</div>
+        
+        <!-- Left Side: Industry Data -->
+        <div class="industry-data">
+          <div class="industry-header">
+            <span class="sector-name">{{ sector.name }}</span>
+            <span class="sector-change" :class="getChangeClass(sector.change)">
+              {{ sector.change.toFixed(2) }}%
+            </span>
+          </div>
+          <div class="industry-grid">
+            <div class="grid-item">
+              <span class="label">热度</span>
+              <span class="value">{{ sector.hotness }}</span>
+            </div>
+            <div class="grid-item">
+              <span class="label">5日</span>
+              <span class="value" :class="getChangeClass(sector.change_5d)">{{ sector.change_5d.toFixed(2) }}%</span>
+            </div>
+            <div class="grid-item">
+              <span class="label">20日</span>
+              <span class="value" :class="getChangeClass(sector.change_20d)">{{ sector.change_20d.toFixed(2) }}%</span>
+            </div>
+            <div class="grid-item">
+              <span class="label">净流入</span>
+              <span class="value" :class="getChangeClass(sector.netInflow)">{{ formatCurrency(sector.netInflow) }}</span>
+            </div>
+          </div>
         </div>
 
-        <div class="leading-stock-info">
-          <div class="stock-identity">
-            <div class="stock-name-tag">
-              <a-tag :color="getChangeClass(sector.leadingStock.change, true)">{{ sector.leadingStock.name }}</a-tag>
+        <!-- Right Side: Leading Stock Data -->
+        <div class="leading-stock-data">
+            <div class="stock-title">领涨股</div>
+            <div class="stock-name-line">
+                <span class="stock-name">{{ sector.leadingStock.name }}</span>
+                <span class="stock-code">{{ sector.leadingStock.market }} {{ sector.leadingStock.code }}</span>
             </div>
-            <div class="stock-code-market">{{ sector.leadingStock.market }} {{ sector.leadingStock.code }}</div>
-          </div>
-
-          <div class="stock-price-details">
-            <div class="price-main">
-              <span class="price-current" :class="getChangeClass(sector.leadingStock.change)">{{ sector.leadingStock.price.toFixed(2) }}</span>
-              <span class="price-change" :class="getChangeClass(sector.leadingStock.change)">{{ sector.leadingStock.change.toFixed(2) }}%</span>
+            <div class="stock-price-line">
+                <span class="stock-price" :class="getChangeClass(sector.leadingStock.change)">{{ sector.leadingStock.price.toFixed(2) }}</span>
+                <span class="stock-change" :class="getChangeClass(sector.leadingStock.change)">{{ sector.leadingStock.change.toFixed(2) }}%</span>
             </div>
-            <div class="price-opening">开: {{ sector.leadingStock.openingPrice.toFixed(2) }}</div>
-          </div>
-
-          <div class="stock-action">
-            <a-button size="small">+自选</a-button>
-          </div>
-        </div>
-
-        <div class="data-grid">
-          <div class="grid-item">
-            <span class="label">5日</span>
-            <span class="value" :class="getChangeClass(sector.change_5d)">{{ sector.change_5d.toFixed(2) }}%</span>
-          </div>
-          <div class="grid-item">
-            <span class="label">20日</span>
-            <span class="value" :class="getChangeClass(sector.change_20d)">{{ sector.change_20d.toFixed(2) }}%</span>
-          </div>
-          <div class="grid-item">
-            <span class="label">净流入</span>
-            <span class="value" :class="getChangeClass(sector.netInflow)">{{ formatCurrency(sector.netInflow) }}</span>
-          </div>
         </div>
       </div>
     </div>
@@ -68,7 +69,7 @@
 
 <script setup lang="ts">
 import { reactive, computed } from 'vue';
-// 根据指示，不再导入组件，假定已全局注册
+// No component imports as per instruction
 
 interface LeadingStock {
   name: string;
@@ -90,9 +91,9 @@ interface Sector {
 }
 
 const sortOptions = [
-  { key: 'netInflow', label: '按流入金额' },
-  { key: 'hotness', label: '按热度' },
-  { key: 'change', label: '按涨幅' },
+  { key: 'netInflow', label: '净流入' },
+  { key: 'hotness', label: '热度' },
+  { key: 'change', label: '涨幅' },
 ];
 
 const sortState = reactive({
@@ -129,10 +130,7 @@ const handleSort = (key: 'netInflow' | 'hotness' | 'change') => {
   }
 };
 
-const getChangeClass = (value: number, forTag = false) => {
-  if (forTag) {
-    return value > 0 ? 'red' : 'green';
-  }
+const getChangeClass = (value: number) => {
   return { 'is-up': value > 0, 'is-down': value < 0 };
 };
 
@@ -146,94 +144,105 @@ const formatCurrency = (value: number): string => {
 
 <style scoped lang="scss">
 .industry-sector-container {
-  position: relative;
+  padding: 15px;
 }
 
 .sorter-wrapper {
-  position: sticky;
-  top: 0;
-  background-color: rgba(255, 255, 255, 0.85);
-  backdrop-filter: blur(8px);
-  padding: 12px 16px;
-  border-radius: 8px;
-  margin-bottom: 16px;
-  z-index: 10;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  display: flex;
+  justify-content: center;
+  margin-bottom: 20px;
+
+  .active-sort {
+    color: #1890ff;
+    font-weight: 500;
+  }
 }
 
-.sector-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+.sector-list {
+  display: flex;
+  flex-direction: column;
   gap: 16px;
 }
 
 .sector-card {
   background-color: #ffffff;
   border-radius: 8px;
-  padding: 16px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
   display: flex;
-  flex-direction: column;
-  gap: 12px;
+  position: relative;
+  padding: 20px;
+  padding-left: 30px; // Space for ranking number
+  overflow: hidden;
 }
 
-.card-header {
+.ranking-number {
+  position: absolute;
+  top: -1px;
+  left: -1px;
+  background-color: #1890ff;
+  color: white;
+  padding: 2px 8px;
+  border-bottom-right-radius: 8px;
+  font-size: 12px;
+  font-weight: bold;
+}
+
+.industry-data {
+  flex: 6; // Takes more space
   display: flex;
-  justify-content: space-between;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.industry-header {
+  display: flex;
   align-items: baseline;
-  .sector-name { font-size: 17px; font-weight: 600; }
-  .sector-change { font-size: 18px; font-weight: bold; }
+  gap: 12px;
+  .sector-name { font-size: 18px; font-weight: 600; }
+  .sector-change { font-size: 20px; font-weight: bold; }
 }
 
-.leading-stock-info {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 8px;
-  padding: 12px;
-  background-color: #f9f9f9;
-  border-radius: 6px;
-}
-
-.stock-identity {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  .stock-code-market { font-size: 12px; color: #888; }
-}
-
-.stock-price-details {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 4px;
-  .price-main {
-    display: flex;
-    align-items: baseline;
-    gap: 8px;
-  }
-  .price-current { font-size: 16px; font-weight: bold; }
-  .price-change { font-size: 13px; }
-  .price-opening { font-size: 12px; color: #888; }
-}
-
-.stock-action {
-  align-self: flex-start;
-}
-
-.data-grid {
+.industry-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 10px;
-  padding-top: 10px;
-  border-top: 1px solid #f0f0f0;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
 }
 
 .grid-item {
   display: flex;
   flex-direction: column;
-  .label { font-size: 12px; color: #888; margin-bottom: 2px; }
-  .value { font-size: 14px; font-weight: 500; }
+  .label { font-size: 13px; color: #888; margin-bottom: 4px; }
+  .value { font-size: 15px; font-weight: 500; }
+}
+
+.leading-stock-data {
+  flex: 4; // Takes less space
+  padding-left: 20px;
+  border-left: 1px solid #f0f0f0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 8px;
+
+  .stock-title {
+    font-size: 13px;
+    color: #888;
+    margin-bottom: 4px;
+  }
+  .stock-name-line {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    .stock-name { font-size: 16px; font-weight: 500; }
+    .stock-code { font-size: 12px; color: #aaa; }
+  }
+  .stock-price-line {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    .stock-price { font-size: 18px; font-weight: bold; }
+    .stock-change { font-size: 14px; }
+  }
 }
 
 .is-up { color: #e53935; }
