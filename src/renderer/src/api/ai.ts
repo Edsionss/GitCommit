@@ -1,4 +1,4 @@
-import type { AiConfig, ChatMessage } from '@shared/types/dtos/ai'
+import type { AiConfig, ChatMessage } from '@sharedType/ai'
 
 export const aiApi = {
   aiChat: (

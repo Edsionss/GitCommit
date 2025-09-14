@@ -9,6 +9,8 @@ import type {
   AiConfig
 } from '@type/setting'
 import _ from 'lodash' // 引入 lodash 用于深层合并
+import { storeApi } from '@api/store'
+import { message } from 'ant-design-vue'
 
 // 默认设置对象保持不变，它作为初始值和重置的依据
 const DefaultSetting: AppSettings = {
@@ -34,6 +36,25 @@ const DefaultSetting: AppSettings = {
   }
 }
 
+const storeLoadSettings = () => {
+  let result = DefaultSetting
+  try {
+    storeApi.get('AppSettings').then((settings) => {
+      if (settings) {
+        result = settings as AppSettings
+      }
+    })
+  } catch (error) {
+    message.warning('Failed to load settings from localStorage')
+  } finally {
+    return result
+  }
+}
+
+const storeSaveSettings = (value: AppSettings) => {
+  storeApi.set('AppSettings', value)
+}
+
 export const useSettingsStore = defineStore('settings', () => {
   // 1. 将一个大的 ref 拆分成多个小的、独立的 ref
   const DisplayConfig = ref<DisplayConfig>({ ...DefaultSetting.DisplayConfig })
@@ -43,10 +64,10 @@ export const useSettingsStore = defineStore('settings', () => {
   const AiConfig = ref<AiConfig>({ ...DefaultSetting.AiConfig })
 
   // 2. 初始化时，从 localStorage 加载并分别赋值
-  const savedSettingsJSON = localStorage.getItem('AppSettings')
+  const savedSettingsJSON = storeLoadSettings()
   if (savedSettingsJSON) {
     try {
-      const savedSettings: Partial<AppSettings> = JSON.parse(savedSettingsJSON)
+      const savedSettings: Partial<AppSettings> = savedSettingsJSON
       // 使用深层合并（_.merge）来安全地加载设置，防止因版本更新导致字段丢失
       DisplayConfig.value = _.merge({}, DefaultSetting.DisplayConfig, savedSettings.DisplayConfig)
       Preferences.value = _.merge({}, DefaultSetting.Preferences, savedSettings.Preferences)
@@ -69,7 +90,7 @@ export const useSettingsStore = defineStore('settings', () => {
 
   // 3. Action 现在负责保存完整的设置对象
   function saveSettings() {
-    localStorage.setItem('AppSettings', JSON.stringify(reassembleAppSettings()))
+    storeSaveSettings(JSON.parse(JSON.stringify(reassembleAppSettings())))
   }
 
   // 4. 重置 Action
