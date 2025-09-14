@@ -11,7 +11,6 @@ import type {
 import _ from 'lodash' // 引入 lodash 用于深层合并
 import { storeApi } from '@api/store'
 import { message } from 'ant-design-vue'
-import { log } from 'console'
 
 // 默认设置对象保持不变，它作为初始值和重置的依据
 const DefaultSetting: AppSettings = {

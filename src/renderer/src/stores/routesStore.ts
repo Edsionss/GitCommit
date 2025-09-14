@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import { MergeArray } from '@/utils'
+import { storeApi } from '@/api/store'
 export interface RouteRecord {
   path: string
   name: string
@@ -98,17 +99,41 @@ const defaultRoutes: RouteRecord[] = [
   }
 ]
 
+const storeLoadAppRoutes = (success: (settings: RouteRecord[]) => void = () => {}) => {
+  storeApi.get('AppRoutes').then((AppRoutes) => {
+    success(AppRoutes || defaultRoutes)
+  })
+}
+
 export const useRoutesStore = defineStore('routes', () => {
   const routes = ref<RouteRecord[]>([])
 
   function initRoutes() {
-    const savedRoutes = localStorage.getItem('appRoutes')
+    // storeLoadAppRoutes((AppRoutes) => {
+    //   if (AppRoutes) {
+    //     routes.value = MergeArray(defaultRoutes, AppRoutes, true, 'path')
+    //   } else {
+    //     routes.value = defaultRoutes
+    //     // storeApi.set('AppRoutes', JSON.parse(JSON.stringify(defaultRoutes)))
+    //     saveRoutes()
+    //   }
+    // })
+    // storeApi.get('AppRoutes').then((AppRoutes) => {
+    //   if (AppRoutes) {
+    //     routes.value = MergeArray(defaultRoutes, AppRoutes, true, 'path')
+    //   } else {
+    //     routes.value = defaultRoutes
+    //     // storeApi.set('AppRoutes', JSON.parse(JSON.stringify(defaultRoutes)))
+    //     saveRoutes()
+    //   }
+    // })
+    const savedRoutes = localStorage.getItem('AppRoutes')
     if (savedRoutes) {
       const currentRoutes = JSON.parse(savedRoutes)
       routes.value = MergeArray(defaultRoutes, currentRoutes, true, 'path')
     } else {
       routes.value = defaultRoutes
-      localStorage.setItem('appRoutes', JSON.stringify(defaultRoutes))
+      localStorage.setItem('AppRoutes', JSON.stringify(defaultRoutes))
     }
   }
 
@@ -127,8 +152,9 @@ export const useRoutesStore = defineStore('routes', () => {
     saveRoutes()
   }
 
-  function saveRoutes() {
-    localStorage.setItem('appRoutes', JSON.stringify(routes.value))
+  function saveRoutes(AppRoutes?: RouteRecord) {
+    // localStorage.setItem('AppRoutes', JSON.stringify(routes.value))
+    storeApi.set('AppRoutes', JSON.parse(JSON.stringify(AppRoutes || routes.value)))
   }
 
   initRoutes()
