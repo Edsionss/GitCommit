@@ -1,6 +1,14 @@
 <template>
   <div class="header">
     <div class="header-title">
+      <a-layout-header style="background: #fff; padding: 0">
+        <menu-unfold-outlined
+          v-if="isExpanded"
+          class="trigger"
+          @click="() => (isExpanded = !isExpanded)"
+        />
+        <menu-fold-outlined v-else class="trigger" @click="() => (isExpanded = !isExpanded)" />
+      </a-layout-header>
       <h1 class="app-title">GitCommit</h1>
       <span class="page-title">{{ currentPageTitle }}</span>
       <span class="code-container">{{ route.fullPath }}</span>
@@ -57,6 +65,7 @@
 </template>
 
 <script setup lang="ts">
+import { MenuUnfoldOutlined, MenuFoldOutlined } from '@ant-design/icons-vue'
 import { ref, computed } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import {
@@ -66,6 +75,8 @@ import {
   ReloadOutlined,
   LogoutOutlined
 } from '@ant-design/icons-vue'
+
+const isExpanded = defineModel<boolean>()
 
 const router = useRouter()
 const route = useRoute()

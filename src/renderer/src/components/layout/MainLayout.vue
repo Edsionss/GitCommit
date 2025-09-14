@@ -1,11 +1,11 @@
 <template>
   <div class="layout-container" :class="layoutClasses">
     <div class="sidebar">
-      <TheSidebar />
+      <TheSidebar v-model="isExpanded" />
     </div>
     <div class="body">
       <div class="header">
-        <TheHeader />
+        <TheHeader v-model:="isExpanded" />
       </div>
       <div class="main">
         <div class="content-area">
@@ -22,11 +22,13 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useSettingsStore } from '@/stores/settingsStore'
 import TheSidebar from './TheSidebar.vue'
 import TheHeader from './TheHeader.vue'
+
+const isExpanded = ref(false)
 
 const settingsStore = useSettingsStore()
 const { DisplayConfig } = storeToRefs(settingsStore)
@@ -36,11 +38,6 @@ const sidebarPosition = computed(() => DisplayConfig?.value?.sidebarPosition || 
 const layoutClasses = computed(() => ({
   'sidebar-right': sidebarPosition.value === 'right'
 }))
-
-onMounted(() => {
-  // Ensure theme is applied to body, which is handled by useTheme now
-  // The store loads initial state, and watchers in composables handle the rest.
-})
 </script>
 
 <style scoped>

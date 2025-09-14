@@ -1,52 +1,24 @@
 <template>
-  <div class="sidebar" :class="{ expanded: isExpanded }">
-    <div class="sidebar-header">
+  <div class="sidebar">
+    <a-layout-sider v-model:collapsed="isExpanded" :trigger="null" collapsible>
       <div class="logo">
-        <img v-if="isExpanded" :src="logoFull" alt="GitCommit Logo" class="logo-icon" />
-        <img v-else :src="logoFull" alt="GitCommit Icon" class="logo-icon" />
+        <img :src="logoFull" alt="" :class="{ fold: isExpanded }" />
       </div>
-      <div class="sidebar-toggle-button">
-        <a-button class="toggle-button" type="text" size="small" @click="toggleSidebar">
-          <template #icon>
-            <LeftOutlined v-if="isExpanded" />
-            <RightOutlined v-else />
-          </template>
-        </a-button>
-      </div>
-    </div>
 
-    <a-menu
-      v-model:selectedKeys="selectedKeys"
-      :inline-collapsed="!isExpanded"
-      class="sidebar-menu"
-      theme="light"
-      mode="inline"
-      @click="handleMenuClick"
-    >
-      <a-menu-item v-for="item in menuItems" :key="item.path">
-        <template #icon>
-          <component :is="item.icon" />
-        </template>
-        <span>{{ item.label }}</span>
-      </a-menu-item>
-    </a-menu>
-
-    <div class="sidebar-footer">
       <a-menu
         v-model:selectedKeys="selectedKeys"
-        :inline-collapsed="!isExpanded"
         theme="light"
         mode="inline"
         @click="handleMenuClick"
       >
-        <a-menu-item key="/settings">
+        <a-menu-item v-for="item in menuItems" :key="item.path">
           <template #icon>
-            <SettingOutlined />
+            <component :is="item.icon" />
           </template>
-          <span>设置</span>
+          <span>{{ item.label }}</span>
         </a-menu-item>
       </a-menu>
-    </div>
+    </a-layout-sider>
   </div>
 </template>
 
@@ -63,20 +35,19 @@ import {
   ShareAltOutlined,
   AreaChartOutlined,
   SettingOutlined,
-  LeftOutlined,
-  RightOutlined,
   SearchOutlined,
   HistoryOutlined,
   RobotOutlined
 } from '@ant-design/icons-vue'
 import type { MenuProps } from 'ant-design-vue'
 
+const isExpanded = defineModel<boolean>()
+
 const routesStore = useRoutesStore()
 const { routes } = storeToRefs(routesStore)
 const route = useRoute()
 const router = useRouter()
 
-const isExpanded = ref(true)
 const selectedKeys = ref<string[]>([route.path])
 
 // Map route names to icons
@@ -92,29 +63,10 @@ const iconMap = {
   Settings: SettingOutlined
 }
 
-const toggleSidebar = () => {
-  isExpanded.value = !isExpanded.value
-}
-
-// Watch for route changes to update selected keys
 watch(
   () => route.path,
   (newPath) => {
     selectedKeys.value = [newPath]
-  },
-  { immediate: true }
-)
-
-// Watch for sidebar state changes to dispatch events
-watch(
-  isExpanded,
-  (expanded) => {
-    document.documentElement.dataset.sidebarExpanded = expanded.toString()
-    window.dispatchEvent(
-      new CustomEvent('sidebar-state-change', {
-        detail: { expanded }
-      })
-    )
   },
   { immediate: true }
 )
@@ -136,70 +88,27 @@ const handleMenuClick: MenuProps['onClick'] = (e) => {
 }
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .sidebar {
   display: flex;
   flex-direction: column;
   height: 100%;
-  width: 60px;
   background-color: var(--bg-content);
   border-right: 1px solid var(--border-color);
   transition: width 0.3s ease;
-  overflow: hidden;
-  z-index: 40; /* 确保高于header */
-}
+  .logo {
+    padding-top: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    img {
+      padding: 10px 0;
+      height: 100px;
 
-.sidebar.expanded {
-  width: 200px;
-}
-
-.sidebar-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 19.5px;
-  border-bottom: 1px solid var(--border-color);
-  position: relative;
-  z-index: 30;
-  min-height: 60px;
-}
-
-.logo {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden;
-}
-
-.logo-icon {
-  height: 24px;
-  width: 24px;
-}
-
-.toggle-button {
-  z-index: 40;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* 增强阴影效果 */
-}
-
-.toggle-button .anticon {
-  font-size: 14px;
-}
-
-.sidebar-menu {
-  flex: 1;
-  border-right: none !important;
-}
-
-.sidebar-footer {
-  padding-bottom: 16px;
-  border-top: 1px solid var(--border-color);
-}
-
-.sidebar-footer .ant-menu {
-  border-right: none !important;
-}
-
-.anticon {
-  font-size: 16px;
+      &.fold {
+        height: 60px;
+      }
+    }
+  }
 }
 </style>
