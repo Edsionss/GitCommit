@@ -1,92 +1,75 @@
 <template>
   <div class="header">
     <div class="header-title">
-      <h1 class="app-title">GitCommit</h1>
+      <a-layout-header style="background: #fff; padding: 0">
+        <menu-unfold-outlined
+          v-if="isExpanded"
+          class="trigger"
+          @click="() => (isExpanded = !isExpanded)"
+        />
+        <menu-fold-outlined v-else class="trigger" @click="() => (isExpanded = !isExpanded)" />
+      </a-layout-header>
+      <h1 class="app-title">
+        {{ PROJECT_NAME }} <a-tag :bordered="false" color="cyan">{{ PROJECT_VERSION }}</a-tag>
+      </h1>
       <span class="page-title">{{ currentPageTitle }}</span>
+      <span class="code-container">{{ route.fullPath }}</span>
     </div>
     <div class="header-actions">
-      <div class="repo-selector">
-        <el-select v-model="currentRepo" placeholder="选择仓库" filterable>
-          <el-option
-            v-for="repo in repositories"
-            :key="repo.id"
-            :label="repo.name"
-            :value="repo.id"
-          />
-        </el-select>
-        <el-button class="add-repo-btn" circle size="small" @click="openAddRepoDialog">
-          <el-icon><Plus /></el-icon>
-        </el-button>
-      </div>
-
       <div class="user-menu">
-        <el-dropdown trigger="click">
+        <a-dropdown trigger="click">
           <div class="user-avatar">
-            <el-avatar :size="36" :src="userAvatar"></el-avatar>
-            <el-icon class="el-icon--right"><ArrowDown /></el-icon>
+            <a-avatar :size="40" :src="CognitoOcean"></a-avatar>
+            <DownOutlined />
           </div>
-          <template #dropdown>
-            <el-dropdown-menu>
-              <el-dropdown-item @click="goToSettings">
-                <el-icon><Setting /></el-icon>
+          <template #overlay>
+            <a-menu>
+              <a-menu-item key="settings" @click="goToSettings">
+                <SettingOutlined />
                 <span>设置</span>
-              </el-dropdown-item>
-              <el-dropdown-item @click="refreshApp">
-                <el-icon><RefreshRight /></el-icon>
+              </a-menu-item>
+              <a-menu-item key="refresh" @click="refreshApp">
+                <ReloadOutlined />
                 <span>刷新</span>
-              </el-dropdown-item>
-              <el-dropdown-item divided @click="exitApp">
-                <el-icon><SwitchButton /></el-icon>
+              </a-menu-item>
+              <a-menu-item key="exit" @click="exitApp">
+                <LogoutOutlined />
                 <span>退出</span>
-              </el-dropdown-item>
-            </el-dropdown-menu>
+              </a-menu-item>
+            </a-menu>
           </template>
-        </el-dropdown>
+        </a-dropdown>
       </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
+import CognitoOcean from '@/assets/img/logo/CognitoOcean.png'
+
+import { MenuUnfoldOutlined, MenuFoldOutlined } from '@ant-design/icons-vue'
 import { ref, computed } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
-import { Plus, ArrowDown, Setting, RefreshRight, SwitchButton } from '@element-plus/icons-vue'
+import {
+  PlusOutlined,
+  DownOutlined,
+  SettingOutlined,
+  ReloadOutlined,
+  LogoutOutlined
+} from '@ant-design/icons-vue'
+const PROJECT_NAME = import.meta.env.NAME
+const PROJECT_VERSION = import.meta.env.VERSION
+
+const isExpanded = defineModel<boolean>()
 
 const router = useRouter()
 const route = useRoute()
 
-// 页面标题
-const pageMap = {
-  '/': '仪表盘',
-  '/commits': '提交记录',
-  '/branches': '分支管理',
-  '/analysis': '代码分析',
-  '/reports': '报告生成',
-  '/settings': '设置'
-}
-
 const currentPageTitle = computed(() => {
-  const path = route.path
-  return pageMap[path] || '页面'
+  return route.meta.title || ''
 })
 
-// 仓库列表
-const repositories = ref([
-  { id: 1, name: 'GitCommit' },
-  { id: 2, name: 'electron-app' },
-  { id: 3, name: 'vue-project' }
-])
-
 const currentRepo = ref(1)
-
-// 用户头像
-const userAvatar = ref('https://i.pravatar.cc/150?u=gitcommit')
-
-// 打开添加仓库对话框
-const openAddRepoDialog = () => {
-  // 实际应用中会打开一个添加仓库的对话框
-  console.log('Open add repository dialog')
-}
 
 // 跳转到设置页面
 const goToSettings = () => {
@@ -114,8 +97,8 @@ const exitApp = () => {
   height: 64px;
   min-height: 64px;
   max-height: 64px;
-  background-color: var(--color-background);
-  border-bottom: 1px solid var(--color-border);
+  background-color: var(--bg-content);
+  border-bottom: 1px solid var(--border-color);
   z-index: 100;
   box-sizing: border-box;
   overflow: hidden;
@@ -129,17 +112,19 @@ const exitApp = () => {
 }
 
 .app-title {
+  font-family: Crystal;
   font-size: 18px;
-  font-weight: 600;
+  font-weight: 800;
   margin: 0;
   white-space: nowrap;
+  color: var(--text-primary);
 }
 
 .page-title {
   font-size: 16px;
-  color: var(--color-text-light);
+  color: var(--text-secondary);
   padding-left: 12px;
-  border-left: 1px solid var(--color-border);
+  border-left: 1px solid var(--border-color);
   pointer-events: none;
   user-select: none;
 }
@@ -148,16 +133,6 @@ const exitApp = () => {
   display: flex;
   align-items: center;
   gap: 20px;
-}
-
-.repo-selector {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.add-repo-btn {
-  font-size: 12px;
 }
 
 .user-menu {
@@ -170,10 +145,6 @@ const exitApp = () => {
   align-items: center;
   gap: 8px;
   cursor: pointer;
-}
-
-.el-dropdown-menu .el-icon {
-  margin-right: 8px;
 }
 
 /* 当侧边栏展开时调整头部位置 */

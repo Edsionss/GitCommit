@@ -1,4 +1,5 @@
 /// <reference types="vite/client" />
+import type { AiConfig } from '@shared/types/dtos/ai'
 
 declare module '*.vue' {
   import type { DefineComponent } from 'vue'
@@ -39,6 +40,18 @@ interface RepoHistory {
   authors?: string[]
 }
 
+interface GitCommitResult {
+  commits: GitCommit[]
+  analysisResult: any
+}
+
+// export interface AiConfig {
+//   provider: 'openai' | 'gemini' | 'anthropic' | 'kimi' | 'custom' | null
+//   apiKey: string
+//   endpoint?: string
+//   model?: string
+// }
+
 // 定义window对象上的API接口
 interface Window {
   api: {
@@ -52,7 +65,11 @@ interface Window {
     getRepoAuthors: (repoPath: string) => Promise<string[]>
 
     // 扫描Git仓库
-    scanGitRepo: (repoPath: string, options?: GitScanOptions) => Promise<GitCommit[]>
+    scanGitRepo: (
+      repoPath: string,
+      options?: GitScanOptions,
+      aiConfig?: AiConfig
+    ) => Promise<GitCommitResult>
 
     // 保存文件
     saveFile: (options: {

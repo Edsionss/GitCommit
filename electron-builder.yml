@@ -1,5 +1,5 @@
 appId: com.electron.app
-productName: gitcommit
+productName: CognitoOcean
 directories:
   buildResources: build
 files:
@@ -12,7 +12,8 @@ files:
 asarUnpack:
   - resources/**
 win:
-  executableName: gitcommit
+  executableName: CognitoOcean
+   icon: build/CognitoOcean.ico
 nsis:
   artifactName: ${name}-${version}-setup.${ext}
   shortcutName: ${productName}

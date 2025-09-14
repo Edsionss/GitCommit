@@ -1,204 +1,114 @@
 <template>
-  <div class="sidebar" :class="{ expanded: isExpanded }">
-    <div class="sidebar-header">
+  <div class="sidebar">
+    <a-layout-sider v-model:collapsed="isExpanded" :trigger="null" collapsible>
       <div class="logo">
-        <img v-if="isExpanded" :src="logoFull" alt="GitCommit Logo" class="logo-icon" />
-        <img v-else :src="logoFull" alt="GitCommit Icon" class="logo-icon" />
+        <img :src="CognitoOcean" alt="" :class="{ fold: isExpanded }" />
       </div>
-      <div class="sidebar-toggle-button">
-        <el-button class="toggle-button" circle size="small" @click="toggleSidebar">
-          <el-icon>
-            <ArrowLeft v-if="isExpanded" />
-            <ArrowRight v-else />
-          </el-icon>
-        </el-button>
-      </div>
-    </div>
 
-    <div class="sidebar-menu">
-      <router-link
-        v-for="item in menuItems"
-        :key="item.path"
-        :to="item.path"
-        class="menu-item"
-        :class="{ active: isActive(item.path) }"
+      <a-menu
+        v-model:selectedKeys="selectedKeys"
+        theme="light"
+        mode="inline"
+        @click="handleMenuClick"
       >
-        <el-icon>
-          <component :is="item.icon" />
-        </el-icon>
-        <span v-if="isExpanded" class="menu-label">{{ item.label }}</span>
-      </router-link>
-    </div>
-
-    <div class="sidebar-footer">
-      <router-link to="/settings" class="menu-item" :class="{ active: isActive('/settings') }">
-        <el-icon><Setting /></el-icon>
-        <span v-if="isExpanded" class="menu-label">设置</span>
-      </router-link>
-    </div>
+        <a-menu-item v-for="item in menuItems" :key="item.path">
+          <template #icon>
+            <component :is="item.icon" />
+          </template>
+          <span>{{ item.label }}</span>
+        </a-menu-item>
+      </a-menu>
+    </a-layout-sider>
   </div>
 </template>
 
 <script setup lang="ts">
-import logoFull from '@/assets/img/logo/LOGO1.png'
-import { ref, computed } from 'vue'
+import CognitoOcean from '@/assets/img/logo/CognitoOcean.png'
+import { computed, watch, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { storeToRefs } from 'pinia'
+import { useRoutesStore } from '@/stores/routesStore'
 import {
-  HomeFilled,
-  Document,
-  Histogram,
-  Share,
-  DataAnalysis,
-  DocumentCopy,
-  Setting,
-  ArrowLeft,
-  ArrowRight
-} from '@element-plus/icons-vue'
+  HomeOutlined,
+  FileTextOutlined,
+  BarChartOutlined,
+  ShareAltOutlined,
+  AreaChartOutlined,
+  SettingOutlined,
+  SearchOutlined,
+  HistoryOutlined,
+  RobotOutlined
+} from '@ant-design/icons-vue'
+import type { MenuProps } from 'ant-design-vue'
 
-const isExpanded = ref(true)
+const isExpanded = defineModel<boolean>()
+
+const routesStore = useRoutesStore()
+const { routes } = storeToRefs(routesStore)
 const route = useRoute()
+const router = useRouter()
 
-const toggleSidebar = () => {
-  isExpanded.value = !isExpanded.value
-  localStorage.setItem('sidebarExpanded', isExpanded.value.toString())
+const selectedKeys = ref<string[]>([route.path])
 
-  // 通知父组件侧边栏状态
-  document.documentElement.dataset.sidebarExpanded = isExpanded.value.toString()
-
-  // 全局事件分发
-  window.dispatchEvent(
-    new CustomEvent('sidebar-state-change', {
-      detail: { expanded: isExpanded.value }
-    })
-  )
+// Map route names to icons
+const iconMap = {
+  Dashboard: HomeOutlined,
+  Scan: SearchOutlined,
+  ScanHistory: HistoryOutlined,
+  Commits: FileTextOutlined,
+  BranchesView: ShareAltOutlined,
+  CodeAnalysis: BarChartOutlined,
+  Reports: AreaChartOutlined,
+  AiChat: RobotOutlined,
+  Settings: SettingOutlined
 }
 
-const menuItems = [
-  { path: '/', label: '概览', icon: HomeFilled },
-  { path: '/commits', label: '提交记录', icon: Document },
-  { path: '/branches', label: '分支管理', icon: Share },
-  { path: '/analysis', label: '代码分析', icon: DataAnalysis },
-  { path: '/reports', label: '报告生成', icon: DocumentCopy }
-]
+watch(
+  () => route.path,
+  (newPath) => {
+    selectedKeys.value = [newPath]
+  },
+  { immediate: true }
+)
 
-const isActive = (path: string): boolean => {
-  if (path === '/') {
-    return route.path === '/'
-  }
-  return route.path.startsWith(path)
+// Dynamically generate menu items from the routes store
+const menuItems = computed(() => {
+  return routes.value
+    .filter((r) => r.isMenu)
+    .sort((a, b) => a.menuOrder - b.menuOrder)
+    .map((r) => ({
+      path: r.path === '' ? '/' : `/${r.path}`,
+      label: r.meta.title,
+      icon: iconMap[r.name] || FileTextOutlined // Fallback icon
+    }))
+})
+
+const handleMenuClick: MenuProps['onClick'] = (e) => {
+  router.push(e.key as string)
 }
-
-// 组件初始化时读取侧边栏状态
-const initSidebar = () => {
-  const savedState = localStorage.getItem('sidebarExpanded')
-  if (savedState !== null) {
-    isExpanded.value = savedState === 'true'
-  }
-
-  // 通知父组件侧边栏状态
-  document.documentElement.dataset.sidebarExpanded = isExpanded.value.toString()
-
-  // 全局事件分发
-  window.dispatchEvent(
-    new CustomEvent('sidebar-state-change', {
-      detail: { expanded: isExpanded.value }
-    })
-  )
-}
-
-// 组件初始化时读取侧边栏状态
-initSidebar()
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .sidebar {
   display: flex;
   flex-direction: column;
   height: 100%;
-  width: 60px;
-  background-color: var(--color-background-soft);
-  border-right: 1px solid var(--color-border);
+  background-color: var(--bg-content);
+  border-right: 1px solid var(--border-color);
   transition: width 0.3s ease;
-  overflow: hidden;
-  z-index: 40; /* 确保高于header */
-}
+  .logo {
+    padding-top: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    img {
+      padding: 10px 0;
+      height: 100px;
 
-.sidebar.expanded {
-  width: 200px;
-}
-
-.sidebar-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 16px;
-  border-bottom: 1px solid var(--color-border);
-  position: relative;
-  z-index: 30;
-  min-height: 60px;
-}
-
-.logo {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden;
-}
-
-.logo-icon {
-  height: 24px;
-  width: 24px;
-}
-
-.toggle-button {
-  z-index: 40;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* 增强阴影效果 */
-}
-
-.toggle-button .el-icon {
-  font-size: 14px;
-}
-
-.sidebar-menu {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  padding: 16px 0;
-  overflow-y: auto;
-}
-
-.sidebar-footer {
-  padding: 16px 0;
-  border-top: 1px solid var(--color-border);
-}
-
-.menu-item {
-  display: flex;
-  align-items: center;
-  padding: 12px 16px;
-  color: var(--color-text);
-  text-decoration: none;
-  margin: 4px 8px;
-  border-radius: 8px;
-  transition: all 0.2s ease;
-}
-
-.menu-item:hover {
-  background-color: var(--color-background-mute);
-}
-
-.menu-item.active {
-  background-color: var(--el-color-primary-light-9);
-  color: var(--el-color-primary);
-}
-
-.menu-label {
-  margin-left: 12px;
-  font-size: 14px;
-  white-space: nowrap;
-}
-
-.el-icon {
-  font-size: 18px;
+      &.fold {
+        height: 60px;
+      }
+    }
+  }
 }
 </style>

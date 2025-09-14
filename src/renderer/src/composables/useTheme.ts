@@ -1,122 +1,98 @@
-import { ref } from 'vue'
-
-type Theme = 'light' | 'dark'
-type ThemeMode = 'light' | 'dark' | 'system'
+import { watch, computed } from 'vue'
+import { storeToRefs } from 'pinia'
+import { useSettingsStore } from '@/stores/settingsStore'
+import type { ThemeMode } from '@type/setting'
 
 export function useTheme() {
-  const currentTheme = ref<Theme>('light')
-  const themeMode = ref<ThemeMode>('light')
-
+  const settingsStore = useSettingsStore()
+  const { DisplayConfig } = storeToRefs(settingsStore)
   // 应用主题到DOM
-  const applyTheme = (theme: Theme) => {
-    // 设置文档根元素的data-theme属性
+  const applyTheme = (theme: ThemeMode) => {
     document.documentElement.setAttribute('data-theme', theme)
-    // 同时设置body元素以确保全局应用
     document.body.setAttribute('data-theme', theme)
-
-    // 更新META标签以改善移动端体验
     const metaThemeColor = document.querySelector('meta[name="theme-color"]')
+    const metaContent = theme === 'dark' ? '#141414' : '#ffffff'
     if (metaThemeColor) {
-      metaThemeColor.setAttribute('content', theme === 'dark' ? '#1e1e1e' : '#ffffff')
+      metaThemeColor.setAttribute('content', metaContent)
     } else {
-      // 如果不存在则创建
       const meta = document.createElement('meta')
       meta.name = 'theme-color'
-      meta.content = theme === 'dark' ? '#1e1e1e' : '#ffffff'
+      meta.content = metaContent
       document.head.appendChild(meta)
-    }
-
-    currentTheme.value = theme
-    localStorage.setItem('theme', theme)
-    console.log(`主题已应用: ${theme}`)
-  }
-
-  // 设置主题模式
-  const setThemeMode = (mode: ThemeMode) => {
-    console.log(`设置主题模式: ${mode}`)
-    themeMode.value = mode
-    localStorage.setItem('themeMode', mode)
-
-    if (mode === 'system') {
-      // 如果是系统模式，则应用系统主题
-      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches
-      applyTheme(prefersDark ? 'dark' : 'light')
-    } else {
-      // 否则直接应用明确的主题
-      applyTheme(mode as Theme)
     }
   }
 
   // 获取系统主题
-  const getSystemTheme = (): Theme => {
+  const getSystemTheme = (): ThemeMode => {
     return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
   }
 
-  // 初始化主题
-  const initTheme = () => {
-    // 强制清除可能存在的内联样式
-    document.documentElement.style.removeProperty('background-color')
-    document.body.style.removeProperty('background-color')
-
-    const savedThemeMode = localStorage.getItem('themeMode') as ThemeMode | null
-
-    if (savedThemeMode) {
-      themeMode.value = savedThemeMode
-      console.log(`读取到保存的主题模式: ${savedThemeMode}`)
-
-      if (savedThemeMode === 'system') {
-        applyTheme(getSystemTheme())
-      } else {
-        applyTheme(savedThemeMode as Theme)
-      }
-    } else {
-      // 没有保存的模式，看是否有旧版的theme设置
-      const savedTheme = localStorage.getItem('theme') as Theme | null
-      if (savedTheme) {
-        // 兼容旧版设置
-        themeMode.value = savedTheme
-        applyTheme(savedTheme)
-        // 更新为新格式
-        localStorage.setItem('themeMode', savedTheme)
-      } else {
-        // 全新安装，默认使用浅色主题
-        setThemeMode('light')
-      }
-    }
-  }
-
-  // 切换明暗主题
-  const toggleTheme = () => {
-    if (themeMode.value === 'system') {
-      // 如果当前是系统模式，切换到明确模式
-      setThemeMode(currentTheme.value === 'light' ? 'dark' : 'light')
-    } else {
-      // 在明暗主题间切换
-      setThemeMode(themeMode.value === 'light' ? 'dark' : 'light')
-    }
-  }
-
   // 监听系统主题变化
+  let systemListenerInit = false
   const setupSystemThemeListener = () => {
+    if (systemListenerInit) return
+    systemListenerInit = true
     window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
-      const currentMode = localStorage.getItem('themeMode')
-      console.log(`系统主题变化，当前模式: ${currentMode}，系统深色: ${e.matches}`)
-
-      if (currentMode === 'system') {
+      if (DisplayConfig.value?.theme === 'system') {
         applyTheme(e.matches ? 'dark' : 'light')
       }
     })
   }
 
-  // 初始化
-  initTheme()
-  setupSystemThemeListener()
+  // 获取主题值
+  const getThemeMode = (themeMode: ThemeMode) => {
+    if (themeMode === 'system') {
+      return getSystemTheme()
+    }
+    return themeMode
+  }
+
+  // 应用动画设置
+  const applyAnimations = (enabled: boolean) => {
+    document.documentElement.classList.toggle('no-animations', !enabled)
+  }
+
+  // 应用缩放
+  const applyZoom = (zoomValue: string | number) => {
+    document.documentElement.style.zoom = String(zoomValue)
+  }
+
+  const settingEffects = {
+    theme: (themeValue) => {
+      applyTheme(getThemeMode(themeValue))
+      setupSystemThemeListener()
+    },
+    animations: (animationsValue) => {
+      applyAnimations(animationsValue)
+    },
+    zoom: (zoomValue) => {
+      applyZoom(zoomValue)
+    }
+    // ✨ 未来添加新设置，只需要在这里加一行！✨
+  }
+
+  watch(
+    DisplayConfig,
+    (newConfig, oldConfig) => {
+      if (!newConfig) return
+      const isInitialRun = !oldConfig
+
+      // 遍历副作用映射对象
+      for (const key in settingEffects) {
+        const effectFn = settingEffects[key]
+        const newValue = newConfig[key]
+        const oldValue = oldConfig?.[key]
+
+        // 如果是首次运行，或新旧值不同，则执行副作用
+        if (isInitialRun || newValue !== oldValue) {
+          effectFn(newValue)
+        }
+      }
+    },
+    { deep: true, immediate: true }
+  )
 
   return {
-    currentTheme,
-    themeMode,
-    setThemeMode,
-    toggleTheme,
-    applyTheme
+    effectiveTheme: computed(() => getThemeMode(DisplayConfig.value?.theme || 'light'))
   }
 }

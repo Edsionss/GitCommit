@@ -1,0 +1,126 @@
+<template>
+  <div class="routes-view-container">
+    <a-table :columns="columns" :data-source="routes" :row-key="'name'" :pagination="false">
+      <template #expandedRowRender="{ record }">
+        <div class="expanded-row-content">
+          <strong>路由名称 (Name):</strong>
+          <span class="commit-message-pre">{{ record.name }}</span>
+          <a-divider type="vertical" />
+          <strong>菜单名称:</strong> <span class="commit-message-pre">{{ record.meta.title }}</span>
+          <a-divider type="vertical" />
+          <strong>组件路径:</strong>
+          <span class="commit-message-pre">{{ record.componentPath }}</span>
+        </div>
+      </template>
+      <template #bodyCell="{ column, record }">
+        <template v-if="column.key === 'isMenu'">
+          <a-switch
+            :checked="record.isMenu"
+            @change="(checked) => onFieldChange(record, 'isMenu', checked)"
+          />
+        </template>
+        <template v-if="column.key === 'keepAlive'">
+          <a-switch
+            :checked="record.meta.keepAlive"
+            @change="(checked) => onFieldChange(record, 'keepAlive', checked)"
+          />
+        </template>
+        <template v-if="column.key === 'action'">
+          <a-space>
+            <a-button type="link" size="small" @click="openEditModal(record)">编辑</a-button>
+            <a-popconfirm title="确定删除此路由吗?" @confirm="handleDelete(record.name)">
+              <a-button danger type="link" size="small">删除</a-button>
+            </a-popconfirm>
+          </a-space>
+        </template>
+      </template>
+    </a-table>
+
+    <EditRouteDialog
+      :open="isModalVisible"
+      :route-data="editingRoute"
+      @update:open="isModalVisible = false"
+      @submit="handleUpdate"
+    />
+  </div>
+</template>
+
+<script setup lang="ts">
+import { ref } from 'vue'
+import { storeToRefs } from 'pinia'
+import { useRoutesStore, RouteRecord } from '@/stores/routesStore'
+import EditRouteDialog from './EditRouteDialog.vue'
+import { message } from 'ant-design-vue'
+
+const routesStore = useRoutesStore()
+const { routes } = storeToRefs(routesStore)
+
+const isModalVisible = ref(false)
+const editingRoute = ref<RouteRecord | null>(null)
+
+const columns = [
+  { title: '菜单名称', dataIndex: ['meta', 'title'], key: 'title' },
+  { title: '菜单顺序', key: 'menuOrder', width: 120 },
+  { title: '路由路径', dataIndex: 'path', key: 'path' },
+  { title: '设为菜单', key: 'isMenu', width: 100 },
+  { title: '缓存页面', key: 'keepAlive', width: 100 },
+  { title: '操作', key: 'action', width: 150 }
+]
+
+const openEditModal = (route: RouteRecord) => {
+  editingRoute.value = { ...route } // Use a copy for editing
+  isModalVisible.value = true
+}
+
+const handleDelete = (routeName: string) => {
+  routesStore.deleteRoute(routeName)
+  message.success('路由已删除')
+}
+
+const handleUpdate = (updatedRoute: RouteRecord) => {
+  routesStore.updateRoute(updatedRoute.name, updatedRoute)
+  isModalVisible.value = false
+  message.success('路由已更新')
+}
+
+const onFieldChange = (record: RouteRecord, field: string, value: any) => {
+  const updatedRecord = { ...record }
+  if (field === 'isMenu') {
+    updatedRecord.isMenu = value
+  } else if (field === 'keepAlive') {
+    updatedRecord.meta = { ...updatedRecord.meta, keepAlive: value }
+  } else if (field === 'menuOrder') {
+    if (value === null) return // Do not update if value is cleared
+    updatedRecord.menuOrder = value
+  }
+  routesStore.updateRoute(record.name, updatedRecord)
+  message.success('设置已更新')
+}
+</script>
+
+<style scoped lang="scss">
+.routes-view-container {
+}
+.page-title {
+  font-size: 24px;
+  font-weight: bold;
+  margin-bottom: 20px;
+}
+.expanded-row-content {
+  background-color: #f9f9f9;
+  padding-left: 20px;
+
+  strong {
+    margin-right: 5px;
+  }
+}
+.commit-message-pre {
+  white-space: pre-wrap;
+  word-break: break-all;
+  font-family: monospace;
+  font-size: 12px;
+  background-color: #eee;
+  padding: 5px;
+  border-radius: 3px;
+}
+</style>

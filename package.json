@@ -1,9 +1,10 @@
 {
-  "name": "gitcommit",
+  "name": "cognitoocean",
+  "project": "CognitoOcean",
   "version": "1.0.0",
-  "description": "An Electron application with Vue and TypeScript",
+  "description": " Charting Your Path to Clarity.By Electron with Vue and TypeScript",
   "main": "./out/main/index.js",
-  "author": "example.com",
+  "author": "Bocean.com",
   "homepage": "https://electron-vite.org",
   "scripts": {
     "format": "prettier --write .",
@@ -22,28 +23,72 @@
   "dependencies": {
     "@electron-toolkit/preload": "^3.0.1",
     "@electron-toolkit/utils": "^4.0.0",
+    "@google/genai": "^1.15.0",
+    "@imengyu/vue3-context-menu": "^1.5.2",
+    "@types/marked": "^6.0.0",
+    "@types/uuid": "^10.0.0",
+    "ant-design-vue": "^4.2.3",
+    "axios": "^1.11.0",
+    "better-sqlite3": "^12.2.0",
+    "chart.js": "^4.4.3",
+    "chartjs-adapter-date-fns": "^3.0.0",
+    "chartjs-chart-financial": "^0.2.1",
+    "cheerio": "^1.1.2",
+    "date-fns": "^4.1.0",
     "dayjs": "^1.11.10",
-    "echarts": "^5.6.0",
+    "electron-store": "^10.1.0",
     "electron-updater": "^6.3.9",
-    "element-plus": "^2.5.6",
     "exceljs": "^4.4.0",
     "jspdf": "^2.5.2",
     "jspdf-autotable": "^3.8.4",
+    "lodash": "^4.17.21",
     "marked": "^15.0.8",
+    "openai": "^5.13.1",
+    "pinia": "^2.2.0",
+    "puppeteer-core": "^24.20.0",
     "simple-git": "^3.22.0",
-    "vue-router": "^4.5.0"
+    "technicalindicators": "^3.1.0",
+    "uuid": "^11.1.0",
+    "vue-chartjs": "^5.3.1",
+    "vue-router": "^4.5.0",
+    "yahoo-finance2": "^2.13.3"
   },
   "devDependencies": {
     "@electron-toolkit/tsconfig": "^1.0.1",
+    "@types/better-sqlite3": "^7.6.13",
     "@types/node": "^22.13.13",
     "@vitejs/plugin-vue": "^5.2.3",
     "electron": "^35.0.3",
     "electron-builder": "^25.1.8",
     "electron-vite": "^3.1.0",
     "prettier": "^3.5.3",
+    "sass": "^1.90.0",
     "typescript": "^5.8.2",
     "vite": "^6.2.3",
     "vue": "^3.5.13",
     "vue-tsc": "^2.2.8"
+  },
+  "build": {
+    "appId": "com.electron.app",
+    "productName": "CognitoOcean",
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "out/**/*"
+    ],
+    "win": {
+      "icon": "build/CognitoOcean.ico"
+    },
+    "mac": {
+      "icon": "build/CognitoOcean.icns"
+    },
+    "linux": {
+      "icon": "build/CognitoOcean.png",
+      "target": [
+        "AppImage",
+        "deb"
+      ]
+    }
   }
 }

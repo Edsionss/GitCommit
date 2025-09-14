@@ -1,0 +1,44 @@
+[
+  {
+    "path": "src/renderer/src/components/Table.vue",
+    "changes": 28,
+    "additions": 542,
+    "deletions": 238,
+    "changeFrequency": "高频"
+  },
+  {
+    "path": "src/renderer/src/views/Dashboard.vue",
+    "changes": 24,
+    "additions": 486,
+    "deletions": 210,
+    "changeFrequency": "高频"
+  },
+  {
+    "path": "src/renderer/src/store/index.ts",
+    "changes": 18,
+    "additions": 326,
+    "deletions": 187,
+    "changeFrequency": "中频"
+  },
+  {
+    "path": "src/renderer/src/api/repository.ts",
+    "changes": 15,
+    "additions": 245,
+    "deletions": 132,
+    "changeFrequency": "中频"
+  },
+  {
+    "path": "src/renderer/src/components/Header.vue",
+    "changes": 12,
+    "additions": 168,
+    "deletions": 95,
+    "changeFrequency": "中频"
+  },
+  {
+    "path": "src/renderer/src/utils/formatters.ts",
+    "changes": 8,
+    "additions": 112,
+    "deletions": 64,
+    "changeFrequency": "低频"
+  }
+]

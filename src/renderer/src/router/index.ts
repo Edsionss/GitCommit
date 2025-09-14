@@ -1,55 +1,32 @@
-import { createRouter, createWebHashHistory } from 'vue-router'
-import Dashboard from '../views/Dashboard.vue'
+import { createRouter, createWebHashHistory, RouteRecordRaw, Router } from 'vue-router'
 import MainLayout from '../components/layout/MainLayout.vue'
+import NotFound from '@views/404NotFound.vue'
+import { useRoutesStore, RouteRecord } from '@/stores/routesStore'
 
-const routes = [
-  {
-    path: '/',
-    component: MainLayout,
-    children: [
-      {
-        path: '',
-        name: 'Dashboard',
-        component: Dashboard,
-        meta: { title: '仪表盘' }
-      },
-      {
-        path: 'commits',
-        name: 'Commits',
-        component: () => import('../views/CommitsView1.vue'),
-        meta: { title: '提交记录' }
-      },
-      {
-        path: 'analysis',
-        name: 'CodeAnalysis',
-        component: () => import('../views/CodeAnalysis.vue'),
-        meta: { title: '代码分析' }
-      },
-      {
-        path: 'reports',
-        name: 'Reports',
-        component: () => import('../views/Reports.vue'),
-        meta: { title: '报告生成' }
-      },
-      {
-        path: 'branches',
-        name: 'BranchesView',
-        component: () => import('../views/BranchesView.vue'),
-        meta: { title: '分支管理' }
-      },
-      {
-        path: 'settings',
-        name: 'Settings',
-        component: () => import('../views/Settings.vue'),
-        meta: { title: '设置' }
-      }
-    ]
-  }
-]
+const modules = import.meta.glob('@views/**/*.vue')
 
 const router = createRouter({
   history: createWebHashHistory(),
-  routes
+  routes: [] // Initialize with no routes
 })
+
+export function addDynamicRoutes(routerInstance: Router) {
+  const routesStore = useRoutesStore() // This is now safe to call
+
+  const mainLayoutRoute: RouteRecordRaw = {
+    path: '/',
+    component: MainLayout,
+    children: routesStore.routes.map((route: RouteRecord): RouteRecordRaw => {
+      return {
+        path: route.path,
+        name: route.name,
+        component: modules[route.componentPath.replace('@views', '/src/views')] || NotFound,
+        meta: route.meta
+      } as RouteRecordRaw
+    })
+  }
+
+  routerInstance.addRoute(mainLayoutRoute)
+}
 
 export default router

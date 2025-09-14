@@ -1,19 +1,15 @@
-import './assets/styles/main.css'
+import './assets/styles/index.css'
 
 import { createApp } from 'vue'
 import App from './App.vue'
-import router from './router'
-import ElementPlus from 'element-plus'
-import 'element-plus/dist/index.css'
-import * as ElementPlusIconsVue from '@element-plus/icons-vue'
-import zhCn from 'element-plus/es/locale/lang/zh-cn.mjs'
+import router, { addDynamicRoutes } from './router'
+import { createPinia } from 'pinia'
+import Antd from 'ant-design-vue'
+import 'ant-design-vue/dist/reset.css' // Use reset.css for a cleaner start
+import ContextMenu from '@imengyu/vue3-context-menu'
+import '@imengyu/vue3-context-menu/lib/vue3-context-menu.css'
 
 const app = createApp(App)
-
-// 注册所有Element Plus图标
-for (const [key, component] of Object.entries(ElementPlusIconsVue)) {
-  app.component(key, component)
-}
 
 // 全局错误处理
 app.config.errorHandler = (err, vm, info) => {
@@ -22,11 +18,16 @@ app.config.errorHandler = (err, vm, info) => {
   console.info('错误信息:', info)
 }
 
+// 1. Install Pinia
+app.use(createPinia())
+
+// 2. Add dynamic routes AFTER Pinia is initialized
+addDynamicRoutes(router)
+
+// 3. Install the router
 app.use(router)
-app.use(ElementPlus, {
-  locale: zhCn,
-  size: 'default',
-  zIndex: 3000
-})
+
+app.use(Antd)
+app.use(ContextMenu)
 
 app.mount('#app')

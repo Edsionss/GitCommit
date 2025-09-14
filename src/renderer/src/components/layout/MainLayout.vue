@@ -1,15 +1,20 @@
 <template>
-  <div class="layout-container">
+  <div class="layout-container" :class="layoutClasses">
     <div class="sidebar">
-      <TheSidebar />
+      <TheSidebar v-model="isExpanded" />
     </div>
     <div class="body">
       <div class="header">
-        <TheHeader />
+        <TheHeader v-model:="isExpanded" />
       </div>
       <div class="main">
         <div class="content-area">
-          <router-view />
+          <router-view v-slot="{ Component, route }">
+            <keep-alive v-if="route.meta.keepAlive">
+              <component :is="Component" :key="route.fullPath" />
+            </keep-alive>
+            <component v-if="!route.meta.keepAlive" :is="Component" :key="route.fullPath" />
+          </router-view>
         </div>
       </div>
     </div>
@@ -17,20 +22,22 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted } from 'vue'
+import { computed, onMounted, ref } from 'vue'
+import { storeToRefs } from 'pinia'
+import { useSettingsStore } from '@/stores/settingsStore'
 import TheSidebar from './TheSidebar.vue'
 import TheHeader from './TheHeader.vue'
-import { useTheme } from '../../composables/useTheme'
 
-const { currentTheme } = useTheme()
+const isExpanded = ref(false)
 
-onMounted(() => {
-  // 确保主题应用到body上
-  const dataTheme = document.documentElement.getAttribute('data-theme')
-  if (dataTheme) {
-    document.body.setAttribute('data-theme', dataTheme)
-  }
-})
+const settingsStore = useSettingsStore()
+const { DisplayConfig } = storeToRefs(settingsStore)
+
+const sidebarPosition = computed(() => DisplayConfig?.value?.sidebarPosition || 'left')
+
+const layoutClasses = computed(() => ({
+  'sidebar-right': sidebarPosition.value === 'right'
+}))
 </script>
 
 <style scoped>
@@ -39,11 +46,22 @@ onMounted(() => {
   width: 100%;
   height: 100vh;
   overflow: hidden;
+  flex-direction: row;
+}
+
+.layout-container.sidebar-right {
+  flex-direction: row-reverse;
 }
 
 .sidebar {
   height: 100%;
   z-index: 20;
+  border-right: 1px solid var(--color-border);
+}
+
+.layout-container.sidebar-right .sidebar {
+  border-right: none;
+  border-left: 1px solid var(--color-border);
 }
 
 .body {
@@ -68,11 +86,12 @@ onMounted(() => {
   flex-direction: column;
   overflow: hidden;
   position: relative;
+  background-color: var(--bg-color);
 }
 
 .content-area {
   flex: 1;
-  padding: 24px;
+  padding: 10px;
   width: 100%;
   box-sizing: border-box;
   overflow: auto;
