@@ -1,4 +1,4 @@
-# gitcommit
+# CognitoOcean
 
 An Electron application with Vue and TypeScript
 

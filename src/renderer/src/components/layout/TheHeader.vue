@@ -9,7 +9,9 @@
         />
         <menu-fold-outlined v-else class="trigger" @click="() => (isExpanded = !isExpanded)" />
       </a-layout-header>
-      <h1 class="app-title">GitCommit</h1>
+      <h1 class="app-title">
+        {{ PROJECT_NAME }} <a-tag :bordered="false" color="cyan">{{ PROJECT_VERSION }}</a-tag>
+      </h1>
       <span class="page-title">{{ currentPageTitle }}</span>
       <span class="code-container">{{ route.fullPath }}</span>
     </div>
@@ -75,6 +77,8 @@ import {
   ReloadOutlined,
   LogoutOutlined
 } from '@ant-design/icons-vue'
+const PROJECT_NAME = import.meta.env.NAME
+const PROJECT_VERSION = import.meta.env.VERSION
 
 const isExpanded = defineModel<boolean>()
 

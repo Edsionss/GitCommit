@@ -1,8 +1,8 @@
-# GitCommit 后端架构分层分析 - Kiro 评估报告
+# CognitoOcean 后端架构分层分析 - Kiro 评估报告
 
 ## 项目概述
 
-GitCommit 是一个基于 Electron + Vue + TypeScript 的桌面应用程序，专注于 Git 仓库分析和提交记录管理。本文档对其后端架构的分层设计进行深入分析和评估。
+CognitoOcean 是一个基于 Electron + Vue + TypeScript 的桌面应用程序，专注于 Git 仓库分析和提交记录管理。本文档对其后端架构的分层设计进行深入分析和评估。
 
 ## 当前架构概览
 
@@ -141,7 +141,7 @@ export async function validateRepositoryPath(repoPath: string) {
 ```typescript
 // 建议的Repository接口设计
 interface GitRepository {
-  scanCommits(repoPath: string, options: GitScanOptions): Promise<GitCommit[]>
+  scanCommits(repoPath: string, options: GitScanOptions): Promise<CognitoOcean[]>
   getRepositoryInfo(path: string): Promise<RepoInfo>
   validateRepository(path: string): Promise<boolean>
 }
@@ -323,4 +323,4 @@ interface SecurityService {
 
 ---
 
-_本分析报告基于 Kiro 架构评估标准，为 GitCommit 项目的后续优化提供指导方向。_
+_本分析报告基于 Kiro 架构评估标准，为 CognitoOcean 项目的后续优化提供指导方向。_

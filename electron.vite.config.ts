@@ -1,6 +1,20 @@
 import { resolve } from 'path'
 import { defineConfig, externalizeDepsPlugin } from 'electron-vite'
 import vue from '@vitejs/plugin-vue'
+import packageJson from './package.json'
+
+// 自定义插件，用于替换 HTML 中的变量
+function htmlPlugin() {
+  return {
+    name: 'html-transform',
+    transformIndexHtml(html) {
+      return html
+        .replace(/%__APP_PRODUCT_NAME__%/g, packageJson.project)
+        .replace(/%__APP_VERSION__%/g, packageJson.version)
+      // 你可以根据需要添加更多替换
+    }
+  }
+}
 
 export default defineConfig({
   main: {
@@ -35,6 +49,14 @@ export default defineConfig({
     plugins: [externalizeDepsPlugin()]
   },
   renderer: {
+    define: {
+      'import.meta.env.VERSION': JSON.stringify(packageJson.version),
+      'import.meta.env.NAME': JSON.stringify(packageJson.project),
+      'import.meta.env.desc': JSON.stringify(packageJson.description),
+      __APP_VERSION__: JSON.stringify(packageJson.version),
+      __APP_PRODUCT_NAME__: JSON.stringify(packageJson.project),
+      __APP_DESC__: JSON.stringify(packageJson.description)
+    },
     resolve: {
       alias: {
         '@renderer': resolve('src/renderer/src'),
@@ -52,6 +74,6 @@ export default defineConfig({
         '@utils': resolve('src/renderer/src/utils')
       }
     },
-    plugins: [vue()]
+    plugins: [vue(), htmlPlugin()]
   }
 })
