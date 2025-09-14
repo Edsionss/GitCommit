@@ -11,6 +11,7 @@ import type {
 import _ from 'lodash' // 引入 lodash 用于深层合并
 import { storeApi } from '@api/store'
 import { message } from 'ant-design-vue'
+import { log } from 'console'
 
 // 默认设置对象保持不变，它作为初始值和重置的依据
 const DefaultSetting: AppSettings = {
@@ -36,19 +37,10 @@ const DefaultSetting: AppSettings = {
   }
 }
 
-const storeLoadSettings = () => {
-  let result = DefaultSetting
-  try {
-    storeApi.get('AppSettings').then((settings) => {
-      if (settings) {
-        result = settings as AppSettings
-      }
-    })
-  } catch (error) {
-    message.warning('Failed to load settings from localStorage')
-  } finally {
-    return result
-  }
+const storeLoadSettings = (success: (settings: AppSettings) => void = () => {}) => {
+  storeApi.get('AppSettings').then((settings) => {
+    success(settings || DefaultSetting)
+  })
 }
 
 const storeSaveSettings = (value: AppSettings) => {
@@ -64,20 +56,21 @@ export const useSettingsStore = defineStore('settings', () => {
   const AiConfig = ref<AiConfig>({ ...DefaultSetting.AiConfig })
 
   // 2. 初始化时，从 localStorage 加载并分别赋值
-  const savedSettingsJSON = storeLoadSettings()
-  if (savedSettingsJSON) {
-    try {
-      const savedSettings: Partial<AppSettings> = savedSettingsJSON
-      // 使用深层合并（_.merge）来安全地加载设置，防止因版本更新导致字段丢失
-      DisplayConfig.value = _.merge({}, DefaultSetting.DisplayConfig, savedSettings.DisplayConfig)
-      Preferences.value = _.merge({}, DefaultSetting.Preferences, savedSettings.Preferences)
-      GitConfig.value = _.merge({}, DefaultSetting.GitConfig, savedSettings.GitConfig)
-      SystemConfig.value = _.merge({}, DefaultSetting.SystemConfig, savedSettings.SystemConfig)
-      AiConfig.value = _.merge({}, DefaultSetting.AiConfig, savedSettings.AiConfig)
-    } catch (e) {
-      console.error('Failed to parse settings from localStorage', e)
+  storeLoadSettings((settings) => {
+    if (settings) {
+      try {
+        const savedSettings: Partial<AppSettings> = settings
+        // 使用深层合并（_.merge）来安全地加载设置，防止因版本更新导致字段丢失
+        DisplayConfig.value = _.merge({}, DefaultSetting.DisplayConfig, savedSettings.DisplayConfig)
+        Preferences.value = _.merge({}, DefaultSetting.Preferences, savedSettings.Preferences)
+        GitConfig.value = _.merge({}, DefaultSetting.GitConfig, savedSettings.GitConfig)
+        SystemConfig.value = _.merge({}, DefaultSetting.SystemConfig, savedSettings.SystemConfig)
+        AiConfig.value = _.merge({}, DefaultSetting.AiConfig, savedSettings.AiConfig)
+      } catch (e) {
+        console.error('Failed to parse settings from localStorage', e)
+      }
     }
-  }
+  })
 
   // 内部函数，用于将分散的 state 重新组合成一个对象以便保存
   const reassembleAppSettings = (): AppSettings => ({
