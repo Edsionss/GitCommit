@@ -7,7 +7,7 @@ import { DatabaseHelper } from './DatabaseHelper'
 import { createTableSQL } from './TableDesign'
 
 // 1. 创建唯一的数据库连接实例
-const dbPath = path.join(app.getPath('userData'), 'my-app.db')
+const dbPath = path.join(app.getPath('userData'), 'CognitoOcean.db')
 const db = new Database(dbPath, { verbose: console.log }) // 加上 verbose 方便调试
 
 // 2. 初始化数据库表结构
