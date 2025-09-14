@@ -13,6 +13,7 @@ asarUnpack:
   - resources/**
 win:
   executableName: CognitoOcean
+   icon: build/CognitoOcean.ico
 nsis:
   artifactName: ${name}-${version}-setup.${ext}
   shortcutName: ${productName}

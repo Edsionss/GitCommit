@@ -67,5 +67,28 @@
     "vite": "^6.2.3",
     "vue": "^3.5.13",
     "vue-tsc": "^2.2.8"
+  },
+  "build": {
+    "appId": "com.electron.app",
+    "productName": "CognitoOcean",
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "out/**/*"
+    ],
+    "win": {
+      "icon": "build/CognitoOcean.ico"
+    },
+    "mac": {
+      "icon": "build/CognitoOcean.icns"
+    },
+    "linux": {
+      "icon": "build/CognitoOcean.png",
+      "target": [
+        "AppImage",
+        "deb"
+      ]
+    }
   }
 }
