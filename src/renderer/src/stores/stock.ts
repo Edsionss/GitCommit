@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import { ref, reactive } from 'vue'
-import { StockData } from '@/shared/types/dtos/stock'
+import { StockData } from '@sharedType/stock'
 
 // 从 localStorage 加载持久化的数据
 const loadWatchListFromStorage = (): Map<string, StockData> => {
