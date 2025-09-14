@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CognitoOcean</title>
+
+    <!-- 假设你的CSS文件名为 styles.css -->
+  </head>
+  <style>
+    .mirror-text {
+      font-size: 72px;
+      font-weight: bold;
+      /* 移除原有的纯色设置 */
+      /* color: #333; */
+      text-align: center;
+      margin-top: 50px;
+      position: relative;
+      z-index: 1;
+
+      /* 添加渐变颜色 */
+      background: linear-gradient(to right, #ff7e5f, #feb47b); /* 你的渐变颜色 */
+      -webkit-background-clip: text; /* 仅在文字区域显示背景 */
+      background-clip: text;
+      color: transparent; /* 将文字颜色设置为透明，以便看到背景渐变 */
+    }
+
+    .mirror-text::after {
+      content: attr(data-text);
+      position: absolute;
+      top: 100%;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      color: transparent;
+      background: linear-gradient(to bottom, rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0));
+      -webkit-background-clip: text;
+      background-clip: text;
+      transform: scaleY(-1);
+      transform-origin: top;
+      opacity: 0.6;
+      filter: blur(2px);
+    }
+  </style>
+  <body>
+    <div class="mirror-text" data-text="Hello Mirror">CognitoOcean</div>
+  </body>
+</html>

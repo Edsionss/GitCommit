@@ -2,7 +2,7 @@
   <div class="sidebar">
     <a-layout-sider v-model:collapsed="isExpanded" :trigger="null" collapsible>
       <div class="logo">
-        <img :src="logoFull" alt="" :class="{ fold: isExpanded }" />
+        <img :src="CognitoOcean" alt="" :class="{ fold: isExpanded }" />
       </div>
 
       <a-menu
@@ -23,7 +23,7 @@
 </template>
 
 <script setup lang="ts">
-import logoFull from '@/assets/img/logo/LOGO1.png'
+import CognitoOcean from '@/assets/img/logo/CognitoOcean.png'
 import { computed, watch, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { storeToRefs } from 'pinia'

@@ -16,32 +16,10 @@
       <span class="code-container">{{ route.fullPath }}</span>
     </div>
     <div class="header-actions">
-      <div class="repo-selector">
-        <a-select
-          v-model:value="currentRepo"
-          placeholder="选择仓库"
-          show-search
-          :filter-option="filterOption"
-        >
-          <a-select-option v-for="repo in repositories" :key="repo.id" :value="repo.id">{{
-            repo.name
-          }}</a-select-option>
-        </a-select>
-        <a-button
-          class="add-repo-btn"
-          type="primary"
-          shape="circle"
-          size="small"
-          @click="openAddRepoDialog"
-        >
-          <template #icon><PlusOutlined /></template>
-        </a-button>
-      </div>
-
       <div class="user-menu">
         <a-dropdown trigger="click">
           <div class="user-avatar">
-            <a-avatar :size="36" :src="userAvatar"></a-avatar>
+            <a-avatar :size="40" :src="CognitoOcean"></a-avatar>
             <DownOutlined />
           </div>
           <template #overlay>
@@ -67,6 +45,8 @@
 </template>
 
 <script setup lang="ts">
+import CognitoOcean from '@/assets/img/logo/CognitoOcean.png'
+
 import { MenuUnfoldOutlined, MenuFoldOutlined } from '@ant-design/icons-vue'
 import { ref, computed } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
@@ -89,28 +69,7 @@ const currentPageTitle = computed(() => {
   return route.meta.title || ''
 })
 
-// 仓库列表
-const repositories = ref([
-  { id: 1, name: 'GitCommit' },
-  { id: 2, name: 'electron-app' },
-  { id: 3, name: 'vue-project' }
-])
-
 const currentRepo = ref(1)
-
-// 用户头像
-const userAvatar = ref('https://i.pravatar.cc/150?u=gitcommit')
-
-// Select组件的过滤方法
-const filterOption = (input: string, option: any) => {
-  return option.children[0].toLowerCase().indexOf(input.toLowerCase()) >= 0
-}
-
-// 打开添加仓库对话框
-const openAddRepoDialog = () => {
-  // 实际应用中会打开一个添加仓库的对话框
-  console.log('Open add repository dialog')
-}
 
 // 跳转到设置页面
 const goToSettings = () => {
@@ -173,16 +132,6 @@ const exitApp = () => {
   display: flex;
   align-items: center;
   gap: 20px;
-}
-
-.repo-selector {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.add-repo-btn {
-  font-size: 12px;
 }
 
 .user-menu {
