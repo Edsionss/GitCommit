@@ -112,6 +112,7 @@ const exitApp = () => {
 }
 
 .app-title {
+  font-family: Aurora;
   font-size: 18px;
   font-weight: 600;
   margin: 0;

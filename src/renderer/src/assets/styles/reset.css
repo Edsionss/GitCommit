@@ -1,5 +1,8 @@
 /* CSS 重置样式 */
-
+@font-face {
+  font-family: 'Aurora';
+  src: url('../font/Aurora-2.ttf');
+}
 /* 基础元素重置 */
 *,
 *::before,

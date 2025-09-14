@@ -4,7 +4,7 @@ import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 // import icon from '../../resources/icon.png?asset'
 import { promises as fs } from 'fs'
 import * as path from 'path'
-import icon from '../../build/CognitoOcean.png?asset' // Vite/TypeScript 可能会帮你处理这个导入，但路径更可靠
+import icon from '../../build/CognitoOcean1.png?asset' // Vite/TypeScript 可能会帮你处理这个导入，但路径更可靠
 
 import { registerIpcHandlers } from '@handlers/ipcHandlers'
 
@@ -18,7 +18,7 @@ function createWindow(): void {
     height: 800,
     show: false,
     autoHideMenuBar: true,
-    icon: join(__dirname, '../../build/CognitoOcean.png'), // Windows和Linux会使用这个
+    icon: join(__dirname, '../../build/CognitoOcean1.png'), // Windows和Linux会使用这个
     ...(process.platform === 'linux' ? { icon } : {}),
     webPreferences: {
       preload: join(__dirname, '../preload/index.js'),
