@@ -3,6 +3,10 @@
   font-family: 'Aurora';
   src: url('../font/Aurora-2.ttf');
 }
+@font-face {
+  font-family: 'Crystal';
+  src: url('../font/Crystal-Regular-2.ttf');
+}
 /* 基础元素重置 */
 *,
 *::before,

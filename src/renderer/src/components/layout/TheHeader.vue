@@ -112,9 +112,9 @@ const exitApp = () => {
 }
 
 .app-title {
-  font-family: Aurora;
+  font-family: Crystal;
   font-size: 18px;
-  font-weight: 600;
+  font-weight: 800;
   margin: 0;
   white-space: nowrap;
   color: var(--text-primary);
