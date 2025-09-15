@@ -48,7 +48,6 @@ const settingsStore = useSettingsStore()
 const { AiConfig, GitConfig } = storeToRefs(settingsStore)
 const clearScanConfigOnFinish = computed(() => GitConfig.value.clearScanConfigOnFinish)
 
-const { getGitCommits } = storeToRefs(scanStore)
 const defaultFormState = {
   selectedFields: ['repository', 'commitId', 'shortHash', 'author', 'date', 'message'],
   statsDimension: 'none',
@@ -141,7 +140,6 @@ const startScan = async () => {
     )
     addLog(`扫描完成，共找到 ${commits.length} 条提交记录`, 'success')
     hasResults.value = true
-    scanStore.setGitCommits(commits)
     const newRecord = {
       repoPath: form.repoPath || '未知仓库',
       scanTime: dayjs().toISOString(),
@@ -174,21 +172,7 @@ const stopScan = () => {
   }
 }
 
-const saveResults = async () => {
-  try {
-    const commits = getGitCommits.value
-    if (commits.length === 0) return message.warning('没有可保存的结果')
-    const result = await exportApi.exportCommits(commits, form.outputFormat)
-    if (result) {
-      addLog(`结果已保存到: ${result}`, 'success')
-      message.success('保存成功')
-    }
-  } catch (error) {
-    const errorMsg = error instanceof Error ? error.message : String(error)
-    addLog(`保存失败: ${errorMsg}`, 'error')
-    message.error('保存失败')
-  }
-}
+const saveResults = async () => {}
 
 const scanAuthors = () => {
   if (settingsFormRef.value) {

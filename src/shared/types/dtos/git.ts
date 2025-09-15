@@ -1,3 +1,16 @@
+//扫描记录接口
+export interface ScanHistoryItem {
+  id: string
+  analysisResult: string
+  log: string[]
+  repoPath: string
+  results: GitCommit[]
+  scanOptions: GitScanOptions
+  scanTime: string
+  status: string
+  totalCommits: number
+}
+
 // Git提交记录接口
 export interface GitCommit {
   repository: string
@@ -35,8 +48,11 @@ export interface ScanProgress {
   commits?: GitCommit[]
 }
 
+// 仓库历史记录接口
 export interface RepoHistoryItem {
   path: string
   lastAccessed: string
 }
+
+// 进度回调
 export type ProgressCallback = (progress: ScanProgress) => void
