@@ -41,20 +41,24 @@ CognitoOcean 是一个使用 Electron、Vue 3 和 TypeScript 构建的现代化�
 ### 安装与运行
 
 1.  **克隆仓库**
+
     ```bash
     git clone https://github.com/your-username/cognitoocean.git
     cd cognitoocean
     ```
 
 2.  **安装依赖**
+
     ```bash
     pnpm install
     ```
 
 3.  **启动开发环境**
+
     ```bash
     pnpm dev
     ```
+
     此命令将以热重载模式启动应用程序，方便进行开发和调试。
 
 4.  **打包应用程序**
@@ -71,7 +75,7 @@ CognitoOcean 是一个使用 Electron、Vue 3 和 TypeScript 构建的现代化�
       ```bash
       pnpm build:linux
       ```
-    打包后的文件将位于项目根目录下的 `release` 文件夹中。
+      打包后的文件将位于项目根目录下的 `release` 文件夹中。
 
 ## 📂 项目结构
 

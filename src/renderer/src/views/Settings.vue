@@ -1,5 +1,5 @@
 <template>
-  <div class="settings-container page-container">
+  <div class="settings-container">
     <DisplayConfig />
 
     <Preferences />
@@ -11,7 +11,8 @@
     <AiConfig />
 
     <a-card title="菜单与路由管理">
-      <RouterSetting />
+      <!-- <RouterSetting /> -->
+      <MenuManagement />
     </a-card>
     <a-float-button-group trigger="hover" type="primary" :right="'24px'">
       <template #tooltip>
@@ -38,6 +39,7 @@ import GitConfig from '@renderer/components/SettingsView/GitConfig.vue'
 import SystemConfig from '@/components/SettingsView/SystemConfig.vue'
 import AiConfig from '@renderer/components/SettingsView/AiConfig.vue'
 import RouterSetting from '@/components/SettingsView/RouterSetting.vue'
+import MenuManagement from './MenuManagement.vue'
 import { SaveOutlined, RedoOutlined } from '@ant-design/icons-vue'
 
 // 使用 Pinia Store
@@ -70,8 +72,6 @@ const resetSettings = () => {
 <style scoped>
 .settings-container {
   width: 100%;
-  padding-bottom: 30px;
-  padding-top: 20px; /* 添加顶部内边距 */
 }
 
 .page-title {

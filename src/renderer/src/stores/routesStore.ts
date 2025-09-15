@@ -2,106 +2,113 @@ import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import { MergeArray } from '@/utils'
 import { storeApi } from '@/api/store'
-export interface RouteRecord {
-  path: string
-  name: string
-  componentPath: string
-  meta: {
-    title: string
-    keepAlive?: boolean
-  }
-  isMenu: boolean
-  menuOrder: number
-  children?: RouteRecord[]
-}
+import type { RouteRecord } from '@type/MenuManagement'
 
-const defaultRoutes: RouteRecord[] = [
+export const mockFlatRoutes: RouteRecord[] = [
   {
+    id: '1',
+    parentId: null,
     path: 'dashboard',
     name: 'Dashboard',
-    componentPath: '@views/Dashboard.vue',
-    meta: { title: '仪表盘', keepAlive: true },
-    isMenu: true,
-    menuOrder: 0
+    componentPath: 'Dashboard',
+    meta: { title: '仪表盘', keepAlive: '1' },
+    hide: '0',
+    menuOrder: 0,
+    menuIcon: 'DashboardOutlined'
   },
   {
+    id: '2',
+    parentId: null,
     path: 'scan',
     name: 'Scan',
-    componentPath: '@views/BasicSettings.vue',
-    meta: { title: '开始扫描', keepAlive: false },
-    isMenu: true,
-    menuOrder: 10
+    componentPath: 'BasicSettings',
+    meta: { title: '开始扫描', keepAlive: '0' },
+    hide: '0',
+    menuOrder: 10,
+    menuIcon: 'ScanOutlined'
   },
   {
+    id: '3',
+    parentId: null,
     path: 'scanHistory',
     name: 'ScanHistory',
-    componentPath: '@views/ScanHistory.vue',
-    meta: { title: '扫描记录', keepAlive: true },
-    isMenu: true,
-    menuOrder: 20
+    componentPath: 'ScanHistory',
+    meta: { title: '扫描记录', keepAlive: '1' },
+    hide: '0',
+    menuOrder: 20,
+    menuIcon: 'HistoryOutlined'
   },
-
   {
+    id: '4',
+    parentId: null,
     path: 'branches',
     name: 'Branches',
-    componentPath: '@views/BranchesView.vue',
-    meta: { title: '分支管理', keepAlive: true },
-    isMenu: true,
-    menuOrder: 40
+    componentPath: 'BranchesView',
+    meta: { title: '分支管理', keepAlive: '1' },
+    hide: '0',
+    menuOrder: 40,
+    menuIcon: 'BranchesOutlined'
   },
   {
+    id: '5',
+    parentId: null,
     path: 'analysis',
     name: 'Analysis',
-    componentPath: '@views/CodeAnalysis.vue',
-    meta: { title: '代码分析', keepAlive: true },
-    isMenu: true,
-    menuOrder: 50
+    componentPath: 'CodeAnalysis',
+    meta: { title: '代码分析', keepAlive: '1' },
+    hide: '0',
+    menuOrder: 50,
+    menuIcon: 'CodeOutlined'
   },
   {
+    id: '6',
+    parentId: null,
     path: 'reports',
     name: 'Reports',
-    componentPath: '@views/Reports.vue',
-    meta: { title: '报告生成', keepAlive: true },
-    isMenu: true,
-    menuOrder: 60
+    componentPath: 'Reports',
+    meta: { title: '报告生成', keepAlive: '1' },
+    hide: '0',
+    menuOrder: 60,
+    menuIcon: 'FileTextOutlined'
   },
   {
+    id: '7',
+    parentId: null,
     path: 'aiChat',
     name: 'AiChat',
-    componentPath: '@views/AiChat.vue',
-    meta: { title: 'AI Chat', keepAlive: false },
-    isMenu: true,
-    menuOrder: 70
+    componentPath: 'AiChat',
+    meta: { title: 'AI Chat', keepAlive: '0' },
+    hide: '0',
+    menuOrder: 70,
+    menuIcon: 'RobotOutlined'
   },
   {
+    id: '8',
+    parentId: null,
     path: 'stock',
     name: 'Stock',
-    componentPath: '@views/Stock.vue',
-    meta: { title: '股票分析', keepAlive: true },
-    isMenu: true,
-    menuOrder: 80
+    componentPath: 'Stock',
+    meta: { title: '股票分析', keepAlive: '1' },
+    hide: '0',
+    menuOrder: 80,
+    menuIcon: 'StockOutlined'
   },
   {
-    path: 'routes',
-    name: 'RoutesView',
-    componentPath: '@views/RoutesView.vue',
-    meta: { title: '路由管理', keepAlive: false },
-    isMenu: false,
-    menuOrder: 999
-  },
-  {
+    id: '10',
+    parentId: null,
     path: 'settings',
     name: 'Settings',
-    componentPath: '@views/Settings.vue',
-    meta: { title: '设置', keepAlive: false },
-    isMenu: false,
-    menuOrder: 1000
+    componentPath: 'Settings',
+    meta: { title: '设置', keepAlive: '0' },
+    hide: '0',
+    menuOrder: 1000,
+    menuIcon: 'SettingOutlined' // 设置页面通常有个图标，即使不在主菜单
   }
 ]
 
 const storeLoadAppRoutes = (success: (settings: RouteRecord[]) => void = () => {}) => {
   storeApi.get('AppRoutes').then((AppRoutes) => {
-    success(AppRoutes || defaultRoutes)
+    success(AppRoutes || mockFlatRoutes)
   })
 }
 
@@ -130,10 +137,10 @@ export const useRoutesStore = defineStore('routes', () => {
     const savedRoutes = localStorage.getItem('AppRoutes')
     if (savedRoutes) {
       const currentRoutes = JSON.parse(savedRoutes)
-      routes.value = MergeArray(defaultRoutes, currentRoutes, true, 'path')
+      routes.value = MergeArray(mockFlatRoutes, currentRoutes, true, 'path')
     } else {
-      routes.value = defaultRoutes
-      localStorage.setItem('AppRoutes', JSON.stringify(defaultRoutes))
+      routes.value = mockFlatRoutes
+      // localStorage.setItem('AppRoutes', JSON.stringify(mockFlatRoutes))
     }
   }
 

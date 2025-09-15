@@ -1,14 +1,45 @@
 import { createRouter, createWebHashHistory, RouteRecordRaw, Router } from 'vue-router'
-import MainLayout from '../components/layout/MainLayout.vue'
+import MainLayout from '@components/layout/MainLayout.vue'
 import NotFound from '@views/404NotFound.vue'
-import { useRoutesStore, RouteRecord } from '@/stores/routesStore'
+import { useRoutesStore } from '@/stores/routesStore'
+import type { RouteRecord } from '@type/MenuManagement'
 
-const modules = import.meta.glob('@views/**/*.vue')
+const views = import.meta.glob('@views/**/*.vue')
+const components = import.meta.glob('@components/**/*.vue')
 
 const router = createRouter({
   history: createWebHashHistory(),
-  routes: [] // Initialize with no routes
+  routes: [
+    {
+      path: '/:pathMatch(.*)*',
+      name: 'NotFound',
+      component: NotFound,
+      meta: {
+        title: '404 Not Found',
+        keepAlive: '0'
+      }
+    }
+  ] // Initialize with no routes
 })
+const calculatePath = (path: string) => {
+  let pathMap = views,
+    replaceString = 'views',
+    pathPrefix = '@' + replaceString,
+    pathSuffix = '/'
+  if (path.includes('@')) {
+    pathPrefix = ''
+    pathSuffix = ''
+    if (path.includes('@components')) {
+      pathMap = components
+      replaceString = 'components'
+    }
+  }
+  path = pathPrefix + path
+  return (
+    pathMap[path.replace('@' + replaceString, '/src/' + replaceString + pathSuffix) + '.vue'] ||
+    NotFound
+  )
+}
 
 export function addDynamicRoutes(routerInstance: Router) {
   const routesStore = useRoutesStore() // This is now safe to call
@@ -20,12 +51,12 @@ export function addDynamicRoutes(routerInstance: Router) {
       return {
         path: route.path,
         name: route.name,
-        component: modules[route.componentPath.replace('@views', '/src/views')] || NotFound,
+        // component: views[route.componentPath.replace('@views', '/src/views')] || NotFound,
+        component: calculatePath(route.componentPath),
         meta: route.meta
       } as RouteRecordRaw
     })
   }
-
   routerInstance.addRoute(mainLayoutRoute)
 }
 

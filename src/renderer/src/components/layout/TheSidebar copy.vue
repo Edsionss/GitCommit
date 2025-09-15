@@ -74,7 +74,6 @@ watch(
 // Dynamically generate menu items from the routes store
 const menuItems = computed(() => {
   return routes.value
-    .filter((r) => r.isMenu)
     .sort((a, b) => a.menuOrder - b.menuOrder)
     .map((r) => ({
       path: r.path === '' ? '/' : `/${r.path}`,

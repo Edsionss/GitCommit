@@ -2,7 +2,7 @@
   "name": "cognitoocean",
   "project": "CognitoOcean",
   "version": "1.0.0",
-  "description": " Charting Your Path to Clarity.By Electron with Vue and TypeScript",
+  "description": "Charting Your Path to Clarity.By Electron with Vue and TypeScript",
   "main": "./out/main/index.js",
   "author": "Bocean.com",
   "homepage": "https://electron-vite.org",

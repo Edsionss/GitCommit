@@ -11,12 +11,30 @@
         mode="inline"
         @click="handleMenuClick"
       >
-        <a-menu-item v-for="item in menuItems" :key="item.path">
-          <template #icon>
-            <component :is="item.icon" />
-          </template>
-          <span>{{ item.label }}</span>
-        </a-menu-item>
+        <div v-for="item in menuItems" :key="item.path">
+          <a-sub-menu :key="item.path" v-if="item.children && item.children.length">
+            <template #title>
+              <span>
+                <component :is="item.icon" />
+                <span>{{ item.label }}</span>
+              </span>
+            </template>
+            <a-menu-item v-for="menu in item.children" :key="menu.path">
+              <template #icon>
+                <component :is="menu.icon" />
+              </template>
+              <span>{{ menu.label }}</span>
+            </a-menu-item>
+          </a-sub-menu>
+          <div v-else>
+            <a-menu-item :key="item.path">
+              <template #icon>
+                <component :is="item.icon" />
+              </template>
+              <span>{{ item.label }}</span>
+            </a-menu-item>
+          </div>
+        </div>
       </a-menu>
     </a-layout-sider>
   </div>
@@ -28,18 +46,9 @@ import { computed, watch, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { storeToRefs } from 'pinia'
 import { useRoutesStore } from '@/stores/routesStore'
-import {
-  HomeOutlined,
-  FileTextOutlined,
-  BarChartOutlined,
-  ShareAltOutlined,
-  AreaChartOutlined,
-  SettingOutlined,
-  SearchOutlined,
-  HistoryOutlined,
-  RobotOutlined
-} from '@ant-design/icons-vue'
+import * as iconMap from '@ant-design/icons-vue' // 引入所有图标
 import type { MenuProps } from 'ant-design-vue'
+import { buildTree } from '@utils/index'
 
 const isExpanded = defineModel<boolean>()
 
@@ -49,19 +58,6 @@ const route = useRoute()
 const router = useRouter()
 
 const selectedKeys = ref<string[]>([route.path])
-
-// Map route names to icons
-const iconMap = {
-  Dashboard: HomeOutlined,
-  Scan: SearchOutlined,
-  ScanHistory: HistoryOutlined,
-  Commits: FileTextOutlined,
-  BranchesView: ShareAltOutlined,
-  CodeAnalysis: BarChartOutlined,
-  Reports: AreaChartOutlined,
-  AiChat: RobotOutlined,
-  Settings: SettingOutlined
-}
 
 watch(
   () => route.path,
@@ -73,18 +69,18 @@ watch(
 
 // Dynamically generate menu items from the routes store
 const menuItems = computed(() => {
-  return routes.value
-    .filter((r) => r.isMenu)
-    .sort((a, b) => a.menuOrder - b.menuOrder)
-    .map((r) => ({
+  return buildTree(
+    routes.value.map((r) => ({
+      ...r,
       path: r.path === '' ? '/' : `/${r.path}`,
       label: r.meta.title,
-      icon: iconMap[r.name] || FileTextOutlined // Fallback icon
+      icon: iconMap[r.menuIcon || 'FileTextOutlined']
     }))
+  )
 })
 
-const handleMenuClick: MenuProps['onClick'] = (e) => {
-  router.push(e.key as string)
+const handleMenuClick: MenuProps['onClick'] = ({ item, key, keyPath }) => {
+  router.push(key as string)
 }
 </script>
 
@@ -97,7 +93,7 @@ const handleMenuClick: MenuProps['onClick'] = (e) => {
   border-right: 1px solid var(--border-color);
   transition: width 0.3s ease;
   .logo {
-    padding-top: 5px;
+    padding: 10px 0;
     display: flex;
     align-items: center;
     justify-content: center;
