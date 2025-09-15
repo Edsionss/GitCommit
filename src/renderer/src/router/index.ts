@@ -9,17 +9,7 @@ const components = import.meta.glob('@components/**/*.vue')
 
 const router = createRouter({
   history: createWebHashHistory(),
-  routes: [
-    {
-      path: '/:pathMatch(.*)*',
-      name: 'NotFound',
-      component: NotFound,
-      meta: {
-        title: '404 Not Found',
-        keepAlive: '0'
-      }
-    }
-  ] // Initialize with no routes
+  routes: [] // Initialize with no routes
 })
 const calculatePath = (path: string) => {
   let pathMap = views,
@@ -57,6 +47,15 @@ export function addDynamicRoutes(routerInstance: Router) {
       } as RouteRecordRaw
     })
   }
+  mainLayoutRoute.children.push({
+    path: '/:pathMatch(.*)*',
+    name: 'NotFound',
+    component: NotFound,
+    meta: {
+      title: '404 Not Found',
+      keepAlive: '0'
+    }
+  })
   routerInstance.addRoute(mainLayoutRoute)
 }
 
