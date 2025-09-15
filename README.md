@@ -103,6 +103,20 @@ CognitoOcean 是一个使用 Electron、Vue 3 和 TypeScript 构建的现代化�
 └── electron.vite.config.ts # Electron-Vite 配置文件
 ```
 
+## 📚 功能开发流程
+
+1.  **定义需求**: 确定要开发的功能，并确定功能所需的 API、数据来源和 UI 设计。
+2.  **设计 UI**: 根据需求，设计用户界面，并确定组件的布局和交互方式。
+3.  **实现UI**: 开发前端UI代码，并确保与 UI 设计一致，使用 Ant Design Vue UI库构建。
+4.  **设计后台功能逻辑**: 根据需求，设计后台功能逻辑，并确定与前端UI的交互方式。
+5.  **开发功能的server层 在/src/main/features/servers文件夹下**: 开发后台功能逻辑，并确保与前端UI的交互方式一致。
+6.  **开发功能的handler层 在/src/main/features/handlers文件夹下**: 开发ipc注册方法和初始化方法。
+7.  **填写\src\main\features\handlers\ipcHandlers.ts 文件，导入handler的注册方法并使用**: 注册ipc方法。
+8.  **完成\src\main\preload 文件夹下的方法注册以及类型填写**: 绑定ipc方法到Window并填写类型。
+9.  **封装前端API 文件路径为：\src\renderer\src\api**: 封装前端可直接调用的api接口。
+10. **前端UI页面调用封装好的API接口**: 完成前后端的完整交互逻辑。
+11. **测试**: 确保功能在开发过程中没有错误，并确保功能在打包后的应用程序中正确运行。
+
 ## 🤝 贡献
 
 欢迎对 CognitoOcean 做出贡献！如果您有任何想法、建议或发现了 Bug，请随时提交 Issues 或 Pull Requests。
