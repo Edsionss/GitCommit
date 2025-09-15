@@ -1,4 +1,4 @@
-# CognitoOcean ![一只可爱的猫](/build/CognitoOcean1.png)
+# CognitoOcean <img src="/build/CognitoOcean1.png"  alt="App Screenshot" height="80px">
 
 > Charting Your Path to Clarity.
 
