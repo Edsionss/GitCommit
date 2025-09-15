@@ -49,8 +49,6 @@ const { AiConfig, GitConfig } = storeToRefs(settingsStore)
 const clearScanConfigOnFinish = computed(() => GitConfig.value.clearScanConfigOnFinish)
 
 const defaultFormState = {
-  selectedFields: ['repository', 'commitId', 'shortHash', 'author', 'date', 'message'],
-  statsDimension: 'none',
   repoPath: '',
   scanSubfolders: true,
   selectedRepos: [],
@@ -59,7 +57,7 @@ const defaultFormState = {
   authorFilter: [],
   dateRange: [dayjs().startOf('month'), dayjs()],
   outputFormat: 'json',
-  AutoAiAnalysis: true,
+  AutoAiAnalysis: false,
   analysisRules: `
     1.根据这段提交记录的日期先得到其中的工作日
     2.根据提交内容和提交代码行数以及提交信息进行综合分析
@@ -109,7 +107,6 @@ const validateRepoPath = async (path: string) => {
 
 const startScan = async () => {
   if (!form.repoPath) return message.warning('请选择Git仓库路径')
-  if (form.selectedFields.length === 0) return message.warning('请至少选择一个字段')
   if (form.scanSubfolders && form.selectedRepos.length === 0)
     return message.warning('请至少选择一个子仓库进行扫描')
   if (!form.scanSubfolders && repoStatus.value !== 'valid')
@@ -120,7 +117,6 @@ const startScan = async () => {
   const scanOptions = {
     authorFilter: [...form.authorFilter],
     dateRange: form.dateRange.map((d) => d.format('YYYY-MM-DD HH:mm:ss')) as [string, string],
-    selectedFields: [...form.selectedFields],
     maxCommits: form.maxCommits || undefined,
     branches: [...form.branches],
     scanSubfolders: form.scanSubfolders,

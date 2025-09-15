@@ -32,7 +32,6 @@ export interface GitCommit {
 export interface GitScanOptions {
   authorFilter?: string[]
   dateRange?: [string, string]
-  selectedFields: string[]
   maxCommits?: number
   branches?: string[]
   scanSubfolders?: boolean

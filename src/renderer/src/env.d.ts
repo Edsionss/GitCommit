@@ -28,7 +28,6 @@ interface GitCommit {
 interface GitScanOptions {
   authorFilter?: string
   dateRange?: [string, string]
-  selectedFields: string[]
   maxCommits?: number
   branch?: string
 }

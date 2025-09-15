@@ -3,52 +3,6 @@
     <a-card class="settings-card">
       <template #title>
         <div class="card-header">
-          <div>字段与统计配置</div>
-          <div @click="filterFiledShow = !filterFiledShow" style="cursor: pointer">
-            <DownOutlined v-if="!filterFiledShow" />
-            <UpOutlined v-else />
-          </div>
-        </div>
-      </template>
-      <div class="head-container" v-show="filterFiledShow">
-        <a-form :model="localForm" layout="vertical">
-          <a-form-item label="字段选择">
-            <a-checkbox-group v-model:value="localForm.selectedFields">
-              <a-checkbox
-                :value="check.value"
-                v-for="check in checkboxOptions"
-                :key="check.value"
-                >{{ check.label }}</a-checkbox
-              >
-            </a-checkbox-group>
-          </a-form-item>
-
-          <div class="form-row">
-            <label class="form-row-label">统计选项</label>
-            <a-select
-              v-model:value="localForm.statsDimension"
-              placeholder="选择统计维度"
-              style="width: 200px"
-            >
-              <a-select-option
-                :value="select.value"
-                v-for="select in selectOptions"
-                :key="select.value"
-                >{{ select.label }}</a-select-option
-              >
-            </a-select>
-          </div>
-          <div class="form-row">
-            <label class="form-row-label">自动AI分析</label>
-            <a-switch v-model:checked="localForm.AutoAiAnalysis" />
-          </div>
-        </a-form>
-      </div>
-    </a-card>
-
-    <a-card class="settings-card">
-      <template #title>
-        <div class="card-header">
           <span>仓库与过滤配置</span>
           <div @click="repoFilterShow = !repoFilterShow" style="cursor: pointer">
             <DownOutlined v-if="!repoFilterShow" />
@@ -294,6 +248,10 @@
               <a-select-option value="markdown">Markdown</a-select-option>
             </a-select>
           </a-form-item>
+          <div class="form-row">
+            <label class="form-row-label">自动AI分析</label>
+            <a-switch v-model:checked="localForm.AutoAiAnalysis" />
+          </div>
         </a-form>
       </div>
     </a-card>
@@ -331,26 +289,6 @@ const props = defineProps({
 const filterFiledShow: any = ref(true)
 const repoFilterShow: any = ref(true)
 
-const checkboxOptions = [
-  { value: 'repository', label: '仓库名称' },
-  { value: 'repoPath', label: '仓库完整路径' },
-  { value: 'commitId', label: '完整提交ID' },
-  { value: 'shortHash', label: '短提交ID' },
-  { value: 'author', label: '作者' },
-  { value: 'email', label: '邮箱' },
-  { value: 'date', label: '日期' },
-  { value: 'message', label: '提交消息' },
-  { value: 'body', label: '详细描述' },
-  { value: 'filesChanged', label: '变更文件数' },
-  { value: 'insertions', label: '新增行数' },
-  { value: 'deletions', label: '删除行数' }
-]
-const selectOptions = [
-  { value: 'author', label: '按作者统计' },
-  { value: 'repository', label: '按仓库统计' },
-  { value: 'date', label: '按日期统计' },
-  { value: 'none', label: '不按任何' }
-]
 const emit = defineEmits(['update:form', 'add-log', 'validate-repo-path', 'update:repoStatus'])
 
 const localForm = reactive(props.form)

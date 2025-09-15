@@ -14,7 +14,7 @@ app.commandLine.appendSwitch('remote-debugging-port', DEBUG_PORT)
 function createWindow(): void {
   // Create the browser window.
   const mainWindow = new BrowserWindow({
-    width: 1700,
+    width: 2000,
     height: 800,
     show: false,
     autoHideMenuBar: true,

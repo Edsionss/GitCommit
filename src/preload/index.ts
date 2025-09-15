@@ -6,7 +6,6 @@ import type { AiConfig } from '@shared/types/dtos/ai'
 interface GitScanOptions {
   authorFilter?: string
   dateRange?: [string, string]
-  selectedFields: string[]
   maxCommits?: number
   branch?: string
   scanSubfolders?: boolean
