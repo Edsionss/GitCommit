@@ -1,4 +1,4 @@
-# CognitoOcean
+# CognitoOcean ![一只可爱的猫](/build/CognitoOcean1.png)
 
 > Charting Your Path to Clarity.
 
