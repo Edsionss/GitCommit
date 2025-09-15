@@ -1,5 +1,4 @@
 /// <reference types="vite/client" />
-import type { AiConfig } from '@shared/types/dtos/ai'
 
 declare module '*.vue' {
   import type { DefineComponent } from 'vue'
