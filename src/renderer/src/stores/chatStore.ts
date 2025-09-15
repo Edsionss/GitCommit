@@ -1,7 +1,6 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
-import { v4 as uuidv4 } from 'uuid'
-
+import { nanoid } from 'nanoid'
 export interface Message {
   sender: 'user' | 'ai'
   text: string
@@ -59,7 +58,7 @@ export const useChatStore = defineStore('chat', () => {
 
   function createNewSession() {
     const newSession: ChatSession = {
-      id: uuidv4(),
+      id: nanoid(),
       name: '新会话',
       startTime: new Date().toISOString(),
       messages: [{ sender: 'ai', text: '您好！有什么可以帮助您的吗？' }]

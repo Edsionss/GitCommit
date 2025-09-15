@@ -34,7 +34,7 @@ import MenuList from '@components/MenuManagement/MenuList.vue'
 import MenuModal from '@components/MenuManagement/MenuModal.vue'
 import type { RouteRecord } from '@sharedType/MenuManagement'
 import { buildTree } from '@utils/index'
-import { v4 as uuidv4 } from 'uuid' // 使用 uuid 生成唯一ID
+import { nanoid } from 'nanoid' // 使用 uuid 生成唯一ID
 import { useRoutesStore } from '@/stores/routesStore'
 const routesStore = useRoutesStore()
 const { routes } = storeToRefs(routesStore)
@@ -122,7 +122,7 @@ const handleModalOk = async (formData: Omit<RouteRecord, 'id' | 'children'>) => 
     // 新增逻辑
     const newMenuItem: RouteRecord = {
       ...formData,
-      id: uuidv4() // 生成唯一ID
+      id: nanoid() // 生成唯一ID
     }
     routes.value.push(newMenuItem)
     message.success('新增成功')

@@ -20,12 +20,6 @@ importers:
       '@imengyu/vue3-context-menu':
         specifier: ^1.5.2
         version: 1.5.2
-      '@types/marked':
-        specifier: ^6.0.0
-        version: 6.0.0
-      '@types/uuid':
-        specifier: ^10.0.0
-        version: 10.0.0
       ant-design-vue:
         specifier: ^4.2.3
         version: 4.2.6(vue@3.5.13(typescript@5.8.3))
@@ -74,6 +68,9 @@ importers:
       marked:
         specifier: ^15.0.8
         version: 15.0.8
+      nanoid:
+        specifier: ^5.1.5
+        version: 5.1.5
       openai:
         specifier: ^5.13.1
         version: 5.13.1(ws@8.18.3)(zod@3.25.76)
@@ -89,9 +86,6 @@ importers:
       technicalindicators:
         specifier: ^3.1.0
         version: 3.1.0
-      uuid:
-        specifier: ^11.1.0
-        version: 11.1.0
       vue-chartjs:
         specifier: ^5.3.1
         version: 5.3.2(chart.js@4.5.0)(vue@3.5.13(typescript@5.8.3))
@@ -750,10 +744,6 @@ packages:
   '@types/keyv@3.1.4':
     resolution: {integrity: sha512-BQ5aZNSCpj7D6K2ksrRCTmKRLEpnPvWDiLPfoGyhZ++8YtiK9d/3DBKPJgry359X/P1PfruyYwvnvwFjuEiEIg==}
 
-  '@types/marked@6.0.0':
-    resolution: {integrity: sha512-jmjpa4BwUsmhxcfsgUit/7A9KbrC48Q0q8KvnY107ogcjGgTFDlIL3RpihNpx2Mu1hM4mdFQjoVc4O6JoGKHsA==}
-    deprecated: This is a stub types definition. marked provides its own type definitions, so you do not need this installed.
-
   '@types/ms@2.1.0':
     resolution: {integrity: sha512-GsCCIZDE/p3i96vtEqx+7dBUGXrc7zeSK3wwPHIaRThS+9OhWIXRqzs4d6k1SVU8g91DrNRWxWUGhp5KXQb2VA==}
 
@@ -777,9 +767,6 @@ packages:
 
   '@types/tough-cookie@4.0.5':
     resolution: {integrity: sha512-/Ad8+nIOV7Rl++6f1BdKxFSMgmoqEoYbHRpPcx3JEfv8VRsQe9Z4mCXeJBzxs7mbHY/XOZZuXlRNfhpVPbs6ZA==}
-
-  '@types/uuid@10.0.0':
-    resolution: {integrity: sha512-7gqG38EyHgyP1S+7+xomFtL+ZNHcKv6DwNaCZmJmo1vgMugyF3TCnXVg4t1uk89mLNwnLtnY3TpOpCOyp1/xHQ==}
 
   '@types/verror@1.10.11':
     resolution: {integrity: sha512-RlDm9K7+o5stv0Co8i8ZRGxDbrTxhJtgjqjFyVh/tXQyl/rYtTKlnTvZ88oSTeYREWurwx20Js4kTuKCsFkUtg==}
@@ -2245,6 +2232,11 @@ packages:
     engines: {node: ^10 || ^12 || ^13.7 || ^14 || >=15.0.1}
     hasBin: true
 
+  nanoid@5.1.5:
+    resolution: {integrity: sha512-Ir/+ZpE9fDsNH0hQ3C68uyThDXzYcim2EqcZ8zn8Chtt1iylPT9xXJB0kPCnqzgcEGikO9RxSrh63MsmVCU7Fw==}
+    engines: {node: ^18 || >=20}
+    hasBin: true
+
   nanopop@2.4.2:
     resolution: {integrity: sha512-NzOgmMQ+elxxHeIha+OG/Pv3Oc3p4RU2aBhwWwAqDpXrdTbtRylbRLQztLy8dMMwfl6pclznBdfUhccEn9ZIzw==}
 
@@ -2882,10 +2874,6 @@ packages:
 
   utrie@1.0.2:
     resolution: {integrity: sha512-1MLa5ouZiOmQzUbjbu9VmjLzn1QLXBhwpUa7kdLUQK+KQ5KA9I1vk5U4YHe/X2Ch7PYnJfWuWT+VbuxbGwljhw==}
-
-  uuid@11.1.0:
-    resolution: {integrity: sha512-0/A9rDy9P7cJ+8w1c9WD9V//9Wj15Ce2MPz8Ri6032usz+NfePxx5AcN3bN+r6ZL6jEo066/yNYB3tn4pQEx+A==}
-    hasBin: true
 
   uuid@8.3.2:
     resolution: {integrity: sha512-+NYs2QeMWy+GWFOEm9xnn6HCDp0l7QBD7ml8zLUmJ+93Q5NF0NocErnwkTkXVFNiX3/fpC6afS8Dhb/gz7R7eg==}
@@ -3662,10 +3650,6 @@ snapshots:
     dependencies:
       '@types/node': 22.14.0
 
-  '@types/marked@6.0.0':
-    dependencies:
-      marked: 15.0.8
-
   '@types/ms@2.1.0': {}
 
   '@types/node@14.18.63': {}
@@ -3690,8 +3674,6 @@ snapshots:
       '@types/node': 22.14.0
 
   '@types/tough-cookie@4.0.5': {}
-
-  '@types/uuid@10.0.0': {}
 
   '@types/verror@1.10.11':
     optional: true
@@ -5426,6 +5408,8 @@ snapshots:
 
   nanoid@3.3.11: {}
 
+  nanoid@5.1.5: {}
+
   nanopop@2.4.2: {}
 
   napi-build-utils@2.0.0: {}
@@ -6153,8 +6137,6 @@ snapshots:
     dependencies:
       base64-arraybuffer: 1.0.2
     optional: true
-
-  uuid@11.1.0: {}
 
   uuid@8.3.2: {}
 

@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
-import { v4 as uuidv4 } from 'uuid'
+import { nanoid } from 'nanoid'
 import type { RepoHistoryItem } from '@shared/types/dtos/git'
 
 export const useScanStore = defineStore('scan', () => {
@@ -26,7 +26,7 @@ export const useScanStore = defineStore('scan', () => {
     return scanRecordList.value.filter((item) => item.id === id)[0]
   }
   const setScanRecordList = (item) => {
-    scanRecordList.value.push({ ...item, id: uuidv4() })
+    scanRecordList.value.push({ ...item, id: nanoid() })
     _savaScanRecord()
   }
   const setScanRecordById = (id: string, data: any) => {
@@ -71,7 +71,7 @@ export const useScanStore = defineStore('scan', () => {
     if (!item || !item.length) {
       return
     }
-    gitCommits.value.push({ ...item, id: uuidv4() })
+    gitCommits.value.push({ ...item, id: nanoid() })
     _savaGitCommits()
   }
 
