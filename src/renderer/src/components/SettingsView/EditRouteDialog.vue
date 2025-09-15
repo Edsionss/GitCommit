@@ -32,7 +32,7 @@
 
 <script setup lang="ts">
 import { ref, watch } from 'vue'
-import { RouteRecord } from '@/stores/routesStore'
+import type { RouteRecord } from '@sharedType/MenuManagement'
 
 const props = defineProps<{
   open: boolean

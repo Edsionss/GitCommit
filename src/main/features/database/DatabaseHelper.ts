@@ -1,6 +1,6 @@
 // src/main/database/db-helper.ts
 
-import type { Database, Statement } from 'better-sqlite3'
+import type { Database, Statement, RunResult } from 'better-sqlite3'
 
 // 定义一个通用的 where 条件对象类型
 // 示例: { id: 5, status: 'active' } 会被转换成 "WHERE id = ? AND status = ?"
@@ -34,7 +34,7 @@ export class DatabaseHelper {
    * @param data - 要插入的数据对象 { column: value }
    * @returns - { id: number } 返回新插入行的 ID
    */
-  public insert(tableName: string, data: Record<string, any>): { id: number } {
+  public insert(tableName: string, data: Record<string, any>): RunResult {
     const keys = Object.keys(data)
     const columns = keys.join(', ')
     const placeholders = keys.map(() => '?').join(', ')
@@ -44,7 +44,7 @@ export class DatabaseHelper {
     const stmt = this.db.prepare(sql)
     const info = stmt.run(values)
 
-    return { id: Number(info.lastInsertRowid) }
+    return info
   }
 
   /**
@@ -54,7 +54,8 @@ export class DatabaseHelper {
    * @param columns - (可选) 要查询的列，默认 '*'
    * @returns - 结果数组
    */
-  public find<T>(tableName: string, where: WhereClause = {}, columns: string = '*'): T[] {
+  // public find<T>(tableName: string, where: WhereClause = {}, columns: string = '*'): T[] {
+  public find<T>(tableName: string, where: Partial<T> = {}, columns: string = '*'): T[] {
     const { text, params } = this.formatWhereClause(where)
     const sql = `SELECT ${columns} FROM ${tableName} ${text}`
     const stmt = this.db.prepare(sql)
@@ -68,7 +69,8 @@ export class DatabaseHelper {
    * @param columns - (可选) 要查询的列，默认 '*'
    * @returns - 单个结果对象或 null
    */
-  public findOne<T>(tableName: string, where: WhereClause = {}, columns: string = '*'): T | null {
+  // public findOne<T>(tableName: string, where: WhereClause = {}, columns: string = '*'): T | null {
+  public findOne<T>(tableName: string, where: Partial<T> = {}, columns: string = '*'): T | null {
     const { text, params } = this.formatWhereClause(where)
     const sql = `SELECT ${columns} FROM ${tableName} ${text} LIMIT 1`
     const stmt = this.db.prepare(sql)
@@ -83,10 +85,12 @@ export class DatabaseHelper {
    * @param where - 更新条件
    * @returns - { changes: number } 影响的行数
    */
-  public update(
+  public update<T>(
     tableName: string,
-    data: Record<string, any>,
-    where: WhereClause
+    // data: Record<string, any>,
+    // where: WhereClause
+    data: Partial<T>,
+    where: Partial<T>
   ): { changes: number } {
     const dataKeys = Object.keys(data)
     if (dataKeys.length === 0) {
@@ -145,5 +149,14 @@ export class DatabaseHelper {
   public execute(sql: string, params: any[] = []): { changes: number } {
     const info = this.db.prepare(sql).run(params)
     return { changes: info.changes }
+  }
+
+  /**
+   * 执行一个事务
+   * @param callback - 包含所有数据库操作的回调函数
+   */
+  public transaction<T>(callback: () => T): T {
+    const runTransaction = this.db.transaction(callback)
+    return runTransaction()
   }
 }

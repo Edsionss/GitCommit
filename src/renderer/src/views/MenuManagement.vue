@@ -32,7 +32,7 @@ import { message, Modal } from 'ant-design-vue'
 import { PlusOutlined } from '@ant-design/icons-vue'
 import MenuList from '@components/MenuManagement/MenuList.vue'
 import MenuModal from '@components/MenuManagement/MenuModal.vue'
-import { type RouteRecord } from '@type/MenuManagement'
+import type { RouteRecord } from '@sharedType/MenuManagement'
 import { buildTree } from '@utils/index'
 import { v4 as uuidv4 } from 'uuid' // 使用 uuid 生成唯一ID
 import { useRoutesStore } from '@/stores/routesStore'

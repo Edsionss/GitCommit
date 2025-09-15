@@ -51,7 +51,7 @@
 
 <script setup lang="ts">
 import type { PropType } from 'vue'
-import type { RouteRecord } from '@type/MenuManagement'
+import type { RouteRecord } from '@sharedType/MenuManagement'
 import * as Icons from '@ant-design/icons-vue' // 引入所有图标
 
 interface Emits {

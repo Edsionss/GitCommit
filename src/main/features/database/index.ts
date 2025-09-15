@@ -12,8 +12,12 @@ const db = new Database(dbPath, { verbose: console.log }) // 加上 verbose 方�
 
 // 2. 初始化数据库表结构
 function initializeDatabase() {
-  console.log(`Database initialized at: ${dbPath}`)
-  db.exec(createTableSQL)
+  try {
+    db.exec(createTableSQL)
+    console.log(`Database tables created or already exist at: ${dbPath}.`)
+  } catch (error) {
+    console.error('Error initializing database:', error)
+  }
 }
 
 // 3. 创建并导出通用的 DatabaseHelper 实例

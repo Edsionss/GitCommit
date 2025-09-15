@@ -68,7 +68,7 @@
 import { ref, reactive, watch, computed, type PropType } from 'vue'
 import type { FormInstance } from 'ant-design-vue'
 import { message } from 'ant-design-vue'
-import type { RouteRecord } from '@type/MenuManagement'
+import type { RouteRecord } from '@sharedType/MenuManagement'
 import * as Icons from '@ant-design/icons-vue'
 
 // 简单列举一些图标，实际项目可以更丰富

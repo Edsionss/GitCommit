@@ -48,7 +48,8 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { storeToRefs } from 'pinia'
-import { useRoutesStore, RouteRecord } from '@/stores/routesStore'
+import { useRoutesStore } from '@/stores/routesStore'
+import type { RouteRecord } from '@sharedType/MenuManagement'
 import EditRouteDialog from './EditRouteDialog.vue'
 import { message } from 'ant-design-vue'
 

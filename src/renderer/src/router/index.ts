@@ -2,7 +2,7 @@ import { createRouter, createWebHashHistory, RouteRecordRaw, Router } from 'vue-
 import MainLayout from '@components/layout/MainLayout.vue'
 import NotFound from '@views/404NotFound.vue'
 import { useRoutesStore } from '@/stores/routesStore'
-import type { RouteRecord } from '@type/MenuManagement'
+import type { RouteRecord } from '@sharedType/MenuManagement'
 
 const views = import.meta.glob('@views/**/*.vue')
 const components = import.meta.glob('@components/**/*.vue')

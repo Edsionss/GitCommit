@@ -14,7 +14,7 @@ app.commandLine.appendSwitch('remote-debugging-port', DEBUG_PORT)
 function createWindow(): void {
   // Create the browser window.
   const mainWindow = new BrowserWindow({
-    width: 1200,
+    width: 1700,
     height: 800,
     show: false,
     autoHideMenuBar: true,
@@ -36,6 +36,9 @@ function createWindow(): void {
     shell.openExternal(details.url)
     return { action: 'deny' }
   })
+
+  // 添加 DevTools
+  mainWindow.webContents.openDevTools({ mode: 'right' })
 
   // HMR为基于电子-vite cli的渲染器。
   //加载用于开发的远程URL或用于生产的本地html文件。
