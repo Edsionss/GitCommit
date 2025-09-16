@@ -40,13 +40,18 @@
 
       <!-- 主机信息展示 -->
       <div v-if="isHost && roomToken" class="host-info">
-        <a-alert message="让其他人使用你的IP和以下令牌加入房间：" type="info" show-icon>
-          <template #description>
+        <a-collapse v-model:activeKey="activeKey" :bordered="false" expand-icon-position="right">
+          <a-collapse-panel key="1" style="background: #e6f7ff; border: 1px solid #91d5ff">
+            <template #header>
+              <a-typography-text type="secondary"
+                >点击此处查看/隐藏房间信息</a-typography-text
+              >
+            </template>
             <a-typography-text strong>IP: {{ hostIpForDisplay }}</a-typography-text>
             <br />
             <a-typography-text strong>令牌: {{ roomToken }}</a-typography-text>
-          </template>
-        </a-alert>
+          </a-collapse-panel>
+        </a-collapse>
       </div>
 
       <!-- 消息列表 -->
@@ -129,6 +134,7 @@ const hostIpForDisplay = ref('')
 const roomToken = ref('') // 主机生成的令牌
 const showTokenModal = ref(false) // 是否显示令牌输入框
 const inputToken = ref('') // 客户端输入的令牌
+const activeKey = ref(['1']) // 控制折叠面板的展开，默认展开
 
 let ws: WebSocket | null = null
 let serverAddress = ''
