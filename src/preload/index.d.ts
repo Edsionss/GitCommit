@@ -70,6 +70,9 @@ interface ExposedAPI {
 
   searchStokes: (query: string) => Promise<any[]>
   getStockInfoByCode: (code: string, name?: string) => Promise<any>
+
+  //websocket
+  getWsAddress: () => Promise<string>
 }
 
 declare global {

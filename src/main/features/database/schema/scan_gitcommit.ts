@@ -1,6 +1,4 @@
 export default `
--- 完整的数据库初始化脚本
-
 -- 步骤 1: 创建核心数据表
 CREATE TABLE IF NOT EXISTS scan_histories (
     -- 本次扫描历史记录的唯一ID
@@ -30,6 +28,7 @@ CREATE TABLE IF NOT EXISTS scan_histories (
     -- 最佳实践：记录创建和更新时间戳
     created_at       TEXT    NOT NULL DEFAULT (datetime('now', 'localtime')),
     updated_at       TEXT    NOT NULL DEFAULT (datetime('now', 'localtime'))
+);
 
 
 

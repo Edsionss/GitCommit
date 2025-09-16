@@ -1,3 +1,5 @@
+import { networkInterfaces } from 'os'
+
 /**
  * 强大的通用 DOM 解析函数 (在 page.evaluate 中执行)
  * @param {object} config - 爬取配置对象
@@ -72,4 +74,38 @@ export const scrapingLogic = (config) => {
   })
 
   return results
+}
+
+export function getLocalIpAddress(): string | null {
+  const nets = networkInterfaces()
+  const results: string[] = []
+
+  for (const name of Object.keys(nets)) {
+    const netInfo = nets[name]
+    if (netInfo) {
+      for (const net of netInfo) {
+        // --- 核心过滤逻辑 ---
+        // 1. 只关心 IPv4
+        // 2. 排除环回地址 (127.0.0.1)
+        // 3. 必须是私有地址 (192.168.x.x, 10.x.x.x, or 172.16.x.x - 172.31.x.x)
+        if (net.family === 'IPv4' && !net.internal) {
+          // 私有 IP 地址段正则表达式
+          const isPrivateIP = /^(10\.|192\.168\.|172\.(1[6-9]|2[0-9]|3[0-1])\.)/.test(net.address)
+
+          if (isPrivateIP) {
+            results.push(net.address)
+          }
+        }
+      }
+    }
+  }
+
+  // 如果找到了多个符合条件的私有IP，优先返回 192.168.x.x 的
+  const preferredIp = results.find((ip) => ip.startsWith('192.168.'))
+  if (preferredIp) {
+    return preferredIp
+  }
+
+  // 否则，返回找到的第一个符合条件的私有IP
+  return results.length > 0 ? results[0] : null
 }

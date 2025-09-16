@@ -96,7 +96,10 @@ const api = {
   // stock API
   searchStokes: (query: string) => ipcRenderer.invoke('stock:search', query),
   getStockInfoByCode: (code: string, name?: string) =>
-    ipcRenderer.invoke('stock:getStockInfoByCode', code, name)
+    ipcRenderer.invoke('stock:getStockInfoByCode', code, name),
+
+  //websocket
+  getWsAddress: () => ipcRenderer.invoke('get-ws-address')
 }
 
 // 暴露API

@@ -37,7 +37,7 @@ CREATE TABLE IF NOT EXISTS routes_menu (
 
     -- 外键约束, 确保 parent_id 引用的是一个存在的 id
     -- ON DELETE CASCADE 表示当父菜单被删除时, 其所有子菜单也会被级联删除
-    FOREIGN KEY (parent_id) REFERENCES routes(id) ON DELETE CASCADE ON UPDATE CASCADE
+    FOREIGN KEY (parent_id) REFERENCES routes_menu(id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 --为常用查询字段创建索引以提高性能
@@ -57,14 +57,14 @@ CREATE INDEX IF NOT EXISTS idx_routes_menu_order ON routes_menu(menu_order);
 
 --SQLite 提供了 json_object() 函数，可以非常方便地将行数据转换为 JSON。
 -- 创建  INSERT 触发器  
-CREATE TRIGGER IF NOT EXISTS trg_routes_after_insert
-AFTER INSERT ON routes
+CREATE TRIGGER IF NOT EXISTS trg_routes_menu_after_insert
+AFTER INSERT ON routes_menu
 FOR EACH ROW
 BEGIN
     INSERT INTO audit_logs (action_type, table_name, record_id, new_data, user_id)
     VALUES (
         'INSERT',
-        'routes',
+        'routes_menu',
         NEW.id,
         json_object(
             'id', NEW.id,
@@ -77,21 +77,22 @@ BEGIN
             'menuIcon', NEW.menu_icon,
             'hide', NEW.hide
         ),
-        'SYSTEM' -- 这里可以动态传入真实 user_id, 但触发器内较难实现, 通常在应用层处理或设为默认值
+        -- 这里可以动态传入真实 user_id, 但触发器内较难实现, 通常在应用层处理或设为默认值
+        'SYSTEM' 
     );
 END;
 
 
 
 --DELETE 触发器
-CREATE TRIGGER IF NOT EXISTS trg_routes_after_delete
-AFTER DELETE ON routes
+CREATE TRIGGER IF NOT EXISTS trg_routes_menu_after_delete
+AFTER DELETE ON routes_menu
 FOR EACH ROW
 BEGIN
     INSERT INTO audit_logs (action_type, table_name, record_id, old_data)
     VALUES (
         'DELETE',
-        'routes',
+        'routes_menu',
         OLD.id,
         json_object(
             'id', OLD.id,
@@ -109,14 +110,14 @@ END;
 
 
 --UPDATE 触发器
-CREATE TRIGGER IF NOT EXISTS trg_routes_after_update
-AFTER UPDATE ON routes
+CREATE TRIGGER IF NOT EXISTS trg_routes_menu_after_update
+AFTER UPDATE ON routes_menu
 FOR EACH ROW
 BEGIN
     INSERT INTO audit_logs (action_type, table_name, record_id, old_data, new_data)
     VALUES (
         'UPDATE',
-        'routes',
+        'routes_menu',
         NEW.id,
         json_object( -- 旧数据
             'id', OLD.id,

@@ -103,6 +103,17 @@ export const mockFlatRoutes: RouteRecord[] = [
     hide: '0',
     menuOrder: 1000,
     menuIcon: 'SettingOutlined' // 设置页面通常有个图标，即使不在主菜单
+  },
+  {
+    id: '199',
+    parentId: null,
+    path: 'chat',
+    name: 'Chat',
+    componentPath: 'RealTimeCommunication',
+    meta: { title: 'WebSocket', keepAlive: '1' },
+    hide: '0',
+    menuOrder: 10000,
+    menuIcon: 'CommentOutlined'
   }
 ]
 

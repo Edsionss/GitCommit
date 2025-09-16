@@ -38,7 +38,6 @@ import Preferences from '@renderer/components/SettingsView/Preferences.vue'
 import GitConfig from '@renderer/components/SettingsView/GitConfig.vue'
 import SystemConfig from '@/components/SettingsView/SystemConfig.vue'
 import AiConfig from '@renderer/components/SettingsView/AiConfig.vue'
-import RouterSetting from '@/components/SettingsView/RouterSetting.vue'
 import MenuManagement from './MenuManagement.vue'
 import { SaveOutlined, RedoOutlined } from '@ant-design/icons-vue'
 
