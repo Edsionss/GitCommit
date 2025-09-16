@@ -1,9 +1,22 @@
 <template>
   <div class="webSocket-container">
+    <!-- 模式选择界面 -->
+    <div v-if="!modeSelected" class="mode-selection">
+      <a-typography-title :level="3">选择聊天模式</a-typography-title>
+      <a-space direction="vertical" :size="20">
+        <a-button type="primary" size="large" @click="startHosting"> 创建房间 (作为主机) </a-button>
+        <a-divider>或</a-divider>
+        <div class="join-section">
+          <a-input v-model:value="hostIp" placeholder="输入主机的IP地址" size="large" />
+          <a-button size="large" @click="joinRoom" :disabled="!hostIp"> 加入房间 </a-button>
+        </div>
+      </a-space>
+    </div>
+
     <!-- 昵称输入模态框 -->
     <a-modal
       v-model:open="showNicknameModal"
-      title="Enter Your Nickname"
+      title="输入你的昵称"
       :closable="false"
       :maskClosable="false"
       @ok="handleSetNickname"
@@ -11,15 +24,17 @@
     >
       <a-input
         v-model:value="nickname"
-        placeholder="Your nickname"
+        placeholder="你的昵称"
         @keyup.enter="handleSetNickname"
       />
     </a-modal>
 
     <!-- 主聊天容器 -->
-    <div class="chat-container" v-if="!showNicknameModal">
+    <div class="chat-container" v-if="modeSelected && !showNicknameModal">
       <div class="header">
-        <a-typography-title :level="4" style="margin: 0"> Real-time Chat </a-typography-title>
+        <a-typography-title :level="4" style="margin: 0">
+          局域网聊天室 - {{ isHost ? '主机' : '客户端' }}
+        </a-typography-title>
         <a-tag :color="isConnected ? 'green' : 'red'">{{ connectionStatus }}</a-tag>
       </div>
 
@@ -53,7 +68,7 @@
         <a-input
           v-model:value="newMessage"
           size="large"
-          placeholder="Type a message..."
+          placeholder="输入消息..."
           @keyup.enter="sendMessage"
           :disabled="!isConnected"
         />
@@ -64,7 +79,7 @@
           :disabled="!isConnected || !newMessage"
         >
           <template #icon><SendOutlined /></template>
-          Send
+          发送
         </a-button>
       </div>
     </div>
@@ -76,46 +91,82 @@ import { ref, onUnmounted, nextTick } from 'vue'
 import type { ChatMessage } from '@sharedType/Chat'
 import { SendOutlined } from '@ant-design/icons-vue'
 import { webSocketApi } from '@api/webSocket'
-import { nanoid } from 'nanoid'
+import { message as antMessage } from 'ant-design-vue'
+
 // --- 状态 ---
 const messages = ref<ChatMessage[]>([])
 const newMessage = ref('')
 const isConnected = ref(false)
 const isConnecting = ref(false)
-const connectionStatus = ref('Disconnected')
-const messageListRef = ref<any>(null) // 用于引用 List 组件的 DOM
+const connectionStatus = ref('未连接')
+const messageListRef = ref<any>(null)
 const showNicknameModal = ref(false)
 const nickname = ref('')
 
+// --- 新增：模式选择状态 ---
+const modeSelected = ref(false) // 是否已选择模式
+const isHost = ref(false) // 是否为主机
+const hostIp = ref('') // 要加入的主机IP
+
 let ws: WebSocket | null = null
-let serverAddress = '' // 用于存储服务器地址
-// --- 昵称处理 ---
-const handleSetNickname = async () => {
-  // if (nickname.value.trim()) {
-  // 在连接前，先异步获取服务器地址
-  if (!serverAddress) {
+let serverAddress = '' // 最终用于连接的服务器地址
+
+// --- 模式选择逻辑 ---
+const startHosting = async () => {
+  try {
+    // 1. 通知主进程启动 WebSocket 服务器
+    await webSocketApi.startWsServer()
+    // 2. 获取本机IP作为服务器地址
     serverAddress = await webSocketApi.getWsAddress()
-    nickname.value = nanoid()
+    if (!serverAddress || serverAddress.includes('localhost')) {
+      antMessage.error('无法获取有效的局域网IP地址，无法作为主机。')
+      return
+    }
+    antMessage.success(`主机已在 ${serverAddress} 启动！请让其他人加入此地址。`)
+    isHost.value = true
+    modeSelected.value = true
+    showNicknameModal.value = true // 显示昵称输入框
+  } catch (error) {
+    console.error('启动主机失败:', error)
+    antMessage.error('启动主机失败，请查看控制台日志。')
   }
-  isConnecting.value = true
-  connectWebSocket()
-  // }
 }
-handleSetNickname()
+
+const joinRoom = () => {
+  if (!hostIp.value.trim()) {
+    antMessage.warn('请输入有效的主机IP地址。')
+    return
+  }
+  // 假设端口固定为 8888
+  serverAddress = `ws://${hostIp.value.trim()}:8888`
+  modeSelected.value = true
+  showNicknameModal.value = true // 显示昵称输入框
+}
+
+// --- 昵称处理 ---
+const handleSetNickname = () => {
+  if (nickname.value.trim()) {
+    isConnecting.value = true
+    connectWebSocket()
+  } else {
+    antMessage.warn('请输入一个昵称。')
+  }
+}
+
 // --- WebSocket 逻辑 ---
 const connectWebSocket = () => {
   if (ws || !serverAddress) return
 
-  console.log(`Connecting to WebSocket server at: ${serverAddress}`)
-  ws = new WebSocket(serverAddress) // 使用动态获取的地址
+  console.log(`正在连接到 WebSocket 服务器: ${serverAddress}`)
+  ws = new WebSocket(serverAddress)
 
-  connectionStatus.value = 'Connecting...'
+  connectionStatus.value = '正在连接...'
 
   ws.onopen = () => {
     isConnected.value = true
     isConnecting.value = false
-    connectionStatus.value = 'Connected'
-    // showNicknameModal.value = false // 连接成功后关闭模态框
+    connectionStatus.value = '已连接'
+    showNicknameModal.value = false // 连接成功后关闭模态框
   }
 
   ws.onmessage = (event) => {
@@ -124,22 +175,28 @@ const connectWebSocket = () => {
       messages.value.push(message)
       scrollToBottom()
     } catch (error) {
-      console.error('Failed to parse message:', error)
+      console.error('解析消息失败:', error)
     }
   }
 
   ws.onclose = () => {
     isConnected.value = false
     isConnecting.value = false
-    connectionStatus.value = 'Disconnected. Retrying...'
-    ws = null // 清理 ws 实例
-    setTimeout(connectWebSocket, 3000)
+    connectionStatus.value = '已断开. 正在重试...'
+    ws = null
+    // 如果不是主机，才进行重连尝试
+    if (!isHost.value) {
+      setTimeout(connectWebSocket, 3000)
+    } else {
+      connectionStatus.value = '主机服务器已关闭'
+    }
   }
 
   ws.onerror = (error) => {
-    console.error('WebSocket error:', error)
+    console.error('WebSocket 错误:', error)
     isConnecting.value = false
-    connectionStatus.value = 'Connection Error'
+    connectionStatus.value = '连接错误'
+    antMessage.error(`无法连接到 ${serverAddress}，请检查地址是否正确或主机是否在线。`)
     ws?.close()
   }
 }
@@ -171,12 +228,26 @@ onUnmounted(() => {
     ws.onclose = null
     ws.close()
   }
+  // 注意：这里没有停止WebSocket服务器的逻辑，
+  // 服务器会随应用的关闭而关闭。
 })
 </script>
 
 <style scoped>
 .webSocket-container {
   height: calc(100% - 40px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.mode-selection {
+  text-align: center;
+}
+
+.join-section {
+  display: flex;
+  gap: 10px;
 }
 
 .chat-container {
@@ -184,8 +255,6 @@ onUnmounted(() => {
   flex-direction: column;
   height: 100%;
   width: 100%;
-  /* height: 500px; */
-  /* max-width: 700px; */
   border: 1px solid #d9d9d9;
   border-radius: 8px;
   margin: 20px auto;

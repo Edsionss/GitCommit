@@ -99,7 +99,8 @@ const api = {
     ipcRenderer.invoke('stock:getStockInfoByCode', code, name),
 
   //websocket
-  getWsAddress: () => ipcRenderer.invoke('get-ws-address')
+  getWsAddress: () => ipcRenderer.invoke('get-ws-address'),
+  startWsServer: () => ipcRenderer.invoke('start-ws-server')
 }
 
 // 暴露API

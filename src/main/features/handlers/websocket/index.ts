@@ -1,7 +1,7 @@
 import type { WebSocket } from 'ws'
 import type { ChatMessage } from '@sharedType/Chat'
 import { ipcMain } from 'electron'
-import { handleGetWsAddress } from '@services/websocket'
+import { handleGetWsAddress, startWebSocketServer } from '@services/websocket'
 /**
  * 处理从客户端接收到的消息
  * @param message - 从客户端收到的原始消息字符串
@@ -30,4 +30,5 @@ export function handleMessage(message: string, clientId: string): ChatMessage {
 export function initializeWebSocket() {
   // 注册 IPC 处理器
   ipcMain.handle('get-ws-address', handleGetWsAddress)
+  ipcMain.handle('start-ws-server', startWebSocketServer)
 }
