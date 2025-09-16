@@ -168,41 +168,39 @@ const prevStep = () => {
 }
 
 const startFetching = async () => {
-  if (!selectedStock.value) return
-  const result = await stockApi.getStockInfoByCode(
-    selectedStock.value.code,
-    selectedStock.value.name
-  )
-  console.log(result)
-  return
-  currentStep.value++
-  isFetching.value = true
-  fetchSuccess.value = false
-
-  try {
-    const fetchedData = await window.api.invoke(
-      'stock:fetch-advanced',
-      selectedStock.value.code,
-      config
-    )
-
-    if (fetchedData) {
-      const fullStockData: StockData = {
-        ...selectedStock.value,
-        ...fetchedData,
-        analysisHistory: [] // Initialize with empty history
-      }
-      await stockStore.addStockWithOptions(fullStockData)
-      fetchSuccess.value = true
-    } else {
-      throw new Error('Failed to fetch data from main process')
-    }
-  } catch (error) {
-    console.error('Failed to fetch stock data:', error)
-    fetchSuccess.value = false
-  } finally {
-    isFetching.value = false
-  }
+  // if (!selectedStock.value) return
+  // const result = await stockApi.getStockInfoByCode(
+  //   selectedStock.value.code,
+  //   selectedStock.value.name
+  // )
+  // console.log(result)
+  // return
+  // currentStep.value++
+  // isFetching.value = true
+  // fetchSuccess.value = false
+  // try {
+  //   const fetchedData = await window.api.invoke(
+  //     'stock:fetch-advanced',
+  //     selectedStock.value.code,
+  //     config
+  //   )
+  //   if (fetchedData) {
+  //     const fullStockData: StockData = {
+  //       ...selectedStock.value,
+  //       ...fetchedData,
+  //       analysisHistory: [] // Initialize with empty history
+  //     }
+  //     await stockStore.addStockWithOptions(fullStockData)
+  //     fetchSuccess.value = true
+  //   } else {
+  //     throw new Error('Failed to fetch data from main process')
+  //   }
+  // } catch (error) {
+  //   console.error('Failed to fetch stock data:', error)
+  //   fetchSuccess.value = false
+  // } finally {
+  //   isFetching.value = false
+  // }
 }
 
 const handleCancel = () => {
