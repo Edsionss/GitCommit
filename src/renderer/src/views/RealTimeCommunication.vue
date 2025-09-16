@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="webSocket-container">
     <!-- 昵称输入模态框 -->
     <a-modal
       v-model:open="showNicknameModal"
@@ -175,11 +175,17 @@ onUnmounted(() => {
 </script>
 
 <style scoped>
+.webSocket-container {
+  height: calc(100% - 40px);
+}
+
 .chat-container {
   display: flex;
   flex-direction: column;
-  height: 500px;
-  max-width: 700px;
+  height: 100%;
+  width: 100%;
+  /* height: 500px; */
+  /* max-width: 700px; */
   border: 1px solid #d9d9d9;
   border-radius: 8px;
   margin: 20px auto;
