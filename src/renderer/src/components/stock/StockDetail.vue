@@ -68,7 +68,7 @@ const components = {
   TimeSharing: defineAsyncComponent(
     () => import('./StockList/StockDetail/components/TimeSharing.vue')
   ),
-  DailyK: defineAsyncComponent(() => import('./detail/DailyK.vue')),
+  DailyK: defineAsyncComponent(() => import('./StockList/StockDetail/components/DailyK.vue')),
   WeeklyK: defineAsyncComponent(() => import('./StockList/StockDetail/components/WeeklyK.vue')),
   MonthlyK: defineAsyncComponent(() => import('./StockList/StockDetail/components/MonthlyK.vue')),
   FiveDay: defineAsyncComponent(() => import('./StockList/StockDetail/components/FiveDay.vue')),
