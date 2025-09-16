@@ -20,7 +20,9 @@ export default defineConfig({
     plugins: [
       // 这个插件会自动将 package.json -> dependencies 中的所有模块设为外部依赖
       // 这是 electron-vite 推荐的最佳实践
-      externalizeDepsPlugin()
+      externalizeDepsPlugin({
+        exclude: ['entities']
+      })
     ],
     // 别名配置保持不变
     resolve: {
@@ -31,12 +33,20 @@ export default defineConfig({
         '@services': resolve('src/main/features/services'),
         '@shared': resolve('src/shared'),
         '@sharedType': resolve('src/shared/types/dtos'),
-        '@nodeUtils': resolve('src/main/utils')
+        '@nodeUtils': resolve('src/main/utils'),
+
+        // ✅ 关键补丁，解决 entities exports 限制
+        'entities/decode': resolve(__dirname, 'node_modules/entities/lib/decode.js'),
+        'entities/encode': resolve(__dirname, 'node_modules/entities/lib/encode.js')
       }
     }
   },
   preload: {
-    plugins: [externalizeDepsPlugin()],
+    plugins: [
+      externalizeDepsPlugin({
+        exclude: ['entities']
+      })
+    ],
     // 别名配置保持不变
     resolve: {
       alias: {
@@ -68,9 +78,13 @@ export default defineConfig({
         '@shared': resolve('src/shared'),
         '@sharedType': resolve('src/shared/types/dtos'),
         '@type': resolve('src/renderer/src/types'),
-        '@utils': resolve('src/renderer/src/utils')
+        '@utils': resolve('src/renderer/src/utils'),
+
+        // ✅ 关键补丁，解决 entities exports 限制
+        'entities/decode': resolve(__dirname, 'node_modules/entities/lib/decode.js'),
+        'entities/encode': resolve(__dirname, 'node_modules/entities/lib/encode.js')
       }
     },
     plugins: [vue(), htmlPlugin()]
   }
-});
+})
