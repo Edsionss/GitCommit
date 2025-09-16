@@ -8,7 +8,7 @@ import { handleGetWsAddress, startWebSocketServer } from '@services/websocket'
  * @returns - 经过处理、准备广播的 ChatMessage 对象
  */
 export function handleMessage(message: string, clientId: string): ChatMessage {
-  // 客户端现在会发送 { text: '...', nickname: '...' }
+  // 客户端现在会发送 { text: '...', nickname: '...', token: '...' }
   const incomingData = JSON.parse(message)
 
   if (!incomingData.text || !incomingData.nickname) {
@@ -20,7 +20,8 @@ export function handleMessage(message: string, clientId: string): ChatMessage {
     text: incomingData.text,
     sender: clientId, // 使用一个唯一标识符来代表发送者
     nickname: incomingData.nickname, // 使用客户端传来的昵称
-    timestamp: Date.now()
+    timestamp: Date.now(),
+    token: incomingData.token // 将 token 传递下去
   }
 
   console.log('Processed message:', processedMessage)

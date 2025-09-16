@@ -8,34 +8,45 @@
         <a-divider>或</a-divider>
         <div class="join-section">
           <a-input v-model:value="hostIp" placeholder="输入主机的IP地址" size="large" />
-          <a-button size="large" @click="joinRoom" :disabled="!hostIp"> 加入房间 </a-button>
+          <a-button size="large" @click="showTokenEntry" :disabled="!hostIp"> 加入房间 </a-button>
         </div>
       </a-space>
     </div>
 
-    <!-- 昵称输入模态框 -->
+    <!-- 令牌输入模态框 -->
     <a-modal
-      v-model:open="showNicknameModal"
-      title="输入你的昵称"
+      v-model:open="showTokenModal"
+      title="输入房间令牌"
       :closable="false"
       :maskClosable="false"
-      @ok="handleSetNickname"
+      @ok="handleTokenSubmit"
       :confirm-loading="isConnecting"
     >
       <a-input
-        v-model:value="nickname"
-        placeholder="你的昵称"
-        @keyup.enter="handleSetNickname"
+        v-model:value="inputToken"
+        placeholder="向主机索要令牌"
+        @keyup.enter="handleTokenSubmit"
       />
     </a-modal>
 
     <!-- 主聊天容器 -->
-    <div class="chat-container" v-if="modeSelected && !showNicknameModal">
+    <div class="chat-container" v-if="modeSelected">
       <div class="header">
         <a-typography-title :level="4" style="margin: 0">
-          局域网聊天室 - {{ isHost ? '主机' : '客户端' }}
+          局域网聊天室 - {{ isHost ? '主机' : '客户端' }} ({{ nickname }})
         </a-typography-title>
         <a-tag :color="isConnected ? 'green' : 'red'">{{ connectionStatus }}</a-tag>
+      </div>
+
+      <!-- 主机信息展示 -->
+      <div v-if="isHost && roomToken" class="host-info">
+        <a-alert message="让其他人使用你的IP和以下令牌加入房间：" type="info" show-icon>
+          <template #description>
+            <a-typography-text strong>IP: {{ hostIpForDisplay }}</a-typography-text>
+            <br />
+            <a-typography-text strong>令牌: {{ roomToken }}</a-typography-text>
+          </template>
+        </a-alert>
       </div>
 
       <!-- 消息列表 -->
@@ -46,7 +57,12 @@
         item-layout="horizontal"
       >
         <template #renderItem="{ item }">
-          <a-list-item class="message-item" :class="{ 'is-me': item.isMe }">
+          <!-- 简单的令牌验证：只显示令牌匹配的消息 -->
+          <a-list-item
+            v-if="item.token === (isHost ? roomToken : inputToken)"
+            class="message-item"
+            :class="{ 'is-me': item.isMe }"
+          >
             <a-list-item-meta>
               <template #title>
                 <span class="nickname">{{ item.nickname }}</span>
@@ -92,6 +108,7 @@ import type { ChatMessage } from '@sharedType/Chat'
 import { SendOutlined } from '@ant-design/icons-vue'
 import { webSocketApi } from '@api/webSocket'
 import { message as antMessage } from 'ant-design-vue'
+import { nanoid } from 'nanoid'
 
 // --- 状态 ---
 const messages = ref<ChatMessage[]>([])
@@ -100,57 +117,65 @@ const isConnected = ref(false)
 const isConnecting = ref(false)
 const connectionStatus = ref('未连接')
 const messageListRef = ref<any>(null)
-const showNicknameModal = ref(false)
 const nickname = ref('')
 
-// --- 新增：模式选择状态 ---
-const modeSelected = ref(false) // 是否已选择模式
-const isHost = ref(false) // 是否为主机
-const hostIp = ref('') // 要加入的主机IP
+// --- 模式选择状态 ---
+const modeSelected = ref(false)
+const isHost = ref(false)
+const hostIp = ref('')
+const hostIpForDisplay = ref('')
+
+// --- 令牌相关状态 ---
+const roomToken = ref('') // 主机生成的令牌
+const showTokenModal = ref(false) // 是否显示令牌输入框
+const inputToken = ref('') // 客户端输入的令牌
 
 let ws: WebSocket | null = null
-let serverAddress = '' // 最终用于连接的服务器地址
+let serverAddress = ''
 
 // --- 模式选择逻辑 ---
 const startHosting = async () => {
   try {
-    // 1. 通知主进程启动 WebSocket 服务器
     await webSocketApi.startWsServer()
-    // 2. 获取本机IP作为服务器地址
     serverAddress = await webSocketApi.getWsAddress()
+
     if (!serverAddress || serverAddress.includes('localhost')) {
       antMessage.error('无法获取有效的局域网IP地址，无法作为主机。')
       return
     }
-    antMessage.success(`主机已在 ${serverAddress} 启动！请让其他人加入此地址。`)
+
+    hostIpForDisplay.value = serverAddress.replace('ws://', '').split(':')[0]
+    antMessage.success(`主机已在 ${serverAddress} 启动！`)
+
     isHost.value = true
     modeSelected.value = true
-    showNicknameModal.value = true // 显示昵称输入框
+    roomToken.value = nanoid(8) // 生成8位随机令牌
+    nickname.value = `主机-${nanoid(6)}` // 自动生成昵称
+
+    connectWebSocket()
   } catch (error) {
     console.error('启动主机失败:', error)
     antMessage.error('启动主机失败，请查看控制台日志。')
   }
 }
 
-const joinRoom = () => {
+const showTokenEntry = () => {
   if (!hostIp.value.trim()) {
     antMessage.warn('请输入有效的主机IP地址。')
     return
   }
-  // 假设端口固定为 8888
-  serverAddress = `ws://${hostIp.value.trim()}:8888`
-  modeSelected.value = true
-  showNicknameModal.value = true // 显示昵称输入框
+  showTokenModal.value = true
 }
 
-// --- 昵称处理 ---
-const handleSetNickname = () => {
-  if (nickname.value.trim()) {
-    isConnecting.value = true
-    connectWebSocket()
-  } else {
-    antMessage.warn('请输入一个昵称。')
+const handleTokenSubmit = () => {
+  if (!inputToken.value.trim()) {
+    antMessage.warn('请输入房间令牌。')
+    return
   }
+  serverAddress = `ws://${hostIp.value.trim()}:8888`
+  nickname.value = `访客-${nanoid(6)}` // 自动生成昵称
+  isConnecting.value = true
+  connectWebSocket()
 }
 
 // --- WebSocket 逻辑 ---
@@ -159,14 +184,14 @@ const connectWebSocket = () => {
 
   console.log(`正在连接到 WebSocket 服务器: ${serverAddress}`)
   ws = new WebSocket(serverAddress)
-
   connectionStatus.value = '正在连接...'
 
   ws.onopen = () => {
     isConnected.value = true
     isConnecting.value = false
     connectionStatus.value = '已连接'
-    showNicknameModal.value = false // 连接成功后关闭模态框
+    showTokenModal.value = false // 如果是从令牌框连接的，则关闭它
+    modeSelected.value = true // 确认进入聊天界面
   }
 
   ws.onmessage = (event) => {
@@ -184,7 +209,6 @@ const connectWebSocket = () => {
     isConnecting.value = false
     connectionStatus.value = '已断开. 正在重试...'
     ws = null
-    // 如果不是主机，才进行重连尝试
     if (!isHost.value) {
       setTimeout(connectWebSocket, 3000)
     } else {
@@ -196,7 +220,7 @@ const connectWebSocket = () => {
     console.error('WebSocket 错误:', error)
     isConnecting.value = false
     connectionStatus.value = '连接错误'
-    antMessage.error(`无法连接到 ${serverAddress}，请检查地址是否正确或主机是否在线。`)
+    antMessage.error(`无法连接到 ${serverAddress}，请检查地址和令牌是否正确。`)
     ws?.close()
   }
 }
@@ -206,7 +230,8 @@ const sendMessage = () => {
   if (newMessage.value.trim() && ws && isConnected.value) {
     const messagePayload = {
       text: newMessage.value,
-      nickname: nickname.value
+      nickname: nickname.value,
+      token: isHost.value ? roomToken.value : inputToken.value
     }
     ws.send(JSON.stringify(messagePayload))
     newMessage.value = ''
@@ -228,8 +253,6 @@ onUnmounted(() => {
     ws.onclose = null
     ws.close()
   }
-  // 注意：这里没有停止WebSocket服务器的逻辑，
-  // 服务器会随应用的关闭而关闭。
 })
 </script>
 
@@ -270,6 +293,11 @@ onUnmounted(() => {
   justify-content: space-between;
   align-items: center;
   flex-shrink: 0;
+}
+
+.host-info {
+  padding: 10px 24px;
+  background-color: #ffffff;
 }
 
 .message-area {
