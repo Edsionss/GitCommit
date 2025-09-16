@@ -29,14 +29,27 @@ export default defineConfig({
         external: [
           'electron', // electron 自身必须外部化
           'electron-updater',
-
+          // 您已经正确识别出的模块，改为正则表达式形式
+          /^better-sqlite3/,
+          /^simple-git/,
+          /^puppeteer-core/,
+          /^ws/,
+          /^yahoo-finance2/,
+          // --- 关键补充：添加常见的纯 ESM 传递性依赖 ---
+          // 很多库（比如 yahoo-finance2）内部可能使用了 node-fetch
+          // 而 node-fetch v3+ 是纯 ESM 包，是导致此错误的常见元凶
+          /^node-fetch/,
+          // 以下是 node-fetch 的一些依赖，也一并外部化以求万无一失
+          /^data-uri-to-buffer/,
+          /^fetch-blob/,
+          /^formdata-polyfill/
           // --- 以下是我们分析出的关键模块 ---
-          'better-sqlite3', // 原生模块，必须外部化
-          'electron-store', // 纯 ESM + IPC 密集型，强烈建议外部化
-          'simple-git', // 纯 ESM + 子进程，强烈建议外部化
-          'puppeteer-core', // 复杂 I/O + 子进程，强烈建议外部化
-          'ws', // 推荐外部化
-          'yahoo-finance2' // 可选，但推荐外部化
+          // 'better-sqlite3', // 原生模块，必须外部化
+          // 'electron-store', // 纯 ESM + IPC 密集型，强烈建议外部化
+          // 'simple-git', // 纯 ESM + 子进程，强烈建议外部化
+          // 'puppeteer-core', // 复杂 I/O + 子进程，强烈建议外部化
+          // 'ws', // 推荐外部化
+          // 'yahoo-finance2' // 可选，但推荐外部化
         ]
       }
     },

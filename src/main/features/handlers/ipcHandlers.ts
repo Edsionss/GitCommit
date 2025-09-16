@@ -1,4 +1,4 @@
-import { registerStoreHandlers } from '@handlers/store/store'
+import { registerStoreHandlers } from '@handlers/store_conf'
 import { registerGitInfoHandlers } from './git/git-info'
 import { registerGitScanHandlers } from './git/git-scan'
 import { registerGitUtilsHandlers } from './git/git-utils'
