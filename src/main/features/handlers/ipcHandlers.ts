@@ -4,7 +4,6 @@ import { registerGitScanHandlers } from './git/git-scan'
 import { registerGitUtilsHandlers } from './git/git-utils'
 import { registerFileSystemHandlers } from './fileSystem/file-system'
 import { registerHistoryHandlers } from './history/history'
-import { registerExportHandlers } from './export/export'
 import { registerAiHandlers } from '@handlers/ai/ai'
 import { initializeStockHandlers } from '@handlers/stock/stock'
 import { initializePuppeteerHandlers } from '@handlers/puppeteer/puppeteer'
@@ -18,7 +17,6 @@ export function registerIpcHandlers() {
   registerGitUtilsHandlers()
   registerFileSystemHandlers()
   registerHistoryHandlers()
-  registerExportHandlers()
   registerAiHandlers()
   registerStoreHandlers()
   initializeStockHandlers()

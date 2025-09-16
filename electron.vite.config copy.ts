@@ -3,7 +3,7 @@ import { defineConfig, externalizeDepsPlugin } from 'electron-vite'
 import vue from '@vitejs/plugin-vue'
 import packageJson from './package.json'
 
-// 您的自定义 htmlPlugin 保持不变
+// 自定义插件，用于替换 HTML 中的变量
 function htmlPlugin() {
   return {
     name: 'html-transform',
@@ -11,36 +11,22 @@ function htmlPlugin() {
       return html
         .replace(/%__APP_PRODUCT_NAME__%/g, packageJson.project)
         .replace(/%__APP_VERSION__%/g, packageJson.version)
+      // 你可以根据需要添加更多替换
     }
   }
 }
 
 export default defineConfig({
   main: {
-    // ------------------- 核心修改在这里 -------------------
-    plugins: [
-      // externalizeDepsPlugin 会自动将 package.json 中的 dependencies 设为外部依赖
-      externalizeDepsPlugin()
-    ],
     build: {
       sourcemap: false,
       rollupOptions: {
-        // 在这里我们手动、明确地再次声明最关键的外部依赖，作为双重保障
         external: [
-          'electron', // electron 自身必须外部化
-          'electron-updater',
-
-          // --- 以下是我们分析出的关键模块 ---
-          'better-sqlite3', // 原生模块，必须外部化
-          'electron-store', // 纯 ESM + IPC 密集型，强烈建议外部化
-          'simple-git', // 纯 ESM + 子进程，强烈建议外部化
-          'puppeteer-core', // 复杂 I/O + 子进程，强烈建议外部化
-          'ws', // 推荐外部化
-          'yahoo-finance2' // 可选，但推荐外部化
+          'electron',
+          'electron-store' // 将 electron-store 设为外部依赖
         ]
       }
     },
-    // 您的别名配置保持不变
     resolve: {
       alias: {
         '@main': resolve('src/main'),
@@ -51,19 +37,18 @@ export default defineConfig({
         '@sharedType': resolve('src/shared/types/dtos'),
         '@nodeUtils': resolve('src/main/utils')
       }
-    }
+    },
+    plugins: [externalizeDepsPlugin()]
   },
   preload: {
-    // preload 配置保持不变
-    plugins: [externalizeDepsPlugin()],
     resolve: {
       alias: {
         '@preload': resolve('src/preload')
       }
-    }
+    },
+    plugins: [externalizeDepsPlugin()]
   },
   renderer: {
-    // renderer 配置保持不变
     define: {
       'import.meta.env.VERSION': JSON.stringify(packageJson.version),
       'import.meta.env.NAME': JSON.stringify(packageJson.project),

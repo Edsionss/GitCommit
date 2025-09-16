@@ -1,0 +1,30 @@
+{
+  "extends": "@electron-toolkit/tsconfig/tsconfig.web.json",
+  "include": [
+    "src/renderer/src/env.d.ts",
+    "src/renderer/src/**/*",
+    "src/renderer/src/**/*.vue",
+    "src/preload/*.d.ts",
+    "src/shared/**/*"
+  ],
+  "compilerOptions": {
+    "composite": true,
+    "baseUrl": ".",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "paths": {
+      "@renderer/*": ["src/renderer/src/*"],
+      "@/*": ["src/renderer/src/*"],
+      "@components/*": ["src/renderer/src/components/*"],
+      "@views/*": ["src/renderer/src/views/*"],
+      "@api/*": ["src/renderer/src/api/*"],
+      "@assets/*": ["src/renderer/src/assets/*"],
+      "@composables/*": ["src/renderer/src/composables/*"],
+      "@router/*": ["src/renderer/src/router/*"],
+      "@shared/*": ["src/shared/*"],
+      "@sharedType/*": ["src/shared/types/dtos/*"],
+      "@type/*": ["src/renderer/src/types/*"],
+      "@utils/*": ["src/renderer/src/utils/*"],
+    }
+  }
+}

@@ -1,5 +1,7 @@
 {
+  // 继承自 @electron-toolkit 的基础配置，保持不变
   "extends": "@electron-toolkit/tsconfig/tsconfig.web.json",
+
   "include": [
     "src/renderer/src/env.d.ts",
     "src/renderer/src/**/*",
@@ -7,12 +9,29 @@
     "src/preload/*.d.ts",
     "src/shared/**/*"
   ],
+
   "compilerOptions": {
+    // ------------------- 核心修改与优化 -------------------
+
+    // 模块系统：使用现代浏览器和打包工具的标准
+    "module": "ESNext",
+    "moduleResolution": "Bundler", // 或者 "NodeNext" 也可以，但 "Bundler" 更推荐
+
+    // 与 Vite 和现代构建工具更好地集成
+    "isolatedModules": true, // 确保每个文件都可以被独立编译
+    "resolveJsonModule": true, // 允许直接 import json 文件
+    "esModuleInterop": true, // 改善与 CommonJS 模块的互操作性（通常基础配置里有，这里确保开启）
+
+    // 推荐的严格模式与代码质量选项
+    "noUnusedLocals": true, // 报告未使用的局部变量
+    "noUnusedParameters": true, // 报告未使用的函数参数
+    "noFallthroughCasesInSwitch": true, // 检查 switch 语句中的 fall-through 情况
+
+    // 类型与路径配置（您原来的配置很好，我们保留并整合）
     "composite": true,
     "baseUrl": ".",
-    "module": "NodeNext",
-    "moduleResolution": "NodeNext",
     "paths": {
+      // 保持您原有的清晰路径别名
       "@renderer/*": ["src/renderer/src/*"],
       "@/*": ["src/renderer/src/*"],
       "@components/*": ["src/renderer/src/components/*"],
@@ -24,7 +43,8 @@
       "@shared/*": ["src/shared/*"],
       "@sharedType/*": ["src/shared/types/dtos/*"],
       "@type/*": ["src/renderer/src/types/*"],
-      "@utils/*": ["src/renderer/src/utils/*"],
-    }
+      "@utils/*": ["src/renderer/src/utils/*"]
+    },
+    "types": ["electron-vite/client"] // 确保 Vite 的客户端类型被包含
   }
 }

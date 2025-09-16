@@ -8,10 +8,11 @@
   ],
   "compilerOptions": {
     "composite": true,
-    "module": "NodeNext",
-    "moduleResolution": "NodeNext",
+    "module": "CommonJS",
+    "moduleResolution": "Bundler",
     "esModuleInterop": true,
     "types": ["electron-vite/node"],
+    "target": "ESNext", // 目标可以是新的ES版本，但模块系统是CJS
     "baseUrl": ".",
     "paths": {
       "@shared/*": ["src/shared/*"],
