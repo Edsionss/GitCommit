@@ -10,10 +10,6 @@
 
     <AiConfig />
 
-    <a-card title="菜单与路由管理">
-      <!-- <RouterSetting /> -->
-      <MenuManagement />
-    </a-card>
     <a-float-button-group trigger="hover" type="primary" :right="'24px'">
       <template #tooltip>
         <div>操作</div>
@@ -38,7 +34,6 @@ import Preferences from '@renderer/components/SettingsView/Preferences.vue'
 import GitConfig from '@renderer/components/SettingsView/GitConfig.vue'
 import SystemConfig from '@/components/SettingsView/SystemConfig.vue'
 import AiConfig from '@renderer/components/SettingsView/AiConfig.vue'
-import MenuManagement from './MenuManagement.vue'
 import { SaveOutlined, RedoOutlined } from '@ant-design/icons-vue'
 
 // 使用 Pinia Store

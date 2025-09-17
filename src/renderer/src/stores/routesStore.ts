@@ -6,17 +6,6 @@ import type { RouteRecord } from '@sharedType/MenuManagement'
 
 export const mockFlatRoutes: RouteRecord[] = [
   {
-    id: '1',
-    parentId: null,
-    path: 'dashboard',
-    name: 'Dashboard',
-    componentPath: 'Dashboard',
-    meta: { title: '仪表盘', keepAlive: '1' },
-    hide: '0',
-    menuOrder: 0,
-    menuIcon: 'DashboardOutlined'
-  },
-  {
     id: '2',
     parentId: null,
     path: 'scan',
@@ -38,39 +27,7 @@ export const mockFlatRoutes: RouteRecord[] = [
     menuOrder: 20,
     menuIcon: 'HistoryOutlined'
   },
-  {
-    id: '4',
-    parentId: null,
-    path: 'branches',
-    name: 'Branches',
-    componentPath: 'BranchesView',
-    meta: { title: '分支管理', keepAlive: '1' },
-    hide: '0',
-    menuOrder: 40,
-    menuIcon: 'BranchesOutlined'
-  },
-  {
-    id: '5',
-    parentId: null,
-    path: 'analysis',
-    name: 'Analysis',
-    componentPath: 'CodeAnalysis',
-    meta: { title: '代码分析', keepAlive: '1' },
-    hide: '0',
-    menuOrder: 50,
-    menuIcon: 'CodeOutlined'
-  },
-  {
-    id: '6',
-    parentId: null,
-    path: 'reports',
-    name: 'Reports',
-    componentPath: 'Reports',
-    meta: { title: '报告生成', keepAlive: '1' },
-    hide: '0',
-    menuOrder: 60,
-    menuIcon: 'FileTextOutlined'
-  },
+
   {
     id: '7',
     parentId: null,
@@ -82,17 +39,7 @@ export const mockFlatRoutes: RouteRecord[] = [
     menuOrder: 70,
     menuIcon: 'RobotOutlined'
   },
-  {
-    id: '8',
-    parentId: null,
-    path: 'stock',
-    name: 'Stock',
-    componentPath: 'Stock',
-    meta: { title: '股票分析', keepAlive: '1' },
-    hide: '0',
-    menuOrder: 80,
-    menuIcon: 'StockOutlined'
-  },
+
   {
     id: '10',
     parentId: null,
@@ -100,7 +47,7 @@ export const mockFlatRoutes: RouteRecord[] = [
     name: 'Settings',
     componentPath: 'Settings',
     meta: { title: '设置', keepAlive: '0' },
-    hide: '0',
+    hide: '1',
     menuOrder: 1000,
     menuIcon: 'SettingOutlined' // 设置页面通常有个图标，即使不在主菜单
   },

@@ -5,9 +5,6 @@ import { registerGitUtilsHandlers } from './git/git-utils'
 import { registerFileSystemHandlers } from './fileSystem/file-system'
 import { registerHistoryHandlers } from './history/history'
 import { registerAiHandlers } from '@handlers/ai/ai'
-import { initializeStockHandlers } from '@handlers/stock/stock'
-import { initializePuppeteerHandlers } from '@handlers/puppeteer/puppeteer'
-import { initializeDatabase } from '@features/database'
 import { initializeWebSocket } from '@handlers/websocket'
 export function registerIpcHandlers() {
   // Register handlers from other modules
@@ -18,9 +15,6 @@ export function registerIpcHandlers() {
   registerHistoryHandlers()
   registerAiHandlers()
   registerStoreHandlers()
-  initializeStockHandlers()
-  initializePuppeteerHandlers()
-  initializeDatabase()
   initializeWebSocket()
   // 注册 IPC 处理器
 }

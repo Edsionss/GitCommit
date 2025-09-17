@@ -32,10 +32,6 @@
                 <ReloadOutlined />
                 <span>刷新</span>
               </a-menu-item>
-              <a-menu-item key="exit" @click="exitApp">
-                <LogoutOutlined />
-                <span>退出</span>
-              </a-menu-item>
             </a-menu>
           </template>
         </a-dropdown>

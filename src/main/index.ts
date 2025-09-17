@@ -1,36 +1,16 @@
 import { app, shell, BrowserWindow, ipcMain, dialog, session } from 'electron'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
-// import icon from '../../resources/icon.png?asset'
-import { promises as fs } from 'fs'
-import * as path from 'path'
 import icon from '../../build/CognitoOcean1.png?asset' // Vite/TypeScript 可能会帮你处理这个导入，但路径更可靠
-import { execSync } from 'child_process'
 import { registerIpcHandlers } from '@handlers/ipcHandlers'
-import { db } from '@features/database'
 import { startWebSocketServer, stopWebSocketServer } from '@services/websocket'
 import { getLocalIpAddress } from '@nodeUtils/index'
-// 如果是 Windows，尝试设置控制台编码为 UTF-8
-if (process.platform === 'win32') {
-  try {
-    execSync('chcp 65001')
-  } catch (e) {
-    console.warn('Failed to set console code page:', e)
-  }
-}
-// 确保 stdout/stderr 默认用 utf-8
-process.stdout.setDefaultEncoding('utf8')
-process.stderr.setDefaultEncoding('utf8')
-
-// 在开发模式下，设置远程调试端口
-const DEBUG_PORT = '9222' // 选择一个未被占用的端口
-app.commandLine.appendSwitch('remote-debugging-port', DEBUG_PORT)
 
 // 创建窗口
 function createWindow(): void {
   // Create the browser window.
   const mainWindow = new BrowserWindow({
-    width: 2000,
+    width: 800,
     height: 800,
     show: false,
     autoHideMenuBar: true,
@@ -99,15 +79,11 @@ function createWindow(): void {
     return { action: 'deny' }
   })
 
-  // 添加 DevTools
-  mainWindow.webContents.openDevTools({ mode: 'right' })
-
   // HMR为基于电子-vite cli的渲染器。
   //加载用于开发的远程URL或用于生产的本地html文件。
   if (is.dev && process.env['ELECTRON_RENDERER_URL']) {
     mainWindow.loadURL(process.env['ELECTRON_RENDERER_URL'])
   } else {
-    mainWindow.webContents.openDevTools()
     mainWindow.loadFile(join(__dirname, '../renderer/index.html'))
   }
 }
@@ -142,14 +118,6 @@ app.whenReady().then(() => {
 app.on('will-quit', () => {
   // 停止 WebSocket 服务器
   stopWebSocketServer()
-
-  // 在这里关闭数据库连接
-  if (db) {
-    // 您的 db 实例
-    console.log('Closing database connection...')
-    db.close()
-    console.log('Database connection closed.')
-  }
 })
 
 // Quit when all windows are closed, except on macOS. There, it's common
@@ -160,11 +128,3 @@ app.on('window-all-closed', () => {
     app.quit()
   }
 })
-
-// 选择目录
-
-// In this file you can include the rest of your app's specific main process
-// code. You can also put them in separate files and require them here.
-
-// In this file you can include the rest of your app's specific main process
-// code. You can also put them in separate files and require them here.
