@@ -34,6 +34,11 @@ interface ChatMessage {
   text: string
 }
 
+interface DirectBroadcastPayload {
+  targets: string[]
+  message: { text: string; nickname: string }
+}
+
 // Define the shape of the API object
 interface ExposedAPI {
   selectDirectory: () => Promise<SelectDirectoryResult | null>
@@ -74,7 +79,9 @@ interface ExposedAPI {
   //websocket
   getWsAddress: () => Promise<string>
   startWsServer: () => Promise<void>
-  sendGlobalBroadcast: (message: { text: string; nickname: string; token: string }) => void
+  sendRoomBroadcast: (message: { text: string; nickname: string; token: string }) => void
+  sendDirectBroadcast: (payload: DirectBroadcastPayload) => void
+  onDirectBroadcastReceived: (callback: (data: any) => void) => () => void
 
   // network
   networkScan: (port: number) => Promise<{ success: boolean; ips?: string[]; error?: string }>

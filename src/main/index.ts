@@ -4,10 +4,17 @@ import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../build/CognitoOcean1.png?asset' // Vite/TypeScript 可能会帮你处理这个导入，但路径更可靠
 import { registerIpcHandlers } from '@handlers/ipcHandlers'
 import { startWebSocketServer, stopWebSocketServer } from '@services/websocket'
-import { getLocalIpAddress } from '@nodeUtils/index'
 
 // 将 mainWindow 声明在函数外部，以便在其他地方访问
 let mainWindow: BrowserWindow | null = null
+
+/**
+ * 获取主窗口实例
+ * @returns {BrowserWindow | null} 主窗口实例
+ */
+export function getMainWindow(): BrowserWindow | null {
+  return mainWindow
+}
 
 /**
  * 触发主窗口任务栏闪烁

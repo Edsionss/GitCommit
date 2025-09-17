@@ -1,27 +1,55 @@
 <template>
   <div class="webSocket-container">
     <!-- 模式选择界面 -->
-    <div v-if="!wsStore.modeSelected" class="mode-selection">
-      <a-typography-title :level="3">选择聊天模式</a-typography-title>
-      <a-space direction="vertical" :size="20">
-        <a-button type="primary" size="large" @click="wsStore.startHosting"> 创建房间 (作为主机) </a-button>
-        <a-divider>或</a-divider>
-        <div class="join-section">
-          <a-input v-model:value="hostIp" placeholder="输入主机的IP地址" size="large" />
-          <a-button size="large" @click="showTokenEntry" :disabled="!hostIp"> 加入房间 </a-button>
-          <a-button size="large" @click="scanNetwork" :loading="isScanning"> 扫描网络 </a-button>
-        </div>
-        <div v-if="foundIps.length > 0" class="found-ips-list">
-          <a-typography-text>发现的主机:</a-typography-text>
+    <div v-if="!wsStore.modeSelected" class="mode-selection-wrapper">
+      <div class="mode-selection">
+        <a-typography-title :level="3">选择聊天模式</a-typography-title>
+        <a-space direction="vertical" :size="20">
+          <a-button type="primary" size="large" @click="wsStore.startHosting">
+            创建房间 (作为主机)
+          </a-button>
+          <a-divider>或</a-divider>
+          <div class="join-section">
+            <a-input v-model:value="hostIp" placeholder="输入主机的IP地址" size="large" />
+            <a-button size="large" @click="showTokenEntry" :disabled="!hostIp"> 加入房间 </a-button>
+            <a-button size="large" @click="scanNetwork" :loading="isScanning"> 扫描网络 </a-button>
+          </div>
+        </a-space>
+      </div>
+
+      <!-- 扫描结果与直接广播 -->
+      <div v-if="foundIps.length > 0" class="direct-broadcast-section">
+        <a-typography-title :level="4">扫描结果与直接广播</a-typography-title>
+        <a-checkbox-group v-model:value="selectedIps" style="width: 100%">
           <a-list :data-source="foundIps" size="small" bordered>
+            <template #header>
+              <a-checkbox @change="handleSelectAll">全选</a-checkbox>
+            </template>
             <template #renderItem="{ item }">
               <a-list-item>
-                <a @click="hostIp = item">{{ item }}</a>
+                <a-checkbox :value="item">{{ item }}</a-checkbox>
               </a-list-item>
             </template>
           </a-list>
+        </a-checkbox-group>
+        <div class="input-area" style="margin-top: 16px">
+          <a-input
+            v-model:value="directMessage"
+            placeholder="输入要广播的消息..."
+            size="large"
+            @keyup.enter="handleSendDirectBroadcast"
+          />
+          <a-button
+            type="primary"
+            size="large"
+            @click="handleSendDirectBroadcast"
+            :disabled="selectedIps.length === 0 || !directMessage"
+          >
+            <template #icon><SendOutlined /></template>
+            发送广播
+          </a-button>
         </div>
-      </a-space>
+      </div>
     </div>
 
     <!-- 令牌输入模态框 -->
@@ -71,7 +99,6 @@
         item-layout="horizontal"
       >
         <template #renderItem="{ item }">
-          <!-- 令牌验证现在由store处理，这里只显示 -->
           <a-list-item
             v-if="item.token === (wsStore.isHost ? wsStore.roomToken : wsStore.inputToken)"
             class="message-item"
@@ -102,7 +129,7 @@
           @keyup.enter="handleSendMessage"
           :disabled="!wsStore.isConnected"
         />
-        <a-button
+        <a-dropdown-button
           type="primary"
           size="large"
           @click="handleSendMessage"
@@ -110,58 +137,48 @@
         >
           <template #icon><SendOutlined /></template>
           发送
-        </a-button>
-      </div>
-
-      <!-- 全局广播区域 (仅主机可见) -->
-      <div v-if="wsStore.isHost" class="input-area global-broadcast">
-        <a-input
-          v-model:value="globalMessage"
-          size="large"
-          placeholder="输入全局广播..."
-          @keyup.enter="handleSendGlobalBroadcast"
-          :disabled="!wsStore.isConnected"
-        />
-        <a-button
-          type="danger"
-          size="large"
-          @click="handleSendGlobalBroadcast"
-          :disabled="!wsStore.isConnected || !globalMessage"
-        >
-          <template #icon><NotificationOutlined /></template>
-          全局广播
-        </a-button>
+          <template #overlay v-if="wsStore.isHost">
+            <a-menu @click="handleMenuClick">
+              <a-menu-item key="roomBroadcast">
+                <template #icon><NotificationOutlined /></template>
+                房间广播
+              </a-menu-item>
+            </a-menu>
+          </template>
+        </a-dropdown-button>
       </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, onUnmounted } from 'vue'
+import { ref, onUnmounted, computed } from 'vue'
 import { SendOutlined, NotificationOutlined } from '@ant-design/icons-vue'
 import { message as antMessage } from 'ant-design-vue'
 import { networkApi } from '@renderer/api/network'
 import { useWebSocketStore } from '@renderer/stores/webSocketStore'
 import { storeToRefs } from 'pinia'
+import type { CheckboxChangeEvent } from 'ant-design-vue/es/checkbox/interface';
 
 const wsStore = useWebSocketStore()
-// 从 store 中解构 state 和 getters，同时保持响应性
-const { modeSelected, isHost, nickname, isConnected, connectionStatus, roomToken, hostIpForDisplay, messages } = storeToRefs(wsStore)
+const { nickname } = storeToRefs(wsStore)
 
 // --- 本地状态 ---
 const newMessage = ref('')
-const globalMessage = ref('')
+const directMessage = ref('')
 const hostIp = ref('')
 const localInputToken = ref('')
 const showTokenModal = ref(false)
 const isScanning = ref(false)
 const foundIps = ref<string[]>([])
+const selectedIps = ref<string[]>([])
 const activeKey = ref(['1']) // 控制折叠面板
 
 // --- 网络扫描 ---
 const scanNetwork = async () => {
   isScanning.value = true
   foundIps.value = []
+  selectedIps.value = []
   antMessage.info('正在扫描局域网中的主机...')
   try {
     const result = await networkApi.scan(8888)
@@ -176,6 +193,10 @@ const scanNetwork = async () => {
   } finally {
     isScanning.value = false
   }
+}
+
+const handleSelectAll = (e: CheckboxChangeEvent) => {
+  selectedIps.value = e.target.checked ? [...foundIps.value] : []
 }
 
 // --- 模式选择 ---
@@ -202,15 +223,22 @@ const handleSendMessage = () => {
   newMessage.value = ''
 }
 
-const handleSendGlobalBroadcast = () => {
-  wsStore.sendGlobalBroadcast(globalMessage.value)
-  globalMessage.value = ''
+const handleSendDirectBroadcast = () => {
+  wsStore.sendDirectBroadcast(selectedIps.value, directMessage.value)
+  directMessage.value = ''
+}
+
+const handleMenuClick = ({ key }: { key: string }) => {
+  if (key === 'roomBroadcast') {
+    wsStore.sendRoomBroadcast(newMessage.value)
+    newMessage.value = '' // 清空输入框
+  }
 }
 
 // --- 生命周期 ---
 onUnmounted(() => {
-  // 页面卸载时断开连接，清理状态
-  wsStore.disconnect()
+  // 页面卸载时不断开连接，以便在后台继续接收直接广播
+  // wsStore.disconnect()
 })
 </script>
 
@@ -219,38 +247,38 @@ onUnmounted(() => {
   height: calc(100% - 40px);
   display: flex;
   justify-content: center;
-  align-items: center;
+  align-items: flex-start; /* 顶部对齐 */
+  padding: 20px;
+  gap: 20px;
   background-color: var(--color-background);
   color: var(--color-text);
+  overflow-y: auto;
 }
 
-.mode-selection {
+.mode-selection-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+  width: 100%;
+  max-width: 500px; /* 限制最大宽度 */
+  margin: 0 auto;
+}
+
+.mode-selection, .direct-broadcast-section {
   text-align: center;
+  width: 100%;
 }
 
 .join-section {
   display: flex;
   gap: 10px;
-  align-items: center; /* 垂直居中对齐 */
+  align-items: center;
 }
 
-.found-ips-list {
-  height: 300px;
+.direct-broadcast-section .ant-list {
+  text-align: left;
+  max-height: 200px;
   overflow-y: auto;
-  margin: 20px;
-  width: 100%;
-}
-
-.found-ips-list .ant-list-item a {
-  width: 100%;
-  display: block;
-  padding: 4px 8px;
-  border-radius: 4px;
-  color: var(--color-text);
-}
-
-.found-ips-list .ant-list-item a:hover {
-  background-color: var(--color-background-mute);
 }
 
 .chat-container {
@@ -260,7 +288,6 @@ onUnmounted(() => {
   width: 100%;
   border: 1px solid var(--color-border);
   border-radius: 8px;
-  margin: 20px auto;
   overflow: hidden;
   background-color: var(--color-background-soft);
 }
@@ -280,7 +307,6 @@ onUnmounted(() => {
   background-color: var(--color-background);
 }
 
-/* Collapse panel theming */
 .host-info :deep(.ant-collapse) {
   background-color: transparent;
   border: none;
@@ -332,7 +358,6 @@ onUnmounted(() => {
   color: var(--color-text);
 }
 
-/* 自己发送的消息样式 */
 .message-item.is-me {
   text-align: right;
 }
@@ -346,7 +371,7 @@ onUnmounted(() => {
 }
 
 .message-item.is-me .nickname {
-  display: none; /* 自己发的不显示昵称 */
+  display: none;
 }
 
 .message-item.is-me .message-text {
@@ -360,9 +385,5 @@ onUnmounted(() => {
   border-top: 1px solid var(--color-border);
   background-color: var(--color-background);
   gap: 10px;
-}
-
-.global-broadcast {
-  border-top: 1px dashed var(--color-border);
 }
 </style>

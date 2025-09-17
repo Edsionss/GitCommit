@@ -4,7 +4,8 @@ import { ipcMain } from 'electron'
 import {
   handleGetWsAddress,
   startWebSocketServer,
-  handleSendGlobalBroadcast
+  handleSendRoomBroadcast,
+  handleSendDirectBroadcast
 } from '@services/websocket'
 /**
  * 处理从客户端接收到的消息
@@ -36,6 +37,8 @@ export function initializeWebSocket() {
   // 注册 IPC 处理器
   ipcMain.handle('get-ws-address', handleGetWsAddress)
   ipcMain.handle('start-ws-server', startWebSocketServer)
-  // 注册用于发送全局广播的 IPC 监听器
-  ipcMain.on('send-global-broadcast', handleSendGlobalBroadcast)
+  // 重命名：用于向当前主机的所有连接客户端广播（房间内广播）
+  ipcMain.on('send-room-broadcast', handleSendRoomBroadcast)
+  // 新增：用于向指定IP地址发送一次性广播
+  ipcMain.on('send-direct-broadcast', handleSendDirectBroadcast)
 }

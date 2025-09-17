@@ -5,13 +5,18 @@
 </template>
 
 <script setup lang="ts">
-import { computed, watchEffect } from 'vue'
+import { computed, watchEffect, onMounted } from 'vue'
 import { theme as antTheme } from 'ant-design-vue'
 import { useTheme } from './composables/useTheme'
 import { useWebSocketStore } from '@renderer/stores/webSocketStore'
 
-// 初始化 WebSocket store，使其能够接收全局通知
-useWebSocketStore()
+// 初始化 WebSocket store
+const wsStore = useWebSocketStore()
+
+onMounted(() => {
+  // 开启对直接广播的监听
+  wsStore.listenForDirectBroadcasts()
+})
 
 const { effectiveTheme } = useTheme()
 const { token } = antTheme.useToken()

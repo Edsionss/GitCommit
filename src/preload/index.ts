@@ -90,6 +90,12 @@ const api = {
     ipcRenderer.on('scan-cancelled', listener)
     return () => ipcRenderer.removeListener('scan-cancelled', listener)
   },
+  onDirectBroadcastReceived: (callback: (data: any) => void) => {
+    const listener = (_: any, data: any) => callback(data)
+    ipcRenderer.on('direct-broadcast-received', listener)
+    return () => ipcRenderer.removeListener('direct-broadcast-received', listener)
+  },
+
   storeGet: (key: string) => ipcRenderer.invoke('store:get', key),
   storeSet: (key: string, value: any) => ipcRenderer.invoke('store:set', key, value),
   storeDelete: (key: string) => ipcRenderer.invoke('store:delete', key),
@@ -101,8 +107,8 @@ const api = {
   //websocket
   getWsAddress: () => ipcRenderer.invoke('get-ws-address'),
   startWsServer: () => ipcRenderer.invoke('start-ws-server'),
-  sendGlobalBroadcast: (message: { text: string; nickname: string; token: string }) =>
-    ipcRenderer.send('send-global-broadcast', message),
+  sendRoomBroadcast: (message) => ipcRenderer.send('send-room-broadcast', message),
+  sendDirectBroadcast: (payload) => ipcRenderer.send('send-direct-broadcast', payload),
 
   // network
   networkScan: (port: number): Promise<{ success: boolean; ips?: string[]; error?: string }> =>

@@ -11,7 +11,7 @@ export const useWebSocketStore = defineStore('websocket', () => {
   const isConnected = ref(false)
   const isConnecting = ref(false)
   const connectionStatus = ref('未连接')
-  const nickname = ref('')
+  const nickname = ref(`用户-${nanoid(6)}`) // 初始时就提供一个默认昵称
   const modeSelected = ref(false)
   const isHost = ref(false)
   const hostIpForDisplay = ref('')
@@ -22,6 +22,17 @@ export const useWebSocketStore = defineStore('websocket', () => {
   let serverAddress = ''
 
   // --- Actions ---
+
+  // 监听来自主进程的直接广播
+  const listenForDirectBroadcasts = () => {
+    webSocketApi.onDirectBroadcastReceived((data) => {
+      notification.info({
+        message: `收到来自 ${data.sourceIp} 的广播`,
+        description: data.text,
+        placement: 'topRight'
+      })
+    })
+  }
 
   const connectWebSocket = () => {
     if (ws || !serverAddress) return
@@ -43,10 +54,10 @@ export const useWebSocketStore = defineStore('websocket', () => {
       try {
         const message: ChatMessage = JSON.parse(event.data)
 
-        // 检查是否是全局消息
+        // 检查是否是房间内的全局广播
         if (message.isGlobal) {
           notification.info({
-            message: `全局广播 - 来自: ${message.nickname}`,
+            message: `房间广播 - 来自: ${message.nickname}`,
             description: message.text,
             placement: 'topRight'
           })
@@ -69,11 +80,10 @@ export const useWebSocketStore = defineStore('websocket', () => {
       console.log(`[WebSocket] 连接关闭`, event)
       isConnected.value = false
       isConnecting.value = false
-      connectionStatus.value = '已断开. 正在重试...'
+      connectionStatus.value = '已断开'
       ws = null
-      if (!isHost.value) {
-        setTimeout(connectWebSocket, 3000)
-      } else {
+      // 客户端断线后不再自动重连，让用户手动操作
+      if (isHost.value) {
         connectionStatus.value = '主机服务器已关闭'
       }
     }
@@ -114,7 +124,7 @@ export const useWebSocketStore = defineStore('websocket', () => {
   const joinRoom = (ip: string, token: string) => {
     serverAddress = `ws://${ip.trim()}:8888`
     inputToken.value = token
-    nickname.value = `访客-${nanoid(6)}`
+    // nickname 在加入房间时不需要重新生成，使用已有的
     connectWebSocket()
   }
 
@@ -129,21 +139,39 @@ export const useWebSocketStore = defineStore('websocket', () => {
     }
   }
 
-  const sendGlobalBroadcast = (text: string) => {
+  const sendRoomBroadcast = (text: string) => {
     if (text.trim() && isHost.value) {
       const messagePayload = {
         text,
         nickname: nickname.value,
-        token: 'global' // Or any identifier for global messages
+        token: 'room-broadcast' // Differentiate room broadcast
       }
-      webSocketApi.sendGlobalBroadcast(messagePayload)
-      antMessage.success('全局广播已发送')
+      webSocketApi.sendRoomBroadcast(messagePayload)
+      antMessage.success('房间广播已发送')
     }
+  }
+
+  const sendDirectBroadcast = (targets: string[], text: string) => {
+    if (!text.trim()) return
+    if (targets.length === 0) {
+      antMessage.warn('请至少选择一个广播目标')
+      return
+    }
+
+    const payload = {
+      targets,
+      message: {
+        text,
+        nickname: nickname.value
+      }
+    }
+    webSocketApi.sendDirectBroadcast(payload)
+    antMessage.success(`已向 ${targets.length} 个目标发送广播`)
   }
 
   const disconnect = () => {
     if (ws) {
-      ws.onclose = null // 防止重连
+      ws.onclose = null
       ws.close()
       ws = null
     }
@@ -153,7 +181,6 @@ export const useWebSocketStore = defineStore('websocket', () => {
     isHost.value = false
     roomToken.value = ''
     inputToken.value = ''
-    nickname.value = ''
     connectionStatus.value = '未连接'
   }
 
@@ -168,10 +195,12 @@ export const useWebSocketStore = defineStore('websocket', () => {
     hostIpForDisplay,
     roomToken,
     inputToken,
+    listenForDirectBroadcasts,
     startHosting,
     joinRoom,
     sendMessage,
-    sendGlobalBroadcast,
+    sendRoomBroadcast,
+    sendDirectBroadcast,
     disconnect
   }
 })
