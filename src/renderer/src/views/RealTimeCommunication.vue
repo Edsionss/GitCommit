@@ -9,6 +9,17 @@
         <div class="join-section">
           <a-input v-model:value="hostIp" placeholder="输入主机的IP地址" size="large" />
           <a-button size="large" @click="showTokenEntry" :disabled="!hostIp"> 加入房间 </a-button>
+          <a-button size="large" @click="scanNetwork" :loading="isScanning"> 扫描网络 </a-button>
+        </div>
+        <div v-if="foundIps.length > 0" class="found-ips-list">
+          <a-typography-text>发现的主机:</a-typography-text>
+          <a-list :data-source="foundIps" size="small" bordered>
+            <template #renderItem="{ item }">
+              <a-list-item>
+                <a @click="hostIp = item">{{ item }}</a>
+              </a-list-item>
+            </template>
+          </a-list>
         </div>
       </a-space>
     </div>
@@ -41,11 +52,9 @@
       <!-- 主机信息展示 -->
       <div v-if="isHost && roomToken" class="host-info">
         <a-collapse v-model:activeKey="activeKey" :bordered="false" expand-icon-position="right">
-          <a-collapse-panel key="1" style="background: #e6f7ff; border: 1px solid #91d5ff">
+          <a-collapse-panel key="1">
             <template #header>
-              <a-typography-text type="secondary"
-                >点击此处查看/隐藏房间信息</a-typography-text
-              >
+              <a-typography-text type="secondary">点击此处查看/隐藏房间信息</a-typography-text>
             </template>
             <a-typography-text strong>IP: {{ hostIpForDisplay }}</a-typography-text>
             <br />
@@ -136,8 +145,36 @@ const showTokenModal = ref(false) // 是否显示令牌输入框
 const inputToken = ref('') // 客户端输入的令牌
 const activeKey = ref(['1']) // 控制折叠面板的展开，默认展开
 
+// --- 扫描相关状态 ---
+const isScanning = ref(false)
+const foundIps = ref<string[]>([])
+
 let ws: WebSocket | null = null
 let serverAddress = ''
+
+// --- 网络扫描逻辑 ---
+const scanNetwork = async () => {
+  isScanning.value = true
+  foundIps.value = []
+  antMessage.info('正在扫描局域网中的主机...')
+  try {
+    const result = await webSocketApi.scan(8888)
+    if (result.success && result.ips) {
+      foundIps.value = result.ips
+      if (result.ips.length > 0) {
+        antMessage.success(`扫描完成！发现 ${result.ips.length} 个主机。`)
+      } else {
+        antMessage.warn('扫描完成，未发现任何主机。')
+      }
+    } else {
+      antMessage.error(`扫描失败: ${result.error}`)
+    }
+  } catch (error) {
+    antMessage.error(`扫描时发生错误: ${(error as Error).message}`)
+  } finally {
+    isScanning.value = false
+  }
+}
 
 // --- 模式选择逻辑 ---
 const startHosting = async () => {
@@ -157,6 +194,7 @@ const startHosting = async () => {
     modeSelected.value = true
     roomToken.value = nanoid(8) // 生成8位随机令牌
     nickname.value = `主机-${nanoid(6)}` // 自动生成昵称
+    console.log(`[主机启动] IP: ${hostIpForDisplay.value}, 令牌: ${roomToken.value}`)
 
     connectWebSocket()
   } catch (error) {
@@ -180,6 +218,7 @@ const handleTokenSubmit = () => {
   }
   serverAddress = `ws://${hostIp.value.trim()}:8888`
   nickname.value = `访客-${nanoid(6)}` // 自动生成昵称
+  console.log(`[加入房间] 准备连接到 ${serverAddress}，使用令牌: ${inputToken.value}`)
   isConnecting.value = true
   connectWebSocket()
 }
@@ -193,6 +232,7 @@ const connectWebSocket = () => {
   connectionStatus.value = '正在连接...'
 
   ws.onopen = () => {
+    console.log(`[WebSocket] 连接成功: ${serverAddress}`)
     isConnected.value = true
     isConnecting.value = false
     connectionStatus.value = '已连接'
@@ -210,7 +250,9 @@ const connectWebSocket = () => {
     }
   }
 
-  ws.onclose = () => {
+  ws.onclose = (event) => {
+    console.log(`[WebSocket] 连接关闭`, event)
+    console.log(`[WebSocket] 关闭代码: ${event.code}, 原因: ${event.reason}`)
     isConnected.value = false
     isConnecting.value = false
     connectionStatus.value = '已断开. 正在重试...'
@@ -223,7 +265,7 @@ const connectWebSocket = () => {
   }
 
   ws.onerror = (error) => {
-    console.error('WebSocket 错误:', error)
+    console.error('[WebSocket] 发生错误:', error)
     isConnecting.value = false
     connectionStatus.value = '连接错误'
     antMessage.error(`无法连接到 ${serverAddress}，请检查地址和令牌是否正确。`)
@@ -268,6 +310,8 @@ onUnmounted(() => {
   display: flex;
   justify-content: center;
   align-items: center;
+  background-color: var(--color-background);
+  color: var(--color-text);
 }
 
 .mode-selection {
@@ -277,6 +321,26 @@ onUnmounted(() => {
 .join-section {
   display: flex;
   gap: 10px;
+  align-items: center; /* 垂直居中对齐 */
+}
+
+.found-ips-list {
+  height: 300px;
+  overflow-y: auto;
+  margin: 20px;
+  width: 100%;
+}
+
+.found-ips-list .ant-list-item a {
+  width: 100%;
+  display: block;
+  padding: 4px 8px;
+  border-radius: 4px;
+  color: var(--color-text);
+}
+
+.found-ips-list .ant-list-item a:hover {
+  background-color: var(--color-background-mute);
 }
 
 .chat-container {
@@ -284,17 +348,17 @@ onUnmounted(() => {
   flex-direction: column;
   height: 100%;
   width: 100%;
-  border: 1px solid #d9d9d9;
+  border: 1px solid var(--color-border);
   border-radius: 8px;
   margin: 20px auto;
   overflow: hidden;
-  background: #f0f2f5;
+  background-color: var(--color-background-soft);
 }
 
 .header {
   padding: 12px 24px;
-  background-color: #ffffff;
-  border-bottom: 1px solid #d9d9d9;
+  background-color: var(--color-background);
+  border-bottom: 1px solid var(--color-border);
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -303,7 +367,26 @@ onUnmounted(() => {
 
 .host-info {
   padding: 10px 24px;
-  background-color: #ffffff;
+  background-color: var(--color-background);
+}
+
+/* Collapse panel theming */
+.host-info :deep(.ant-collapse) {
+  background-color: transparent;
+  border: none;
+}
+.host-info :deep(.ant-collapse-item) {
+  background-color: var(--color-background-mute) !important;
+  border: 1px solid var(--color-primary) !important;
+  border-radius: 4px !important;
+}
+.host-info :deep(.ant-collapse-header) {
+  color: var(--color-text-light);
+}
+.host-info :deep(.ant-collapse-content) {
+  background-color: transparent !important;
+  color: var(--color-text);
+  border-top: 1px solid var(--color-primary) !important;
 }
 
 .message-area {
@@ -320,21 +403,23 @@ onUnmounted(() => {
 .message-item .nickname {
   font-weight: bold;
   font-size: 14px;
+  color: var(--color-heading);
 }
 
 .message-item .timestamp {
   font-size: 12px;
-  color: #8c8c8c;
+  color: var(--color-text-light);
   margin-left: 8px;
 }
 
 .message-text {
   padding: 8px 12px;
-  background: #fff;
+  background: var(--color-background);
   border-radius: 8px;
   display: inline-block;
   max-width: 100%;
   word-wrap: break-word;
+  color: var(--color-text);
 }
 
 /* 自己发送的消息样式 */
@@ -355,15 +440,15 @@ onUnmounted(() => {
 }
 
 .message-item.is-me .message-text {
-  background: #1890ff;
+  background: var(--color-primary);
   color: #fff;
 }
 
 .input-area {
   display: flex;
   padding: 12px 24px;
-  border-top: 1px solid #d9d9d9;
-  background-color: #ffffff;
+  border-top: 1px solid var(--color-border);
+  background-color: var(--color-background);
   gap: 10px;
 }
 </style>

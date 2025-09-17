@@ -1,13 +1,16 @@
 import { WebSocketServer, WebSocket } from 'ws'
+import http from 'http'
 import { handleMessage } from '@handlers/websocket'
 import type { ChatMessage } from '@sharedType/Chat'
 import { nanoid } from 'nanoid'
 import { getLocalIpAddress } from '@nodeUtils/index'
+import { networkInterfaces } from 'os'
 
 const PORT = 8888 // 定义 WebSocket 服务器端口
 const HOST = '0.0.0.0' // 显式声明监听所有网络接口
 
 let wss: WebSocketServer | null = null
+let httpServer: http.Server | null = null
 // 创建一个 Map 来存储客户端 ID
 const clients = new Map<WebSocket, string>()
 /**
@@ -19,7 +22,20 @@ export function startWebSocketServer() {
     return
   }
 
-  wss = new WebSocketServer({ port: PORT, host: HOST })
+  // 1. Create HTTP server
+  httpServer = http.createServer((req, res) => {
+    // 2. Add ping handler
+    if (req.url === '/ping' && req.method === 'GET') {
+      res.writeHead(200, { 'Content-Type': 'application/json' })
+      res.end(JSON.stringify({ app: 'CognitoOcean' }))
+    } else {
+      res.writeHead(404)
+      res.end()
+    }
+  })
+
+  // 3. Create WebSocket server and attach it to the HTTP server
+  wss = new WebSocketServer({ server: httpServer })
 
   wss.on('connection', (ws: WebSocket) => {
     const clientId = nanoid() // 为每个新连接生成一个唯一ID
@@ -46,7 +62,10 @@ export function startWebSocketServer() {
     })
   })
 
-  console.log(`WebSocket server started on ws://localhost:${PORT}`)
+  // 4. Start listening
+  httpServer.listen(PORT, HOST, () => {
+    console.log(`Server (HTTP + WebSocket) started on ws://localhost:${PORT}`)
+  })
 }
 
 /**
@@ -57,6 +76,12 @@ export function stopWebSocketServer() {
     wss.close(() => {
       console.log('WebSocket server stopped.')
       wss = null
+    })
+  }
+  if (httpServer) {
+    httpServer.close(() => {
+      console.log('HTTP server stopped.')
+      httpServer = null
     })
   }
 }
@@ -89,4 +114,71 @@ export function handleGetWsAddress() {
   }
   // 如果获取不到局域网IP，则回退到 localhost (适用于单机测试)
   return `ws://localhost:${port}`
+}
+
+// Function to find CognitoOcean hosts on the local network
+export async function findAppHosts(port: number): Promise<string[]> {
+  const nets = networkInterfaces()
+  const results: string[] = []
+  const promises: Promise<void>[] = []
+
+  for (const name of Object.keys(nets)) {
+    const netInfo = nets[name]
+    if (!netInfo) continue
+
+    for (const net of netInfo) {
+      // Skip over non-IPv4 and internal (i.e. 127.0.0.1) addresses
+      if (net.family === 'IPv4' && !net.internal) {
+        const subnet = net.address.substring(0, net.address.lastIndexOf('.'))
+        for (let i = 1; i < 255; i++) {
+          const ip = `${subnet}.${i}`
+          const promise = new Promise<void>((resolve) => {
+            const options = {
+              host: ip,
+              port: port,
+              path: '/ping',
+              timeout: 500 // Short timeout for quick scanning
+            }
+
+            const req = http.get(options, (res) => {
+              let data = ''
+              if (res.statusCode === 200) {
+                res.on('data', (chunk) => {
+                  data += chunk
+                })
+                res.on('end', () => {
+                  try {
+                    const jsonData = JSON.parse(data)
+                    if (jsonData.app === 'CognitoOcean') {
+                      results.push(ip)
+                    }
+                  } catch (e) {
+                    // JSON parsing error, not a valid host
+                  }
+                  resolve()
+                })
+              } else {
+                res.resume() // Consume response data to free up memory
+                resolve()
+              }
+            })
+
+            req.on('timeout', () => {
+              req.destroy()
+              resolve()
+            })
+
+            req.on('error', (err) => {
+              // Ignore connection errors (e.g., ECONNREFUSED)
+              resolve()
+            })
+          })
+          promises.push(promise)
+        }
+      }
+    }
+  }
+
+  await Promise.all(promises)
+  return results
 }

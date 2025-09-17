@@ -1,7 +1,7 @@
 import type { WebSocket } from 'ws'
 import type { ChatMessage } from '@sharedType/Chat'
 import { ipcMain } from 'electron'
-import { handleGetWsAddress, startWebSocketServer } from '@services/websocket'
+import { handleGetWsAddress, startWebSocketServer, findAppHosts } from '@services/websocket'
 /**
  * 处理从客户端接收到的消息
  * @param message - 从客户端收到的原始消息字符串
@@ -32,4 +32,13 @@ export function initializeWebSocket() {
   // 注册 IPC 处理器
   ipcMain.handle('get-ws-address', handleGetWsAddress)
   ipcMain.handle('start-ws-server', startWebSocketServer)
+  ipcMain.handle('network:scan', async (_event, port: number) => {
+    try {
+      const ips = await findAppHosts(port)
+      return { success: true, ips }
+    } catch (error) {
+      console.error('Failed to scan network:', error)
+      return { success: false, error: (error as Error).message }
+    }
+  })
 }

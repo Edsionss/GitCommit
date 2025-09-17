@@ -72,7 +72,8 @@ interface ExposedAPI {
   getStockInfoByCode: (code: string, name?: string) => Promise<any>
 
   //websocket
-  getWsAddress: () => Promise<string>
+  startWsServer: () => Promise<void>
+  networkScan: (port: number) => Promise<{ success: boolean; ips?: string[]; error?: string }>
 }
 
 declare global {
