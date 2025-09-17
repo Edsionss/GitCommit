@@ -1,10 +1,10 @@
 <template>
   <div class="webSocket-container">
     <!-- 模式选择界面 -->
-    <div v-if="!modeSelected" class="mode-selection">
+    <div v-if="!wsStore.modeSelected" class="mode-selection">
       <a-typography-title :level="3">选择聊天模式</a-typography-title>
       <a-space direction="vertical" :size="20">
-        <a-button type="primary" size="large" @click="startHosting"> 创建房间 (作为主机) </a-button>
+        <a-button type="primary" size="large" @click="wsStore.startHosting"> 创建房间 (作为主机) </a-button>
         <a-divider>或</a-divider>
         <div class="join-section">
           <a-input v-model:value="hostIp" placeholder="输入主机的IP地址" size="large" />
@@ -31,34 +31,34 @@
       :closable="false"
       :maskClosable="false"
       @ok="handleTokenSubmit"
-      :confirm-loading="isConnecting"
+      :confirm-loading="wsStore.isConnecting"
     >
       <a-input
-        v-model:value="inputToken"
+        v-model:value="localInputToken"
         placeholder="向主机索要令牌"
         @keyup.enter="handleTokenSubmit"
       />
     </a-modal>
 
     <!-- 主聊天容器 -->
-    <div class="chat-container" v-if="modeSelected">
+    <div class="chat-container" v-if="wsStore.modeSelected">
       <div class="header">
         <a-typography-title :level="4" style="margin: 0">
-          局域网聊天室 - {{ isHost ? '主机' : '客户端' }} ({{ nickname }})
+          局域网聊天室 - {{ wsStore.isHost ? '主机' : '客户端' }} ({{ wsStore.nickname }})
         </a-typography-title>
-        <a-tag :color="isConnected ? 'green' : 'red'">{{ connectionStatus }}</a-tag>
+        <a-tag :color="wsStore.isConnected ? 'green' : 'red'">{{ wsStore.connectionStatus }}</a-tag>
       </div>
 
       <!-- 主机信息展示 -->
-      <div v-if="isHost && roomToken" class="host-info">
+      <div v-if="wsStore.isHost && wsStore.roomToken" class="host-info">
         <a-collapse v-model:activeKey="activeKey" :bordered="false" expand-icon-position="right">
           <a-collapse-panel key="1">
             <template #header>
               <a-typography-text type="secondary">点击此处查看/隐藏房间信息</a-typography-text>
             </template>
-            <a-typography-text strong>IP: {{ hostIpForDisplay }}</a-typography-text>
+            <a-typography-text strong>IP: {{ wsStore.hostIpForDisplay }}</a-typography-text>
             <br />
-            <a-typography-text strong>令牌: {{ roomToken }}</a-typography-text>
+            <a-typography-text strong>令牌: {{ wsStore.roomToken }}</a-typography-text>
           </a-collapse-panel>
         </a-collapse>
       </div>
@@ -67,13 +67,13 @@
       <a-list
         class="message-area"
         ref="messageListRef"
-        :data-source="messages"
+        :data-source="wsStore.messages"
         item-layout="horizontal"
       >
         <template #renderItem="{ item }">
-          <!-- 简单的令牌验证：只显示令牌匹配的消息 -->
+          <!-- 令牌验证现在由store处理，这里只显示 -->
           <a-list-item
-            v-if="item.token === (isHost ? roomToken : inputToken)"
+            v-if="item.token === (wsStore.isHost ? wsStore.roomToken : wsStore.inputToken)"
             class="message-item"
             :class="{ 'is-me': item.isMe }"
           >
@@ -99,17 +99,37 @@
           v-model:value="newMessage"
           size="large"
           placeholder="输入消息..."
-          @keyup.enter="sendMessage"
-          :disabled="!isConnected"
+          @keyup.enter="handleSendMessage"
+          :disabled="!wsStore.isConnected"
         />
         <a-button
           type="primary"
           size="large"
-          @click="sendMessage"
-          :disabled="!isConnected || !newMessage"
+          @click="handleSendMessage"
+          :disabled="!wsStore.isConnected || !newMessage"
         >
           <template #icon><SendOutlined /></template>
           发送
+        </a-button>
+      </div>
+
+      <!-- 全局广播区域 (仅主机可见) -->
+      <div v-if="wsStore.isHost" class="input-area global-broadcast">
+        <a-input
+          v-model:value="globalMessage"
+          size="large"
+          placeholder="输入全局广播..."
+          @keyup.enter="handleSendGlobalBroadcast"
+          :disabled="!wsStore.isConnected"
+        />
+        <a-button
+          type="danger"
+          size="large"
+          @click="handleSendGlobalBroadcast"
+          :disabled="!wsStore.isConnected || !globalMessage"
+        >
+          <template #icon><NotificationOutlined /></template>
+          全局广播
         </a-button>
       </div>
     </div>
@@ -117,43 +137,28 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onUnmounted, nextTick } from 'vue'
-import type { ChatMessage } from '@sharedType/Chat'
-import { SendOutlined } from '@ant-design/icons-vue'
-import { webSocketApi } from '@api/webSocket'
+import { ref, onUnmounted } from 'vue'
+import { SendOutlined, NotificationOutlined } from '@ant-design/icons-vue'
 import { message as antMessage } from 'ant-design-vue'
-import { nanoid } from 'nanoid'
 import { networkApi } from '@renderer/api/network'
+import { useWebSocketStore } from '@renderer/stores/webSocketStore'
+import { storeToRefs } from 'pinia'
 
-// --- 状态 ---
-const messages = ref<ChatMessage[]>([])
+const wsStore = useWebSocketStore()
+// 从 store 中解构 state 和 getters，同时保持响应性
+const { modeSelected, isHost, nickname, isConnected, connectionStatus, roomToken, hostIpForDisplay, messages } = storeToRefs(wsStore)
+
+// --- 本地状态 ---
 const newMessage = ref('')
-const isConnected = ref(false)
-const isConnecting = ref(false)
-const connectionStatus = ref('未连接')
-const messageListRef = ref<any>(null)
-const nickname = ref('')
-
-// --- 模式选择状态 ---
-const modeSelected = ref(false)
-const isHost = ref(false)
+const globalMessage = ref('')
 const hostIp = ref('')
-const hostIpForDisplay = ref('')
-
-// --- 令牌相关状态 ---
-const roomToken = ref('') // 主机生成的令牌
-const showTokenModal = ref(false) // 是否显示令牌输入框
-const inputToken = ref('') // 客户端输入的令牌
-const activeKey = ref(['1']) // 控制折叠面板的展开，默认展开
-
-// --- 扫描相关状态 ---
+const localInputToken = ref('')
+const showTokenModal = ref(false)
 const isScanning = ref(false)
 const foundIps = ref<string[]>([])
+const activeKey = ref(['1']) // 控制折叠面板
 
-let ws: WebSocket | null = null
-let serverAddress = ''
-
-// --- 网络扫描逻辑 ---
+// --- 网络扫描 ---
 const scanNetwork = async () => {
   isScanning.value = true
   foundIps.value = []
@@ -162,13 +167,9 @@ const scanNetwork = async () => {
     const result = await networkApi.scan(8888)
     if (result.success && result.ips) {
       foundIps.value = result.ips
-      if (result.ips.length > 0) {
-        antMessage.success(`扫描完成！发现 ${result.ips.length} 个主机。`)
-      } else {
-        antMessage.warn('扫描完成，未发现任何主机。')
-      }
+      antMessage.success(`扫描完成！发现 ${result.ips.length} 个主机。`)
     } else {
-      antMessage.error(`扫描失败: ${result.error}`)
+      antMessage.warn('扫描完成，未发现任何主机。')
     }
   } catch (error) {
     antMessage.error(`扫描时发生错误: ${(error as Error).message}`)
@@ -177,33 +178,7 @@ const scanNetwork = async () => {
   }
 }
 
-// --- 模式选择逻辑 ---
-const startHosting = async () => {
-  try {
-    await webSocketApi.startWsServer()
-    serverAddress = await webSocketApi.getWsAddress()
-
-    if (!serverAddress || serverAddress.includes('localhost')) {
-      antMessage.error('无法获取有效的局域网IP地址，无法作为主机。')
-      return
-    }
-
-    hostIpForDisplay.value = serverAddress.replace('ws://', '').split(':')[0]
-    antMessage.success(`主机已在 ${serverAddress} 启动！`)
-
-    isHost.value = true
-    modeSelected.value = true
-    roomToken.value = nanoid(8) // 生成8位随机令牌
-    nickname.value = `主机-${nanoid(6)}` // 自动生成昵称
-    console.log(`[主机启动] IP: ${hostIpForDisplay.value}, 令牌: ${roomToken.value}`)
-
-    connectWebSocket()
-  } catch (error) {
-    console.error('启动主机失败:', error)
-    antMessage.error('启动主机失败，请查看控制台日志。')
-  }
-}
-
+// --- 模式选择 ---
 const showTokenEntry = () => {
   if (!hostIp.value.trim()) {
     antMessage.warn('请输入有效的主机IP地址。')
@@ -213,95 +188,29 @@ const showTokenEntry = () => {
 }
 
 const handleTokenSubmit = () => {
-  if (!inputToken.value.trim()) {
+  if (!localInputToken.value.trim()) {
     antMessage.warn('请输入房间令牌。')
     return
   }
-  serverAddress = `ws://${hostIp.value.trim()}:8888`
-  nickname.value = `访客-${nanoid(6)}` // 自动生成昵称
-  console.log(`[加入房间] 准备连接到 ${serverAddress}，使用令牌: ${inputToken.value}`)
-  isConnecting.value = true
-  connectWebSocket()
+  wsStore.joinRoom(hostIp.value, localInputToken.value)
+  showTokenModal.value = false
 }
 
-// --- WebSocket 逻辑 ---
-const connectWebSocket = () => {
-  if (ws || !serverAddress) return
-
-  console.log(`正在连接到 WebSocket 服务器: ${serverAddress}`)
-  ws = new WebSocket(serverAddress)
-  connectionStatus.value = '正在连接...'
-
-  ws.onopen = () => {
-    console.log(`[WebSocket] 连接成功: ${serverAddress}`)
-    isConnected.value = true
-    isConnecting.value = false
-    connectionStatus.value = '已连接'
-    showTokenModal.value = false // 如果是从令牌框连接的，则关闭它
-    modeSelected.value = true // 确认进入聊天界面
-  }
-
-  ws.onmessage = (event) => {
-    try {
-      const message: ChatMessage = JSON.parse(event.data)
-      messages.value.push(message)
-      scrollToBottom()
-    } catch (error) {
-      console.error('解析消息失败:', error)
-    }
-  }
-
-  ws.onclose = (event) => {
-    console.log(`[WebSocket] 连接关闭`, event)
-    console.log(`[WebSocket] 关闭代码: ${event.code}, 原因: ${event.reason}`)
-    isConnected.value = false
-    isConnecting.value = false
-    connectionStatus.value = '已断开. 正在重试...'
-    ws = null
-    if (!isHost.value) {
-      setTimeout(connectWebSocket, 3000)
-    } else {
-      connectionStatus.value = '主机服务器已关闭'
-    }
-  }
-
-  ws.onerror = (error) => {
-    console.error('[WebSocket] 发生错误:', error)
-    isConnecting.value = false
-    connectionStatus.value = '连接错误'
-    antMessage.error(`无法连接到 ${serverAddress}，请检查地址和令牌是否正确。`)
-    ws?.close()
-  }
+// --- 消息发送 ---
+const handleSendMessage = () => {
+  wsStore.sendMessage(newMessage.value)
+  newMessage.value = ''
 }
 
-// --- 发送消息 ---
-const sendMessage = () => {
-  if (newMessage.value.trim() && ws && isConnected.value) {
-    const messagePayload = {
-      text: newMessage.value,
-      nickname: nickname.value,
-      token: isHost.value ? roomToken.value : inputToken.value
-    }
-    ws.send(JSON.stringify(messagePayload))
-    newMessage.value = ''
-  }
-}
-
-// --- 自动滚动 ---
-const scrollToBottom = async () => {
-  await nextTick()
-  const listEl = document.querySelector('.message-area')
-  if (listEl) {
-    listEl.scrollTop = listEl.scrollHeight
-  }
+const handleSendGlobalBroadcast = () => {
+  wsStore.sendGlobalBroadcast(globalMessage.value)
+  globalMessage.value = ''
 }
 
 // --- 生命周期 ---
 onUnmounted(() => {
-  if (ws) {
-    ws.onclose = null
-    ws.close()
-  }
+  // 页面卸载时断开连接，清理状态
+  wsStore.disconnect()
 })
 </script>
 
@@ -451,5 +360,9 @@ onUnmounted(() => {
   border-top: 1px solid var(--color-border);
   background-color: var(--color-background);
   gap: 10px;
+}
+
+.global-broadcast {
+  border-top: 1px dashed var(--color-border);
 }
 </style>

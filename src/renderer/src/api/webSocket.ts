@@ -1,4 +1,6 @@
 export const webSocketApi = {
   getWsAddress: async (): Promise<string> => window.api.getWsAddress(),
-  startWsServer: async (): Promise<void> => window.api.startWsServer()
+  startWsServer: async (): Promise<void> => window.api.startWsServer(),
+  sendGlobalBroadcast: (message: { text: string; nickname: string; token: string }): void =>
+    window.api.sendGlobalBroadcast(message)
 }

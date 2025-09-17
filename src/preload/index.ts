@@ -101,6 +101,8 @@ const api = {
   //websocket
   getWsAddress: () => ipcRenderer.invoke('get-ws-address'),
   startWsServer: () => ipcRenderer.invoke('start-ws-server'),
+  sendGlobalBroadcast: (message: { text: string; nickname: string; token: string }) =>
+    ipcRenderer.send('send-global-broadcast', message),
 
   // network
   networkScan: (port: number): Promise<{ success: boolean; ips?: string[]; error?: string }> =>

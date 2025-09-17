@@ -6,10 +6,31 @@ import { registerIpcHandlers } from '@handlers/ipcHandlers'
 import { startWebSocketServer, stopWebSocketServer } from '@services/websocket'
 import { getLocalIpAddress } from '@nodeUtils/index'
 
+// 将 mainWindow 声明在函数外部，以便在其他地方访问
+let mainWindow: BrowserWindow | null = null
+
+/**
+ * 触发主窗口任务栏闪烁
+ */
+export function flashMainWindow(): void {
+  if (mainWindow && !mainWindow.isFocused()) {
+    mainWindow.flashFrame(true)
+  }
+}
+
+/**
+ * 停止主窗口任务栏闪烁
+ */
+export function stopFlashMainWindow(): void {
+  if (mainWindow) {
+    mainWindow.flashFrame(false)
+  }
+}
+
 // 创建窗口
 function createWindow(): void {
   // Create the browser window.
-  const mainWindow = new BrowserWindow({
+  mainWindow = new BrowserWindow({
     width: 800,
     height: 800,
     show: false,
@@ -23,6 +44,9 @@ function createWindow(): void {
       contextIsolation: true
     }
   })
+
+  // 在窗口获得焦点时停止闪烁
+  mainWindow.on('focus', stopFlashMainWindow)
 
   // 修改会话的 CSP
   session.defaultSession.webRequest.onHeadersReceived((details, callback) => {

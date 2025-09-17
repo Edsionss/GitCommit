@@ -4,6 +4,7 @@ import { handleMessage } from '@handlers/websocket'
 import type { ChatMessage } from '@sharedType/Chat'
 import { nanoid } from 'nanoid'
 import { getLocalIpAddress } from '@nodeUtils/index'
+import { flashMainWindow } from '@main/index' // 导入 flashMainWindow
 
 const PORT = 8888 // 定义 WebSocket 服务器端口
 const HOST = '0.0.0.0' // 显式声明监听所有网络接口
@@ -92,6 +93,9 @@ export function stopWebSocketServer() {
 function broadcast(message: ChatMessage) {
   if (!wss) return
 
+  // 在广播前触发任务栏闪烁
+  flashMainWindow()
+
   clients.forEach((id, client) => {
     if (client.readyState === WebSocket.OPEN) {
       // 为每个客户端定制消息，告诉它这条消息是不是自己发的
@@ -102,6 +106,34 @@ function broadcast(message: ChatMessage) {
       client.send(JSON.stringify(messageToSend))
     }
   })
+}
+
+/**
+ * 处理从渲染器发送的全局广播请求
+ * @param _event - IpcMainEvent
+ * @param message - 包含 text, nickname, 和 token 的对象
+ */
+export function handleSendGlobalBroadcast(
+  _event: Electron.IpcMainEvent,
+  message: { text: string; nickname: string; token: string }
+): void {
+  try {
+    // 模拟一个客户端ID用于全局消息
+    const globalSenderId = 'global-broadcaster'
+    const processedMessage = handleMessage(JSON.stringify(message), globalSenderId)
+
+    // 标记为全局消息
+    const globalMessage = {
+      ...processedMessage,
+      isGlobal: true,
+      // 全局消息不属于任何特定房间，所以清空 token
+      token: undefined
+    }
+
+    broadcast(globalMessage)
+  } catch (error) {
+    console.error('Failed to send global broadcast:', error)
+  }
 }
 
 // 获取 WebSocket 地址

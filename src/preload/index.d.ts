@@ -74,6 +74,7 @@ interface ExposedAPI {
   //websocket
   getWsAddress: () => Promise<string>
   startWsServer: () => Promise<void>
+  sendGlobalBroadcast: (message: { text: string; nickname: string; token: string }) => void
 
   // network
   networkScan: (port: number) => Promise<{ success: boolean; ips?: string[]; error?: string }>

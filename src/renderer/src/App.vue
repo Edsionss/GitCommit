@@ -8,6 +8,10 @@
 import { computed, watchEffect } from 'vue'
 import { theme as antTheme } from 'ant-design-vue'
 import { useTheme } from './composables/useTheme'
+import { useWebSocketStore } from '@renderer/stores/webSocketStore'
+
+// 初始化 WebSocket store，使其能够接收全局通知
+useWebSocketStore()
 
 const { effectiveTheme } = useTheme()
 const { token } = antTheme.useToken()

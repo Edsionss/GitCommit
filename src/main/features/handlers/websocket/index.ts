@@ -1,7 +1,11 @@
 import type { WebSocket } from 'ws'
 import type { ChatMessage } from '@sharedType/Chat'
 import { ipcMain } from 'electron'
-import { handleGetWsAddress, startWebSocketServer } from '@services/websocket'
+import {
+  handleGetWsAddress,
+  startWebSocketServer,
+  handleSendGlobalBroadcast
+} from '@services/websocket'
 /**
  * 处理从客户端接收到的消息
  * @param message - 从客户端收到的原始消息字符串
@@ -32,4 +36,6 @@ export function initializeWebSocket() {
   // 注册 IPC 处理器
   ipcMain.handle('get-ws-address', handleGetWsAddress)
   ipcMain.handle('start-ws-server', startWebSocketServer)
+  // 注册用于发送全局广播的 IPC 监听器
+  ipcMain.on('send-global-broadcast', handleSendGlobalBroadcast)
 }
