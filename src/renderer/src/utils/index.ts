@@ -52,3 +52,7 @@ export const buildTree = (list: any[]): any[] => {
   sortTree(tree)
   return tree
 }
+
+export const copyNormalize = (target: any) => {
+  return JSON.parse(JSON.stringify(target))
+}

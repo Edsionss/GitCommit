@@ -24,7 +24,11 @@
         @show-join-modal="showTokenModal = true"
         @scan-network="scanNetwork"
       />
-      <DirectBroadcast v-if="foundIps.length > 0" :found-ips="foundIps" />
+      <DirectBroadcast
+        v-if="foundIps.length > 0"
+        :found-ips="foundIps"
+        @ip-selected="(ip) => (hostIp = ip)"
+      />
     </div>
 
     <!-- Token Input Modal -->

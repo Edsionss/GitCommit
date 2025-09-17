@@ -7,8 +7,8 @@
           <a-checkbox @change="handleSelectAll">全选</a-checkbox>
         </template>
         <template #renderItem="{ item }">
-          <a-list-item>
-            <a-checkbox :value="item">{{ item }}</a-checkbox>
+          <a-list-item class="ip-list-item" @click="$emit('ip-selected', item)">
+            <a-checkbox :value="item" @click.stop>{{ item }}</a-checkbox>
           </a-list-item>
         </template>
       </a-list>
@@ -34,12 +34,13 @@
 </template>
 
 <script setup lang="ts">
-import { ref, defineProps } from 'vue'
+import { ref, defineProps, defineEmits } from 'vue'
 import { useWebSocketStore } from '@renderer/stores/webSocketStore'
 import { SendOutlined } from '@ant-design/icons-vue'
 import type { CheckboxChangeEvent } from 'ant-design-vue/es/checkbox/interface'
-
+import { copyNormalize } from '@utils/index'
 const props = defineProps<{ foundIps: string[] }>()
+const emit = defineEmits(['ip-selected'])
 
 const wsStore = useWebSocketStore()
 const directMessage = ref('')
@@ -50,7 +51,7 @@ const handleSelectAll = (e: CheckboxChangeEvent) => {
 }
 
 const handleSendDirectBroadcast = () => {
-  wsStore.sendDirectBroadcast(selectedIps.value, directMessage.value)
+  wsStore.sendDirectBroadcast(copyNormalize(selectedIps.value), copyNormalize(directMessage.value))
   directMessage.value = ''
 }
 </script>
@@ -65,6 +66,15 @@ const handleSendDirectBroadcast = () => {
   max-height: 200px;
   overflow-y: auto;
   width: 100%;
+}
+
+.ip-list-item {
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.ip-list-item:hover {
+  background-color: var(--color-background-mute);
 }
 
 .input-area {
