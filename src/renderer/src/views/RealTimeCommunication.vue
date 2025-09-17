@@ -52,7 +52,7 @@
       <!-- 主机信息展示 -->
       <div v-if="isHost && roomToken" class="host-info">
         <a-collapse v-model:activeKey="activeKey" :bordered="false" expand-icon-position="right">
-          <a-collapse-panel key="1" style="background: #e6f7ff; border: 1px solid #91d5ff">
+          <a-collapse-panel key="1">
             <template #header>
               <a-typography-text type="secondary">点击此处查看/隐藏房间信息</a-typography-text>
             </template>
@@ -311,6 +311,8 @@ onUnmounted(() => {
   display: flex;
   justify-content: center;
   align-items: center;
+  background-color: var(--color-background);
+  color: var(--color-text);
 }
 
 .mode-selection {
@@ -335,10 +337,11 @@ onUnmounted(() => {
   display: block;
   padding: 4px 8px;
   border-radius: 4px;
+  color: var(--color-text);
 }
 
 .found-ips-list .ant-list-item a:hover {
-  background-color: #e6f7ff;
+  background-color: var(--color-background-mute);
 }
 
 .chat-container {
@@ -346,17 +349,17 @@ onUnmounted(() => {
   flex-direction: column;
   height: 100%;
   width: 100%;
-  border: 1px solid #d9d9d9;
+  border: 1px solid var(--color-border);
   border-radius: 8px;
   margin: 20px auto;
   overflow: hidden;
-  background: #f0f2f5;
+  background-color: var(--color-background-soft);
 }
 
 .header {
   padding: 12px 24px;
-  background-color: #ffffff;
-  border-bottom: 1px solid #d9d9d9;
+  background-color: var(--color-background);
+  border-bottom: 1px solid var(--color-border);
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -365,7 +368,26 @@ onUnmounted(() => {
 
 .host-info {
   padding: 10px 24px;
-  background-color: #ffffff;
+  background-color: var(--color-background);
+}
+
+/* Collapse panel theming */
+.host-info :deep(.ant-collapse) {
+  background-color: transparent;
+  border: none;
+}
+.host-info :deep(.ant-collapse-item) {
+  background-color: var(--color-background-mute) !important;
+  border: 1px solid var(--color-primary) !important;
+  border-radius: 4px !important;
+}
+.host-info :deep(.ant-collapse-header) {
+  color: var(--color-text-light);
+}
+.host-info :deep(.ant-collapse-content) {
+  background-color: transparent !important;
+  color: var(--color-text);
+  border-top: 1px solid var(--color-primary) !important;
 }
 
 .message-area {
@@ -382,21 +404,23 @@ onUnmounted(() => {
 .message-item .nickname {
   font-weight: bold;
   font-size: 14px;
+  color: var(--color-heading);
 }
 
 .message-item .timestamp {
   font-size: 12px;
-  color: #8c8c8c;
+  color: var(--color-text-light);
   margin-left: 8px;
 }
 
 .message-text {
   padding: 8px 12px;
-  background: #fff;
+  background: var(--color-background);
   border-radius: 8px;
   display: inline-block;
   max-width: 100%;
   word-wrap: break-word;
+  color: var(--color-text);
 }
 
 /* 自己发送的消息样式 */
@@ -417,15 +441,15 @@ onUnmounted(() => {
 }
 
 .message-item.is-me .message-text {
-  background: #1890ff;
+  background: var(--color-primary);
   color: #fff;
 }
 
 .input-area {
   display: flex;
   padding: 12px 24px;
-  border-top: 1px solid #d9d9d9;
-  background-color: #ffffff;
+  border-top: 1px solid var(--color-border);
+  background-color: var(--color-background);
   gap: 10px;
 }
 </style>
