@@ -100,7 +100,11 @@ const api = {
 
   //websocket
   getWsAddress: () => ipcRenderer.invoke('get-ws-address'),
-  startWsServer: () => ipcRenderer.invoke('start-ws-server')
+  startWsServer: () => ipcRenderer.invoke('start-ws-server'),
+
+  // network
+  networkScan: (port: number): Promise<{ success: boolean; ips?: string[]; error?: string }> =>
+    ipcRenderer.invoke('network:scan', port)
 }
 
 // 暴露API

@@ -6,6 +6,7 @@ import { registerFileSystemHandlers } from './fileSystem/file-system'
 import { registerHistoryHandlers } from './history/history'
 import { registerAiHandlers } from '@handlers/ai/ai'
 import { initializeWebSocket } from '@handlers/websocket'
+import { registerNetworkScanHandlers } from './network/network-scan'
 export function registerIpcHandlers() {
   // Register handlers from other modules
   registerGitInfoHandlers()
@@ -16,5 +17,6 @@ export function registerIpcHandlers() {
   registerAiHandlers()
   registerStoreHandlers()
   initializeWebSocket()
+  registerNetworkScanHandlers()
   // 注册 IPC 处理器
 }

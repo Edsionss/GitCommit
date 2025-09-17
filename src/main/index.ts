@@ -26,46 +26,28 @@ function createWindow(): void {
 
   // 修改会话的 CSP
   session.defaultSession.webRequest.onHeadersReceived((details, callback) => {
-    // 1. 定义你的 WebSocket 端口
-    const wsPort = 8888 // <--- 如果你的端口号不是8888，请在这里修改
-
-    // 2. 动态获取本机的局域网 IP 地址
-    const localIp = getLocalIpAddress()
-
-    // 3. 构建动态的 connect-src 策略
-    // 基础策略总是允许 'self' 和 'localhost'
-    const connectSrc = ["'self'", `ws://localhost:${wsPort}`]
-    // 如果获取到了局域网 IP，就把它也加入白名单
-    if (localIp) {
-      connectSrc.push(`ws://${localIp}:${wsPort}`)
-    }
-
-    // 4. 根据开发环境和生产环境构建动态的 script-src 策略
+    // 根据开发环境和生产环境构建动态的 script-src 策略
     const scriptSrc = ["'self'"]
     if (is.dev) {
       // Vite 的 HMR 需要 'unsafe-eval'
       scriptSrc.push("'unsafe-eval'")
     }
 
-    // 5. 整合所有的 CSP 策略
+    // 整合所有的 CSP 策略
     const cspPolicies = [
       "default-src 'self'",
       `script-src ${scriptSrc.join(' ')}`,
       "style-src 'self' 'unsafe-inline'",
-      // 这里是你之前定义的 img-src 规则，保持不变
       "img-src 'self' data: https://i.pravatar.cc https://*.cdn.com https://*.element-plus.org",
-      // 使用我们动态生成的 connect-src
-      `connect-src ${connectSrc.join(' ')}`
+      // 允许连接到任意 WebSocket 地址，修复局域网连接问题
+      "connect-src 'self' ws:"
     ]
 
-    // 6. 设置响应头
+    // 设置响应头
     callback({
       responseHeaders: {
         ...details.responseHeaders,
-        'Content-Security-Policy': [
-          // 将所有策略用分号和空格连接成一个字符串
-          cspPolicies.join('; ')
-        ]
+        'Content-Security-Policy': [cspPolicies.join('; ')]
       }
     })
   })

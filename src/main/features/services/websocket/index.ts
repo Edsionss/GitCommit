@@ -1,4 +1,5 @@
 import { WebSocketServer, WebSocket } from 'ws'
+import http from 'http'
 import { handleMessage } from '@handlers/websocket'
 import type { ChatMessage } from '@sharedType/Chat'
 import { nanoid } from 'nanoid'
@@ -8,6 +9,7 @@ const PORT = 8888 // 定义 WebSocket 服务器端口
 const HOST = '0.0.0.0' // 显式声明监听所有网络接口
 
 let wss: WebSocketServer | null = null
+let httpServer: http.Server | null = null
 // 创建一个 Map 来存储客户端 ID
 const clients = new Map<WebSocket, string>()
 /**
@@ -19,7 +21,20 @@ export function startWebSocketServer() {
     return
   }
 
-  wss = new WebSocketServer({ port: PORT, host: HOST })
+  // 1. Create HTTP server
+  httpServer = http.createServer((req, res) => {
+    // 2. Add ping handler
+    if (req.url === '/ping' && req.method === 'GET') {
+      res.writeHead(200, { 'Content-Type': 'application/json' })
+      res.end(JSON.stringify({ app: 'CognitoOcean' }))
+    } else {
+      res.writeHead(404)
+      res.end()
+    }
+  })
+
+  // 3. Create WebSocket server and attach it to the HTTP server
+  wss = new WebSocketServer({ server: httpServer })
 
   wss.on('connection', (ws: WebSocket) => {
     const clientId = nanoid() // 为每个新连接生成一个唯一ID
@@ -46,7 +61,10 @@ export function startWebSocketServer() {
     })
   })
 
-  console.log(`WebSocket server started on ws://localhost:${PORT}`)
+  // 4. Start listening
+  httpServer.listen(PORT, HOST, () => {
+    console.log(`Server (HTTP + WebSocket) started on ws://localhost:${PORT}`)
+  })
 }
 
 /**
@@ -57,6 +75,12 @@ export function stopWebSocketServer() {
     wss.close(() => {
       console.log('WebSocket server stopped.')
       wss = null
+    })
+  }
+  if (httpServer) {
+    httpServer.close(() => {
+      console.log('HTTP server stopped.')
+      httpServer = null
     })
   }
 }
