@@ -1,10 +1,11 @@
 import { WebSocketServer, WebSocket } from 'ws'
 import http from 'http'
 import { handleMessage } from '@handlers/websocket'
-import type { ChatMessage } from '@sharedType/Chat'
+import type { ChatMessage } from '@sharedType/WebSocket'
 import { nanoid } from 'nanoid'
 import { getLocalIpAddress } from '@nodeUtils/index'
 import { networkInterfaces } from 'os'
+import { flashMainWindow, getMainWindow } from '@main/index'
 
 const PORT = 8888 // 定义 WebSocket 服务器端口
 const HOST = '0.0.0.0' // 显式声明监听所有网络接口
@@ -181,4 +182,44 @@ export async function findAppHosts(port: number): Promise<string[]> {
 
   await Promise.all(promises)
   return results
+}
+
+export function handleSendDirectBroadcast(
+  _event: Electron.IpcMainEvent,
+  { targets, message }: { targets: string[]; message: { text: string; nickname: string } }
+): void {
+  const sourceIp = getLocalIpAddress() // 获取本机IP
+  targets.forEach((ip) => {
+    const ws = new WebSocket(`ws://${ip}:${PORT}`)
+
+    ws.on('open', () => {
+      const payload = {
+        ...message,
+        type: 'direct-broadcast',
+        sourceIp // 添加源IP地址
+      }
+      ws.send(JSON.stringify(payload))
+      ws.close() // 发送后立即关闭
+    })
+
+    ws.on('error', (err) => {
+      console.error(`Failed to send direct broadcast to ${ip}:`, err.message)
+      // Optional: Notify the renderer process about the failure
+      getMainWindow()?.webContents.send('direct-broadcast-failed', { ip, error: err.message })
+    })
+  })
+}
+
+export function handleSendRoomBroadcast(
+  _event: Electron.IpcMainEvent,
+  message: { text: string; nickname: string; token: string }
+): void {
+  try {
+    const globalSenderId = 'room-broadcaster'
+    const processedMessage = handleMessage(JSON.stringify(message), globalSenderId)
+    const globalMessage = { ...processedMessage, isGlobal: true, token: undefined }
+    broadcast(globalMessage)
+  } catch (error) {
+    console.error('Failed to send room broadcast:', error)
+  }
 }

@@ -102,7 +102,9 @@ const api = {
   getWsAddress: () => ipcRenderer.invoke('get-ws-address'),
   startWsServer: () => ipcRenderer.invoke('start-ws-server'),
   networkScan: (port: number): Promise<{ success: boolean; ips?: string[]; error?: string }> =>
-    ipcRenderer.invoke('network:scan', port)
+    ipcRenderer.invoke('network:scan', port),
+  sendRoomBroadcast: (message) => ipcRenderer.send('send-room-broadcast', message),
+  sendDirectBroadcast: (payload) => ipcRenderer.send('send-direct-broadcast', payload)
 }
 
 // 暴露API

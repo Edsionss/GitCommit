@@ -9,7 +9,7 @@ import { execSync } from 'child_process'
 import { registerIpcHandlers } from '@handlers/ipcHandlers'
 import { db } from '@features/database'
 import { startWebSocketServer, stopWebSocketServer } from '@services/websocket'
-import { getLocalIpAddress } from '@nodeUtils/index'
+
 // 如果是 Windows，尝试设置控制台编码为 UTF-8
 if (process.platform === 'win32') {
   try {
@@ -26,10 +26,39 @@ process.stderr.setDefaultEncoding('utf8')
 const DEBUG_PORT = '9222' // 选择一个未被占用的端口
 app.commandLine.appendSwitch('remote-debugging-port', DEBUG_PORT)
 
+// 将 mainWindow 声明在函数外部，以便在其他地方访问
+let mainWindow: BrowserWindow | null = null
+
+/**
+ * 获取主窗口实例
+ * @returns {BrowserWindow | null} 主窗口实例
+ */
+export function getMainWindow(): BrowserWindow | null {
+  return mainWindow
+}
+
+/**
+ * 触发主窗口任务栏闪烁
+ */
+export function flashMainWindow(): void {
+  if (mainWindow && !mainWindow.isFocused()) {
+    mainWindow.flashFrame(true)
+  }
+}
+
+/**
+ * 停止主窗口任务栏闪烁
+ */
+export function stopFlashMainWindow(): void {
+  if (mainWindow) {
+    mainWindow.flashFrame(false)
+  }
+}
+
 // 创建窗口
 function createWindow(): void {
   // Create the browser window.
-  const mainWindow = new BrowserWindow({
+  mainWindow = new BrowserWindow({
     width: 2000,
     height: 800,
     show: false,
@@ -43,6 +72,9 @@ function createWindow(): void {
       contextIsolation: true
     }
   })
+
+  // 在窗口获得焦点时停止闪烁
+  mainWindow.on('focus', stopFlashMainWindow)
 
   // 修改会话的 CSP
   session.defaultSession.webRequest.onHeadersReceived((details, callback) => {

@@ -1,7 +1,7 @@
 import { ElectronAPI } from '@electron-toolkit/preload'
-import type { GitCommit, RepoHistoryItem } from '@shared/types/dtos/git'
-import type { AiConfig } from '@shared/types/dtos/ai'
-
+import type { GitCommit, RepoHistoryItem } from '@sharedType/git'
+import type { AiConfig } from '@sharedType/ai'
+import type { DirectBroadcastPayload } from '@sharedTypes/WebSocket'
 // Define interfaces for the data structures used in the API
 interface GitScanOptions {
   authorFilter?: string
@@ -74,6 +74,10 @@ interface ExposedAPI {
   //websocket
   startWsServer: () => Promise<void>
   networkScan: (port: number) => Promise<{ success: boolean; ips?: string[]; error?: string }>
+  getWsAddress: () => Promise<string>
+  sendRoomBroadcast: (message: { text: string; nickname: string; token: string }) => void
+  sendDirectBroadcast: (payload: DirectBroadcastPayload) => void
+  onDirectBroadcastReceived: (callback: (data: any) => void) => () => void
 }
 
 declare global {

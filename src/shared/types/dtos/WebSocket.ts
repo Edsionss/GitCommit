@@ -7,3 +7,8 @@ export interface ChatMessage {
   token?: string // 新增：用于房间验证的令牌
   isMe?: boolean // 新增：标记消息是否由当前客户端发送
 }
+
+export interface DirectBroadcastPayload {
+  targets: string[]
+  message: { text: string; nickname: string }
+}
