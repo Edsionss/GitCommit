@@ -73,7 +73,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, defineProps, defineEmits } from 'vue'
+import { ref } from 'vue'
 import { SendOutlined, NotificationOutlined } from '@ant-design/icons-vue'
 import type { ChatMessage } from '@sharedType/Chat'
 
