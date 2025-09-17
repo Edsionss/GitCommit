@@ -35,7 +35,7 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
-import { useWebSocketStore } from '@renderer/stores/webSocketStore'
+import { useWebSocketStore } from '@/stores/webSocketStore'
 import { SendOutlined } from '@ant-design/icons-vue'
 import type { CheckboxChangeEvent } from 'ant-design-vue/es/checkbox/interface'
 import { copyNormalize } from '@utils/index'
