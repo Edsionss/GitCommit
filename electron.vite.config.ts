@@ -17,13 +17,7 @@ function htmlPlugin() {
 
 export default defineConfig({
   main: {
-    plugins: [
-      // 这个插件会自动将 package.json -> dependencies 中的所有模块设为外部依赖
-      // 这是 electron-vite 推荐的最佳实践
-      externalizeDepsPlugin({
-        exclude: ['entities']
-      })
-    ],
+    plugins: [externalizeDepsPlugin()],
     // 别名配置保持不变
     resolve: {
       alias: {
@@ -33,21 +27,12 @@ export default defineConfig({
         '@services': resolve('src/main/features/services'),
         '@shared': resolve('src/shared'),
         '@sharedType': resolve('src/shared/types/dtos'),
-        '@nodeUtils': resolve('src/main/utils'),
-
-        // ✅ 关键补丁，解决 entities exports 限制
-        'entities/decode': resolve(__dirname, 'node_modules/entities/lib/decode.js'),
-        'entities/encode': resolve(__dirname, 'node_modules/entities/lib/encode.js')
+        '@nodeUtils': resolve('src/main/utils')
       }
     }
   },
   preload: {
-    plugins: [
-      externalizeDepsPlugin({
-        exclude: ['entities']
-      })
-    ],
-    // 别名配置保持不变
+    plugins: [externalizeDepsPlugin({})],
     resolve: {
       alias: {
         '@preload': resolve('src/preload')
@@ -55,7 +40,6 @@ export default defineConfig({
     }
   },
   renderer: {
-    // renderer 配置保持不变
     define: {
       'import.meta.env.VERSION': JSON.stringify(packageJson.version),
       'import.meta.env.NAME': JSON.stringify(packageJson.project),
@@ -78,11 +62,7 @@ export default defineConfig({
         '@shared': resolve('src/shared'),
         '@sharedType': resolve('src/shared/types/dtos'),
         '@type': resolve('src/renderer/src/types'),
-        '@utils': resolve('src/renderer/src/utils'),
-
-        // ✅ 关键补丁，解决 entities exports 限制
-        'entities/decode': resolve(__dirname, 'node_modules/entities/lib/decode.js'),
-        'entities/encode': resolve(__dirname, 'node_modules/entities/lib/encode.js')
+        '@utils': resolve('src/renderer/src/utils')
       }
     },
     plugins: [vue(), htmlPlugin()]
