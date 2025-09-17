@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import { ref, nextTick } from 'vue'
-import type { ChatMessage } from '@sharedType/Chat'
+import type { ChatMessage } from '@sharedType/WebSocket'
 import { webSocketApi } from '@api/webSocket'
 import { message as antMessage, notification } from 'ant-design-vue'
 import { nanoid } from 'nanoid'

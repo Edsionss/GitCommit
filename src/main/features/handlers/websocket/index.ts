@@ -1,11 +1,12 @@
 import type { WebSocket } from 'ws'
-import type { ChatMessage } from '@sharedType/Chat'
+import type { ChatMessage } from '@sharedType/WebSocket'
 import { ipcMain } from 'electron'
 import {
   handleGetWsAddress,
   startWebSocketServer,
   handleSendRoomBroadcast,
-  handleSendDirectBroadcast
+  handleSendDirectBroadcast,
+  findAppHosts
 } from '@services/websocket'
 /**
  * 处理从客户端接收到的消息
@@ -41,4 +42,14 @@ export function initializeWebSocket() {
   ipcMain.on('send-room-broadcast', handleSendRoomBroadcast)
   // 新增：用于向指定IP地址发送一次性广播
   ipcMain.on('send-direct-broadcast', handleSendDirectBroadcast)
+
+  ipcMain.handle('network:scan', async (_event, port: number) => {
+    try {
+      const ips = await findAppHosts(port)
+      return { success: true, ips }
+    } catch (error) {
+      console.error('Failed to scan network:', error)
+      return { success: false, error: (error as Error).message }
+    }
+  })
 }

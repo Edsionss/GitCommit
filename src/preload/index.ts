@@ -109,8 +109,6 @@ const api = {
   startWsServer: () => ipcRenderer.invoke('start-ws-server'),
   sendRoomBroadcast: (message) => ipcRenderer.send('send-room-broadcast', message),
   sendDirectBroadcast: (payload) => ipcRenderer.send('send-direct-broadcast', payload),
-
-  // network
   networkScan: (port: number): Promise<{ success: boolean; ips?: string[]; error?: string }> =>
     ipcRenderer.invoke('network:scan', port)
 }

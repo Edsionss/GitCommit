@@ -75,7 +75,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { SendOutlined, NotificationOutlined } from '@ant-design/icons-vue'
-import type { ChatMessage } from '@sharedType/Chat'
+import type { ChatMessage } from '@sharedType/WebSocket'
 
 const props = defineProps<{
   messages: ChatMessage[]

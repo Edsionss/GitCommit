@@ -1,10 +1,11 @@
 import { WebSocketServer, WebSocket } from 'ws'
 import http from 'http'
 import { handleMessage } from '@handlers/websocket'
-import type { ChatMessage } from '@sharedType/Chat'
+import type { ChatMessage } from '@sharedType/WebSocket'
 import { nanoid } from 'nanoid'
 import { getLocalIpAddress } from '@nodeUtils/index'
 import { flashMainWindow, getMainWindow } from '@main/index'
+import { networkInterfaces } from 'os'
 
 const PORT = 8888
 const HOST = '0.0.0.0'
@@ -143,4 +144,71 @@ export function handleGetWsAddress() {
     return `ws://${ip}:${PORT}`
   }
   return `ws://localhost:${PORT}`
+}
+
+// Function to find CognitoOcean hosts on the local network
+export async function findAppHosts(port: number): Promise<string[]> {
+  const nets = networkInterfaces()
+  const results: string[] = []
+  const promises: Promise<void>[] = []
+
+  for (const name of Object.keys(nets)) {
+    const netInfo = nets[name]
+    if (!netInfo) continue
+
+    for (const net of netInfo) {
+      // Skip over non-IPv4 and internal (i.e. 127.0.0.1) addresses
+      if (net.family === 'IPv4' && !net.internal) {
+        const subnet = net.address.substring(0, net.address.lastIndexOf('.'))
+        for (let i = 1; i < 255; i++) {
+          const ip = `${subnet}.${i}`
+          const promise = new Promise<void>((resolve) => {
+            const options = {
+              host: ip,
+              port: port,
+              path: '/ping',
+              timeout: 500 // Short timeout for quick scanning
+            }
+
+            const req = http.get(options, (res) => {
+              let data = ''
+              if (res.statusCode === 200) {
+                res.on('data', (chunk) => {
+                  data += chunk
+                })
+                res.on('end', () => {
+                  try {
+                    const jsonData = JSON.parse(data)
+                    if (jsonData.app === 'CognitoOcean') {
+                      results.push(ip)
+                    }
+                  } catch (e) {
+                    // JSON parsing error, not a valid host
+                  }
+                  resolve()
+                })
+              } else {
+                res.resume() // Consume response data to free up memory
+                resolve()
+              }
+            })
+
+            req.on('timeout', () => {
+              req.destroy()
+              resolve()
+            })
+
+            req.on('error', (err) => {
+              // Ignore connection errors (e.g., ECONNREFUSED)
+              resolve()
+            })
+          })
+          promises.push(promise)
+        }
+      }
+    }
+  }
+
+  await Promise.all(promises)
+  return results
 }

@@ -1,6 +1,7 @@
 import { ElectronAPI } from '@electron-toolkit/preload'
 import type { GitCommit, RepoHistoryItem } from '@shared/types/dtos/git'
 import type { AiConfig } from '@shared/types/dtos/ai'
+import type { DirectBroadcastPayload } from '@sharedType/WebSocket'
 
 // Define interfaces for the data structures used in the API
 interface GitScanOptions {
@@ -32,11 +33,6 @@ interface AiChatResponse {
 interface ChatMessage {
   sender: 'user' | 'ai'
   text: string
-}
-
-interface DirectBroadcastPayload {
-  targets: string[]
-  message: { text: string; nickname: string }
 }
 
 // Define the shape of the API object
@@ -82,8 +78,6 @@ interface ExposedAPI {
   sendRoomBroadcast: (message: { text: string; nickname: string; token: string }) => void
   sendDirectBroadcast: (payload: DirectBroadcastPayload) => void
   onDirectBroadcastReceived: (callback: (data: any) => void) => () => void
-
-  // network
   networkScan: (port: number) => Promise<{ success: boolean; ips?: string[]; error?: string }>
 }
 

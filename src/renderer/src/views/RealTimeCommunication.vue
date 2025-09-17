@@ -52,7 +52,7 @@
 <script setup lang="ts">
 import { ref, onUnmounted } from 'vue'
 import { message as antMessage } from 'ant-design-vue'
-import { networkApi } from '@renderer/api/network'
+import { webSocketApi } from '@api/webSocket'
 import { useWebSocketStore } from '@renderer/stores/webSocketStore'
 
 // Import child components
@@ -75,7 +75,7 @@ const scanNetwork = async () => {
   foundIps.value = []
   antMessage.info('正在扫描局域网中的主机...')
   try {
-    const result = await networkApi.scan(8888)
+    const result = await webSocketApi.scan(8888)
     if (result.success && result.ips) {
       foundIps.value = result.ips
       antMessage.success(`扫描完成！发现 ${result.ips.length} 个主机。`)
