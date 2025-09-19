@@ -121,7 +121,7 @@ const joinRoom = (item: any) => {
   width: auto !important;
   max-width: 300px !important;
   min-width: 0px !important;
-  border-right: 1px solid #f0f0f0;
+  border-left: 1px solid #f0f0f0;
   padding: 10px;
   flex: none !important;
 }

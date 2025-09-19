@@ -1,7 +1,37 @@
 <template>
   <div class="webSocket-container">
-    <!-- Chat Window -->
-    <NetWorkTool v-show="collapsed" v-model="selectedIps"></NetWorkTool>
+    <div class="chat-container" :style="{ width: collapsed ? 'calc(100% - 300px)' : '100% ' }">
+      <div class="chat-room" v-if="wsStore.modeSelected">
+        <ChatWindow
+          :messages="wsStore.messages"
+          :is-host="wsStore.isHost"
+          :is-connected="wsStore.isConnected"
+          :nickname="wsStore.nickname"
+          :connection-status="wsStore.connectionStatus"
+          :room-token="wsStore.roomToken"
+          :input-token="wsStore.inputToken"
+          :host-ip-for-display="wsStore.hostIpForDisplay"
+          @send-message="wsStore.sendMessage"
+          @send-room-broadcast="wsStore.sendRoomBroadcast"
+        />
+      </div>
+      <div v-else class="direct-container">
+        <a-textarea v-model:value="directMessage" show-count :maxlength="100" />
+        <a-button
+          type="primary"
+          size="large"
+          @click="handleSendDirectBroadcast"
+          :disabled="!directMessage"
+        >
+          <template #icon><SendOutlined /></template>
+          发送广播
+        </a-button>
+      </div>
+    </div>
+    <div class="network-tool-container" v-if="collapsed">
+      <NetWorkTool v-model="selectedIps"></NetWorkTool>
+    </div>
+
     <a-float-button
       class="back-button"
       type="primary"
@@ -14,35 +44,6 @@
         <UnorderedListOutlined />
       </template>
     </a-float-button>
-
-    <ChatWindow
-      v-if="wsStore.modeSelected"
-      :messages="wsStore.messages"
-      :is-host="wsStore.isHost"
-      :is-connected="wsStore.isConnected"
-      :nickname="wsStore.nickname"
-      :connection-status="wsStore.connectionStatus"
-      :room-token="wsStore.roomToken"
-      :input-token="wsStore.inputToken"
-      :host-ip-for-display="wsStore.hostIpForDisplay"
-      @send-message="wsStore.sendMessage"
-      @send-room-broadcast="wsStore.sendRoomBroadcast"
-    />
-    <!-- Initial Screen -->
-    <div v-else class="mode-selection-wrapper">
-      <!-- <ModeSelection
-        v-model:hostIp="hostIp"
-        :is-scanning="isScanning"
-        @start-hosting="wsStore.startHosting"
-        @show-join-modal="showTokenModal = true"
-        @scan-network="scanNetwork"
-      /> -->
-      <DirectBroadcast
-        v-if="foundIps.length > 0"
-        :found-ips="foundIps"
-        @ip-selected="(ip) => (hostIp = ip)"
-      />
-    </div>
   </div>
 </template>
 
@@ -51,87 +52,55 @@ import { ref, onUnmounted } from 'vue'
 import { message as antMessage } from 'ant-design-vue'
 import { webSocketApi } from '@api/webSocket'
 import { useWebSocketStore } from '@/stores/webSocketStore'
-import { UnorderedListOutlined } from '@ant-design/icons-vue'
+import { UnorderedListOutlined, SendOutlined } from '@ant-design/icons-vue'
+import { copyNormalize } from '@utils/index'
+
 // Import child components
 import NetWorkTool from '@components/RealTimeCommunication/NetWorkTool.vue'
-import ModeSelection from '@components/RealTimeCommunication/ModeSelection.vue'
-import DirectBroadcast from '@components/RealTimeCommunication/DirectBroadcast.vue'
 import ChatWindow from '@components/RealTimeCommunication/ChatWindow.vue'
 
 const collapsed = ref(true)
 const selectedIps = ref<string[]>([])
 const wsStore = useWebSocketStore()
 
-// --- Local state for orchestration ---
-const hostIp = ref('')
-const localInputToken = ref('')
-const showTokenModal = ref(false)
-const isScanning = ref(false)
-const foundIps = ref<string[]>([])
+const directMessage = ref('')
 
-// --- Network Scan Logic ---
-const scanNetwork = async () => {
-  isScanning.value = true
-  foundIps.value = []
-  antMessage.info('正在扫描局域网中的主机...')
-  try {
-    const result = await webSocketApi.scan(8888)
-    if (result.success && result.ips) {
-      foundIps.value = result.ips
-      console.log(foundIps.value)
-
-      antMessage.success(`扫描完成！发现 ${result.ips.length} 个主机。`)
-    } else {
-      antMessage.warn('扫描完成，未发现任何主机。')
-    }
-  } catch (error) {
-    antMessage.error(`扫描时发生错误: ${(error as Error).message}`)
-  } finally {
-    isScanning.value = false
-  }
-}
-
-// --- Modal Logic ---
-const handleTokenSubmit = () => {
-  if (!localInputToken.value.trim()) {
-    antMessage.warn('请输入房间令牌。')
-    return
-  }
-  if (!hostIp.value.trim()) {
-    antMessage.warn('IP地址不能为空，请从扫描结果中选择或手动输入。')
-    return
-  }
-  wsStore.joinRoom(hostIp.value, localInputToken.value)
-  showTokenModal.value = false
+const handleSendDirectBroadcast = () => {
+  wsStore.sendDirectBroadcast(copyNormalize(selectedIps.value), copyNormalize(directMessage.value))
+  directMessage.value = ''
 }
 
 // --- Lifecycle Hooks ---
 onUnmounted(() => {
-  // Disconnect when the user navigates away from the page
   if (wsStore.isConnected) {
     wsStore.disconnect()
   }
 })
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .webSocket-container {
-  height: calc(100% - 0px);
+  height: 100%;
   display: flex;
-  justify-content: center;
-  align-items: flex-start;
+  width: 100%;
+  /* justify-content: center; */
+  /* align-items: flex-start; */
   padding: 10px;
   background-color: var(--color-background);
   color: var(--color-text);
   overflow-y: auto;
-}
+  .chat-container {
+    width: calc(100% - 300px);
+    padding: 10px;
 
-.mode-selection-wrapper {
-  display: flex;
-  flex-direction: column;
-  gap: 40px;
-  width: 100%;
-  max-width: 500px;
-  margin: 0 auto;
+    .direct-container {
+      width: 100%;
+      align-items: center;
+      justify-content: center;
+    }
+  }
+  .network-tool-container {
+    width: 300px;
+  }
 }
 </style>
