@@ -89,10 +89,10 @@ export function stopWebSocketServer() {
 function broadcast(message: ChatMessage) {
   if (!wss) return
   flashMainWindow()
-  clients.forEach((id, client) => {
-    if (client.readyState === WebSocket.OPEN) {
-      const messageToSend = { ...message, isMe: message.sender === id }
-      client.send(JSON.stringify(messageToSend))
+  clients.forEach((clientId, ws) => {
+    if (ws.readyState === WebSocket.OPEN) {
+      const messageToSend = { ...message, isMe: message.sender === clientId }
+      ws.send(JSON.stringify(messageToSend))
     }
   })
 }
