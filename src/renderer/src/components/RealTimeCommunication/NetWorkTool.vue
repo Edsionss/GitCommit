@@ -58,17 +58,17 @@ import { reactive, ref } from 'vue'
 import {
   ToolOutlined,
   DesktopOutlined,
-  CloudUploadOutlined,
-  SettingOutlined,
   SearchOutlined,
   PlusCircleOutlined
 } from '@ant-design/icons-vue'
 
+const emit = defineEmits(['foundIps'])
 const isScanning = ref(false)
 const foundIps = ref<string[]>([])
 import { message as antMessage } from 'ant-design-vue'
 import { webSocketApi } from '@api/webSocket'
 import { useWebSocketStore } from '@/stores/webSocketStore'
+import { emit } from 'process'
 const wsStore = useWebSocketStore()
 const roomData = reactive<any>({
   hostIp: '',
@@ -98,6 +98,7 @@ const scanNetwork = async () => {
     const result = await webSocketApi.scan(8888)
     if (result.success && result.ips) {
       foundIps.value = result.ips
+      emit('foundIps', foundIps.value)
       antMessage.success(`扫描完成！发现 ${result.ips.length} 个主机。`)
     } else {
       antMessage.warn('扫描完成，未发现任何主机。')
@@ -119,8 +120,9 @@ const joinRoom = (item: any) => {
 .network-tool-sider {
   text-align: center;
   height: 100%;
+  width: 100%;
   width: auto !important;
-  max-width: 300px !important;
+  // max-width: 300px !important;
   min-width: 0px !important;
   border-left: 1px solid #f0f0f0;
   padding: 10px;
@@ -130,6 +132,7 @@ const joinRoom = (item: any) => {
   border: none;
 }
 .content-wrapper {
+  width: 100%;
   height: 100%;
   display: flex;
   flex-direction: column;

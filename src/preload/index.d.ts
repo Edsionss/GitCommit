@@ -1,7 +1,10 @@
 import { ElectronAPI } from '@electron-toolkit/preload'
 import type { GitCommit, RepoHistoryItem } from '@sharedType/git'
 import type { AiConfig } from '@sharedType/ai'
-import type { DirectBroadcastPayload } from '@sharedTypes/WebSocket'
+import type {
+  DirectBroadcastPayload,
+  ChatMessage as webSocketChatMessage
+} from '@sharedTypes/WebSocket'
 // Define interfaces for the data structures used in the API
 interface GitScanOptions {
   authorFilter?: string

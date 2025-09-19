@@ -1,4 +1,4 @@
-import type { DirectBroadcastPayload } from '@sharedType/WebSocket'
+import type { DirectBroadcastPayload, ChatMessage } from '@sharedType/WebSocket'
 export const webSocketApi = {
   getWsAddress: async (): Promise<string> => window.api.getWsAddress(),
   startWsServer: async (): Promise<void> => window.api.startWsServer(),
@@ -9,6 +9,7 @@ export const webSocketApi = {
     window.api.sendRoomBroadcast(message),
   sendDirectBroadcast: (payload: DirectBroadcastPayload): void =>
     window.api.sendDirectBroadcast(payload),
+
   onDirectBroadcastReceived: (callback: (data: any) => void): (() => void) =>
     window.api.onDirectBroadcastReceived(callback)
 }

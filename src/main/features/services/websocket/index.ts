@@ -1,31 +1,25 @@
 import { WebSocketServer, WebSocket } from 'ws'
 import http from 'http'
-import { handleMessage } from '@handlers/websocket'
 import type { ChatMessage } from '@sharedType/WebSocket'
 import { nanoid } from 'nanoid'
 import { getLocalIpAddress } from '@nodeUtils/index'
-import { networkInterfaces } from 'os'
 import { flashMainWindow, getMainWindow } from '@main/index'
+import { networkInterfaces } from 'os'
 
-const PORT = 8888 // 定义 WebSocket 服务器端口
-const HOST = '0.0.0.0' // 显式声明监听所有网络接口
+const PORT = 8888
+const HOST = '0.0.0.0'
 
 let wss: WebSocketServer | null = null
 let httpServer: http.Server | null = null
-// 创建一个 Map 来存储客户端 ID
 const clients = new Map<WebSocket, string>()
-/**
- * 启动 WebSocket 服务器
- */
+
 export function startWebSocketServer() {
   if (wss) {
     console.log('WebSocket server is already running.')
     return
   }
 
-  // 1. Create HTTP server
   httpServer = http.createServer((req, res) => {
-    // 2. Add ping handler
     if (req.url === '/ping' && req.method === 'GET') {
       res.writeHead(200, { 'Content-Type': 'application/json' })
       res.end(JSON.stringify({ app: 'CognitoOcean' }))
@@ -35,17 +29,26 @@ export function startWebSocketServer() {
     }
   })
 
-  // 3. Create WebSocket server and attach it to the HTTP server
   wss = new WebSocketServer({ server: httpServer })
 
   wss.on('connection', (ws: WebSocket) => {
-    const clientId = nanoid() // 为每个新连接生成一个唯一ID
+    const clientId = nanoid()
     clients.set(ws, clientId)
     console.log(`A new client connected with ID: ${clientId}`)
 
     ws.on('message', (message: string) => {
       try {
-        // 将 clientId 传递给 handler
+        const incomingData = JSON.parse(message.toString())
+
+        // 检查是否是直接广播消息
+        if (incomingData.type === 'direct-broadcast') {
+          console.log('Received direct broadcast:', incomingData)
+          flashMainWindow()
+          getMainWindow()?.webContents.send('direct-broadcast-received', incomingData)
+          return // 不再继续处理
+        }
+
+        // 处理普通聊天室消息
         const processedMessage = handleMessage(message.toString(), clientId)
         broadcast(processedMessage)
       } catch (error) {
@@ -55,7 +58,7 @@ export function startWebSocketServer() {
 
     ws.on('close', () => {
       console.log(`Client ${clients.get(ws)} disconnected.`)
-      clients.delete(ws) // 客户端断开时移除
+      clients.delete(ws)
     })
 
     ws.on('error', (error) => {
@@ -63,15 +66,11 @@ export function startWebSocketServer() {
     })
   })
 
-  // 4. Start listening
   httpServer.listen(PORT, HOST, () => {
     console.log(`Server (HTTP + WebSocket) started on ws://localhost:${PORT}`)
   })
 }
 
-/**
- * 停止 WebSocket 服务器
- */
 export function stopWebSocketServer() {
   if (wss) {
     wss.close(() => {
@@ -87,34 +86,90 @@ export function stopWebSocketServer() {
   }
 }
 
-/**
- * 广播消息给所有客户端
- * @param message - 要广播的 ChatMessage 对象
- */
 function broadcast(message: ChatMessage) {
   if (!wss) return
-
+  flashMainWindow()
   clients.forEach((id, client) => {
     if (client.readyState === WebSocket.OPEN) {
-      // 为每个客户端定制消息，告诉它这条消息是不是自己发的
-      const messageToSend = {
-        ...message,
-        isMe: message.sender === id
-      }
+      const messageToSend = { ...message, isMe: message.sender === id }
       client.send(JSON.stringify(messageToSend))
     }
   })
 }
 
-// 获取 WebSocket 地址
+export function handleSendRoomBroadcast(
+  _event: Electron.IpcMainEvent,
+  message: { text: string; nickname: string; token: string }
+): void {
+  try {
+    const globalSenderId = 'room-broadcaster'
+    const processedMessage = handleMessage(JSON.stringify(message), globalSenderId)
+    const globalMessage = { ...processedMessage, isGlobal: true, token: undefined }
+    broadcast(globalMessage)
+  } catch (error) {
+    console.error('Failed to send room broadcast:', error)
+  }
+}
+
+/**
+ * 处理从客户端接收到的消息
+ * @param message - 从客户端收到的原始消息字符串
+ * @returns - 经过处理、准备广播的 ChatMessage 对象
+ */
+export function handleMessage(message: string, clientId: string): ChatMessage {
+  // 客户端现在会发送 { text: '...', nickname: '...', token: '...' }
+  const incomingData = JSON.parse(message)
+
+  if (!incomingData.text || !incomingData.nickname) {
+    throw new Error('Invalid message payload. "text" and "nickname" are required.')
+  }
+
+  const processedMessage: ChatMessage = {
+    id: `msg-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+    text: incomingData.text,
+    sender: clientId, // 使用一个唯一标识符来代表发送者
+    nickname: incomingData.nickname, // 使用客户端传来的昵称
+    timestamp: Date.now(),
+    token: incomingData.token // 将 token 传递下去
+  }
+
+  console.log('Processed message:', processedMessage)
+  return processedMessage
+}
+
+// 处理发送给指定目标的直接广播
+export function handleSendDirectBroadcast(
+  _event: Electron.IpcMainEvent,
+  { targets, message }: { targets: string[]; message: { text: string; nickname: string } }
+): void {
+  const sourceIp = getLocalIpAddress() // 获取本机IP
+  targets.forEach((ip) => {
+    const ws = new WebSocket(`ws://${ip}:${PORT}`)
+
+    ws.on('open', () => {
+      const payload = {
+        ...message,
+        type: 'direct-broadcast',
+        sourceIp // 添加源IP地址
+      }
+      ws.send(JSON.stringify(payload))
+      ws.close() // 发送后立即关闭
+    })
+
+    ws.on('error', (err) => {
+      console.error(`Failed to send direct broadcast to ${ip}:`, err.message)
+      // Optional: Notify the renderer process about the failure
+      getMainWindow()?.webContents.send('direct-broadcast-failed', { ip, error: err.message })
+    })
+  })
+}
+
 export function handleGetWsAddress() {
   const ip = getLocalIpAddress()
-  const port = 8888 // 确保这里的端口和 server.ts 中的一致
   if (ip) {
-    return `ws://${ip}:${port}`
+    return `ws://${ip}:${PORT}`
   }
-  // 如果获取不到局域网IP，则回退到 localhost (适用于单机测试)
-  return `ws://localhost:${port}`
+  return `ws://localhost:${PORT}`
 }
 
 // Function to find CognitoOcean hosts on the local network
@@ -182,44 +237,4 @@ export async function findAppHosts(port: number): Promise<string[]> {
 
   await Promise.all(promises)
   return results
-}
-
-export function handleSendDirectBroadcast(
-  _event: Electron.IpcMainEvent,
-  { targets, message }: { targets: string[]; message: { text: string; nickname: string } }
-): void {
-  const sourceIp = getLocalIpAddress() // 获取本机IP
-  targets.forEach((ip) => {
-    const ws = new WebSocket(`ws://${ip}:${PORT}`)
-
-    ws.on('open', () => {
-      const payload = {
-        ...message,
-        type: 'direct-broadcast',
-        sourceIp // 添加源IP地址
-      }
-      ws.send(JSON.stringify(payload))
-      ws.close() // 发送后立即关闭
-    })
-
-    ws.on('error', (err) => {
-      console.error(`Failed to send direct broadcast to ${ip}:`, err.message)
-      // Optional: Notify the renderer process about the failure
-      getMainWindow()?.webContents.send('direct-broadcast-failed', { ip, error: err.message })
-    })
-  })
-}
-
-export function handleSendRoomBroadcast(
-  _event: Electron.IpcMainEvent,
-  message: { text: string; nickname: string; token: string }
-): void {
-  try {
-    const globalSenderId = 'room-broadcaster'
-    const processedMessage = handleMessage(JSON.stringify(message), globalSenderId)
-    const globalMessage = { ...processedMessage, isGlobal: true, token: undefined }
-    broadcast(globalMessage)
-  } catch (error) {
-    console.error('Failed to send room broadcast:', error)
-  }
 }

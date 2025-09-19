@@ -90,6 +90,11 @@ const api = {
     ipcRenderer.on('scan-cancelled', listener)
     return () => ipcRenderer.removeListener('scan-cancelled', listener)
   },
+  onDirectBroadcastReceived: (callback: (data: any) => void) => {
+    const listener = (_: any, data: any) => callback(data)
+    ipcRenderer.on('direct-broadcast-received', listener)
+    return () => ipcRenderer.removeListener('direct-broadcast-received', listener)
+  },
   storeGet: (key: string) => ipcRenderer.invoke('store:get', key),
   storeSet: (key: string, value: any) => ipcRenderer.invoke('store:set', key, value),
   storeDelete: (key: string) => ipcRenderer.invoke('store:delete', key),

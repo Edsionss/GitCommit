@@ -63,7 +63,7 @@
           <a-menu @click="handleMenuClick">
             <a-menu-item key="roomBroadcast">
               <template #icon><NotificationOutlined /></template>
-              房间广播
+              发送广播
             </a-menu-item>
           </a-menu>
         </template>
@@ -89,7 +89,7 @@ const props = defineProps<{
   hostIpForDisplay: string
 }>()
 
-const emit = defineEmits(['send-message', 'send-room-broadcast'])
+const emit = defineEmits(['send-message', 'send-broadcast'])
 
 const newMessage = ref('')
 const activeKey = ref(['1'])
@@ -99,11 +99,9 @@ const sendMessage = () => {
   newMessage.value = ''
 }
 
-const handleMenuClick = ({ key }: { key: string }) => {
-  if (key === 'roomBroadcast') {
-    emit('send-room-broadcast', copyNormalize(newMessage.value))
-    newMessage.value = ''
-  }
+const handleMenuClick = () => {
+  emit('send-broadcast', copyNormalize(newMessage.value))
+  newMessage.value = ''
 }
 </script>
 

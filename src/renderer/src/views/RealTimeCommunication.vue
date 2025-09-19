@@ -1,6 +1,6 @@
 <template>
   <div class="webSocket-container">
-    <div class="chat-container" :style="{ width: collapsed ? 'calc(100% - 300px)' : '100% ' }">
+    <div class="chat-container" :style="{ width: collapsed ? '100%' : '100% ' }">
       <div class="chat-room" v-if="wsStore.modeSelected">
         <ChatWindow
           :messages="wsStore.messages"
@@ -12,7 +12,7 @@
           :input-token="wsStore.inputToken"
           :host-ip-for-display="wsStore.hostIpForDisplay"
           @send-message="wsStore.sendMessage"
-          @send-room-broadcast="wsStore.sendRoomBroadcast"
+          @send-broadcast="handleSendDirectBroadcast"
         />
       </div>
       <div v-else class="direct-container">
@@ -26,7 +26,7 @@
             type="primary"
             size="large"
             @click="handleSendDirectBroadcast"
-            :disabled="!directMessage"
+            :disabled="!directMessage || !WebSocketIps.length"
           >
             <template #icon><NotificationOutlined /></template>
             发送广播
@@ -35,7 +35,7 @@
       </div>
     </div>
     <div class="network-tool-container" v-if="collapsed">
-      <NetWorkTool v-model="selectedIps"></NetWorkTool>
+      <NetWorkTool v-model="selectedIps" @foundIps="getAllIps"></NetWorkTool>
     </div>
 
     <a-float-button
@@ -71,8 +71,24 @@ const wsStore = useWebSocketStore()
 
 const directMessage = ref('')
 
+const WebSocketIps = ref<string[]>([])
+
+const getAllIps = (ips: string[]) => {
+  WebSocketIps.value = ips
+}
+
 const handleSendDirectBroadcast = () => {
-  wsStore.sendDirectBroadcast(copyNormalize(selectedIps.value), copyNormalize(directMessage.value))
+  if (!WebSocketIps.value.length) {
+    antMessage.warn('请先扫描网络')
+    return
+  }
+  let targetIps: string[] = []
+  if (selectedIps.value.length) {
+    targetIps = selectedIps.value
+  } else {
+    targetIps = WebSocketIps.value
+  }
+  wsStore.sendDirectBroadcast(copyNormalize(targetIps), copyNormalize(directMessage.value))
   directMessage.value = ''
 }
 
@@ -89,15 +105,16 @@ onUnmounted(() => {
   height: 100%;
   display: flex;
   width: 100%;
-  /* justify-content: center; */
-  /* align-items: flex-start; */
   padding: 10px;
   background-color: var(--color-background);
   color: var(--color-text);
   overflow-y: auto;
   .chat-container {
-    width: calc(100% - 300px);
+    // width: 70%;
     padding: 10px;
+    .chat-room {
+      height: 100%;
+    }
 
     .direct-container {
       padding-top: 150px;
@@ -113,7 +130,7 @@ onUnmounted(() => {
         border-radius: 8px;
         padding: 30px;
         width: 100%;
-        width: 500px;
+        width: 80%;
         display: flex;
         flex-direction: column;
         gap: 10px;
@@ -122,7 +139,7 @@ onUnmounted(() => {
     }
   }
   .network-tool-container {
-    width: 300px;
+    width: 30%;
   }
 }
 </style>
