@@ -1,10 +1,16 @@
 <template>
   <div class="chat-container">
     <div class="header">
-      <a-typography-title :level="4" style="margin: 0">
-        局域网聊天室 - {{ isHost ? '主机' : '客户端' }} ({{ nickname }})
-      </a-typography-title>
-      <a-tag :color="isConnected ? 'green' : 'red'">{{ connectionStatus }}</a-tag>
+      <div class="header-left">
+        <a-typography-title :level="4" style="margin: 0">
+          局域网聊天室 - {{ isHost ? '主机' : '客户端' }} ({{ nickname }})
+        </a-typography-title>
+        <a-tag :color="isConnected ? 'green' : 'red'">{{ connectionStatus }}</a-tag>
+      </div>
+      <a-button type="primary" danger @click="wsStore.disconnect">
+        <template #icon><LogoutOutlined /></template>
+        退出房间
+      </a-button>
     </div>
 
     <div v-if="isHost && roomToken" class="host-info">
@@ -74,10 +80,11 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
-import { SendOutlined, NotificationOutlined } from '@ant-design/icons-vue'
+import { SendOutlined, NotificationOutlined, LogoutOutlined } from '@ant-design/icons-vue'
 import type { ChatMessage } from '@sharedType/WebSocket'
 import { copyNormalize } from '@utils/index'
-
+import { useWebSocketStore } from '@/stores/webSocketStore'
+const wsStore = useWebSocketStore()
 const props = defineProps<{
   messages: ChatMessage[]
   isHost: boolean
@@ -125,6 +132,13 @@ const handleMenuClick = () => {
   justify-content: space-between;
   align-items: center;
   flex-shrink: 0;
+  gap: 16px;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 16px;
 }
 
 .host-info {
