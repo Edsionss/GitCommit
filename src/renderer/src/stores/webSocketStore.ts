@@ -21,10 +21,6 @@ export const useWebSocketStore = defineStore('websocket', () => {
   const isScanning = ref(false)
   const selectedIpsForBroadcast = ref<string[]>([])
 
-  const setSelectedIpsForBroadcast = (ips: string[]) => {
-    selectedIpsForBroadcast.value = ips
-  }
-
   let ws: WebSocket | null = null
   let serverAddress = ''
 
@@ -182,8 +178,6 @@ export const useWebSocketStore = defineStore('websocket', () => {
         ? selectedIpsForBroadcast.value
         : scannedIps.value
 
-    console.log('Broadcast Targets:', targets); // Added for debugging
-
     if (targets.length === 0) {
       antMessage.warn('没有发现任何可广播的主机，请先扫描网络。')
       return
@@ -244,7 +238,6 @@ export const useWebSocketStore = defineStore('websocket', () => {
     joinRoom,
     sendMessage,
     sendGlobalBroadcast,
-    setSelectedIpsForBroadcast,
     disconnect
   }
 })
