@@ -1,6 +1,9 @@
 <template>
   <div class="webSocket-container">
     <!-- Chat Window -->
+    <NetWorkTool v-show="collapsed" v-model="selectedIps"></NetWorkTool>
+    <a-button class="back-button" type="primary" @click="collapsed = !collapsed"> 1111 </a-button>
+
     <ChatWindow
       v-if="wsStore.modeSelected"
       :messages="wsStore.messages"
@@ -14,7 +17,6 @@
       @send-message="wsStore.sendMessage"
       @send-room-broadcast="wsStore.sendRoomBroadcast"
     />
-
     <!-- Initial Screen -->
     <div v-else class="mode-selection-wrapper">
       <ModeSelection
@@ -56,10 +58,13 @@ import { webSocketApi } from '@api/webSocket'
 import { useWebSocketStore } from '@/stores/webSocketStore'
 
 // Import child components
+import NetWorkTool from '@components/RealTimeCommunication/NetWorkTool.vue'
 import ModeSelection from '@components/RealTimeCommunication/ModeSelection.vue'
 import DirectBroadcast from '@components/RealTimeCommunication/DirectBroadcast.vue'
 import ChatWindow from '@components/RealTimeCommunication/ChatWindow.vue'
 
+const collapsed = ref(true)
+const selectedIps = ref<string[]>([])
 const wsStore = useWebSocketStore()
 
 // --- Local state for orchestration ---
@@ -78,6 +83,8 @@ const scanNetwork = async () => {
     const result = await webSocketApi.scan(8888)
     if (result.success && result.ips) {
       foundIps.value = result.ips
+      console.log(foundIps.value)
+
       antMessage.success(`扫描完成！发现 ${result.ips.length} 个主机。`)
     } else {
       antMessage.warn('扫描完成，未发现任何主机。')
@@ -114,11 +121,11 @@ onUnmounted(() => {
 
 <style scoped>
 .webSocket-container {
-  height: calc(100% - 40px);
+  height: calc(100% - 0px);
   display: flex;
   justify-content: center;
   align-items: flex-start;
-  padding: 20px;
+  padding: 10px;
   background-color: var(--color-background);
   color: var(--color-text);
   overflow-y: auto;
