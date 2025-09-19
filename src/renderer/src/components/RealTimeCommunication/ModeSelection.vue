@@ -1,25 +1,42 @@
 <template>
-  <div class="mode-selection-placeholder">
-    <a-empty description="欢迎使用实时通信功能">
-      <template #default>
-        <a-typography-text type="secondary">
-          请使用左侧的“网络工具”创建或加入一个房间。
-        </a-typography-text>
-      </template>
-    </a-empty>
+  <div class="mode-selection">
+    <a-typography-title :level="3">选择聊天模式</a-typography-title>
+    <a-space direction="vertical" :size="20">
+      <a-button type="primary" size="large" @click="$emit('start-hosting')">
+        创建房间 (作为主机)
+      </a-button>
+      <a-divider>或</a-divider>
+      <div class="join-section">
+        <a-input
+          :value="hostIp"
+          @update:value="$emit('update:hostIp', $event)"
+          placeholder="输入主机的IP地址"
+          size="large"
+        />
+        <a-button size="large" @click="$emit('show-join-modal')" :disabled="!hostIp">
+          加入房间
+        </a-button>
+        <a-button size="large" @click="$emit('scan-network')" :loading="isScanning">
+          扫描网络
+        </a-button>
+      </div>
+    </a-space>
   </div>
 </template>
 
 <script setup lang="ts">
-// No props or emits needed anymore for this simplified component
+defineProps<{ hostIp: string; isScanning: boolean }>()
+defineEmits(['start-hosting', 'show-join-modal', 'scan-network', 'update:hostIp'])
 </script>
 
 <style scoped>
-.mode-selection-placeholder {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: 100%;
+.mode-selection {
+  text-align: center;
   width: 100%;
+}
+.join-section {
+  display: flex;
+  gap: 10px;
+  align-items: center;
 }
 </style>

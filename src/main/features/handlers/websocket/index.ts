@@ -47,6 +47,8 @@ export function initializeWebSocket() {
       return { success: false, error: (error as Error).message }
     }
   })
+  // 重命名：用于向当前主机的所有连接客户端广播（房间内广播）
+  ipcMain.on('send-room-broadcast', handleSendRoomBroadcast)
   // 新增：用于向指定IP地址发送一次性广播
   ipcMain.on('send-direct-broadcast', handleSendDirectBroadcast)
 }

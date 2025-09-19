@@ -17,33 +17,11 @@ export const useWebSocketStore = defineStore('websocket', () => {
   const hostIpForDisplay = ref('')
   const roomToken = ref('')
   const inputToken = ref('')
-  const scannedIps = ref<string[]>([])
-  const isScanning = ref(false)
-  const selectedIpsForBroadcast = ref<string[]>([])
 
   let ws: WebSocket | null = null
   let serverAddress = ''
 
   // --- Actions ---
-
-  const scanNetwork = async () => {
-    isScanning.value = true
-    scannedIps.value = []
-    antMessage.info('正在扫描局域网中的主机...')
-    try {
-      const result = await webSocketApi.scan(8888) // Assuming port 8888
-      if (result.success && result.ips && result.ips.length > 0) {
-        scannedIps.value = result.ips
-        antMessage.success(`扫描完成！发现 ${result.ips.length} 个主机。`)
-      } else {
-        antMessage.warn('扫描完成，未发现任何主机。')
-      }
-    } catch (error) {
-      antMessage.error(`扫描时发生错误: ${(error as Error).message}`)
-    } finally {
-      isScanning.value = false
-    }
-  }
 
   // 监听来自主进程的直接广播
   const listenForDirectBroadcasts = () => {
@@ -70,16 +48,6 @@ export const useWebSocketStore = defineStore('websocket', () => {
       isConnecting.value = false
       connectionStatus.value = '已连接'
       modeSelected.value = true
-
-      // Add a system message for joining
-      messages.value.push({
-        id: nanoid(),
-        text: '您已成功加入房间。欢迎开始聊天！',
-        sender: 'system',
-        nickname: '系统消息',
-        timestamp: Date.now(),
-        isSystemMessage: true
-      })
     }
 
     ws.onmessage = (event) => {
@@ -171,37 +139,34 @@ export const useWebSocketStore = defineStore('websocket', () => {
     }
   }
 
-  const sendGlobalBroadcast = (text: string) => {
-    if (!text.trim()) return
-
-    const targets = selectedIpsForBroadcast.value.length > 0
-        ? selectedIpsForBroadcast.value
-        : scannedIps.value
-
-    if (targets.length === 0) {
-      antMessage.warn('没有发现任何可广播的主机，请先扫描网络。')
-      return
+  const sendRoomBroadcast = (text: string) => {
+    if (text.trim() && isHost.value) {
+      const messagePayload = {
+        text,
+        nickname: nickname.value,
+        token: 'room-broadcast' // Differentiate room broadcast
+      }
+      webSocketApi.sendRoomBroadcast(messagePayload)
+      antMessage.success('房间广播已发送')
     }
+  }
 
-    // Exclude self from broadcast if user is a host and no specific targets are selected
-    const finalTargets = isHost.value && selectedIpsForBroadcast.value.length === 0
-        ? targets.filter((ip) => ip !== hostIpForDisplay.value)
-        : targets
-
-    if (finalTargets.length === 0) {
-      antMessage.info('网络中只有您一个主机，无需广播。')
+  const sendDirectBroadcast = (targets: string[], text: string) => {
+    if (!text.trim()) return
+    if (targets.length === 0) {
+      antMessage.warn('请至少选择一个广播目标')
       return
     }
 
     const payload = {
-      targets: [...finalTargets], // Fix clone error by creating a plain array
+      targets,
       message: {
         text,
         nickname: nickname.value
       }
     }
     webSocketApi.sendDirectBroadcast(payload)
-    antMessage.success(`已向 ${finalTargets.length} 个目标发送全局广播`)
+    antMessage.success(`已向 ${targets.length} 个目标发送广播`)
   }
 
   const disconnect = () => {
@@ -230,14 +195,12 @@ export const useWebSocketStore = defineStore('websocket', () => {
     hostIpForDisplay,
     roomToken,
     inputToken,
-    scannedIps,
-    isScanning,
-    scanNetwork,
     listenForDirectBroadcasts,
     startHosting,
     joinRoom,
     sendMessage,
-    sendGlobalBroadcast,
+    sendRoomBroadcast,
+    sendDirectBroadcast,
     disconnect
   }
 })

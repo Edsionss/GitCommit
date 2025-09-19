@@ -4,14 +4,7 @@
       <a-typography-title :level="4" style="margin: 0">
         局域网聊天室 - {{ isHost ? '主机' : '客户端' }} ({{ nickname }})
       </a-typography-title>
-      <div class="header-actions">
-        <a-tag :color="isConnected ? 'green' : 'red'">{{ connectionStatus }}</a-tag>
-        <a-tooltip title="退出房间">
-          <a-button type="text" shape="circle" @click="$emit('leave-room')">
-            <template #icon><LogoutOutlined /></template>
-          </a-button>
-        </a-tooltip>
-      </div>
+      <a-tag :color="isConnected ? 'green' : 'red'">{{ connectionStatus }}</a-tag>
     </div>
 
     <div v-if="isHost && roomToken" class="host-info">
@@ -29,14 +22,8 @@
 
     <a-list class="message-area" :data-source="messages" item-layout="horizontal">
       <template #renderItem="{ item }">
-        <!-- System Message Template -->
-        <div v-if="item.isSystemMessage" class="system-message-container">
-          <span class="system-message-text">{{ item.text }}</span>
-        </div>
-
-        <!-- User Message Template -->
         <a-list-item
-          v-else-if="item.token === (isHost ? roomToken : inputToken)"
+          v-if="item.token === (isHost ? roomToken : inputToken)"
           class="message-item"
           :class="{ 'is-me': item.isMe }"
         >
@@ -71,12 +58,12 @@
         :disabled="!isConnected || !newMessage"
       >
         <template #icon><SendOutlined /></template>
-        发送到房间
-        <template #overlay v-if="isConnected">
+        发送
+        <template #overlay v-if="isHost">
           <a-menu @click="handleMenuClick">
-            <a-menu-item key="globalBroadcast">
+            <a-menu-item key="roomBroadcast">
               <template #icon><NotificationOutlined /></template>
-              {{ globalBroadcastText }}
+              房间广播
             </a-menu-item>
           </a-menu>
         </template>
@@ -86,12 +73,12 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
-import { SendOutlined, NotificationOutlined, LogoutOutlined } from '@ant-design/icons-vue'
+import { ref } from 'vue'
+import { SendOutlined, NotificationOutlined } from '@ant-design/icons-vue'
 import type { ChatMessage } from '@sharedType/WebSocket'
 import { copyNormalize } from '@utils/index'
 
-const props = withDefaults(defineProps<{
+const props = defineProps<{
   messages: ChatMessage[]
   isHost: boolean
   isConnected: boolean
@@ -100,20 +87,12 @@ const props = withDefaults(defineProps<{
   roomToken: string
   inputToken: string
   hostIpForDisplay: string
-  selectedIps: string[]
-}>(), {
-  selectedIps: () => []
-})
+}>()
 
-const emit = defineEmits(['send-message', 'send-global-broadcast', 'leave-room'])
+const emit = defineEmits(['send-message', 'send-room-broadcast'])
 
 const newMessage = ref('')
 const activeKey = ref(['1'])
-
-const hasSelection = computed(() => props.selectedIps.length > 0)
-const globalBroadcastText = computed(() =>
-  hasSelection.value ? `向 ${props.selectedIps.length} 个已选目标广播` : '全局广播'
-)
 
 const sendMessage = () => {
   emit('send-message', newMessage.value)
@@ -121,8 +100,8 @@ const sendMessage = () => {
 }
 
 const handleMenuClick = ({ key }: { key: string }) => {
-  if (key === 'globalBroadcast') {
-    emit('send-global-broadcast', copyNormalize(newMessage.value))
+  if (key === 'roomBroadcast') {
+    emit('send-room-broadcast', copyNormalize(newMessage.value))
     newMessage.value = ''
   }
 }
@@ -148,12 +127,6 @@ const handleMenuClick = ({ key }: { key: string }) => {
   justify-content: space-between;
   align-items: center;
   flex-shrink: 0;
-}
-
-.header-actions {
-  display: flex;
-  align-items: center;
-  gap: 8px;
 }
 
 .host-info {
@@ -183,20 +156,6 @@ const handleMenuClick = ({ key }: { key: string }) => {
   flex-grow: 1;
   overflow-y: auto;
   padding: 16px 24px;
-}
-
-.system-message-container {
-  text-align: center;
-  margin: 12px 0;
-}
-
-.system-message-text {
-  display: inline-block;
-  padding: 4px 12px;
-  background-color: var(--color-background-mute);
-  color: var(--color-text-secondary);
-  font-size: 12px;
-  border-radius: 12px;
 }
 
 .message-item {
