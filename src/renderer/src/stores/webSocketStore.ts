@@ -55,7 +55,8 @@ export const useWebSocketStore = defineStore('websocket', () => {
       notification.info({
         message: `收到来自 ${data.sourceIp} 的广播`,
         description: data.text,
-        placement: 'topRight'
+        placement: 'topRight',
+        duration: 2000 // Do not automatically close
       })
     })
   }
@@ -95,7 +96,8 @@ export const useWebSocketStore = defineStore('websocket', () => {
           notification.info({
             message: `房间广播 - 来自: ${message.nickname}`,
             description: message.text,
-            placement: 'topRight'
+            placement: 'topRight',
+            duration: 0 // Do not automatically close
           })
           return // 全局消息不添加到聊天列表
         }
@@ -178,11 +180,10 @@ export const useWebSocketStore = defineStore('websocket', () => {
   const sendGlobalBroadcast = (text: string) => {
     if (!text.trim()) return
 
-    const targets = selectedIpsForBroadcast.value.length > 0
-        ? selectedIpsForBroadcast.value
-        : scannedIps.value
+    const targets =
+      selectedIpsForBroadcast.value.length > 0 ? selectedIpsForBroadcast.value : scannedIps.value
 
-    console.log('Broadcast Targets:', targets); // Added for debugging
+    console.log('Broadcast Targets:', targets) // Added for debugging
 
     if (targets.length === 0) {
       antMessage.warn('没有发现任何可广播的主机，请先扫描网络。')
@@ -190,7 +191,8 @@ export const useWebSocketStore = defineStore('websocket', () => {
     }
 
     // Exclude self from broadcast if user is a host and no specific targets are selected
-    const finalTargets = isHost.value && selectedIpsForBroadcast.value.length === 0
+    const finalTargets =
+      isHost.value && selectedIpsForBroadcast.value.length === 0
         ? targets.filter((ip) => ip !== hostIpForDisplay.value)
         : targets
 
