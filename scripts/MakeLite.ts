@@ -101,11 +101,11 @@ const filesToReplace: { source: string; destination: string; deleteSource?: bool
     destination: 'MakeLite/index.ts'
   },
   {
-    source: 'src/main/preload/index.ts',
+    source: 'src/preload/index.ts',
     destination: 'MakeLite/preload/index.ts'
   },
   {
-    source: 'src/main/preload/index.d.ts',
+    source: 'src/preload/index.d.ts',
     destination: 'MakeLite/preload/index.d.ts'
   },
   {
