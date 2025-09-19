@@ -57,11 +57,11 @@
     </a-list>
 
     <div class="input-area">
-      <a-input
+      <a-textarea
         v-model:value="newMessage"
-        size="large"
-        placeholder="输入消息..."
-        @keyup.enter="sendMessage"
+        :placeholder="`输入消息 (Ctrl+Enter 发送)`"
+        :autosize="{ minRows: 2, maxRows: 5 }"
+        @keydown.ctrl.enter.prevent="sendMessage"
         :disabled="!isConnected"
       />
       <a-dropdown-button
@@ -253,5 +253,6 @@ const handleMenuClick = ({ key }: { key: string }) => {
   border-top: 1px solid var(--color-border);
   background-color: var(--color-background);
   gap: 10px;
+  align-items: flex-end; /* Align items to the bottom */
 }
 </style>
