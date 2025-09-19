@@ -7,7 +7,7 @@
       @scan-network="wsStore.scanNetwork"
       @ip-selected="handleIpSelected"
       @create-room="wsStore.startHosting"
-      @selection-change="(ips) => (wsStore.selectedIpsForBroadcast = ips)"
+      @selection-change="wsStore.setSelectedIpsForBroadcast"
     />
 
     <!-- Main Content Area -->
