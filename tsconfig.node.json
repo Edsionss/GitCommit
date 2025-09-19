@@ -23,7 +23,8 @@
       "@main/*": ["src/main/*"],
       "@preload/*": ["src/preload/*"],
       "@nodeUtils/*": ["src/main/utils/*"],
+    },
+    
+  },
 
-    }
-  }
 }

@@ -1,0 +1,133 @@
+import { defineStore } from 'pinia'
+import { ref } from 'vue'
+import { MergeArray } from '@/utils'
+import { storeApi } from '@/api/store'
+import type { RouteRecord } from '@sharedType/MenuManagement'
+
+export const mockFlatRoutes: RouteRecord[] = [
+  {
+    id: '2',
+    parentId: null,
+    path: 'scan',
+    name: 'Scan',
+    componentPath: 'BasicSettings',
+    meta: { title: '开始扫描', keepAlive: '0' },
+    hide: '0',
+    menuOrder: 10,
+    menuIcon: 'ScanOutlined'
+  },
+  {
+    id: '3',
+    parentId: null,
+    path: 'scanHistory',
+    name: 'ScanHistory',
+    componentPath: 'ScanHistory',
+    meta: { title: '扫描记录', keepAlive: '1' },
+    hide: '0',
+    menuOrder: 20,
+    menuIcon: 'HistoryOutlined'
+  },
+
+  {
+    id: '7',
+    parentId: null,
+    path: 'aiChat',
+    name: 'AiChat',
+    componentPath: 'AiChat',
+    meta: { title: 'AI Chat', keepAlive: '0' },
+    hide: '0',
+    menuOrder: 70,
+    menuIcon: 'RobotOutlined'
+  },
+
+  {
+    id: '10',
+    parentId: null,
+    path: 'settings',
+    name: 'Settings',
+    componentPath: 'Settings',
+    meta: { title: '设置', keepAlive: '0' },
+    hide: '1',
+    menuOrder: 1000,
+    menuIcon: 'SettingOutlined' // 设置页面通常有个图标，即使不在主菜单
+  },
+  {
+    id: '199',
+    parentId: null,
+    path: 'chat',
+    name: 'Chat',
+    componentPath: 'RealTimeCommunication',
+    meta: { title: 'WebSocket', keepAlive: '1' },
+    hide: '0',
+    menuOrder: 10000,
+    menuIcon: 'CommentOutlined'
+  }
+]
+
+const storeLoadAppRoutes = (success: (settings: RouteRecord[]) => void = () => {}) => {
+  storeApi.get('AppRoutes').then((AppRoutes) => {
+    success(AppRoutes || mockFlatRoutes)
+  })
+}
+
+export const useRoutesStore = defineStore('routes', () => {
+  const routes = ref<RouteRecord[]>([])
+
+  function initRoutes() {
+    // storeLoadAppRoutes((AppRoutes) => {
+    //   if (AppRoutes) {
+    //     routes.value = MergeArray(defaultRoutes, AppRoutes, true, 'path')
+    //   } else {
+    //     routes.value = defaultRoutes
+    //     // storeApi.set('AppRoutes', JSON.parse(JSON.stringify(defaultRoutes)))
+    //     saveRoutes()
+    //   }
+    // })
+    // storeApi.get('AppRoutes').then((AppRoutes) => {
+    //   if (AppRoutes) {
+    //     routes.value = MergeArray(defaultRoutes, AppRoutes, true, 'path')
+    //   } else {
+    //     routes.value = defaultRoutes
+    //     // storeApi.set('AppRoutes', JSON.parse(JSON.stringify(defaultRoutes)))
+    //     saveRoutes()
+    //   }
+    // })
+    const savedRoutes = localStorage.getItem('AppRoutes')
+    if (savedRoutes) {
+      const currentRoutes = JSON.parse(savedRoutes)
+      routes.value = MergeArray(mockFlatRoutes, currentRoutes, true, 'path')
+    } else {
+      routes.value = mockFlatRoutes
+      // localStorage.setItem('AppRoutes', JSON.stringify(mockFlatRoutes))
+    }
+  }
+
+  function updateRoute(routeName: string, newRouteData: Partial<RouteRecord>) {
+    const routeIndex = routes.value.findIndex((r) => r.name === routeName)
+    if (routeIndex !== -1) {
+      const oldRoute = routes.value[routeIndex]
+      const newMeta = { ...oldRoute.meta, ...newRouteData.meta }
+      routes.value[routeIndex] = { ...oldRoute, ...newRouteData, meta: newMeta }
+      saveRoutes()
+    }
+  }
+
+  function deleteRoute(routeName: string) {
+    routes.value = routes.value.filter((r) => r.name !== routeName)
+    saveRoutes()
+  }
+
+  function saveRoutes(AppRoutes?: RouteRecord) {
+    // localStorage.setItem('AppRoutes', JSON.stringify(routes.value))
+    storeApi.set('AppRoutes', JSON.parse(JSON.stringify(AppRoutes || routes.value)))
+  }
+
+  initRoutes()
+
+  return {
+    routes,
+    initRoutes,
+    updateRoute,
+    deleteRoute
+  }
+})
