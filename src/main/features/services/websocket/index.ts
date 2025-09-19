@@ -12,8 +12,8 @@ const HOST = '0.0.0.0' // 显式声明监听所有网络接口
 
 let wss: WebSocketServer | null = null
 let httpServer: http.Server | null = null
-// 创建一个 Map 来存储客户端 ID 和昵称
-const clients = new Map<WebSocket, { id: string; nickname: string | null }>()
+// 创建一个 Map 来存储客户端 ID
+const clients = new Map<WebSocket, string>()
 /**
  * 启动 WebSocket 服务器
  */
@@ -40,34 +40,13 @@ export function startWebSocketServer() {
 
   wss.on('connection', (ws: WebSocket) => {
     const clientId = nanoid() // 为每个新连接生成一个唯一ID
-    clients.set(ws, { id: clientId, nickname: null })
+    clients.set(ws, clientId)
     console.log(`A new client connected with ID: ${clientId}`)
 
     ws.on('message', (message: string) => {
       try {
-        const clientInfo = clients.get(ws)
-        if (!clientInfo) return
-
-        // 提取消息中的昵称，并检查是否是首次发言
-        const incomingData = JSON.parse(message.toString())
-        const newNickname = incomingData.nickname
-
-        if (newNickname && !clientInfo.nickname) {
-          // This is the first message with a nickname, so announce user has joined.
-          clientInfo.nickname = newNickname
-          const joinMessage: ChatMessage = {
-            id: nanoid(),
-            text: `"${newNickname}" 已加入房间`,
-            sender: 'system',
-            nickname: '系统消息',
-            timestamp: Date.now(),
-            isSystemMessage: true
-          }
-          broadcast(joinMessage)
-        }
-
         // 将 clientId 传递给 handler
-        const processedMessage = handleMessage(message.toString(), clientInfo.id)
+        const processedMessage = handleMessage(message.toString(), clientId)
         broadcast(processedMessage)
       } catch (error) {
         console.error('Failed to process message:', error)
@@ -75,20 +54,7 @@ export function startWebSocketServer() {
     })
 
     ws.on('close', () => {
-      const clientInfo = clients.get(ws)
-      if (clientInfo && clientInfo.nickname) {
-        // Announce user has left.
-        const leaveMessage: ChatMessage = {
-          id: nanoid(),
-          text: `"${clientInfo.nickname}" 已离开房间`,
-          sender: 'system',
-          nickname: '系统消息',
-          timestamp: Date.now(),
-          isSystemMessage: true
-        }
-        broadcast(leaveMessage)
-      }
-      console.log(`Client ${clientInfo?.id} disconnected.`)
+      console.log(`Client ${clients.get(ws)} disconnected.`)
       clients.delete(ws) // 客户端断开时移除
     })
 
@@ -128,12 +94,12 @@ export function stopWebSocketServer() {
 function broadcast(message: ChatMessage) {
   if (!wss) return
 
-  clients.forEach((clientInfo, client) => {
+  clients.forEach((id, client) => {
     if (client.readyState === WebSocket.OPEN) {
       // 为每个客户端定制消息，告诉它这条消息是不是自己发的
       const messageToSend = {
         ...message,
-        isMe: message.sender === clientInfo.id
+        isMe: message.sender === id
       }
       client.send(JSON.stringify(messageToSend))
     }
