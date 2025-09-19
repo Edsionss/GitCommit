@@ -114,6 +114,10 @@ const filesToReplace: { source: string; destination: string; deleteSource?: bool
     source: 'MakeLite/Settings.vue'
   },
   {
+    destination: 'src/renderer/src/stores/routesStore.ts',
+    source: 'MakeLite/routesStore.ts'
+  },
+  {
     destination: 'package.json',
     source: 'MakeLite/package.json'
   }
