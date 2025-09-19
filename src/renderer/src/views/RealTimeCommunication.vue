@@ -2,7 +2,18 @@
   <div class="webSocket-container">
     <!-- Chat Window -->
     <NetWorkTool v-show="collapsed" v-model="selectedIps"></NetWorkTool>
-    <a-button class="back-button" type="primary" @click="collapsed = !collapsed"> 1111 </a-button>
+    <a-float-button
+      class="back-button"
+      type="primary"
+      @click="collapsed = !collapsed"
+      :style="{
+        right: '34px'
+      }"
+    >
+      <template #icon>
+        <UnorderedListOutlined />
+      </template>
+    </a-float-button>
 
     <ChatWindow
       v-if="wsStore.modeSelected"
@@ -19,35 +30,19 @@
     />
     <!-- Initial Screen -->
     <div v-else class="mode-selection-wrapper">
-      <ModeSelection
+      <!-- <ModeSelection
         v-model:hostIp="hostIp"
         :is-scanning="isScanning"
         @start-hosting="wsStore.startHosting"
         @show-join-modal="showTokenModal = true"
         @scan-network="scanNetwork"
-      />
+      /> -->
       <DirectBroadcast
         v-if="foundIps.length > 0"
         :found-ips="foundIps"
         @ip-selected="(ip) => (hostIp = ip)"
       />
     </div>
-
-    <!-- Token Input Modal -->
-    <a-modal
-      v-model:open="showTokenModal"
-      title="输入房间令牌"
-      :closable="false"
-      :maskClosable="false"
-      @ok="handleTokenSubmit"
-      :confirm-loading="wsStore.isConnecting"
-    >
-      <a-input
-        v-model:value="localInputToken"
-        placeholder="向主机索要令牌"
-        @keyup.enter="handleTokenSubmit"
-      />
-    </a-modal>
   </div>
 </template>
 
@@ -56,7 +51,7 @@ import { ref, onUnmounted } from 'vue'
 import { message as antMessage } from 'ant-design-vue'
 import { webSocketApi } from '@api/webSocket'
 import { useWebSocketStore } from '@/stores/webSocketStore'
-
+import { UnorderedListOutlined } from '@ant-design/icons-vue'
 // Import child components
 import NetWorkTool from '@components/RealTimeCommunication/NetWorkTool.vue'
 import ModeSelection from '@components/RealTimeCommunication/ModeSelection.vue'

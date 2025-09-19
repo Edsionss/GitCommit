@@ -12,7 +12,7 @@
               <SearchOutlined />
             </template>
           </a-button>
-          <a-button type="primary" @click="scanNetwork">
+          <a-button type="primary" @click="wsStore.startHosting">
             创建房间
             <template #icon>
               <PlusCircleOutlined />
@@ -35,11 +35,25 @@
         </a-checkbox-group>
       </div>
     </div>
+    <a-modal
+      v-model:open="showTokenModal"
+      title="输入房间令牌"
+      :closable="false"
+      :maskClosable="false"
+      @ok="handleTokenSubmit"
+      :confirm-loading="wsStore.isConnecting"
+    >
+      <a-input
+        v-model:value="roomData.token"
+        placeholder="向主机索要令牌"
+        @keyup.enter="handleTokenSubmit"
+      />
+    </a-modal>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { reactive, ref } from 'vue'
 import {
   FileTextOutlined,
   ApiOutlined,
@@ -54,8 +68,27 @@ const foundIps = ref<string[]>([])
 import { message as antMessage } from 'ant-design-vue'
 import { webSocketApi } from '@api/webSocket'
 import { useWebSocketStore } from '@/stores/webSocketStore'
-
+const wsStore = useWebSocketStore()
+const roomData = reactive<any>({
+  hostIp: '',
+  token: ''
+})
 const selectedIps = defineModel<string[]>()
+const showTokenModal = ref(false)
+
+// --- Modal Logic ---
+const handleTokenSubmit = () => {
+  if (!roomData.hostIp.trim()) {
+    antMessage.warn('请输入房间令牌。')
+    return
+  }
+  if (!roomData.token.trim()) {
+    antMessage.warn('IP地址不能为空，请从扫描结果中选择或手动输入。')
+    return
+  }
+  wsStore.joinRoom(roomData.hostIp, roomData.token)
+  showTokenModal.value = false
+}
 const scanNetwork = async () => {
   isScanning.value = true
   foundIps.value = []
@@ -76,7 +109,8 @@ const scanNetwork = async () => {
 }
 
 const joinRoom = (item: any) => {
-  console.log(item)
+  roomData.hostIp = item
+  showTokenModal.value = true
 }
 </script>
 
