@@ -209,17 +209,3 @@ export function handleSendDirectBroadcast(
     })
   })
 }
-
-export function handleSendRoomBroadcast(
-  _event: Electron.IpcMainEvent,
-  message: { text: string; nickname: string; token: string }
-): void {
-  try {
-    const globalSenderId = 'room-broadcaster'
-    const processedMessage = handleMessage(JSON.stringify(message), globalSenderId)
-    const globalMessage = { ...processedMessage, isGlobal: true, token: undefined }
-    broadcast(globalMessage)
-  } catch (error) {
-    console.error('Failed to send room broadcast:', error)
-  }
-}
