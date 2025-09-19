@@ -3,7 +3,7 @@
     <div class="content-wrapper">
       <div class="head-container">
         <div class="head-title">
-          <h3>网络工具</h3>
+          <h3><ToolOutlined />网络工具</h3>
         </div>
         <div class="head-actions">
           <a-button type="primary" @click="scanNetwork">
@@ -25,8 +25,9 @@
           <a-list :data-source="foundIps" size="small" bordered>
             <template #renderItem="{ item }">
               <a-list-item class="ip-list-item">
-                <a-checkbox :value="item" @click.stop
-                  >{{ item }}
+                <a-checkbox :value="item" @click.stop>
+                  <DesktopOutlined />
+                  {{ item }}
                   <a-button type="link" @click="joinRoom(item)">加入</a-button>
                 </a-checkbox>
               </a-list-item>
@@ -55,8 +56,8 @@
 <script setup lang="ts">
 import { reactive, ref } from 'vue'
 import {
-  FileTextOutlined,
-  ApiOutlined,
+  ToolOutlined,
+  DesktopOutlined,
   CloudUploadOutlined,
   SettingOutlined,
   SearchOutlined,

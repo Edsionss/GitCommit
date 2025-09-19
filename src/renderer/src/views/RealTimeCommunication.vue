@@ -16,16 +16,22 @@
         />
       </div>
       <div v-else class="direct-container">
-        <a-textarea v-model:value="directMessage" show-count :maxlength="100" />
-        <a-button
-          type="primary"
-          size="large"
-          @click="handleSendDirectBroadcast"
-          :disabled="!directMessage"
-        >
-          <template #icon><SendOutlined /></template>
-          发送广播
-        </a-button>
+        <h3>Welcome to the WebSocket Chat</h3>
+        <a-empty :description="null" />
+        <span>请使用左侧的“网络工具”创建或加入一个房间。</span>
+        <div class="direct-content">
+          <a-textarea v-model:value="directMessage" allow-clear />
+          <a-button
+            style="width: 100%"
+            type="primary"
+            size="large"
+            @click="handleSendDirectBroadcast"
+            :disabled="!directMessage"
+          >
+            <template #icon><NotificationOutlined /></template>
+            发送广播
+          </a-button>
+        </div>
       </div>
     </div>
     <div class="network-tool-container" v-if="collapsed">
@@ -52,7 +58,7 @@ import { ref, onUnmounted } from 'vue'
 import { message as antMessage } from 'ant-design-vue'
 import { webSocketApi } from '@api/webSocket'
 import { useWebSocketStore } from '@/stores/webSocketStore'
-import { UnorderedListOutlined, SendOutlined } from '@ant-design/icons-vue'
+import { UnorderedListOutlined, SendOutlined, NotificationOutlined } from '@ant-design/icons-vue'
 import { copyNormalize } from '@utils/index'
 
 // Import child components
@@ -94,9 +100,25 @@ onUnmounted(() => {
     padding: 10px;
 
     .direct-container {
-      width: 100%;
+      padding-top: 150px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      text-align: center;
+      margin: auto;
       align-items: center;
       justify-content: center;
+
+      .direct-content {
+        border-radius: 8px;
+        padding: 30px;
+        width: 100%;
+        width: 500px;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        background-color: var(--color-background-soft);
+      }
     }
   }
   .network-tool-container {
