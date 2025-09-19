@@ -57,7 +57,8 @@ const filesToDelete: string[] = [
   'src/renderer/src/views/Reports.vue',
   'src/renderer/src/views/Stock.vue',
   'src/renderer/src/views/Stock.vue',
-  'stock_demo'
+  'stock_demo',
+  'MakeLite'
 ]
 
 /**
@@ -92,29 +93,29 @@ const contentToModify: { filePath: string; patternsToRemove: RegExp[] }[] = [
 const filesToReplace: { source: string; destination: string; deleteSource?: boolean }[] = [
   {
     //  用精简版的 ipcHandlers.ts 替换现有的 ipcHandlers.ts
-    source: 'src/main/features/handlers/ipcHandlers.ts',
-    destination: 'MakeLite/ipcHandlers.ts'
+    destination: 'src/main/features/handlers/ipcHandlers.ts',
+    source: 'MakeLite/ipcHandlers.ts'
   },
   {
     // 用精简版的 主进程 index.ts 替换现有的 index.ts
-    source: 'src/main/index.ts',
-    destination: 'MakeLite/index.ts'
+    destination: 'src/main/index.ts',
+    source: 'MakeLite/index.ts'
   },
   {
-    source: 'src/preload/index.ts',
-    destination: 'MakeLite/preload/index.ts'
+    destination: 'src/preload/index.ts',
+    source: 'MakeLite/preload/index.ts'
   },
   {
-    source: 'src/preload/index.d.ts',
-    destination: 'MakeLite/preload/index.d.ts'
+    destination: 'src/preload/index.d.ts',
+    source: 'MakeLite/preload/index.d.ts'
   },
   {
-    source: 'src/renderer/src/views/Settings.vue',
-    destination: 'MakeLite/Settings.vue'
+    destination: 'src/renderer/src/views/Settings.vue',
+    source: 'MakeLite/Settings.vue'
   },
   {
-    source: 'package.json',
-    destination: 'MakeLite/package.json'
+    destination: 'package.json',
+    source: 'MakeLite/package.json'
   }
 ]
 
@@ -133,10 +134,10 @@ function main() {
   console.log('🚀 开始执行精简版创建脚本...')
   console.log('项目根目录:', projectRoot)
 
-  runPhase1_DeleteFiles()
   runPhase2_ModifyContent()
   runPhase3_ReplaceFiles()
-  runPhase4_ReinstallDependencies() // <--- 4. 在最后调用新函数
+  runPhase1_DeleteFiles()
+  runPhase4_ReinstallDependencies()
 
   console.log('\n🎉 精简版创建脚本执行完毕！项目已准备就绪。')
 }
@@ -261,24 +262,37 @@ function runPhase4_ReinstallDependencies() {
 
     // 使用 spawnSync 来执行 pnpm install 命令
     const result = spawnSync('pnpm', ['install'], {
-      // stdio: 'inherit' 让子进程的输出直接显示在当前终端中
-      // 这能让你看到 pnpm 的进度条和日志，体验最好
-      stdio: 'inherit',
-      // 在项目根目录执行
       cwd: projectRoot,
-      // 在 windows 上，最好设置为 true，以正确解析命令
+      // 使用 'pipe' 来捕获输出，而不是直接显示
+      // encoding: 'utf-8' 让输出直接是字符串
+      stdio: 'pipe',
+      encoding: 'utf-8',
       shell: true
     })
 
-    if (result.status !== 0) {
-      console.error('\n❌  `pnpm install` 执行失败！请检查上面的错误日志。')
-      // 如果安装失败，可以选择退出脚本
-      // process.exit(1);
+    // 同时检查退出码和错误输出
+    // pnpm 的 "No projects found" 是在 stderr 中输出的
+    if (result.status !== 0 || (result.stderr && result.stderr.includes('ERR_PNPM'))) {
+      console.error('\n❌  `pnpm install` 执行失败！')
+      // 打印完整的输出方便调试
+      console.error('--- STDOUT ---')
+      console.log(result.stdout)
+      console.error('--- STDERR ---')
+      console.error(result.stderr)
+      // 强制以失败状态退出整个脚本
+      process.exit(1)
     } else {
+      // 如果成功，我们仍然可以打印输出
+      console.log(result.stdout)
+      // 如果 stderr 有内容但不是错误（比如只是警告），也打印出来
+      if (result.stderr) {
+        console.warn(result.stderr)
+      }
       console.log('\n✅ `pnpm install` 执行成功！')
     }
   } catch (error) {
     console.error('❌  执行 `pnpm install` 时发生未知错误:', error)
+    process.exit(1)
   }
   console.log('✅ 阶段 4 完成。')
 }
