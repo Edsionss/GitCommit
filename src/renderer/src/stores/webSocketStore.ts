@@ -22,6 +22,7 @@ export const useWebSocketStore = defineStore('websocket', () => {
   let serverAddress = ''
 
   // --- Actions ---
+  //
 
   // 监听来自主进程的直接广播
   const listenForDirectBroadcasts = () => {
