@@ -30,7 +30,8 @@ export const useWebSocketStore = defineStore('websocket', () => {
       notification.info({
         message: `收到来自 ${data.sourceIp} 的广播`,
         description: data.text,
-        placement: 'topRight'
+        placement: 'topRight',
+        duration: 0
       })
     })
   }
