@@ -73,6 +73,9 @@
 <script setup>
 import { ref } from 'vue'
 import { getCardBackgroundByChange } from '@/utils'
+import { useTheme } from '@/composables/useTheme'
+
+const { effectiveTheme } = useTheme()
 
 // 模拟的龙虎榜数据 (新增 openingPrice)
 const stocks = ref([
@@ -215,11 +218,12 @@ const formatCurrency = (value) => {
   return value
 }
 
-// 根据涨跌幅返回对应的class
+// 根据涨跌幅返回对应的颜色
 const getPriceClass = (change) => {
-  if (change > 0) return 'positive'
-  if (change < 0) return 'negative'
-  return 'neutral'
+  const isDark = effectiveTheme.value === 'dark'
+  if (change > 0) return isDark ? 'positive-dark' : 'positive'
+  if (change < 0) return isDark ? 'negative-dark' : 'negative'
+  return isDark ? 'neutral-dark' : 'neutral'
 }
 </script>
 
@@ -234,7 +238,7 @@ const getPriceClass = (change) => {
   font-size: 22px;
   font-weight: bold;
   margin-bottom: 16px;
-  color: #333;
+  color: var(--text-color-primary);
 }
 
 .list-view {
@@ -247,13 +251,13 @@ const getPriceClass = (change) => {
   cursor: pointer;
   border-radius: 8px;
   padding: 15px;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+  box-shadow: var(--box-shadow-base);
   display: flex;
   flex-direction: column;
   gap: 8px;
   transition: box-shadow 0.3s ease;
   &:hover {
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    box-shadow: var(--box-shadow-hover);
   }
 }
 
@@ -315,24 +319,24 @@ const getPriceClass = (change) => {
 
 .opening-price-group .label {
   font-size: 12px;
-  color: #888;
+  color: var(--text-color-tertiary);
 }
 
 .value.opening-price {
   font-size: 13px;
-  color: #333;
+  color: var(--text-color-primary);
   font-weight: 500;
 }
 
 .stock-name {
   font-size: 16px;
   font-weight: bold;
-  color: #2c3e50;
+  color: var(--text-color-primary);
 }
 
 .stock-code-market {
   font-size: 13px;
-  color: #888;
+  color: var(--text-color-tertiary);
   display: flex;
   align-items: center;
   font-weight: bold;
@@ -364,14 +368,14 @@ const getPriceClass = (change) => {
 
 .label {
   font-size: 12px;
-  color: #666;
+  color: var(--text-color-secondary);
   margin-bottom: 2px;
 }
 
 .value {
   font-size: 14px;
   font-weight: 500;
-  color: #333;
+  color: var(--text-color-primary);
 }
 
 .value.positive {
@@ -385,5 +389,16 @@ const getPriceClass = (change) => {
 }
 .value.sell {
   color: #43a047;
+}
+
+[data-theme='dark'] {
+  .value.positive,
+  .value.buy {
+    color: #ff4d4f;
+  }
+  .value.negative,
+  .value.sell {
+    color: #52c41a;
+  }
 }
 </style>

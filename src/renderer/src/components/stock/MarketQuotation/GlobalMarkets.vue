@@ -3,13 +3,13 @@
     <!-- 顶部卡片 -->
     <div class="summary-cards">
       <a-card size="small" class="summary-card">
-        <a-statistic title="上涨家数" :value="marketStats.up" :value-style="{ color: '#cf1322' }" />
+        <a-statistic title="上涨家数" :value="marketStats.up" :value-style="upColor" />
       </a-card>
       <a-card size="small" class="summary-card">
         <a-statistic
           title="下跌家数"
           :value="marketStats.down"
-          :value-style="{ color: '#389e0d' }"
+          :value-style="downColor"
         />
       </a-card>
     </div>
@@ -54,15 +54,26 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import { getCardBackgroundByChange } from '@/utils'
 import IndexChart from './IndexChart.vue'
+import { useTheme } from '@/composables/useTheme'
+
+const { effectiveTheme } = useTheme()
 
 // --- 响应式状态 ---
 const marketStats = ref({
   up: 8,
   down: 4
 })
+
+const upColor = computed(() => ({
+  color: effectiveTheme.value === 'dark' ? '#ff4d4f' : '#cf1322'
+}))
+
+const downColor = computed(() => ({
+  color: effectiveTheme.value === 'dark' ? '#52c41a' : '#389e0d'
+}))
 
 const indices = ref([
   {

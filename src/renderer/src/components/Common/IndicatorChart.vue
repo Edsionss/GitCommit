@@ -19,6 +19,9 @@ import {
 } from 'chart.js'
 import 'chartjs-adapter-date-fns'
 import { computed } from 'vue'
+import { useTheme } from '@/composables/useTheme'
+
+const { effectiveTheme } = useTheme()
 
 ChartJS.register(
   CategoryScale,
@@ -38,6 +41,10 @@ const props = defineProps<{
 }>()
 
 const chartData = computed(() => {
+  const isDark = effectiveTheme.value === 'dark'
+  const upColor = isDark ? 'rgba(255, 77, 79, 0.7)' : 'rgba(207, 19, 34, 0.7)'
+  const downColor = isDark ? 'rgba(82, 196, 26, 0.7)' : 'rgba(56, 158, 13, 0.7)'
+
   switch (props.type) {
     case 'vol':
       return {
@@ -51,7 +58,7 @@ const chartData = computed(() => {
                 return 'rgba(128, 128, 128, 0.7)'
               }
               const { o, c } = props.indicatorData[context.dataIndex]
-              return c >= o ? 'rgba(207, 19, 34, 0.7)' : 'rgba(56, 158, 13, 0.7)'
+              return c >= o ? upColor : downColor
             }
           }
         ]
@@ -63,7 +70,7 @@ const chartData = computed(() => {
           {
             label: 'DIF',
             data: props.indicatorData.map((d) => d.dif),
-            borderColor: '#f5a623',
+            borderColor: isDark ? '#E6A23C' : '#f5a623',
             borderWidth: 1,
             pointRadius: 0,
             type: 'line'
@@ -71,7 +78,7 @@ const chartData = computed(() => {
           {
             label: 'DEA',
             data: props.indicatorData.map((d) => d.dea),
-            borderColor: '#4a90e2',
+            borderColor: isDark ? '#67C23A' : '#4a90e2',
             borderWidth: 1,
             pointRadius: 0,
             type: 'line'
@@ -79,7 +86,7 @@ const chartData = computed(() => {
           {
             label: 'MACD',
             data: props.indicatorData.map((d) => d.macd),
-            backgroundColor: (context) => (context.raw > 0 ? '#cf1322' : '#389e0d'),
+            backgroundColor: (context) => (context.raw > 0 ? upColor : downColor),
             type: 'bar'
           }
         ]
@@ -90,32 +97,41 @@ const chartData = computed(() => {
   }
 })
 
-const chartOptions = computed(() => ({
-  responsive: true,
-  maintainAspectRatio: false,
-  scales: {
-    x: {
-      type: 'time',
-      display: false
-    },
-    y: {
-      position: 'right',
-      grid: {
-        color: '#f0f0f0'
+const chartOptions = computed(() => {
+  const gridColor = effectiveTheme.value === 'dark' ? 'rgba(255, 255, 255, 0.1)' : '#f0f0f0'
+  const textColor = effectiveTheme.value === 'dark' ? 'rgba(255, 255, 255, 0.7)' : 'rgba(0, 0, 0, 0.7)'
+
+  return {
+    responsive: true,
+    maintainAspectRatio: false,
+    scales: {
+      x: {
+        type: 'time',
+        display: false
+      },
+      y: {
+        position: 'right',
+        grid: {
+          color: gridColor
+        },
+        ticks: {
+          color: textColor
+        }
       }
-    }
-  },
-  plugins: {
-    legend: {
-      display: true,
-      position: 'top',
-      labels: {
-        boxWidth: 10,
-        font: {
-          size: 10
+    },
+    plugins: {
+      legend: {
+        display: true,
+        position: 'top',
+        labels: {
+          color: textColor,
+          boxWidth: 10,
+          font: {
+            size: 10
+          }
         }
       }
     }
   }
-}))
+})
 </script>

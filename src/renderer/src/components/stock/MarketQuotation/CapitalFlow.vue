@@ -148,6 +148,9 @@
 import { ref, reactive, computed } from 'vue'
 import { ArrowUpOutlined, ArrowDownOutlined } from '@ant-design/icons-vue'
 import { getCardBackgroundByChange } from '@/utils'
+import { useTheme } from '@/composables/useTheme'
+
+const { effectiveTheme } = useTheme()
 
 // --- 响应式状态 ---
 const marketInfo = ref({
@@ -264,8 +267,9 @@ const formatCurrency = (value: number) => {
 }
 
 const getTextColor = (value: number) => {
-  if (value > 0) return { color: '#cf1322' }
-  if (value < 0) return { color: '#389e0d' }
+  const isDark = effectiveTheme.value === 'dark'
+  if (value > 0) return { color: isDark ? '#ff4d4f' : '#cf1322' }
+  if (value < 0) return { color: isDark ? '#52c41a' : '#389e0d' }
   return {}
 }
 
@@ -293,7 +297,7 @@ const getTextClass = (value: number) => {
 .market-card {
   :deep(.ant-statistic-title) {
     font-size: 14px;
-    color: rgba(0, 0, 0, 0.65);
+    color: var(--text-color-secondary);
   }
   :deep(.ant-statistic-content) {
     font-size: 24px;
@@ -306,7 +310,7 @@ const getTextClass = (value: number) => {
   justify-content: center;
   margin-bottom: 16px;
   .active-sort {
-    color: #1890ff;
+    color: var(--ant-primary-color);
     font-weight: 500;
   }
 }
@@ -320,7 +324,7 @@ const getTextClass = (value: number) => {
 .stock-card {
   cursor: pointer;
   border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+  box-shadow: var(--box-shadow-base);
   display: flex;
   position: relative;
   padding: 16px;
@@ -328,7 +332,7 @@ const getTextClass = (value: number) => {
   overflow: hidden;
   transition: all 0.3s ease;
   &:hover {
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    box-shadow: var(--box-shadow-hover);
     transform: translateY(-2px);
   }
 }
@@ -337,7 +341,7 @@ const getTextClass = (value: number) => {
   position: absolute;
   top: 0;
   left: 0;
-  background-color: #1890ff;
+  background-color: var(--ant-primary-color);
   color: white;
   padding: 2px 8px;
   border-bottom-right-radius: 8px;
@@ -359,6 +363,7 @@ const getTextClass = (value: number) => {
   .stock-name {
     font-size: 18px;
     font-weight: 600;
+    color: var(--text-color-primary);
   }
   .stock-change {
     font-size: 20px;
@@ -382,18 +387,19 @@ const getTextClass = (value: number) => {
   }
   .label {
     font-size: 13px;
-    color: #888;
+    color: var(--text-color-tertiary);
   }
   .value {
     font-size: 14px;
     font-weight: 500;
+    color: var(--text-color-secondary);
   }
 }
 
 .meta-data {
   flex: 4;
   padding-left: 20px;
-  border-left: 2px dashed #cdd1d7;
+  border-left: 2px dashed var(--border-color-split);
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -412,7 +418,7 @@ const getTextClass = (value: number) => {
   gap: 8px;
   .stock-code {
     font-size: 12px;
-    color: #888;
+    color: var(--text-color-tertiary);
   }
 }
 
@@ -426,7 +432,7 @@ const getTextClass = (value: number) => {
     align-items: baseline;
   }
   .label {
-    color: #888;
+    color: var(--text-color-tertiary);
     margin-right: 8px;
     flex-shrink: 0;
   }
@@ -435,6 +441,7 @@ const getTextClass = (value: number) => {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    color: var(--text-color-secondary);
   }
 }
 
@@ -448,4 +455,12 @@ const getTextClass = (value: number) => {
 .is-down {
   color: #389e0d;
 }
-</style>
+
+[data-theme='dark'] {
+  .is-up {
+    color: #ff4d4f;
+  }
+  .is-down {
+    color: #52c41a;
+  }
+}</style>

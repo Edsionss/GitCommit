@@ -14,6 +14,9 @@ import {
   Tooltip
 } from 'chart.js'
 import { computed } from 'vue'
+import { useTheme } from '@/composables/useTheme'
+
+const { effectiveTheme } = useTheme()
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Filler, Tooltip)
 
@@ -43,24 +46,36 @@ const chartData = computed(() => {
   }
 })
 
-const chartOptions = {
-  responsive: true,
-  maintainAspectRatio: false,
-  plugins: {
-    legend: {
-      display: false
+const chartOptions = computed(() => {
+  const textColor = effectiveTheme.value === 'dark' ? 'rgba(255, 255, 255, 0.7)' : 'rgba(0, 0, 0, 0.7)'
+  return {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: {
+        display: false,
+        labels: {
+          color: textColor
+        }
+      },
+      tooltip: {
+        enabled: false // Disable tooltips for a cleaner look in the card
+      }
     },
-    tooltip: {
-      enabled: false // Disable tooltips for a cleaner look in the card
-    }
-  },
-  scales: {
-    x: {
-      display: false
-    },
-    y: {
-      display: false
+    scales: {
+      x: {
+        display: false,
+        ticks: {
+          color: textColor
+        }
+      },
+      y: {
+        display: false,
+        ticks: {
+          color: textColor
+        }
+      }
     }
   }
-}
+})
 </script>

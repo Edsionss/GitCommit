@@ -16,6 +16,9 @@ import {
   Filler
 } from 'chart.js'
 import { computed } from 'vue'
+import { useTheme } from '@/composables/useTheme'
+
+const { effectiveTheme } = useTheme()
 
 ChartJS.register(
   CategoryScale,
@@ -54,29 +57,41 @@ const chartData = computed(() => {
   }
 })
 
-const chartOptions = {
-  responsive: true,
-  maintainAspectRatio: false,
-  plugins: {
-    legend: {
-      display: false
+const chartOptions = computed(() => {
+  const textColor = effectiveTheme.value === 'dark' ? 'rgba(255, 255, 255, 0.7)' : 'rgba(0, 0, 0, 0.7)'
+  return {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: {
+        display: false,
+        labels: {
+          color: textColor
+        }
+      },
+      tooltip: {
+        enabled: false
+      }
     },
-    tooltip: {
-      enabled: false
-    }
-  },
-  scales: {
-    x: {
-      display: false
+    scales: {
+      x: {
+        display: false,
+        ticks: {
+          color: textColor
+        }
+      },
+      y: {
+        display: false,
+        ticks: {
+          color: textColor
+        }
+      }
     },
-    y: {
-      display: false
-    }
-  },
-  elements: {
-    line: {
-      borderCapStyle: 'round'
+    elements: {
+      line: {
+        borderCapStyle: 'round'
+      }
     }
   }
-}
+})
 </script>

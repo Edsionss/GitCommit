@@ -8,6 +8,9 @@ import { Chart as ChartJS, CategoryScale, LinearScale, Tooltip, Legend, TimeScal
 import 'chartjs-adapter-date-fns'
 import { CandlestickController, CandlestickElement } from 'chartjs-chart-financial'
 import { ref, computed } from 'vue'
+import { useTheme } from '@/composables/useTheme'
+
+const { effectiveTheme } = useTheme()
 
 ChartJS.register(
   CategoryScale,
@@ -29,50 +32,61 @@ const chartData = computed(() => ({
       label: 'K线',
       data: props.klineData,
       color: {
-        up: '#cf1322',
-        down: '#389e0d',
+        up: effectiveTheme.value === 'dark' ? '#ff4d4f' : '#cf1322',
+        down: effectiveTheme.value === 'dark' ? '#52c41a' : '#389e0d',
         unchanged: '#888'
       }
     }
   ]
 }))
 
-const chartOptions = ref({
-  responsive: true,
-  maintainAspectRatio: false,
-  scales: {
-    x: {
-      type: 'time',
-      time: {
-        unit: 'day'
+const chartOptions = computed(() => {
+  const gridColor = effectiveTheme.value === 'dark' ? 'rgba(255, 255, 255, 0.1)' : '#f0f0f0'
+  const textColor = effectiveTheme.value === 'dark' ? 'rgba(255, 255, 255, 0.7)' : 'rgba(0, 0, 0, 0.7)'
+
+  return {
+    responsive: true,
+    maintainAspectRatio: false,
+    scales: {
+      x: {
+        type: 'time',
+        time: {
+          unit: 'day'
+        },
+        grid: {
+          display: false
+        },
+        ticks: {
+          color: textColor
+        }
       },
-      grid: {
+      y: {
+        position: 'right',
+        grid: {
+          color: gridColor
+        },
+        ticks: {
+          color: textColor
+        }
+      }
+    },
+    plugins: {
+      legend: {
         display: false
-      }
-    },
-    y: {
-      position: 'right',
-      grid: {
-        color: '#f0f0f0'
-      }
-    }
-  },
-  plugins: {
-    legend: {
-      display: false
-    },
-    tooltip: {
-      mode: 'index',
-      intersect: false,
-      callbacks: {
-        label: function (context) {
-          const raw = context.raw as any
-          return [
-            `开: ${raw.o}`,
-            `高: ${raw.h}`,
-            `低: ${raw.l}`,
-            `收: ${raw.c}`
-          ]
+      },
+      tooltip: {
+        mode: 'index',
+        intersect: false,
+        callbacks: {
+          label: function (context) {
+            const raw = context.raw as any
+            return [
+              `开: ${raw.o}`,
+              `高: ${raw.h}`,
+              `低: ${raw.l}`,
+              `收: ${raw.c}`
+            ]
+          }
         }
       }
     }

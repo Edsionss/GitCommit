@@ -72,3 +72,8 @@
   --el-fill-color: var(--color-background-soft);
   --el-mask-color: rgba(0, 0, 0, 0.3);
 }
+
+body {
+  background-color: var(--color-background);
+  color: var(--color-text);
+}
