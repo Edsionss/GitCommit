@@ -2,10 +2,10 @@
   <div class="system-tools-container">
     <!-- 定时关机 -->
     <a-card title="定时关机" class="tool-card">
-      <a-row :gutter="24">
+      <div class="shutdown-flex-container">
         <!-- Left: Mode Selection -->
-        <a-col :span="8">
-          <a-form layout="vertical" v-if="!isTaskActiveInSession">
+        <div class="shutdown-left-column" v-if="!isTaskActiveInSession">
+          <a-form layout="vertical">
             <a-form-item label="选择模式">
               <a-radio-group v-model:value="shutdownMode" button-style="solid" style="width: 100%">
                 <a-radio-button value="timer" style="width: 50%; text-align: center"
@@ -17,11 +17,11 @@
               </a-radio-group>
             </a-form-item>
           </a-form>
-        </a-col>
+        </div>
 
         <!-- Right: Configuration / Status -->
-        <a-col :span="16">
-          <!-- Configuration View -->
+        <div class="shutdown-right-column">
+          <!-- Configuration View (Only shown if no task is active in this app's session) -->
           <div v-if="!isTaskActiveInSession">
             <a-form layout="vertical">
               <div v-if="shutdownMode === 'timer'">
@@ -59,8 +59,8 @@
             </div>
             <div class="target-time">预计关机时间: {{ formatTimestamp(shutdownTargetTime) }}</div>
           </div>
-        </a-col>
-      </a-row>
+        </div>
+      </div>
 
       <template #actions>
         <div class="card-actions">
@@ -237,6 +237,16 @@ const handleSaveEnvVar = async () => {
 }
 .tool-card {
   width: 100%;
+}
+.shutdown-flex-container {
+  display: flex;
+  gap: 24px;
+}
+.shutdown-left-column {
+  flex: 0 0 200px; /* 固定左侧宽度 */
+}
+.shutdown-right-column {
+  flex: 1; /* 右侧占据剩余空间 */
 }
 .shutdown-status-view {
   text-align: center;
