@@ -116,5 +116,15 @@ export const mockFlatRoutes: Omit<RouteRecord, 'id'>[] = [
     hide: '0',
     menuOrder: 10000,
     menuIcon: 'CommentOutlined'
+  },
+  {
+    parentId: null,
+    path: 'systemTools',
+    name: 'SystemTools',
+    componentPath: 'SystemTools',
+    meta: { title: 'SystemTool', keepAlive: '1' },
+    hide: '0',
+    menuOrder: 1001,
+    menuIcon: 'CommentOutlined'
   }
 ]

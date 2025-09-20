@@ -95,6 +95,12 @@ interface ExposedAPI {
   // Settings API
   getAutoStartStatus: () => Promise<boolean>
   setAutoStart: (isEnabled: boolean) => Promise<{ success: boolean; error?: string }>
+
+  // System Tools API
+  scheduleShutdown: (seconds: number) => Promise<{ success: boolean; message?: string; error?: string }>
+  cancelShutdown: () => Promise<{ success: boolean; message?: string; error?: string }>
+  getEnvVar: (key: string) => Promise<{ success: boolean; value?: string; error?: string }>
+  setEnvVar: (key: string, value: string) => Promise<{ success: boolean; error?: string }>
 }
 
 declare global {

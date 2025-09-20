@@ -121,7 +121,14 @@ const api = {
 
   // Settings API
   getAutoStartStatus: () => ipcRenderer.invoke('settings:get-auto-start'),
-  setAutoStart: (isEnabled: boolean) => ipcRenderer.invoke('settings:set-auto-start', isEnabled)
+  setAutoStart: (isEnabled: boolean) => ipcRenderer.invoke('settings:set-auto-start', isEnabled),
+
+  // System Tools API
+  scheduleShutdown: (seconds: number) =>
+    ipcRenderer.invoke('system-tools:schedule-shutdown', seconds),
+  cancelShutdown: () => ipcRenderer.invoke('system-tools:cancel-shutdown'),
+  getEnvVar: (key: string) => ipcRenderer.invoke('system-tools:get-env-var', key),
+  setEnvVar: (key: string, value: string) => ipcRenderer.invoke('system-tools:set-env-var', key, value)
 }
 
 // 暴露API
