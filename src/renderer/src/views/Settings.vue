@@ -36,6 +36,7 @@
 
 <script setup lang="ts">
 import { message, Modal } from 'ant-design-vue'
+import { storeToRefs } from 'pinia'
 import { useSettingsStore } from '@/stores/settingsStore'
 import DisplayConfig from '@renderer/components/SettingsView/DisplayConfig.vue'
 import Preferences from '@renderer/components/SettingsView/Preferences.vue'
@@ -52,12 +53,9 @@ const routesStore = useRoutesStore()
 const settingsStore = useSettingsStore()
 
 // 保存设置到 Store
-const saveSettings = () => {
-  settingsStore.saveSettings()
-  message.success('设置已保存')
-  setTimeout(() => {
-    location.reload() // 保留重载以应用某些全局设置
-  }, 500)
+const saveSettings = async () => {
+  // 1. 先保存所有设置到 electron-store
+  await settingsStore.saveSettings()
 }
 
 // 重置设置

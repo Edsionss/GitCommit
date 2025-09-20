@@ -10,7 +10,9 @@ import type {
 } from '@type/setting'
 import _ from 'lodash' // 引入 lodash 用于深层合并
 import { storeApi } from '@api/store'
+import { settingsApi } from '@/api/settingsApi'
 import { message } from 'ant-design-vue'
+import { copyNormalize } from '@utils/index'
 
 // 默认设置对象保持不变，它作为初始值和重置的依据
 const DefaultSetting: AppSettings = {
@@ -69,7 +71,20 @@ export const useSettingsStore = defineStore('settings', () => {
         console.error('Failed to parse settings from localStorage', e)
       }
     }
+    // 从主进程获取真实的开机自启状态并更新UI
+    fetchAutoStartStatus()
   })
+
+  async function fetchAutoStartStatus() {
+    try {
+      const isEnabled = await settingsApi.getAutoStartStatus()
+      if (SystemConfig.value.startWithSystem !== isEnabled) {
+        SystemConfig.value.startWithSystem = isEnabled
+      }
+    } catch (error) {
+      console.error('Failed to fetch auto-start status:', error)
+    }
+  }
 
   // 内部函数，用于将分散的 state 重新组合成一个对象以便保存
   const reassembleAppSettings = (): AppSettings => ({
@@ -81,8 +96,19 @@ export const useSettingsStore = defineStore('settings', () => {
   })
 
   // 3. Action 现在负责保存完整的设置对象
-  function saveSettings() {
-    storeSaveSettings(JSON.parse(JSON.stringify(reassembleAppSettings())))
+  async function saveSettings() {
+    try {
+      await settingsApi.setAutoStart(SystemConfig.value.startWithSystem)
+      storeSaveSettings(copyNormalize(reassembleAppSettings()))
+      message.success('设置已保存')
+    } catch (error) {
+      console.error('Failed to set auto-start:', error)
+      message.error('设置开机自启时发生错误')
+      // 即使这里失败，其他设置也已保存
+    }
+    setTimeout(() => {
+      location.reload() // 保留重载以应用某些全局设置
+    }, 500)
   }
 
   // 4. 重置 Action

@@ -117,7 +117,11 @@ const api = {
   addMenus: (menus) => ipcRenderer.invoke('routes-menu:addMany', menus),
   updateMenu: (menu) => ipcRenderer.invoke('routes-menu:update', menu),
   deleteMenu: (id) => ipcRenderer.invoke('routes-menu:delete', id),
-  cleanMenu: () => ipcRenderer.invoke('routes-menu:clean')
+  cleanMenu: () => ipcRenderer.invoke('routes-menu:clean'),
+
+  // Settings API
+  getAutoStartStatus: () => ipcRenderer.invoke('settings:get-auto-start'),
+  setAutoStart: (isEnabled: boolean) => ipcRenderer.invoke('settings:set-auto-start', isEnabled)
 }
 
 // 暴露API

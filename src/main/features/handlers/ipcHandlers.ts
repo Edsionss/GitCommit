@@ -9,7 +9,8 @@ import { initializeStockHandlers } from '@handlers/stock/stock'
 import { initializePuppeteerHandlers } from '@handlers/puppeteer/puppeteer'
 import { initializeDatabase } from '@features/database'
 import { initializeWebSocket } from '@handlers/websocket'
-import { registerRoutesMenuHandlers } from './routes_menu'
+import { registerRoutesMenuHandlers } from '@handlers/routes_menu'
+import { registerSettingsHandlers } from '@handlers/settings'
 
 export function registerIpcHandlers() {
   // Register handlers from other modules
@@ -25,5 +26,6 @@ export function registerIpcHandlers() {
   initializeDatabase()
   initializeWebSocket()
   registerRoutesMenuHandlers()
+  registerSettingsHandlers()
   // 注册 IPC 处理器
 }

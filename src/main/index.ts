@@ -9,6 +9,7 @@ import { execSync } from 'child_process'
 import { registerIpcHandlers } from '@handlers/ipcHandlers'
 import { db } from '@features/database'
 import { startWebSocketServer, stopWebSocketServer } from '@services/websocket'
+import { settingsService } from '@features/services/settings'
 
 // 如果是 Windows，尝试设置控制台编码为 UTF-8
 if (process.platform === 'win32') {
@@ -144,6 +145,14 @@ app.whenReady().then(() => {
 
   // IPC 注册
   registerIpcHandlers()
+
+  // 同步开机自启设置
+  const storedAutoStart = settingsService.getStoredAutoStartSetting()
+  const actualAutoStart = settingsService.getAutoStartStatus()
+  if (storedAutoStart && !actualAutoStart) {
+    settingsService.setAutoStart(true) // 重新应用设置
+  }
+
   createWindow()
   app.on('activate', function () {
     // On macOS it's common to re-create a window in the app when the

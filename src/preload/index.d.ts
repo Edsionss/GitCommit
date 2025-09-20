@@ -91,6 +91,10 @@ interface ExposedAPI {
   updateMenu: (menu: Partial<RouteRecord>) => Promise<any>
   deleteMenu: (id: string) => Promise<any>
   cleanMenu: () => Promise<any>
+
+  // Settings API
+  getAutoStartStatus: () => Promise<boolean>
+  setAutoStart: (isEnabled: boolean) => Promise<{ success: boolean; error?: string }>
 }
 
 declare global {
