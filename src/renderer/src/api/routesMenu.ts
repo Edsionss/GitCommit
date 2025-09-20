@@ -11,5 +11,7 @@ export const routesMenuApi = {
 
   update: (menu: Partial<RouteRecord>): Promise<any> => api.updateMenu(menu),
 
-  delete: (id: string): Promise<any> => api.deleteMenu(id)
+  delete: (id: string): Promise<any> => api.deleteMenu(id),
+
+  clean: (): Promise<any> => api.cleanMenu()
 }

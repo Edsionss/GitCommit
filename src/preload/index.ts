@@ -116,7 +116,8 @@ const api = {
   addMenu: (menu) => ipcRenderer.invoke('routes-menu:add', menu),
   addMenus: (menus) => ipcRenderer.invoke('routes-menu:addMany', menus),
   updateMenu: (menu) => ipcRenderer.invoke('routes-menu:update', menu),
-  deleteMenu: (id) => ipcRenderer.invoke('routes-menu:delete', id)
+  deleteMenu: (id) => ipcRenderer.invoke('routes-menu:delete', id),
+  cleanMenu: () => ipcRenderer.invoke('routes-menu:clean')
 }
 
 // 暴露API

@@ -26,6 +26,10 @@
         <template #icon><RedoOutlined /></template>
         <template #tooltip><div>重置设置</div></template>
       </a-float-button>
+      <a-float-button @click="resetRouterMenu">
+        <template #icon><UnorderedListOutlined /></template>
+        <template #tooltip><div>重置路由</div></template>
+      </a-float-button>
     </a-float-button-group>
   </div>
 </template>
@@ -39,7 +43,10 @@ import GitConfig from '@renderer/components/SettingsView/GitConfig.vue'
 import SystemConfig from '@/components/SettingsView/SystemConfig.vue'
 import AiConfig from '@renderer/components/SettingsView/AiConfig.vue'
 import MenuManagement from './MenuManagement.vue'
-import { SaveOutlined, RedoOutlined } from '@ant-design/icons-vue'
+import { SaveOutlined, RedoOutlined, UnorderedListOutlined } from '@ant-design/icons-vue'
+import { useRoutesStore } from '@/stores/routesStore'
+
+const routesStore = useRoutesStore()
 
 // 使用 Pinia Store
 const settingsStore = useSettingsStore()
@@ -62,6 +69,22 @@ const resetSettings = () => {
     cancelText: '取消',
     onOk() {
       settingsStore.resetSettings()
+
+      setTimeout(() => location.reload(), 500)
+    }
+  })
+}
+
+// 重置路由
+const resetRouterMenu = () => {
+  Modal.confirm({
+    title: '重置设置',
+    content: '确定要重置所有设置到默认值吗？此操作不可撤销。',
+    okText: '确定',
+    cancelText: '取消',
+    onOk() {
+      routesStore.restRoutes()
+
       setTimeout(() => location.reload(), 500)
     }
   })

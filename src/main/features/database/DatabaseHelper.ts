@@ -159,6 +159,36 @@ export class DatabaseHelper {
   }
 
   /**
+   * 清空指定表的所有数据 (类似 TRUNCATE)
+   * @param tableName - 要清空的表名
+   * @param options - (可选) 选项
+   * @param options.resetAutoIncrement - (可选) 是否重置自增ID计数器。默认为 false。
+   * @returns - { changes: number } 删除的行数
+   */
+  public clearTable(
+    tableName: string,
+    options: { resetAutoIncrement?: boolean } = { resetAutoIncrement: false }
+  ): { changes: number } {
+    // 使用事务来确保两个操作（删除数据和重置计数器）的原子性
+    return this.transaction(() => {
+      // 1. 删除表中的所有行
+      const deleteSql = `DELETE FROM ${tableName}`
+      const info = this.db.prepare(deleteSql).run()
+
+      // 2. 如果需要，重置自增计数器
+      // SQLite 将自增计数器存储在名为 `sqlite_sequence` 的内部表中
+      if (options.resetAutoIncrement) {
+        // 只有当有行被实际删除时，才可能有必要重置。
+        // 即使表没有自增键，执行此操作也是安全的（它不会找到匹配的行）。
+        const resetSql = `DELETE FROM sqlite_sequence WHERE name = ?`
+        this.db.prepare(resetSql).run(tableName)
+      }
+
+      return { changes: info.changes }
+    })
+  }
+
+  /**
    * 直接执行 SQL 查询（用于复杂查询）
    * @param sql - 完整的 SQL 语句
    * @param params - (可选) 参数

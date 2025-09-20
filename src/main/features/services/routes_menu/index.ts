@@ -116,6 +116,19 @@ export class RoutesMenuService {
       throw error
     }
   }
+
+  /**
+   * 删除一个菜单
+   * @returns {Promise<{ changes: number }>}
+   */
+  public async cleanMenu() {
+    try {
+      return await dbHelper.clearTable(RoutesMenuService.TABLE_NAME)
+    } catch (error) {
+      console.error('Error clean menu:', error)
+      throw error
+    }
+  }
 }
 
 export const routesMenuService = new RoutesMenuService()

@@ -2,7 +2,7 @@ import { createRouter, createWebHashHistory, RouteRecordRaw, Router } from 'vue-
 import MainLayout from '@components/layout/MainLayout.vue'
 import NotFound from '@views/404NotFound.vue'
 import { useRoutesStore } from '@/stores/routesStore'
-import { mockFlatRoutes, type RouteRecord } from '@sharedType/MenuManagement'
+import { type RouteRecord } from '@sharedType/MenuManagement'
 import PageLoading from '@components/Common/PageLoading.vue'
 
 // 1. 简化组件加载逻辑
@@ -39,13 +39,13 @@ async function addDynamicRoutes(routerInstance: Router) {
 
   // 如果 store 是空的，可以填充 mock 数据 (这个逻辑最好放在 store 内部)
   if (!routesStore.routes.length) {
-    await routesStore.addRoutes(mockFlatRoutes)
+    await routesStore.restRoutes()
   }
 
   const mainLayoutRoute: RouteRecordRaw = {
     path: '/',
     component: MainLayout,
-    redirect: '/dashboard', // 最好有一个默认的重定向
+    // redirect: '/dashboard', // 最好有一个默认的重定向
     children: routesStore.routes.map(
       (route: RouteRecord): RouteRecordRaw => ({
         path: route.path,

@@ -2,7 +2,7 @@ import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import { MergeArray } from '@/utils'
 import { routesMenuApi } from '@/api/routesMenu'
-import type { RouteRecord } from '@shared/types/dtos/MenuManagement'
+import { mockFlatRoutes, type RouteRecord } from '@shared/types/dtos/MenuManagement'
 import { message as AntMessage } from 'ant-design-vue'
 
 export const useRoutesStore = defineStore('routes', () => {
@@ -13,10 +13,19 @@ export const useRoutesStore = defineStore('routes', () => {
       const backendRoutes = await routesMenuApi.getAll()
       routes.value = backendRoutes
       // routes.value = MergeArray(mockFlatRoutes, backendRoutes, true, 'path')
-      // console.log('Routes initialized:', routes.value)
     } catch (error) {
       console.error('Failed to initialize routes:', error)
       routes.value = [] // or set to some default/error state
+    }
+  }
+
+  async function restRoutes() {
+    try {
+      await routesMenuApi.clean()
+      await routesMenuApi.addMany(mockFlatRoutes)
+      AntMessage.success('重置成功')
+    } catch (error) {
+      console.error('Failed to clean and add routes:', error)
     }
   }
 
@@ -69,6 +78,7 @@ export const useRoutesStore = defineStore('routes', () => {
   return {
     routes,
     initRoutes,
+    restRoutes,
     addRoute,
     addRoutes,
     updateRoute,

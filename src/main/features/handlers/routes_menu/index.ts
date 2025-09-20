@@ -52,4 +52,14 @@ export function registerRoutesMenuHandlers() {
       throw error
     }
   })
+
+  // 清空菜单
+  ipcMain.handle('routes-menu:clean', async (_event) => {
+    try {
+      return await routesMenuService.cleanMenu()
+    } catch (error) {
+      console.error('IPC Error: Failed to cleanMenu menu', error)
+      throw error
+    }
+  })
 }

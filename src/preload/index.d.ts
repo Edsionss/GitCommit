@@ -90,6 +90,7 @@ interface ExposedAPI {
   addMenus: (menu: Omit<RouteRecord, 'id'>[]) => Promise<any>
   updateMenu: (menu: Partial<RouteRecord>) => Promise<any>
   deleteMenu: (id: string) => Promise<any>
+  cleanMenu: () => Promise<any>
 }
 
 declare global {
