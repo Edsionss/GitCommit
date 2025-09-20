@@ -113,15 +113,16 @@ CognitoOcean 是一个使用 Electron、Vue 3 和 TypeScript 构建的现代化�
 
 ## 📚 功能开发流程
 
-1.  **定义需求**: 确定要开发的功能，并确定功能所需的 API、数据来源和 UI 设计。
-2.  **设计 UI**: 根据需求，设计用户界面，并确定组件的布局和交互方式。
-3.  **实现UI**: 开发前端UI代码，并确保与 UI 设计一致，使用 Ant Design Vue UI库构建。
-4.  **设计和开发数据库**: 根据需求，设计数据库和编写建表语句，开发数据库流程为：1.确定数据库设置 2.在/src/main/features/database/schema/文件夹下新建一个一功能命名的ts文件并且默认导出字符串，字符串内容是建表语句 3.在/src/main/features/database/schema.ts文件中导入该文件，并且将导入的变量添加到schema 变量中，这样就可以在数据库初始化时自动创建表。 4.在开发与数据库交互的server层时，使用DatabaseHelper.ts封装好的方法进行数据库操作，在server层的文件中使用 import { dbHelper } from '@features/database' 导入dbHelper即可进行数据库操作。
-5.  **设计后台功能逻辑**: 根据需求，设计后台功能逻辑，并确定与前端UI的交互方式。
-6.  **开发功能的service层 在/src/main/features/services文件夹下**: 开发后台功能逻辑，并确保与前端UI的交互方式一致。
-7.  **开发功能的handler层 在/src/main/features/handlers文件夹下**: 开发ipc注册方法和初始化方法。
-8.  **填写`src/main/features/handlers/ipcHandlers.ts` 文件，导入handler的注册方法并使用**: 注册ipc方法。
-9.  **完成`src/main/preload` 文件夹下的方法注册以及类型填写**: 绑定ipc方法到Window并填写类型。
+0. **开发前情提要**: 所有导入路径都使用项目中已有的别名，具体别名请查看`tsconfig.node.json`文件和`tsconfig.web.json`文件。
+1. **定义需求**: 确定要开发的功能，并确定功能所需的 API、数据来源和 UI 设计。
+2. **设计 UI**: 根据需求，设计用户界面，并确定组件的布局和交互方式。
+3. **实现UI**: 开发前端UI代码，并确保与 UI 设计一致，使用 Ant Design Vue UI库构建。
+4. **设计和开发数据库**: 根据需求，设计数据库和编写建表语句，开发数据库流程为：1.确定数据库设置 2.在/src/main/features/database/schema/文件夹下新建一个一功能命名的ts文件并且默认导出字符串，字符串内容是建表语句 3.在/src/main/features/database/schema.ts文件中导入该文件，并且将导入的变量添加到schema 变量中，这样就可以在数据库初始化时自动创建表。 4.在开发与数据库交互的server层时，使用DatabaseHelper.ts封装好的方法进行数据库操作，在server层的文件中使用 import { dbHelper } from '@features/database' 导入dbHelper即可进行数据库操作。
+5. **设计后台功能逻辑**: 根据需求，设计后台功能逻辑，并确定与前端UI的交互方式。
+6. **开发功能的service层 在/src/main/features/services文件夹下**: 开发后台功能逻辑，并确保与前端UI的交互方式一致。
+7. **开发功能的handler层 在/src/main/features/handlers文件夹下**: 开发ipc注册方法和初始化方法。
+8. **填写`src/main/features/handlers/ipcHandlers.ts` 文件，导入handler的注册方法并使用**: 注册ipc方法。
+9. **完成`src/main/preload` 文件夹下的方法注册以及类型填写**: 绑定ipc方法到Window并填写类型。
 10. **封装前端API 文件路径为：`src/renderer/src/api`**: 封装前端可直接调用的api接口。
 11. **前端UI页面调用封装好的API接口**: 完成前后端的完整交互逻辑。
 12. **测试**: 确保功能在开发过程中没有错误，并确保功能在打包后的应用程序中正确运行。
