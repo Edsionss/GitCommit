@@ -185,9 +185,14 @@ const handleCancelShutdown = async () => {
   try {
     const result = await systemToolsApi.cancelShutdown()
     if (result.success) {
-      // 无论取消的是哪个任务，都清除本应用的状态
+      // 清除本应用内的计时器状态
       store.clearShutdownTimer()
-      message.info(result.message || '已成功发送取消所有关机任务的命令。')
+      // 根据后端返回的不同成功信息，给予不同的用户提示
+      if (result.message && result.message.includes('没有')) {
+        message.info(result.message) // 温和地提示“当前没有任务”
+      } else {
+        message.success(result.message || '已成功取消所有关机任务。') // 成功取消
+      }
     } else {
       message.error(result.error || '取消关机失败。')
     }
