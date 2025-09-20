@@ -48,6 +48,34 @@ export class DatabaseHelper {
   }
 
   /**
+   * 通用批量插入方法
+   * @param tableName - 表名
+   * @param dataArray - 要插入的数据对象 {{ column: value }...}
+   * @returns - 每一条的执行结果都能拿到（含 changes 和 lastInsertRowid）
+   */
+  public insertMany(tableName: string, dataArray: Record<string, any>[]): RunResult[] {
+    if (dataArray.length === 0) return []
+
+    const keys = Object.keys(dataArray[0])
+    const columns = keys.join(', ')
+    const placeholders = keys.map(() => '?').join(', ')
+
+    const sql = `INSERT INTO ${tableName} (${columns}) VALUES (${placeholders})`
+    const stmt = this.db.prepare(sql)
+
+    // 用事务保证效率和原子性
+    // const insertManyTransaction = this.db.transaction((rows: Record<string, any>[]) => {
+    //   return rows.map((row) => stmt.run(Object.values(row)))
+    // })
+
+    // return insertManyTransaction(dataArray)
+    // 用你封装好的 transaction 来执行
+    return this.transaction(() => {
+      return dataArray.map((row) => stmt.run(Object.values(row)))
+    })
+  }
+
+  /**
    * 通用查询方法（返回多条记录）
    * @param tableName - 表名
    * @param where - (可选) 查询条件对象

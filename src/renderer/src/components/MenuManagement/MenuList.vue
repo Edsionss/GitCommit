@@ -32,16 +32,20 @@
       <template v-if="column.key === 'action'">
         <a-space>
           <a-button @click="$emit('edit', record)" type="dashed" size="small">编辑</a-button>
-          <a-button size="small" type="primary" @click="$emit('addChild', record)">新增</a-button>
+          <a-button
+            size="small"
+            type="primary"
+            @click="$emit('addChild', record)"
+            :disabled="!!record.componentPath"
+            >新增</a-button
+          >
           <a-popconfirm
             title="确定要删除此菜单及其所有子菜单吗？"
             ok-text="确定"
             cancel-text="取消"
             @confirm="$emit('delete', record.id)"
           >
-            <a-button @click="$emit('edit', record)" type="primary" danger size="small"
-              >删除</a-button
-            >
+            <a-button type="primary" danger size="small">删除</a-button>
           </a-popconfirm>
         </a-space>
       </template>

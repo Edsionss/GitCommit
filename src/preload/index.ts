@@ -109,7 +109,14 @@ const api = {
   networkScan: (port: number): Promise<{ success: boolean; ips?: string[]; error?: string }> =>
     ipcRenderer.invoke('network:scan', port),
   sendRoomBroadcast: (message) => ipcRenderer.send('send-room-broadcast', message),
-  sendDirectBroadcast: (payload) => ipcRenderer.send('send-direct-broadcast', payload)
+  sendDirectBroadcast: (payload) => ipcRenderer.send('send-direct-broadcast', payload),
+
+  // Menu Management API
+  getAllMenus: () => ipcRenderer.invoke('routes-menu:get-all'),
+  addMenu: (menu) => ipcRenderer.invoke('routes-menu:add', menu),
+  addMenus: (menus) => ipcRenderer.invoke('routes-menu:addMany', menus),
+  updateMenu: (menu) => ipcRenderer.invoke('routes-menu:update', menu),
+  deleteMenu: (id) => ipcRenderer.invoke('routes-menu:delete', id)
 }
 
 // 暴露API

@@ -109,3 +109,41 @@ export function getLocalIpAddress(): string | null {
   // 否则，返回找到的第一个符合条件的私有IP
   return results.length > 0 ? results[0] : null
 }
+
+/**
+ * 下划线转驼峰
+ */
+export function toCamelCase(str: string): string {
+  return str.replace(/_([a-z])/g, (_, letter) => letter.toUpperCase())
+}
+
+/**
+ * 驼峰转下划线
+ */
+export function toSnakeCase(str: string): string {
+  return str.replace(/([A-Z])/g, '_$1').toLowerCase()
+}
+
+/**
+ * 自动转换对象/数组的所有 key
+ * @param input - 输入对象或数组
+ * @param mode - 'camel' | 'snake' 自动选择目标格式
+ */
+export function autoTransformKeys<T>(input: T, mode: 'camel' | 'snake'): T {
+  if (Array.isArray(input)) {
+    return input.map((item) => autoTransformKeys(item, mode)) as unknown as T
+  }
+
+  if (input && typeof input === 'object') {
+    const transformer = mode === 'camel' ? toCamelCase : toSnakeCase
+    return Object.fromEntries(
+      Object.entries(input as Record<string, any>).map(([key, value]) => {
+        const newKey = transformer(key)
+        const newValue = autoTransformKeys(value, mode)
+        return [newKey, newValue]
+      })
+    ) as T
+  }
+
+  return input
+}

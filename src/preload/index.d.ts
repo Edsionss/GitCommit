@@ -5,6 +5,8 @@ import type {
   DirectBroadcastPayload,
   ChatMessage as webSocketChatMessage
 } from '@sharedTypes/WebSocket'
+import type { RouteRecord } from '@shared/types/dtos/MenuManagement'
+
 // Define interfaces for the data structures used in the API
 interface GitScanOptions {
   authorFilter?: string
@@ -81,6 +83,13 @@ interface ExposedAPI {
   sendRoomBroadcast: (message: { text: string; nickname: string; token: string }) => void
   sendDirectBroadcast: (payload: DirectBroadcastPayload) => void
   onDirectBroadcastReceived: (callback: (data: any) => void) => () => void
+
+  // Menu Management API
+  getAllMenus: () => Promise<RouteRecord[]>
+  addMenu: (menu: Omit<RouteRecord, 'id'>) => Promise<any>
+  addMenus: (menu: Omit<RouteRecord, 'id'>[]) => Promise<any>
+  updateMenu: (menu: Partial<RouteRecord>) => Promise<any>
+  deleteMenu: (id: string) => Promise<any>
 }
 
 declare global {

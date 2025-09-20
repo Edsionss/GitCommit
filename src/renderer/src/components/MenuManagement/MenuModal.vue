@@ -16,7 +16,7 @@
       <a-form-item label="父级菜单">
         <a-input :value="parentName" disabled />
       </a-form-item>
-      <a-form-item label="菜单名称" name="title">
+      <a-form-item label="菜单名称" :name="['meta', 'title']">
         <a-input v-model:value="formState.meta.title" placeholder="请输入菜单名称" />
       </a-form-item>
       <a-form-item label="菜单排序" name="menuOrder">
@@ -25,19 +25,19 @@
       <a-form-item label="菜单路由" name="path">
         <a-input v-model:value="formState.path" placeholder="例如: /system/user" />
       </a-form-item>
-      <a-form-item label="路由名称" name="name" v-show="!isDirectory">
+      <a-form-item label="路由名称" name="name">
         <a-input v-model:value="formState.name" placeholder="例如: SystemUser" />
       </a-form-item>
-      <a-form-item label="组件路径" name="componentPath" v-show="!isDirectory">
+      <a-form-item label="组件路径" name="componentPath">
         <a-input v-model:value="formState.componentPath" placeholder="例如: system/user/index" />
       </a-form-item>
-      <a-form-item label="是否隐藏" name="hide" v-show="!isDirectory">
+      <a-form-item label="是否隐藏" name="hide">
         <a-select v-model:value="formState.hide" placeholder="默认不隐藏" allow-clear show-search>
           <a-select-option value="1">是 </a-select-option>
           <a-select-option value="0">否 </a-select-option>
         </a-select>
       </a-form-item>
-      <a-form-item label="开启缓存" name="keepAlive" v-show="!isDirectory">
+      <a-form-item label="开启缓存" :name="['meta', 'keepAlive']">
         <a-select
           v-model:value="formState.meta.keepAlive"
           placeholder="默认不开启"
@@ -138,17 +138,29 @@ watch(
 )
 const rules = computed(() => {
   let result = {
-    title: [{ required: true, message: '请输入菜单名称' }],
+    meta: {
+      title: [{ required: true, message: '请输入菜单名称' }]
+    },
     menuOrder: [{ required: true, message: '请输入菜单排序' }],
     path: [{ required: true, message: '请输入路由路径' }]
   }
   if (!props.isDirectory) {
-    Object.assign(result, {
+    result = Object.assign(result, {
       name: [{ required: true, message: '请输入路由名称' }],
       componentPath: [{ required: true, message: '请输入组件路径' }],
-      keepAlive: [{ required: true, message: '请选择是否开启缓存' }]
+      meta: {
+        keepAlive: [
+          {
+            required: true,
+            message: '请输入菜单标题'
+          }
+        ],
+        title: [{ required: true, message: '请输入菜单名称' }]
+      }
     })
   }
+  console.log(result)
+
   return result
 })
 

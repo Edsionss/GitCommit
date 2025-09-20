@@ -15,3 +15,106 @@ export interface RouteRecord {
   menuIcon?: string // 菜单图标
   hide: string
 }
+
+export const mockFlatRoutes: Omit<RouteRecord, 'id'>[] = [
+  {
+    parentId: null,
+    path: 'dashboard',
+    name: 'Dashboard',
+    componentPath: 'Dashboard',
+    meta: { title: '仪表盘', keepAlive: '1' },
+    hide: '0',
+    menuOrder: 0,
+    menuIcon: 'DashboardOutlined'
+  },
+  {
+    parentId: null,
+    path: 'scan',
+    name: 'Scan',
+    componentPath: 'BasicSettings',
+    meta: { title: '开始扫描', keepAlive: '0' },
+    hide: '0',
+    menuOrder: 10,
+    menuIcon: 'ScanOutlined'
+  },
+  {
+    parentId: null,
+    path: 'scanHistory',
+    name: 'ScanHistory',
+    componentPath: 'ScanHistory',
+    meta: { title: '扫描记录', keepAlive: '1' },
+    hide: '0',
+    menuOrder: 20,
+    menuIcon: 'HistoryOutlined'
+  },
+  {
+    parentId: null,
+    path: 'branches',
+    name: 'Branches',
+    componentPath: 'BranchesView',
+    meta: { title: '分支管理', keepAlive: '1' },
+    hide: '0',
+    menuOrder: 40,
+    menuIcon: 'BranchesOutlined'
+  },
+  {
+    parentId: null,
+    path: 'analysis',
+    name: 'Analysis',
+    componentPath: 'CodeAnalysis',
+    meta: { title: '代码分析', keepAlive: '1' },
+    hide: '0',
+    menuOrder: 50,
+    menuIcon: 'CodeOutlined'
+  },
+  {
+    parentId: null,
+    path: 'reports',
+    name: 'Reports',
+    componentPath: 'Reports',
+    meta: { title: '报告生成', keepAlive: '1' },
+    hide: '0',
+    menuOrder: 60,
+    menuIcon: 'FileTextOutlined'
+  },
+  {
+    parentId: null,
+    path: 'aiChat',
+    name: 'AiChat',
+    componentPath: 'AiChat',
+    meta: { title: 'AI Chat', keepAlive: '0' },
+    hide: '0',
+    menuOrder: 70,
+    menuIcon: 'RobotOutlined'
+  },
+  {
+    parentId: null,
+    path: 'stock',
+    name: 'Stock',
+    componentPath: 'Stock',
+    meta: { title: '股票分析', keepAlive: '1' },
+    hide: '0',
+    menuOrder: 80,
+    menuIcon: 'StockOutlined'
+  },
+  {
+    parentId: null,
+    path: 'settings',
+    name: 'Settings',
+    componentPath: 'Settings',
+    meta: { title: '设置', keepAlive: '0' },
+    hide: '0',
+    menuOrder: 1000,
+    menuIcon: 'SettingOutlined' // 设置页面通常有个图标，即使不在主菜单
+  },
+  {
+    parentId: null,
+    path: 'chat',
+    name: 'Chat',
+    componentPath: 'RealTimeCommunication',
+    meta: { title: 'WebSocket', keepAlive: '1' },
+    hide: '0',
+    menuOrder: 10000,
+    menuIcon: 'CommentOutlined'
+  }
+]

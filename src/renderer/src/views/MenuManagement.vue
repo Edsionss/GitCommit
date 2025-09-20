@@ -28,16 +28,16 @@
 <script setup lang="ts">
 import { ref, reactive } from 'vue'
 import { storeToRefs } from 'pinia'
-import { message, Modal } from 'ant-design-vue'
 import { PlusOutlined } from '@ant-design/icons-vue'
 import MenuList from '@components/MenuManagement/MenuList.vue'
 import MenuModal from '@components/MenuManagement/MenuModal.vue'
 import type { RouteRecord } from '@sharedType/MenuManagement'
 import { buildTree } from '@utils/index'
-import { nanoid } from 'nanoid' // 使用 uuid 生成唯一ID
 import { useRoutesStore } from '@/stores/routesStore'
 const routesStore = useRoutesStore()
 const { routes } = storeToRefs(routesStore)
+const { addRoute, deleteRoute, updateRoute } = routesStore
+import { copyNormalize } from '@utils/index'
 // --- 状态管理 ---
 const loading = ref(false)
 const menuTreeData = ref<RouteRecord[]>([])
@@ -87,46 +87,21 @@ const handleEdit = (record: RouteRecord) => {
 
 // 删除菜单
 const handleDelete = (id: string) => {
-  Modal.confirm({
-    title: '确认删除',
-    content: '此操作将永久删除该菜单及其所有子菜单，是否继续？',
-    onOk: async () => {
-      // 模拟API删除
-      const idsToDelete = new Set<string>([id])
-      const findChildren = (parentId: string) => {
-        routes.value.forEach((item) => {
-          if (item.parentId === parentId) {
-            idsToDelete.add(item.id)
-            findChildren(item.id)
-          }
-        })
-      }
-      findChildren(id)
-
-      routes.value = routes.value.filter((item) => !idsToDelete.has(item.id))
-      message.success('删除成功')
-    }
-  })
+  deleteRoute(id)
 }
 
 // 弹窗确认
 const handleModalOk = async (formData: Omit<RouteRecord, 'id' | 'children'>) => {
+  const record = copyNormalize(formData)
+
   if (modalState.isEdit && modalState.currentItem) {
     // 编辑逻辑
-    const index = routes.value.findIndex((item) => item.id === modalState.currentItem!.id)
-    if (index !== -1) {
-      routes.value[index] = { ...routes.value[index], ...formData }
-      message.success('更新成功')
-    }
+    await updateRoute(record)
   } else {
     // 新增逻辑
-    const newMenuItem: RouteRecord = {
-      ...formData,
-      id: nanoid() // 生成唯一ID
-    }
-    routes.value.push(newMenuItem)
-    message.success('新增成功')
+    await addRoute(record)
   }
+  modalState.visible = true
   resetModalState()
 }
 
