@@ -3,24 +3,14 @@ import MainLayout from '@components/layout/MainLayout.vue'
 import NotFound from '@views/404NotFound.vue'
 import { useRoutesStore } from '@/stores/routesStore'
 import { mockFlatRoutes, type RouteRecord } from '@sharedType/MenuManagement'
-import { storeToRefs } from 'pinia'
 import PageLoading from '@components/Common/PageLoading.vue'
 
+// 1. 简化组件加载逻辑
+// 使用更具体的 glob 模式，让路径更清晰
 const views = import.meta.glob('@views/**/*.vue')
 const components = import.meta.glob('@components/**/*.vue')
 
-const router = createRouter({
-  history: createWebHashHistory(),
-  routes: [
-    {
-      path: '/pageLoading',
-      name: 'PageLoading',
-      component: PageLoading,
-      meta: { title: 'Waiting', keepAlive: false }
-    }
-  ] // Initialize with no routes
-})
-const calculatePath = (path: string) => {
+const resolveComponent = (path: string) => {
   let pathMap = views,
     replaceString = 'views',
     pathPrefix = '@' + replaceString,
@@ -40,43 +30,80 @@ const calculatePath = (path: string) => {
   )
 }
 
-export async function addDynamicRoutes(routerInstance: Router) {
+// 2. 将动态路由添加逻辑封装
+async function addDynamicRoutes(routerInstance: Router) {
   const routesStore = useRoutesStore()
-  await routesStore.initRoutes() // 等待数据库
 
-  const { routes } = storeToRefs(routesStore)
+  // 让 store 内部处理初始化逻辑，更符合单一职责原则
+  await routesStore.initRoutes()
 
-  routes.value.length || (await routesStore.addRoutes(mockFlatRoutes))
+  // 如果 store 是空的，可以填充 mock 数据 (这个逻辑最好放在 store 内部)
+  if (!routesStore.routes.length) {
+    await routesStore.addRoutes(mockFlatRoutes)
+  }
 
   const mainLayoutRoute: RouteRecordRaw = {
     path: '/',
     component: MainLayout,
-    children: routes.value.map((route: RouteRecord): RouteRecordRaw => {
-      return {
+    redirect: '/dashboard', // 最好有一个默认的重定向
+    children: routesStore.routes.map(
+      (route: RouteRecord): RouteRecordRaw => ({
         path: route.path,
         name: route.name,
-        component: calculatePath(route.componentPath),
+        component: resolveComponent(route.componentPath),
         meta: route.meta
-      }
-    })
+      })
+    )
   }
 
-  mainLayoutRoute.children.push({
+  // 404 路由应该加在最后
+  const notFoundRoute: RouteRecordRaw = {
     path: '/:pathMatch(.*)*',
     name: 'NotFound',
-    component: NotFound,
-    meta: {
-      title: '404 Not Found',
-      keepAlive: '0'
-    }
-  })
+    component: NotFound
+  }
 
   routerInstance.addRoute(mainLayoutRoute)
-
-  // 🚀 动态路由加载完成后，跳转到第一个路由或者首页
-  if (routes.value.length > 0) {
-    routerInstance.replace(routes.value[1].path)
-  }
+  routerInstance.addRoute(notFoundRoute)
 }
 
-export default router
+// 3. 导出创建和设置路由的主函数
+export async function createAndSetupRouter(): Promise<Router> {
+  const router = createRouter({
+    history: createWebHashHistory(),
+    // 初始路由可以只包含一些公共路由，如登录页
+    routes: [
+      {
+        path: '/pageLoading',
+        name: 'PageLoading',
+        component: PageLoading,
+        meta: { title: 'Waiting', keepAlive: false }
+      }
+      // { path: '/login', name: 'Login', component: () => import('@/views/Login.vue') }
+    ]
+  })
+
+  // 在这里等待动态路由添加完成
+  try {
+    await addDynamicRoutes(router)
+  } catch (error) {
+    console.error('Failed to add dynamic routes:', error)
+    // 这里可以处理路由加载失败的逻辑，比如重定向到一个错误页面
+    // router.push('/error');
+  }
+
+  // 移除复杂的 beforeEach 守卫，可以替换为简单的权限守卫
+  router.beforeEach((to, from, next) => {
+    // 例如：检查 token
+    // const hasToken = getToken();
+    // if (to.path !== '/login' && !hasToken) {
+    //   next({ path: '/login' });
+    // } else {
+    //   next();
+    // }
+    console.log(`Navigating to ${to.path}`)
+    next()
+  })
+
+  return router
+}

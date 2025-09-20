@@ -1,11 +1,10 @@
 import './assets/styles/index.css'
-
 import { createApp } from 'vue'
 import App from './App.vue'
-import router, { addDynamicRoutes } from './router'
+import { createAndSetupRouter } from './router'
 import { createPinia } from 'pinia'
 import Antd from 'ant-design-vue'
-import 'ant-design-vue/dist/reset.css' // Use reset.css for a cleaner start
+import 'ant-design-vue/dist/reset.css'
 import ContextMenu from '@imengyu/vue3-context-menu'
 import '@imengyu/vue3-context-menu/lib/vue3-context-menu.css'
 
@@ -22,20 +21,18 @@ async function bootstrap() {
   // 1. Install Pinia
   app.use(createPinia())
 
+  // 1. 创建并异步设置好路由
+  const router = await createAndSetupRouter()
+
+  // 2. 将完全配置好的路由实例提供给应用
   app.use(router)
 
-  // router.replace('/pageLoading')
-
-  // 2. Add dynamic routes (等待数据库查完)
-  await addDynamicRoutes(router)
-
-  // 3. Install the router
-
+  // 3. Install Antd 和 ContextMenu
   app.use(Antd)
   app.use(ContextMenu)
 
-  // 4. Mount after routes ready
+  // 4. Mount app
   app.mount('#app')
 }
-
+// 启动应用
 bootstrap()
