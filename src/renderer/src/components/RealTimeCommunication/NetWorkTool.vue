@@ -68,7 +68,6 @@ const foundIps = ref<string[]>([])
 import { message as antMessage } from 'ant-design-vue'
 import { webSocketApi } from '@api/webSocket'
 import { useWebSocketStore } from '@/stores/webSocketStore'
-import { emit } from 'process'
 const wsStore = useWebSocketStore()
 const roomData = reactive<any>({
   hostIp: '',

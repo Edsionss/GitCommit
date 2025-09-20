@@ -43,7 +43,8 @@
       type="primary"
       @click="collapsed = !collapsed"
       :style="{
-        right: '34px'
+        bottom: '50px',
+        right: '5px'
       }"
     >
       <template #icon>
@@ -77,7 +78,7 @@ const getAllIps = (ips: string[]) => {
   WebSocketIps.value = ips
 }
 
-const handleSendDirectBroadcast = () => {
+const handleSendDirectBroadcast = (msg?: string) => {
   if (!WebSocketIps.value.length) {
     antMessage.warn('请先扫描网络')
     return
@@ -88,7 +89,8 @@ const handleSendDirectBroadcast = () => {
   } else {
     targetIps = WebSocketIps.value
   }
-  wsStore.sendDirectBroadcast(copyNormalize(targetIps), copyNormalize(directMessage.value))
+  msg = msg || directMessage.value
+  wsStore.sendDirectBroadcast(copyNormalize(targetIps), copyNormalize(msg))
   directMessage.value = ''
 }
 
