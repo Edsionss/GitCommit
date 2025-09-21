@@ -23,7 +23,11 @@ const { token } = antTheme.useToken()
 
 // 动态配置ConfigProvider的主题算法
 const themeConfig = computed(() => ({
-  algorithm: effectiveTheme.value === 'dark' ? antTheme.darkAlgorithm : antTheme.defaultAlgorithm
+  algorithm: effectiveTheme.value === 'dark' ? antTheme.darkAlgorithm : antTheme.defaultAlgorithm,
+  token: {
+    colorBgContainer: effectiveTheme.value === 'dark' ? '#000000' : '#ffffff',
+    colorBgLayout: effectiveTheme.value === 'dark' ? '#141414' : '#f5f5f5'
+  }
 }))
 
 // 监听Ant Design的Token变化，并将其应用为CSS变量
@@ -75,7 +79,7 @@ watchEffect(() => {
       root.style.setProperty(variableName, `${r}, ${g}, ${b}`)
     }
   }
-  
+
   generateRGBVariable(tk.colorPrimary, '--brand-primary-rgb')
   generateRGBVariable(tk.colorSuccess, '--color-success-rgb')
   generateRGBVariable(tk.colorWarning, '--color-warning-rgb')

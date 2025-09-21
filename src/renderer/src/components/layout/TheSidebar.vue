@@ -89,9 +89,12 @@ const handleMenuClick: MenuProps['onClick'] = ({ item, key, keyPath }) => {
   display: flex;
   flex-direction: column;
   height: 100%;
-  background-color: var(--bg-content);
+  background-color: var(--bg-container);
   border-right: 1px solid var(--border-color);
   transition: width 0.3s ease;
+  // :deep(.ant-menu-light) {
+  //   background-color: var(--bg-layout);
+  // }
   .logo {
     padding: 10px 0;
     display: flex;
