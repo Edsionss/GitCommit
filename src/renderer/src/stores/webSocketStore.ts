@@ -27,6 +27,11 @@ export const useWebSocketStore = defineStore('websocket', () => {
   // 监听来自主进程的直接广播
   const listenForDirectBroadcasts = () => {
     webSocketApi.onDirectBroadcastReceived((data) => {
+      const myNotification = new Notification('标题', {
+        body: '这是一条带有声音的通知消息！'
+        // 关键点：不要设置 silent 为 true
+        // silent: false, // 这是默认值，所以可以不写
+      })
       notification.info({
         message: `收到来自 ${data.sourceIp} 的广播`,
         description: data.text,

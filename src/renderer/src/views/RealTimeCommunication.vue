@@ -25,7 +25,7 @@
             style="width: 100%"
             type="primary"
             size="large"
-            @click="handleSendDirectBroadcast"
+            @click="handleSendDirectBroadcast(directMessage)"
             :disabled="!directMessage || !WebSocketIps.length"
           >
             <template #icon><NotificationOutlined /></template>
@@ -78,7 +78,7 @@ const getAllIps = (ips: string[]) => {
   WebSocketIps.value = ips
 }
 
-const handleSendDirectBroadcast = (msg?: string) => {
+const handleSendDirectBroadcast = (msg: string) => {
   if (!WebSocketIps.value.length) {
     antMessage.warn('请先扫描网络')
     return
@@ -89,7 +89,6 @@ const handleSendDirectBroadcast = (msg?: string) => {
   } else {
     targetIps = WebSocketIps.value
   }
-  msg = msg || directMessage.value
   wsStore.sendDirectBroadcast(copyNormalize(targetIps), copyNormalize(msg))
   directMessage.value = ''
 }

@@ -86,7 +86,6 @@ const logoStyle = computed(() => {
 const menuContentStyle = computed(() => {
   return { height: `calc( 100% - ( ${logoStyle.value.height} + 20px ) ) ` }
 })
-console.log(menuContentStyle.value)
 
 const handleMenuClick: MenuProps['onClick'] = ({ item, key, keyPath }) => {
   router.push(key as string)
