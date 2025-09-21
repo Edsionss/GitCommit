@@ -152,14 +152,15 @@ const handleStockClick = (stock) => {
   cursor: pointer;
   transition: background-color 0.3s ease;
   border-radius: 0.5rem;
+  color: var(--color-text);
 
   &:hover {
-    background-color: var(--primary-bg-hover);
+    background-color: var(--active-color);
     color: var(--primary-color) !important;
   }
 
   &.active {
-    background-color: var(--primary-bg-hover);
+    background-color: var(--active-color);
     color: var(--primary-color) !important;
   }
 }

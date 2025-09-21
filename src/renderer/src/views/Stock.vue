@@ -39,34 +39,11 @@ const stockTabs = reactive([
   height: 100%;
   display: flex;
   flex-direction: column;
-
+  // background-color: var(--color-background);
   :deep(.ant-tabs) {
     height: 100%;
     display: flex;
     flex-direction: column;
-  }
-
-  :deep(.ant-tabs-nav) {
-    margin-bottom: 0;
-    background-color: var(--color-background-soft);
-  }
-
-  :deep(.ant-tabs-tab) {
-    color: var(--color-text-light);
-  }
-
-  :deep(.ant-tabs-tab:hover) {
-    color: var(--color-text);
-  }
-
-  :deep(.ant-tabs-tab.ant-tabs-tab-active .ant-tabs-tab-btn) {
-    color: var(--color-primary);
-  }
-
-  :deep(.ant-tabs-content-holder) {
-    flex-grow: 1;
-    overflow-y: auto;
-    background-color: var(--color-background);
   }
 
   :deep(.ant-tabs-content) {
