@@ -41,10 +41,6 @@ const props = defineProps<{
 }>()
 
 const chartData = computed(() => {
-  const isDark = effectiveTheme.value === 'dark'
-  const upColor = 'var(--color-error)'
-  const downColor = 'var(--color-success)'
-
   switch (props.type) {
     case 'vol':
       return {
@@ -58,7 +54,7 @@ const chartData = computed(() => {
                 return 'rgba(128, 128, 128, 0.7)'
               }
               const { o, c } = props.indicatorData[context.dataIndex]
-              return c >= o ? upColor : downColor
+              return c >= o ? '#ff4d4f' : '#52c41a'
             }
           }
         ]
@@ -70,7 +66,7 @@ const chartData = computed(() => {
           {
             label: 'DIF',
             data: props.indicatorData.map((d) => d.dif),
-            borderColor: 'var(--color-warning)',
+            borderColor: '#faad14',
             borderWidth: 1,
             pointRadius: 0,
             type: 'line'
@@ -78,7 +74,7 @@ const chartData = computed(() => {
           {
             label: 'DEA',
             data: props.indicatorData.map((d) => d.dea),
-            borderColor: 'var(--color-info)',
+            borderColor: '#1890ff',
             borderWidth: 1,
             pointRadius: 0,
             type: 'line'
@@ -86,7 +82,7 @@ const chartData = computed(() => {
           {
             label: 'MACD',
             data: props.indicatorData.map((d) => d.macd),
-            backgroundColor: (context) => (context.raw > 0 ? upColor : downColor),
+            backgroundColor: (context) => (context.raw > 0 ? '#ff4d4f' : '#52c41a'),
             type: 'bar'
           }
         ]
@@ -98,9 +94,6 @@ const chartData = computed(() => {
 })
 
 const chartOptions = computed(() => {
-  const gridColor = 'var(--border-secondary)'
-  const textColor = 'var(--text-secondary)'
-
   return {
     responsive: true,
     maintainAspectRatio: false,
@@ -112,10 +105,10 @@ const chartOptions = computed(() => {
       y: {
         position: 'right',
         grid: {
-          color: gridColor
+          display: false
         },
         ticks: {
-          color: textColor
+          color: 'var(--text-secondary)'
         }
       }
     },
@@ -124,7 +117,7 @@ const chartOptions = computed(() => {
         display: true,
         position: 'top',
         labels: {
-          color: textColor,
+          color: 'var(--text-secondary)',
           boxWidth: 10,
           font: {
             size: 10

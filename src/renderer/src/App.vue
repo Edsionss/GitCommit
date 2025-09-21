@@ -64,15 +64,23 @@ watchEffect(() => {
   root.style.setProperty('--color-warning', tk.colorWarning)
   root.style.setProperty('--color-error', tk.colorError)
   root.style.setProperty('--color-info', tk.colorInfo)
+  root.style.setProperty('--color-danger', tk.colorError) // 保持兼容性，--color-danger映射到--color-error
 
-  // --- 6. 辅助：生成 --brand-primary-rgb 变量，用于 background-color: rgba() ---
-  const primaryColor = tk.colorPrimary
-  if (primaryColor.startsWith('#')) {
-    const r = parseInt(primaryColor.slice(1, 3), 16)
-    const g = parseInt(primaryColor.slice(3, 5), 16)
-    const b = parseInt(primaryColor.slice(5, 7), 16)
-    root.style.setProperty('--brand-primary-rgb', `${r}, ${g}, ${b}`)
+  // --- 6. 辅助：生成RGB变量，用于 background-color: rgba() ---
+  const generateRGBVariable = (color: string, variableName: string) => {
+    if (color.startsWith('#')) {
+      const r = parseInt(color.slice(1, 3), 16)
+      const g = parseInt(color.slice(3, 5), 16)
+      const b = parseInt(color.slice(5, 7), 16)
+      root.style.setProperty(variableName, `${r}, ${g}, ${b}`)
+    }
   }
+  
+  generateRGBVariable(tk.colorPrimary, '--brand-primary-rgb')
+  generateRGBVariable(tk.colorSuccess, '--color-success-rgb')
+  generateRGBVariable(tk.colorWarning, '--color-warning-rgb')
+  generateRGBVariable(tk.colorError, '--color-error-rgb')
+  generateRGBVariable(tk.colorInfo, '--color-info-rgb')
 })
 </script>
 

@@ -26,11 +26,11 @@ const props = defineProps<{
 }>()
 
 const chartData = computed(() => {
-  const borderColor = props.change >= 0 ? 'var(--color-error)' : 'var(--color-success)'
+  const borderColor = props.change >= 0 ? '#ff4d4f' : '#52c41a'
   const backgroundColor =
     props.change >= 0
-      ? 'rgba(var(--brand-primary-rgb), 0.1)'
-      : 'rgba(var(--color-success-rgb), 0.1)' // Assuming you have --color-success-rgb
+      ? 'rgba(255, 77, 79, 0.1)'
+      : 'rgba(82, 196, 26, 0.1)'
 
   return {
     labels: Array(props.trendData.length).fill(''),
@@ -49,7 +49,6 @@ const chartData = computed(() => {
 })
 
 const chartOptions = computed(() => {
-  const textColor = 'var(--text-secondary)'
   return {
     responsive: true,
     maintainAspectRatio: false,
@@ -57,7 +56,7 @@ const chartOptions = computed(() => {
       legend: {
         display: false,
         labels: {
-          color: textColor
+          color: 'var(--text-secondary)'
         }
       },
       tooltip: {
@@ -68,13 +67,13 @@ const chartOptions = computed(() => {
       x: {
         display: false,
         ticks: {
-          color: textColor
+          color: 'var(--text-secondary)'
         }
       },
       y: {
         display: false,
         ticks: {
-          color: textColor
+          color: 'var(--text-secondary)'
         }
       }
     }

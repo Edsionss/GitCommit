@@ -135,10 +135,10 @@ const chartData = computed(() => ({
   datasets: [
     {
       backgroundColor: [
-        'var(--color-success)',
-        'var(--color-warning)',
-        'var(--color-error)',
-        'var(--text-tertiary)'
+        '#52c41a',
+        '#faad14',
+        '#ff4d4f',
+        '#999999'
       ],
       data: [216, 72, 28, 10]
     }

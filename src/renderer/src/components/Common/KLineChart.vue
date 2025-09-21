@@ -32,18 +32,15 @@ const chartData = computed(() => ({
       label: 'K线',
       data: props.klineData,
       color: {
-        up: 'var(--color-error)',
-        down: 'var(--color-success)',
-        unchanged: 'var(--text-tertiary)'
+        up: '#ff4d4f',
+        down: '#52c41a',
+        unchanged: '#999999'
       }
     }
   ]
 }))
 
 const chartOptions = computed(() => {
-  const gridColor = 'var(--border-secondary)'
-  const textColor = 'var(--text-secondary)'
-
   return {
     responsive: true,
     maintainAspectRatio: false,
@@ -57,16 +54,16 @@ const chartOptions = computed(() => {
           display: false
         },
         ticks: {
-          color: textColor
+          color: 'var(--text-secondary)'
         }
       },
       y: {
         position: 'right',
         grid: {
-          color: gridColor
+          display: false
         },
         ticks: {
-          color: textColor
+          color: 'var(--text-secondary)'
         }
       }
     },

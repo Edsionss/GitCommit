@@ -16,10 +16,5 @@
   --bg-gradient-red: linear-gradient(to right, rgba(207, 19, 34, 0.04), white);
   --bg-gradient-green: linear-gradient(to right, rgba(56, 158, 13, 0.04), white);
 
-  --color-primary: #409eff;
-  --color-success: #67c23a;
-  --color-warning: #e6a23c;
-  --color-danger: #f56c6c;
-  --color-info: #909399;
   --section-gap: 160px;
 }

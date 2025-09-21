@@ -54,12 +54,12 @@ const fileTypeChartData = computed(() => ({
   datasets: [
     {
       backgroundColor: [
-        'var(--brand-primary)',
-        'var(--color-info)',
-        'var(--color-success)',
-        'var(--color-error)',
-        'var(--color-warning)',
-        'var(--text-tertiary)'
+        '#1890ff',
+        '#52c41a',
+        '#faad14',
+        '#ff4d4f',
+        '#722ed1',
+        '#999999'
       ],
       data: [148, 87, 56, 32, 21, 14]
     }
@@ -71,17 +71,17 @@ const codeLinesChartData = computed(() => ({
   datasets: [
     {
       label: '代码行',
-      backgroundColor: 'var(--brand-primary)',
+      backgroundColor: '#1890ff',
       data: [8420, 6780, 4320, 1560, 980, 540]
     },
     {
       label: '注释行',
-      backgroundColor: 'var(--color-info)',
+      backgroundColor: '#52c41a',
       data: [1240, 980, 640, 210, 120, 85]
     },
     {
       label: '空白行',
-      backgroundColor: 'var(--color-success)',
+      backgroundColor: '#faad14',
       data: [920, 750, 520, 190, 45, 70]
     }
   ]
@@ -89,7 +89,26 @@ const codeLinesChartData = computed(() => ({
 
 const chartOptions = {
   responsive: true,
-  maintainAspectRatio: false
+  maintainAspectRatio: false,
+  plugins: {
+    legend: {
+      labels: {
+        color: 'var(--text-secondary)'
+      }
+    }
+  },
+  scales: {
+    x: {
+      grid: {
+        display: false
+      }
+    },
+    y: {
+      grid: {
+        display: false
+      }
+    }
+  }
 }
 </script>
 

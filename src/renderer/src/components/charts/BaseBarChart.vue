@@ -39,34 +39,31 @@ defineProps({
   }
 })
 
-const chartTextColor = computed(() => 'var(--text-secondary)')
-const chartGridColor = computed(() => 'var(--border-secondary)')
-
 const chartOptions = computed(() => ({
   responsive: true,
   maintainAspectRatio: false,
   plugins: {
     legend: {
       labels: {
-        color: chartTextColor.value
+        color: 'var(--text-secondary)'
       }
     }
   },
   scales: {
     x: {
       ticks: {
-        color: chartTextColor.value
+        color: 'var(--text-secondary)'
       },
       grid: {
-        color: chartGridColor.value
+        display: false
       }
     },
     y: {
       ticks: {
-        color: chartTextColor.value
+        color: 'var(--text-secondary)'
       },
       grid: {
-        color: chartGridColor.value
+        display: false
       }
     }
   }
