@@ -28,8 +28,34 @@
       <a-form-item label="路由名称" name="name">
         <a-input v-model:value="formState.name" placeholder="例如: SystemUser" />
       </a-form-item>
-      <a-form-item label="组件路径" name="componentPath">
-        <a-input v-model:value="formState.componentPath" placeholder="例如: system/user/index" />
+      <template v-if="!isEdit">
+        <a-form-item label="组件文件夹" :rules="componentPathRules.folder">
+          <a-select v-model:value="componentPath.folder" placeholder="默认不隐藏" show-search>
+            <a-select-option value="components">@components </a-select-option>
+            <a-select-option value="view">@view </a-select-option>
+            <a-select-option value="custom">手动输入 </a-select-option>
+          </a-select>
+        </a-form-item>
+        <a-form-item
+          label="组件路径"
+          v-if="componentPath.folder !== 'custom'"
+          :rules="componentPathRules.folder"
+        >
+          <a-input
+            v-model:value="componentPath.path"
+            placeholder="文件夹后的路径 例如: system/user/index"
+          />
+        </a-form-item>
+      </template>
+      <a-form-item
+        label="组件完整路径"
+        name="componentPath"
+        v-if="isEdit || componentPath.folder == 'custom'"
+      >
+        <a-input
+          v-model:value="formState.componentPath"
+          placeholder=" 例如：@view/system/user/index"
+        />
       </a-form-item>
       <a-form-item label="是否隐藏" name="hide">
         <a-select v-model:value="formState.hide" placeholder="默认不隐藏" allow-clear show-search>
@@ -95,11 +121,35 @@ interface Emits {
 }
 
 const props = defineProps<Props>()
+
 const emit = defineEmits<Emits>()
 
 const formRef = ref<FormInstance>()
 const confirmLoading = ref(false)
 
+const componentPath = reactive({
+  folder: 'view',
+  path: ''
+})
+
+const componentPathRules = computed(() => {
+  if (props.isDirectory) {
+    return {}
+  } else {
+    return {
+      folder: [{ required: true, message: '请选择文件夹' }],
+      path: [{ required: true, message: '请输入组件路径' }]
+    }
+  }
+})
+
+const componentPathFull = computed(() => {
+  if (componentPath.folder === 'custom') {
+    return formState.componentPath
+  } else {
+    return `${componentPath.folder}/${componentPath.path}`
+  }
+})
 const getDefaultFormState = (): Omit<RouteRecord, 'id' | 'children'> => ({
   parentId: null,
   name: '',
@@ -128,6 +178,7 @@ watch(
       if (props.isEdit && props.initialData) {
         // 编辑模式：填充表单
         Object.assign(formState, props.initialData)
+        componentPath.folder = 'custom'
       } else {
         // 新增模式：设置父ID
         Object.assign(formState, getDefaultFormState())
@@ -159,12 +210,11 @@ const rules = computed(() => {
       }
     })
   }
-  console.log(result)
-
   return result
 })
 
 const handleOk = async () => {
+  formState = { ...formState, componentPath: componentPathFull.value }
   try {
     await formRef.value?.validate()
     confirmLoading.value = true

@@ -12,22 +12,35 @@ const components = import.meta.glob('@components/**/*.vue')
 
 const resolveComponent = (path: string) => {
   let pathMap = views,
-    replaceString = 'views',
-    pathPrefix = '@' + replaceString,
-    pathSuffix = '/'
-  if (path.includes('@')) {
+    pathPrefix = 'views'
+  if (path.includes('views')) {
+    pathMap = views
+  } else if (path.includes('components')) {
+    console.log(path)
+
+    pathMap = components
     pathPrefix = ''
-    pathSuffix = ''
-    if (path.includes('@components')) {
-      pathMap = components
-      replaceString = 'components'
-    }
   }
-  path = pathPrefix + path
-  const fullPath = path.replace('@' + replaceString, '/src/' + replaceString + pathSuffix) + '.vue'
-  console.log(fullPath)
+  const fullPath = `/src/${pathPrefix ? pathPrefix + '/' : ''}${path}.vue`
 
   return pathMap[fullPath] || NotFound
+  // let pathMap = views,
+  //   replaceString = 'views',
+  //   pathPrefix = '@' + replaceString,
+  //   pathSuffix = '/'
+  // if (path.includes('@')) {
+  //   pathPrefix = ''
+  //   pathSuffix = ''
+  //   if (path.includes('@components')) {
+  //     pathMap = components
+  //     replaceString = 'components'
+  //   }
+  // }
+  // path = pathPrefix + path
+  // const fullPath = path.replace('@' + replaceString, '/src/' + replaceString + pathSuffix) + '.vue'
+  // console.log(fullPath)
+
+  // return pathMap[fullPath] || NotFound
 }
 
 function loadDynamicRoutes(routes) {
@@ -73,7 +86,6 @@ async function addDynamicRoutes(routerInstance: Router) {
     // )
     children: loadDynamicRoutes(routesStore.routes)
   }
-  console.log(loadDynamicRoutes(routesStore.routes))
 
   mainLayoutRoute.children.push({
     path: '/:pathMatch(.*)*',

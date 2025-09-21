@@ -22,6 +22,7 @@ export const useRoutesStore = defineStore('routes', () => {
     try {
       await routesMenuApi.clean()
       await routesMenuApi.addMany(mockFlatRoutes)
+      await initRoutes()
       AntMessage.success('重置成功')
     } catch (error) {
       console.error('Failed to clean and add routes:', error)
