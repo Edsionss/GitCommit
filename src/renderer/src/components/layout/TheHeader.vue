@@ -16,6 +16,14 @@
       <span class="code-container">{{ route.fullPath }}</span>
     </div>
     <div class="header-actions">
+      <a-tooltip :title="DisplayConfig.theme === 'dark' ? '切换到亮色主题' : '切换到暗色主题'">
+        <a-button class="action-button" type="text" @click="toggleTheme">
+          <template #icon>
+            <BulbOutlined />
+          </template>
+        </a-button>
+      </a-tooltip>
+
       <div class="user-menu">
         <a-dropdown trigger="click">
           <div class="user-avatar">
@@ -47,9 +55,11 @@
 <script setup lang="ts">
 import CognitoOcean from '@/assets/img/logo/CognitoOcean.png'
 
-import { MenuUnfoldOutlined, MenuFoldOutlined } from '@ant-design/icons-vue'
+import {  BulbOutlined, MenuUnfoldOutlined, MenuFoldOutlined } from '@ant-design/icons-vue'
 import { ref, computed } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
+import { useSettingsStore } from '@/stores/settingsStore'
+import { storeToRefs } from 'pinia'
 import {
   PlusOutlined,
   DownOutlined,
@@ -65,11 +75,18 @@ const isExpanded = defineModel<boolean>()
 const router = useRouter()
 const route = useRoute()
 
+const settingsStore = useSettingsStore()
+const { DisplayConfig } = storeToRefs(settingsStore)
+
 const currentPageTitle = computed(() => {
   return route.meta.title || ''
 })
 
-const currentRepo = ref(1)
+// 切换主题
+const toggleTheme = () => {
+  DisplayConfig.value.theme = DisplayConfig.value.theme === 'light' ? 'dark' : 'light'
+  settingsStore.saveTheme() // 调用新的 action
+}
 
 // 跳转到设置页面
 const goToSettings = () => {

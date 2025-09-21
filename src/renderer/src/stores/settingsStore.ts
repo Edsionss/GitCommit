@@ -121,6 +121,12 @@ export const useSettingsStore = defineStore('settings', () => {
     saveSettings() // 重置后也保存
   }
 
+  // 新增：只保存主题，不重载页面
+  function saveTheme() {
+    storeSaveSettings(copyNormalize(reassembleAppSettings()))
+    // 这里不调用 message.success，因为是实时切换，不需要提示
+  }
+
   // 5. 返回所有拆分后的 state 和 actions
   return {
     DisplayConfig,
@@ -129,6 +135,7 @@ export const useSettingsStore = defineStore('settings', () => {
     SystemConfig,
     AiConfig,
     saveSettings,
-    resetSettings
+    resetSettings,
+    saveTheme // 导出新方法
   }
 })
