@@ -56,15 +56,12 @@ async function addDynamicRoutes(routerInstance: Router) {
     )
   }
 
-  // 404 路由应该加在最后
-  const notFoundRoute: RouteRecordRaw = {
+  mainLayoutRoute.children.push({
     path: '/:pathMatch(.*)*',
     name: 'NotFound',
     component: NotFound
-  }
-
+  })
   routerInstance.addRoute(mainLayoutRoute)
-  routerInstance.addRoute(notFoundRoute)
 }
 
 // 3. 导出创建和设置路由的主函数
