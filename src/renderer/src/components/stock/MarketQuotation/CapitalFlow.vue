@@ -2,7 +2,7 @@
   <div class="capital-flow-container">
     <!-- 大盘信息 -->
     <div class="summary-cards">
-      <a-card size="small" class="market-card">
+      <a-card size="small" class="market-card" hoverable>
         <a-statistic
           title="大盘净流入"
           :value="marketInfo.netInflow"
@@ -11,7 +11,7 @@
           suffix="亿"
         />
       </a-card>
-      <a-card size="small" class="market-card">
+      <a-card size="small" class="market-card" hoverable>
         <a-statistic
           title="三市成交额"
           :value="marketInfo.totalTurnover"
@@ -44,7 +44,7 @@
 
     <!-- 个股资金流向列表 -->
     <div class="stock-list">
-      <a-card v-for="(stock, index) in sortedStocks" :key="stock.code">
+      <a-card v-for="(stock, index) in sortedStocks" :key="stock.code" hoverable>
         <div class="stock-card" :style="getCardBackgroundByChange(stock.changePercent)">
           <div class="ranking-number">{{ index + 1 }}</div>
 
@@ -321,15 +321,15 @@ const getTextClass = (value: number) => {
 .stock-card {
   cursor: pointer;
   border-radius: 8px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  // box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
   display: flex;
   position: relative;
   padding-left: 24px;
   overflow: hidden;
   transition: all 0.3s ease;
   &:hover {
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-    transform: translateY(-2px);
+    // box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    // transform: translateY(-2px);
   }
 }
 

@@ -1,12 +1,8 @@
 <template>
   <div class="dragon-tiger-list-container">
     <div class="list-view">
-      <a-card v-for="stock in stocks">
-        <div
-          :key="stock.code"
-          class="stock-item"
-          :style="getCardBackgroundByChange(stock.changePercent)"
-        >
+      <a-card v-for="stock in stocks" hoverable>
+        <div class="stock-item" :style="getCardBackgroundByChange(stock.changePercent)">
           <!-- Top Row -->
           <div class="top-row">
             <div class="stock-identity">
@@ -251,14 +247,12 @@ const getPriceClass = (change) => {
 .stock-item {
   cursor: pointer;
   border-radius: 8px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 
   display: flex;
   flex-direction: column;
   gap: 8px;
   transition: box-shadow 0.3s ease;
   &:hover {
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   }
 }
 

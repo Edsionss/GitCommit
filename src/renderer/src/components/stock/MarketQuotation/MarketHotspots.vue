@@ -18,9 +18,8 @@
     <div class="hotspot-list">
       <!-- 个股 -->
       <template v-if="activeCategory === 'stock'">
-        <a-card v-for="(item, index) in stockData">
+        <a-card v-for="(item, index) in stockData" hoverable>
           <div
-            :key="item.code"
             class="hotspot-card stock-card"
             :style="getCardBackgroundByChange(item.changePercent)"
           >
@@ -290,10 +289,7 @@ const formatCurrency = (value: number) => {
 }
 
 .hotspot-card {
-  // background: #fff;
-
   border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.09);
   position: relative;
   overflow: hidden;
   display: flex;

@@ -2,10 +2,10 @@
   <div class="indices-container">
     <!-- 顶部卡片 -->
     <div class="summary-cards">
-      <a-card size="small" class="summary-card">
+      <a-card size="small" class="summary-card" hoverable>
         <a-statistic title="上涨家数" :value="marketStats.up" :value-style="upColor" />
       </a-card>
-      <a-card size="small" class="summary-card">
+      <a-card size="small" class="summary-card" hoverable>
         <a-statistic title="下跌家数" :value="marketStats.down" :value-style="downColor" />
       </a-card>
     </div>
@@ -53,9 +53,6 @@
 import { ref, computed } from 'vue'
 import { getCardBackgroundByChange } from '@/utils'
 import IndexChart from './IndexChart.vue'
-import { useTheme } from '@/composables/useTheme'
-
-const { effectiveTheme } = useTheme()
 
 // --- 响应式状态 ---
 const marketStats = ref({

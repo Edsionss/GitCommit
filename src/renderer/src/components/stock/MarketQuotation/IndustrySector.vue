@@ -21,12 +21,8 @@
     </div>
 
     <div class="sector-list">
-      <a-card v-for="(sector, index) in sortedSectors">
-        <div
-          :key="sector.name"
-          class="sector-card"
-          :style="getCardBackgroundByChange(sector.change)"
-        >
+      <a-card v-for="(sector, index) in sortedSectors" hoverable>
+        <div class="sector-card" :style="getCardBackgroundByChange(sector.change)">
           <div class="ranking-number">{{ index + 1 }}</div>
 
           <!-- Left Side: Industry Data -->
@@ -296,15 +292,11 @@ const formatCurrency = (value: number): string => {
 .sector-card {
   cursor: pointer;
   border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
   display: flex;
   position: relative;
   padding-left: 24px; // Space for ranking number
   overflow: hidden;
   transition: background-color 0.3s ease;
-  &:hover {
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  }
 }
 
 .ranking-number {
