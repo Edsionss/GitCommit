@@ -5,6 +5,7 @@
     :confirm-loading="confirmLoading"
     @ok="handleOk"
     @cancel="handleCancel"
+    :maskClosable="false"
   >
     <a-form
       ref="formRef"

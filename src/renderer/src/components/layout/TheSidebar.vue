@@ -70,12 +70,14 @@ watch(
 
 // Dynamically generate menu items from the routes store
 const menuItems = computed(() => {
-  return routes.value.map((r) => ({
-    ...r,
-    path: r.path === '' ? '/' : `/${r.path}`,
-    // label: r.meta.title,
-    icon: iconMap[r.menuIcon || 'FileTextOutlined']
-  }))
+  return routes.value
+    .filter((route) => route.hide !== '1')
+    .map((r) => ({
+      ...r,
+      path: r.path === '' ? '/' : `/${r.path}`,
+      // label: r.meta.title,
+      icon: iconMap[r.menuIcon || 'FileTextOutlined']
+    }))
 })
 
 const logoStyle = computed(() => {
