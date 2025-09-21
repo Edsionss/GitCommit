@@ -124,29 +124,6 @@ const emit = defineEmits<Emits>()
 const formRef = ref<FormInstance>()
 const confirmLoading = ref(false)
 
-const componentPath = reactive({
-  folder: 'view',
-  path: ''
-})
-
-const componentPathRules = computed(() => {
-  if (props.isDirectory) {
-    return {}
-  } else {
-    return {
-      folder: [{ required: true, message: '请选择文件夹' }],
-      path: [{ required: true, message: '请输入组件路径' }]
-    }
-  }
-})
-
-const componentPathFull = computed(() => {
-  if (componentPath.folder === 'custom') {
-    return formState.componentPath
-  } else {
-    return `${componentPath.folder}/${componentPath.path}`
-  }
-})
 const getDefaultFormState = (): Omit<RouteRecord, 'id' | 'children'> => ({
   parentId: null,
   name: '',
@@ -181,6 +158,36 @@ watch(
     }
   }
 )
+
+const componentPath = reactive({
+  folder: 'view',
+  path: ''
+})
+
+const isFolder = computed(() => {
+  return parentName.value == '顶级菜单'
+})
+
+const componentPathRules = computed(() => {
+  // if (props.isDirectory) {
+  if (isFolder) {
+    return {}
+  } else {
+    return {
+      folder: [{ required: true, message: '请选择文件夹' }],
+      path: [{ required: true, message: '请输入组件路径' }]
+    }
+  }
+})
+
+const componentPathFull = computed(() => {
+  if (componentPath.folder === 'custom') {
+    return formState.componentPath
+  } else {
+    return `${componentPath.folder}/${componentPath.path}`
+  }
+})
+
 const rules = computed(() => {
   let result = {
     meta: {
@@ -189,7 +196,7 @@ const rules = computed(() => {
     menuOrder: [{ required: true, message: '请输入菜单排序' }],
     path: [{ required: true, message: '请输入路由路径' }]
   }
-  if (!props.isDirectory) {
+  if (!isFolder) {
     result = Object.assign(result, {
       name: [{ required: true, message: '请输入路由名称' }],
       componentPath: [{ required: true, message: '请输入组件路径' }],
@@ -232,7 +239,6 @@ const handleCancel = () => {
   overflow-y: auto;
   border: 1px solid #d9d9d9;
   border-radius: 4px;
-  padding: 8px;
 }
 
 .icon-grid {

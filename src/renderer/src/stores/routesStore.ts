@@ -2,7 +2,11 @@ import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import { MergeArray, buildTree } from '@/utils'
 import { routesMenuApi } from '@/api/routesMenu'
-import { mockFlatRoutes, type RouteRecord } from '@shared/types/dtos/MenuManagement'
+import {
+  mockFlatRoutes,
+  type RouteRecord,
+  RouteRecordWithOptionalId
+} from '@shared/types/dtos/MenuManagement'
 import { message as AntMessage } from 'ant-design-vue'
 
 export const useRoutesStore = defineStore('routes', () => {
@@ -40,7 +44,7 @@ export const useRoutesStore = defineStore('routes', () => {
     }
   }
 
-  async function addRoutes(menus: Omit<RouteRecord, 'id'>[]) {
+  async function addRoutes(menus: RouteRecordWithOptionalId[]) {
     try {
       await routesMenuApi.addMany(menus)
       await initRoutes() // Re-fetch all routes to reflect the new state

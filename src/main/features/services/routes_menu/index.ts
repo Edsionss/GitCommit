@@ -1,5 +1,5 @@
 import { dbHelper } from '@features/database'
-import type { RouteRecord } from '@shared/types/dtos/MenuManagement'
+import type { RouteRecord, RouteRecordWithOptionalId } from '@shared/types/dtos/MenuManagement'
 import { nanoid } from 'nanoid' // 使用 uuid 生成唯一ID
 import { autoTransformKeys } from '@nodeUtils/index'
 // 将从数据库取出的记录（meta是字符串）转换为前端需要的格式（meta是对象）
@@ -63,12 +63,14 @@ export class RoutesMenuService {
 
   /**
    * 批量添加菜单
-   * @param {Omit<RouteRecord, 'id'>[]} menus - 要添加的菜单数据数组
+   * @param {RouteRecordWithOptionalId[]} menus - 要添加的菜单数据数组
    * @returns {Promise<RunResult[]>}
    */
-  public async addMenus(menus: Omit<RouteRecord, 'id'>[]) {
+  public async addMenus(menus: RouteRecordWithOptionalId[]) {
     try {
-      const dbRecords = menus.map((menu) => prepareRecordForDb({ ...menu, id: nanoid() }))
+      const dbRecords = menus.map((menu) =>
+        prepareRecordForDb({ ...menu, id: menu.id || nanoid() })
+      )
 
       // 使用批量插入 + 事务
       return await Promise.resolve(

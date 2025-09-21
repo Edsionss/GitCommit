@@ -15,117 +15,332 @@ export interface RouteRecord {
   menuIcon?: string // 菜单图标
   hide: string
 }
+// 定义一个新类型，其中 id 是可选的
+export type RouteRecordWithOptionalId = Omit<RouteRecord, 'id'> & Partial<Pick<RouteRecord, 'id'>>
 
-export const mockFlatRoutes: Omit<RouteRecord, 'id'>[] = [
+// export const mockFlatRoutes: Omit<RouteRecord, 'id'>[] = [
+//   {
+//     parentId: null,
+//     path: 'dashboard',
+//     name: 'Dashboard',
+//     componentPath: 'Dashboard',
+//     meta: { title: '仪表盘', keepAlive: '1' },
+//     hide: '0',
+//     menuOrder: 0,
+//     menuIcon: 'DashboardOutlined'
+//   },
+//   {
+//     parentId: null,
+//     path: 'scan',
+//     name: 'Scan',
+//     componentPath: 'BasicSettings',
+//     meta: { title: '开始扫描', keepAlive: '0' },
+//     hide: '0',
+//     menuOrder: 10,
+//     menuIcon: 'ScanOutlined'
+//   },
+//   {
+//     parentId: null,
+//     path: 'scanHistory',
+//     name: 'ScanHistory',
+//     componentPath: 'ScanHistory',
+//     meta: { title: '扫描记录', keepAlive: '1' },
+//     hide: '0',
+//     menuOrder: 20,
+//     menuIcon: 'HistoryOutlined'
+//   },
+//   {
+//     parentId: null,
+//     path: 'branches',
+//     name: 'Branches',
+//     componentPath: 'BranchesView',
+//     meta: { title: '分支管理', keepAlive: '1' },
+//     hide: '0',
+//     menuOrder: 40,
+//     menuIcon: 'BranchesOutlined'
+//   },
+//   {
+//     parentId: null,
+//     path: 'analysis',
+//     name: 'Analysis',
+//     componentPath: 'CodeAnalysis',
+//     meta: { title: '代码分析', keepAlive: '1' },
+//     hide: '0',
+//     menuOrder: 50,
+//     menuIcon: 'CodeOutlined'
+//   },
+//   {
+//     parentId: null,
+//     path: 'reports',
+//     name: 'Reports',
+//     componentPath: 'Reports',
+//     meta: { title: '报告生成', keepAlive: '1' },
+//     hide: '0',
+//     menuOrder: 60,
+//     menuIcon: 'FileTextOutlined'
+//   },
+//   {
+//     parentId: null,
+//     path: 'aiChat',
+//     name: 'AiChat',
+//     componentPath: 'AiChat',
+//     meta: { title: 'AI Chat', keepAlive: '0' },
+//     hide: '0',
+//     menuOrder: 70,
+//     menuIcon: 'RobotOutlined'
+//   },
+//   {
+//     parentId: null,
+//     path: 'stock',
+//     name: 'Stock',
+//     componentPath: 'Stock',
+//     meta: { title: '股票分析', keepAlive: '1' },
+//     hide: '0',
+//     menuOrder: 80,
+//     menuIcon: 'StockOutlined'
+//   },
+//   {
+//     parentId: null,
+//     path: 'settings',
+//     name: 'Settings',
+//     componentPath: 'Settings',
+//     meta: { title: '设置', keepAlive: '0' },
+//     hide: '0',
+//     menuOrder: 1000,
+//     menuIcon: 'SettingOutlined' // 设置页面通常有个图标，即使不在主菜单
+//   },
+//   {
+//     parentId: null,
+//     path: 'chat',
+//     name: 'Chat',
+//     componentPath: 'RealTimeCommunication',
+//     meta: { title: 'WebSocket', keepAlive: '1' },
+//     hide: '0',
+//     menuOrder: 10000,
+//     menuIcon: 'CommentOutlined'
+//   },
+//   {
+//     parentId: null,
+//     path: 'systemTools',
+//     name: 'SystemTools',
+//     componentPath: 'SystemTools',
+//     meta: { title: 'SystemTool', keepAlive: '1' },
+//     hide: '0',
+//     menuOrder: 1001,
+//     menuIcon: 'CommentOutlined'
+//   }
+// ]
+
+export const mockFlatRoutes: RouteRecordWithOptionalId[] = [
   {
+    id: 'IG1bzaXsigzD8gt1DwDNj',
     parentId: null,
     path: 'dashboard',
     name: 'Dashboard',
     componentPath: 'Dashboard',
-    meta: { title: '仪表盘', keepAlive: '1' },
-    hide: '0',
+    meta: {
+      title: '仪表盘',
+      keepAlive: '1'
+    },
     menuOrder: 0,
-    menuIcon: 'DashboardOutlined'
+    menuIcon: 'DashboardOutlined',
+    hide: '0'
   },
   {
+    id: 'AnusIQBdiS5ZbLx4E8ata',
+    parentId: null,
+    path: 'stock',
+    name: '',
+    componentPath: '',
+    meta: {
+      title: 'Stock',
+      keepAlive: '0'
+    },
+    menuOrder: 0,
+    menuIcon: 'AppstoreOutlined',
+    hide: '0'
+  },
+  {
+    id: 'VKhLEzgdxdRen-hvhXVNv',
+    parentId: 'AnusIQBdiS5ZbLx4E8ata',
+    path: 'marketNewsflash',
+    name: 'MarketNewsflash',
+    componentPath: 'components/Stock/MarketNewsflash/index',
+    meta: {
+      title: '市场资讯',
+      keepAlive: '0'
+    },
+    menuOrder: 0,
+    menuIcon: 'TeamOutlined',
+    hide: '0'
+  },
+  {
+    id: '0RFZKpv4szQ-BxhBQ-wpj',
+    parentId: 'AnusIQBdiS5ZbLx4E8ata',
+    path: 'stock/stockList',
+    name: 'StockList',
+    componentPath: 'components/Stock/StockList/index',
+    meta: {
+      title: '股票自选',
+      keepAlive: '1'
+    },
+    menuOrder: 0,
+    menuIcon: 'SafetyCertificateOutlined',
+    hide: '0'
+  },
+  {
+    id: '_GpOkXJWmoxP-_cIhH-9F',
+    parentId: 'AnusIQBdiS5ZbLx4E8ata',
+    path: 'stock/marketQuotation',
+    name: 'MarketQuotation',
+    componentPath: 'components/Stock/MarketQuotation/index',
+    meta: {
+      title: '市场行情',
+      keepAlive: '0'
+    },
+    menuOrder: 0,
+    menuIcon: 'SafetyCertificateOutlined',
+    hide: '0'
+  },
+  {
+    id: 'bbsyp1V2agdfeTKGK8KoX',
     parentId: null,
     path: 'scan',
     name: 'Scan',
     componentPath: 'BasicSettings',
-    meta: { title: '开始扫描', keepAlive: '0' },
-    hide: '0',
+    meta: {
+      title: '开始扫描',
+      keepAlive: '0'
+    },
     menuOrder: 10,
-    menuIcon: 'ScanOutlined'
+    menuIcon: 'ScanOutlined',
+    hide: '0'
   },
   {
+    id: '3jzQig2z8gK6uJox576M5',
     parentId: null,
     path: 'scanHistory',
     name: 'ScanHistory',
     componentPath: 'ScanHistory',
-    meta: { title: '扫描记录', keepAlive: '1' },
-    hide: '0',
+    meta: {
+      title: '扫描记录',
+      keepAlive: '1'
+    },
     menuOrder: 20,
-    menuIcon: 'HistoryOutlined'
+    menuIcon: 'HistoryOutlined',
+    hide: '0'
   },
   {
+    id: 'BBQYE5BPVVjr_7afMEDlg',
     parentId: null,
     path: 'branches',
     name: 'Branches',
     componentPath: 'BranchesView',
-    meta: { title: '分支管理', keepAlive: '1' },
-    hide: '0',
+    meta: {
+      title: '分支管理',
+      keepAlive: '1'
+    },
     menuOrder: 40,
-    menuIcon: 'BranchesOutlined'
+    menuIcon: 'BranchesOutlined',
+    hide: '0'
   },
   {
+    id: 'qoNsEEMsNGIijpYlb-LMP',
     parentId: null,
     path: 'analysis',
     name: 'Analysis',
     componentPath: 'CodeAnalysis',
-    meta: { title: '代码分析', keepAlive: '1' },
-    hide: '0',
+    meta: {
+      title: '代码分析',
+      keepAlive: '1'
+    },
     menuOrder: 50,
-    menuIcon: 'CodeOutlined'
+    menuIcon: 'CodeOutlined',
+    hide: '0'
   },
   {
+    id: 'IIxcVfeNUGtEjYbIX_cdh',
     parentId: null,
     path: 'reports',
     name: 'Reports',
     componentPath: 'Reports',
-    meta: { title: '报告生成', keepAlive: '1' },
-    hide: '0',
+    meta: {
+      title: '报告生成',
+      keepAlive: '1'
+    },
     menuOrder: 60,
-    menuIcon: 'FileTextOutlined'
+    menuIcon: 'FileTextOutlined',
+    hide: '0'
   },
   {
+    id: 'YWxboacI121N0X8aqTBOg',
     parentId: null,
     path: 'aiChat',
     name: 'AiChat',
     componentPath: 'AiChat',
-    meta: { title: 'AI Chat', keepAlive: '0' },
-    hide: '0',
+    meta: {
+      title: 'AI Chat',
+      keepAlive: '0'
+    },
     menuOrder: 70,
-    menuIcon: 'RobotOutlined'
+    menuIcon: 'RobotOutlined',
+    hide: '0'
   },
   {
+    id: 'auPRcV_br3gMhu2tzRDPS',
     parentId: null,
     path: 'stock',
     name: 'Stock',
     componentPath: 'Stock',
-    meta: { title: '股票分析', keepAlive: '1' },
-    hide: '0',
+    meta: {
+      title: '股票分析',
+      keepAlive: '1'
+    },
     menuOrder: 80,
-    menuIcon: 'StockOutlined'
+    menuIcon: 'StockOutlined',
+    hide: '1'
   },
   {
+    id: 'QJJ0Crd8FRbsY-Q_fDT6p',
     parentId: null,
     path: 'settings',
     name: 'Settings',
     componentPath: 'Settings',
-    meta: { title: '设置', keepAlive: '0' },
-    hide: '0',
+    meta: {
+      title: '设置',
+      keepAlive: '0'
+    },
     menuOrder: 1000,
-    menuIcon: 'SettingOutlined' // 设置页面通常有个图标，即使不在主菜单
+    menuIcon: 'SettingOutlined',
+    hide: '0'
   },
   {
-    parentId: null,
-    path: 'chat',
-    name: 'Chat',
-    componentPath: 'RealTimeCommunication',
-    meta: { title: 'WebSocket', keepAlive: '1' },
-    hide: '0',
-    menuOrder: 10000,
-    menuIcon: 'CommentOutlined'
-  },
-  {
+    id: '3xPTToKm4_uwjHAHGX1C7',
     parentId: null,
     path: 'systemTools',
     name: 'SystemTools',
     componentPath: 'SystemTools',
-    meta: { title: 'SystemTool', keepAlive: '1' },
-    hide: '0',
+    meta: {
+      title: 'SystemTool',
+      keepAlive: '1'
+    },
     menuOrder: 1001,
-    menuIcon: 'CommentOutlined'
+    menuIcon: 'CommentOutlined',
+    hide: '0'
+  },
+  {
+    id: 'HJ-8kf2i6Zz-_jJArgq_Q',
+    parentId: null,
+    path: 'chat',
+    name: 'Chat',
+    componentPath: 'RealTimeCommunication',
+    meta: {
+      title: 'WebSocket',
+      keepAlive: '1'
+    },
+    menuOrder: 10000,
+    menuIcon: 'CommentOutlined',
+    hide: '0'
   }
 ]
 

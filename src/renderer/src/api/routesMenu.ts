@@ -1,4 +1,4 @@
-import type { RouteRecord } from '@sharedType/MenuManagement'
+import type { RouteRecord, RouteRecordWithOptionalId } from '@sharedType/MenuManagement'
 
 const { api } = window
 
@@ -7,7 +7,7 @@ export const routesMenuApi = {
 
   add: (menu: Omit<RouteRecord, 'id'>): Promise<any> => api.addMenu(menu),
 
-  addMany: (menus: Omit<RouteRecord, 'id'>[]): Promise<any> => api.addMenus(menus),
+  addMany: (menus: RouteRecordWithOptionalId[]): Promise<any> => api.addMenus(menus),
 
   update: (menu: Partial<RouteRecord>): Promise<any> => api.updateMenu(menu),
 

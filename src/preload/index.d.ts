@@ -5,7 +5,7 @@ import type {
   DirectBroadcastPayload,
   ChatMessage as webSocketChatMessage
 } from '@sharedTypes/WebSocket'
-import type { RouteRecord } from '@shared/types/dtos/MenuManagement'
+import type { RouteRecord, RouteRecordWithOptionalId } from '@shared/types/dtos/MenuManagement'
 
 // Define interfaces for the data structures used in the API
 interface GitScanOptions {
@@ -87,7 +87,7 @@ interface ExposedAPI {
   // Menu Management API
   getAllMenus: () => Promise<RouteRecord[]>
   addMenu: (menu: Omit<RouteRecord, 'id'>) => Promise<any>
-  addMenus: (menu: Omit<RouteRecord, 'id'>[]) => Promise<any>
+  addMenus: (menu: RouteRecordWithOptionalId[]) => Promise<any>
   updateMenu: (menu: Partial<RouteRecord>) => Promise<any>
   deleteMenu: (id: string) => Promise<any>
   cleanMenu: () => Promise<any>
@@ -97,7 +97,9 @@ interface ExposedAPI {
   setAutoStart: (isEnabled: boolean) => Promise<{ success: boolean; error?: string }>
 
   // System Tools API
-  scheduleShutdown: (seconds: number) => Promise<{ success: boolean; message?: string; error?: string }>
+  scheduleShutdown: (
+    seconds: number
+  ) => Promise<{ success: boolean; message?: string; error?: string }>
   cancelShutdown: () => Promise<{ success: boolean; message?: string; error?: string }>
   getEnvVar: (key: string) => Promise<{ success: boolean; value?: string; error?: string }>
   setEnvVar: (key: string, value: string) => Promise<{ success: boolean; error?: string }>
