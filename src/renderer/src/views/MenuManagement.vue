@@ -32,7 +32,6 @@ import { PlusOutlined } from '@ant-design/icons-vue'
 import MenuList from '@components/MenuManagement/MenuList.vue'
 import MenuModal from '@components/MenuManagement/MenuModal.vue'
 import type { RouteRecord } from '@sharedType/MenuManagement'
-import { buildTree } from '@utils/index'
 import { useRoutesStore } from '@/stores/routesStore'
 const routesStore = useRoutesStore()
 const { routes } = storeToRefs(routesStore)
@@ -48,7 +47,7 @@ const modalState = reactive({
   parentItem: null as RouteRecord | null, // 新增子项时的父项
   isDirectory: false
 })
-menuTreeData.value = buildTree(routes.value)
+menuTreeData.value = routes.value
 const resetModalState = () => {
   modalState.visible = false
   modalState.isEdit = false
@@ -93,12 +92,14 @@ const handleDelete = (id: string) => {
 // 弹窗确认
 const handleModalOk = async (formData: Omit<RouteRecord, 'id' | 'children'>) => {
   const record = copyNormalize(formData)
-
   if (modalState.isEdit && modalState.currentItem) {
     // 编辑逻辑
     await updateRoute(record)
   } else {
-    // 新增逻辑
+    // 新增逻辑 计算完整路由路径
+    if (record.parentId && modalState.parentItem) {
+      record.path = `${modalState.parentItem.path}/${record.path}`
+    }
     await addRoute(record)
   }
   modalState.visible = true

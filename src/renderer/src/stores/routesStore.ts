@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
-import { MergeArray } from '@/utils'
+import { MergeArray, buildTree } from '@/utils'
 import { routesMenuApi } from '@/api/routesMenu'
 import { mockFlatRoutes, type RouteRecord } from '@shared/types/dtos/MenuManagement'
 import { message as AntMessage } from 'ant-design-vue'
@@ -11,8 +11,7 @@ export const useRoutesStore = defineStore('routes', () => {
   async function initRoutes() {
     try {
       const backendRoutes = await routesMenuApi.getAll()
-      routes.value = backendRoutes
-      // routes.value = MergeArray(mockFlatRoutes, backendRoutes, true, 'path')
+      routes.value = buildTree(backendRoutes)
     } catch (error) {
       console.error('Failed to initialize routes:', error)
       routes.value = [] // or set to some default/error state

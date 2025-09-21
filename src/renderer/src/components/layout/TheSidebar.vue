@@ -16,14 +16,14 @@
             <template #title>
               <span>
                 <component :is="item.icon" />
-                <span>{{ item.label }}</span>
+                <span>{{ item.meta.title }}</span>
               </span>
             </template>
-            <a-menu-item v-for="menu in item.children" :key="menu.path">
+            <a-menu-item v-for="menu in item.children" :key="item.path + '/' + menu.path">
               <template #icon>
                 <component :is="menu.icon" />
               </template>
-              <span>{{ menu.label }}</span>
+              <span>{{ menu.meta.title }}</span>
             </a-menu-item>
           </a-sub-menu>
           <div v-else>
@@ -31,7 +31,7 @@
               <template #icon>
                 <component :is="item.icon" />
               </template>
-              <span>{{ item.label }}</span>
+              <span>{{ item.meta.title }}</span>
             </a-menu-item>
           </div>
         </div>
@@ -69,14 +69,12 @@ watch(
 
 // Dynamically generate menu items from the routes store
 const menuItems = computed(() => {
-  return buildTree(
-    routes.value.map((r) => ({
-      ...r,
-      path: r.path === '' ? '/' : `/${r.path}`,
-      label: r.meta.title,
-      icon: iconMap[r.menuIcon || 'FileTextOutlined']
-    }))
-  )
+  return routes.value.map((r) => ({
+    ...r,
+    path: r.path === '' ? '/' : `/${r.path}`,
+    // label: r.meta.title,
+    icon: iconMap[r.menuIcon || 'FileTextOutlined']
+  }))
 })
 
 const handleMenuClick: MenuProps['onClick'] = ({ item, key, keyPath }) => {

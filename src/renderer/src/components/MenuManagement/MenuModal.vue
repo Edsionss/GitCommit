@@ -168,8 +168,6 @@ const handleOk = async () => {
   try {
     await formRef.value?.validate()
     confirmLoading.value = true
-    // 模拟API请求延迟
-    await new Promise((resolve) => setTimeout(resolve, 500))
     emit('ok', { ...formState })
     confirmLoading.value = false
   } catch (error) {

@@ -24,10 +24,27 @@ const resolveComponent = (path: string) => {
     }
   }
   path = pathPrefix + path
-  return (
-    pathMap[path.replace('@' + replaceString, '/src/' + replaceString + pathSuffix) + '.vue'] ||
-    NotFound
-  )
+  const fullPath = path.replace('@' + replaceString, '/src/' + replaceString + pathSuffix) + '.vue'
+  console.log(fullPath)
+
+  return pathMap[fullPath] || NotFound
+}
+
+function loadDynamicRoutes(routes) {
+  return routes.map((route: RouteRecord) => {
+    const newRoute: Partial<RouteRecordRaw> = {
+      path: route.path,
+      name: route.name,
+      meta: route.meta
+    }
+    if (route.componentPath) {
+      newRoute.component = resolveComponent(route.componentPath)
+    }
+    if (route.children && route.children.length) {
+      newRoute.children = loadDynamicRoutes(route.children)
+    }
+    return newRoute
+  })
 }
 
 // 2. 将动态路由添加逻辑封装
@@ -46,15 +63,17 @@ async function addDynamicRoutes(routerInstance: Router) {
     path: '/',
     component: MainLayout,
     // redirect: '/dashboard', // 最好有一个默认的重定向
-    children: routesStore.routes.map(
-      (route: RouteRecord): RouteRecordRaw => ({
-        path: route.path,
-        name: route.name,
-        component: resolveComponent(route.componentPath),
-        meta: route.meta
-      })
-    )
+    // children: routesStore.routes.map(
+    //   (route: RouteRecord): RouteRecordRaw => ({
+    //     path: route.path,
+    //     name: route.name,
+    //     component: resolveComponent(route.componentPath),
+    //     meta: route.meta
+    //   })
+    // )
+    children: loadDynamicRoutes(routesStore.routes)
   }
+  console.log(loadDynamicRoutes(routesStore.routes))
 
   mainLayoutRoute.children.push({
     path: '/:pathMatch(.*)*',
@@ -99,6 +118,7 @@ export async function createAndSetupRouter(): Promise<Router> {
     //   next();
     // }
     console.log(`Navigating to ${to.path}`)
+
     next()
   })
 

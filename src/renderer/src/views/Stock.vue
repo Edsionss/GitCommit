@@ -10,9 +10,9 @@
 
 <script setup lang="ts">
 import { ref, reactive, markRaw } from 'vue'
-import StockList from '@components/stock/StockList/index.vue'
-import MarketQuotation from '@components/stock/MarketQuotation/index.vue'
-import MarketNewsflash from '@components/stock/MarketNewsflash/index.vue'
+import StockList from '@components/Stock/StockList/index.vue'
+import MarketQuotation from '@components/Stock/MarketQuotation/index.vue'
+import MarketNewsflash from '@components/Stock/MarketNewsflash/index.vue'
 const paneKey = ref('marketQuotation')
 
 const stockTabs = reactive([
