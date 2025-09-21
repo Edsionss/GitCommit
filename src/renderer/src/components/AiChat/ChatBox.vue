@@ -229,7 +229,6 @@ onMounted(() => {
   flex-grow: 1;
   overflow-y: auto;
   padding: 14px;
-  background-color: var(--bg-container);
   border-right: 1px solid var(--border-secondary);
   position: relative;
   user-select: text;
