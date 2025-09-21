@@ -2,7 +2,7 @@
   <div class="sidebar">
     <a-layout-sider v-model:collapsed="isExpanded" :trigger="null" collapsible>
       <div class="logo">
-        <img :src="CognitoOcean" alt="" :class="{ fold: isExpanded }" />
+        <img :src="CognitoOcean" alt="" :style="logoStyle" />
       </div>
 
       <a-menu
@@ -10,6 +10,8 @@
         theme="light"
         mode="inline"
         @click="handleMenuClick"
+        class="menu-content"
+        :style="menuContentStyle"
       >
         <div v-for="item in menuItems" :key="item.path">
           <a-sub-menu :key="item.path" v-if="item.children && item.children.length">
@@ -48,7 +50,6 @@ import { storeToRefs } from 'pinia'
 import { useRoutesStore } from '@/stores/routesStore'
 import * as iconMap from '@ant-design/icons-vue' // 引入所有图标
 import type { MenuProps } from 'ant-design-vue'
-import { buildTree } from '@utils/index'
 
 const isExpanded = defineModel<boolean>()
 
@@ -77,6 +78,14 @@ const menuItems = computed(() => {
   }))
 })
 
+const logoStyle = computed(() => {
+  return isExpanded.value ? { height: '60px' } : { height: '100px' }
+})
+const menuContentStyle = computed(() => {
+  return { height: `calc( 100% - ( ${logoStyle.value.height} + 20px ) ) ` }
+})
+console.log(menuContentStyle.value)
+
 const handleMenuClick: MenuProps['onClick'] = ({ item, key, keyPath }) => {
   router.push(key as string)
 }
@@ -90,9 +99,12 @@ const handleMenuClick: MenuProps['onClick'] = ({ item, key, keyPath }) => {
   background-color: var(--bg-container);
   border-right: 1px solid var(--border-color);
   transition: width 0.3s ease;
-  // :deep(.ant-menu-light) {
-  //   background-color: var(--bg-layout);
-  // }
+  :deep(.ant-layout-sider) {
+    height: 100%;
+  }
+  :deep(.ant-layout-sider-children) {
+    height: 100%;
+  }
   .logo {
     padding: 10px 0;
     display: flex;
@@ -106,6 +118,9 @@ const handleMenuClick: MenuProps['onClick'] = ({ item, key, keyPath }) => {
         height: 60px;
       }
     }
+  }
+  .menu-content {
+    overflow-y: auto;
   }
 }
 </style>

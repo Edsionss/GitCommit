@@ -12,9 +12,8 @@ import EnvVarTool from '@/components/SystemTools/EnvVarTool.vue'
 
 <style scoped>
 .system-tools-container {
-  padding: 24px;
   display: flex;
   flex-direction: column;
-  gap: 24px;
+  gap: 14px;
 }
 </style>
