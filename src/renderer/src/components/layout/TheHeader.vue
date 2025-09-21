@@ -1,7 +1,7 @@
 <template>
   <div class="header">
     <div class="header-title">
-      <a-layout-header style="background: #fff; padding: 0">
+      <a-layout-header style="padding: 0">
         <menu-unfold-outlined
           v-if="isExpanded"
           class="trigger"
