@@ -128,3 +128,37 @@ export const mockFlatRoutes: Omit<RouteRecord, 'id'>[] = [
     menuIcon: 'CommentOutlined'
   }
 ]
+
+export const menuIconArray = [
+  'HomeOutlined',
+  'DashboardOutlined',
+  'SettingOutlined',
+  'UserOutlined',
+  'TeamOutlined',
+  'AppstoreOutlined',
+  'BlockOutlined',
+  'AreaChartOutlined',
+  'PieChartOutlined',
+  'TableOutlined',
+  'ProfileOutlined',
+  'FileTextOutlined',
+  'FolderOpenOutlined',
+  'DatabaseOutlined',
+  'LockOutlined',
+  'KeyOutlined',
+  'SafetyCertificateOutlined',
+  'MessageOutlined',
+  'NotificationOutlined',
+  'ToolOutlined',
+  'ControlOutlined',
+  'PlusOutlined',
+  'EditOutlined',
+  'DeleteOutlined',
+  'SearchOutlined',
+  'ReloadOutlined',
+  'CommentOutlined',
+  'ContainerOutlined',
+  'CodeOutlined',
+  'AccountBookOutlined',
+  'LineChartOutlined'
+]

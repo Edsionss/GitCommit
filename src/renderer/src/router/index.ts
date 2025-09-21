@@ -76,14 +76,6 @@ async function addDynamicRoutes(routerInstance: Router) {
     path: '/',
     component: MainLayout,
     // redirect: '/dashboard', // 最好有一个默认的重定向
-    // children: routesStore.routes.map(
-    //   (route: RouteRecord): RouteRecordRaw => ({
-    //     path: route.path,
-    //     name: route.name,
-    //     component: resolveComponent(route.componentPath),
-    //     meta: route.meta
-    //   })
-    // )
     children: loadDynamicRoutes(routesStore.routes)
   }
 
