@@ -17,6 +17,8 @@
   --boarder-color: #f0f0f0;
 
   --active-color: #e6f4ff;
+
+  --code--color: #eee;
 }
 
 /* 深色主题变量 */
@@ -34,6 +36,7 @@
 
   --boarder-color: #303030;
   --active-color: #111a2c;
+  --code--color: #2d2d2d;
 }
 
 body {
