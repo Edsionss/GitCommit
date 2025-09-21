@@ -42,8 +42,8 @@ const props = defineProps<{
 
 const chartData = computed(() => {
   const isDark = effectiveTheme.value === 'dark'
-  const upColor = isDark ? 'rgba(255, 77, 79, 0.7)' : 'rgba(207, 19, 34, 0.7)'
-  const downColor = isDark ? 'rgba(82, 196, 26, 0.7)' : 'rgba(56, 158, 13, 0.7)'
+  const upColor = 'var(--color-error)'
+  const downColor = 'var(--color-success)'
 
   switch (props.type) {
     case 'vol':
@@ -70,7 +70,7 @@ const chartData = computed(() => {
           {
             label: 'DIF',
             data: props.indicatorData.map((d) => d.dif),
-            borderColor: isDark ? '#E6A23C' : '#f5a623',
+            borderColor: 'var(--color-warning)',
             borderWidth: 1,
             pointRadius: 0,
             type: 'line'
@@ -78,7 +78,7 @@ const chartData = computed(() => {
           {
             label: 'DEA',
             data: props.indicatorData.map((d) => d.dea),
-            borderColor: isDark ? '#67C23A' : '#4a90e2',
+            borderColor: 'var(--color-info)',
             borderWidth: 1,
             pointRadius: 0,
             type: 'line'
@@ -98,8 +98,8 @@ const chartData = computed(() => {
 })
 
 const chartOptions = computed(() => {
-  const gridColor = effectiveTheme.value === 'dark' ? 'rgba(255, 255, 255, 0.1)' : '#f0f0f0'
-  const textColor = effectiveTheme.value === 'dark' ? 'rgba(255, 255, 255, 0.7)' : 'rgba(0, 0, 0, 0.7)'
+  const gridColor = 'var(--border-secondary)'
+  const textColor = 'var(--text-secondary)'
 
   return {
     responsive: true,

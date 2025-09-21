@@ -280,7 +280,7 @@ const formatCurrency = (value: number): string => {
   justify-content: center;
   margin-bottom: 10px;
   .active-sort {
-    color: #1890ff;
+    color: var(--brand-primary);
     font-weight: 500;
   }
 }
@@ -311,7 +311,7 @@ const formatCurrency = (value: number): string => {
   position: absolute;
   top: 0;
   left: 0;
-  background-color: #1890ff;
+  background-color: var(--brand-primary);
   color: white;
   padding: 2px 8px;
   border-bottom-right-radius: 8px;
@@ -361,7 +361,7 @@ const formatCurrency = (value: number): string => {
   }
   .label {
     font-size: 13px;
-    color: #888;
+    color: var(--text-secondary);
   }
   .value {
     font-size: 14px;
@@ -372,7 +372,7 @@ const formatCurrency = (value: number): string => {
 .leading-stock-data {
   flex: 4;
   padding-left: 20px;
-  border-left: 2px dashed #cdd1d7;
+  border-left: 2px dashed var(--border-secondary);
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -401,7 +401,7 @@ const formatCurrency = (value: number): string => {
   margin-top: 4px;
   .stock-code {
     font-size: 12px;
-    color: #888;
+    color: var(--text-secondary);
   }
 }
 
@@ -422,15 +422,15 @@ const formatCurrency = (value: number): string => {
   }
   .price-label {
     font-size: 12px;
-    color: #888;
+    color: var(--text-secondary);
     margin-top: 2px;
   }
 }
 
 .is-up {
-  color: #cf1322;
+  color: var(--color-error);
 }
 .is-down {
-  color: #389e0d;
+  color: var(--color-success);
 }
 </style>

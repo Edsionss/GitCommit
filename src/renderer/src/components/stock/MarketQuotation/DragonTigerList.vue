@@ -239,7 +239,7 @@ const getPriceClass = (change) => {
   font-size: 22px;
   font-weight: bold;
   margin-bottom: 16px;
-  color: var(--text-color-primary);
+  color: var(--text-primary);
 }
 
 .list-view {
@@ -251,14 +251,14 @@ const getPriceClass = (change) => {
 .stock-item {
   cursor: pointer;
   border-radius: 8px;
-  box-shadow: var(--box-shadow-base);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 
   display: flex;
   flex-direction: column;
   gap: 8px;
   transition: box-shadow 0.3s ease;
   &:hover {
-    box-shadow: var(--box-shadow-hover);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   }
 }
 
@@ -320,24 +320,24 @@ const getPriceClass = (change) => {
 
 .opening-price-group .label {
   font-size: 12px;
-  color: var(--text-color-tertiary);
+  color: var(--text-tertiary);
 }
 
 .value.opening-price {
   font-size: 13px;
-  color: var(--text-color-primary);
+  color: var(--text-primary);
   font-weight: 500;
 }
 
 .stock-name {
   font-size: 16px;
   font-weight: bold;
-  color: var(--text-color-primary);
+  color: var(--text-primary);
 }
 
 .stock-code-market {
   font-size: 13px;
-  color: var(--text-color-tertiary);
+  color: var(--text-tertiary);
   display: flex;
   align-items: center;
   font-weight: bold;
@@ -369,37 +369,22 @@ const getPriceClass = (change) => {
 
 .label {
   font-size: 12px;
-  color: var(--text-color-secondary);
+  color: var(--text-secondary);
   margin-bottom: 2px;
 }
 
 .value {
   font-size: 14px;
   font-weight: 500;
-  color: var(--text-color-primary);
+  color: var(--text-primary);
 }
 
-.value.positive {
-  color: #e53935;
-}
-.value.negative {
-  color: #43a047;
-}
+.value.positive,
 .value.buy {
-  color: #e53935;
+  color: var(--color-error);
 }
+.value.negative,
 .value.sell {
-  color: #43a047;
-}
-
-[data-theme='dark'] {
-  .value.positive,
-  .value.buy {
-    color: #ff4d4f;
-  }
-  .value.negative,
-  .value.sell {
-    color: #52c41a;
-  }
+  color: var(--color-success);
 }
 </style>

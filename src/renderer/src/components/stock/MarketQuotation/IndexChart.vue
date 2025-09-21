@@ -37,9 +37,11 @@ const props = defineProps<{
 }>()
 
 const chartData = computed(() => {
-  const borderColor = props.change >= 0 ? 'rgba(207, 19, 34, 1)' : 'rgba(56, 158, 13, 1)'
+  const borderColor = props.change >= 0 ? 'var(--color-error)' : 'var(--color-success)'
   const backgroundColor =
-    props.change >= 0 ? 'rgba(207, 19, 34, 0.2)' : 'rgba(56, 158, 13, 0.2)'
+    props.change >= 0
+      ? 'rgba(var(--brand-primary-rgb), 0.2)'
+      : 'rgba(var(--color-success-rgb), 0.2)' // Assuming you have --color-success-rgb
 
   return {
     labels: Array(props.chartDataPoints.length).fill(''),
@@ -58,7 +60,7 @@ const chartData = computed(() => {
 })
 
 const chartOptions = computed(() => {
-  const textColor = effectiveTheme.value === 'dark' ? 'rgba(255, 255, 255, 0.7)' : 'rgba(0, 0, 0, 0.7)'
+  const textColor = 'var(--text-secondary)'
   return {
     responsive: true,
     maintainAspectRatio: false,

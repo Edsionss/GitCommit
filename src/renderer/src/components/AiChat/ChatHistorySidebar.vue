@@ -44,8 +44,8 @@ const { sessionHistory, activeSessionId } = storeToRefs(chatStore)
 .chat-history-sidebar {
   width: 225px;
   height: 100%;
-  border-right: 1px solid var(--color-border);
-  background-color: var(--color-background);
+  border-right: 1px solid var(--border-secondary);
+  background-color: var(--bg-container);
   display: flex;
   flex-direction: column;
   transition:
@@ -60,7 +60,7 @@ const { sessionHistory, activeSessionId } = storeToRefs(chatStore)
 
 .sidebar-header {
   padding: 11.5px;
-  border-bottom: 1px solid var(--color-border);
+  border-bottom: 1px solid var(--border-secondary);
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -87,12 +87,12 @@ const { sessionHistory, activeSessionId } = storeToRefs(chatStore)
 }
 
 .history-item.active {
-  background-color: var(--primary-bg-hover);
-  border-left-color: var(--color-primary);
+  background-color: var(--brand-primary-bg);
+  border-left-color: var(--brand-primary);
 }
 
 .history-item:hover {
-  background-color: var(--primary-bg-hover);
+  background-color: var(--brand-primary-bg);
 }
 :deep(.ant-list-item) {
   padding: 10px 5px;

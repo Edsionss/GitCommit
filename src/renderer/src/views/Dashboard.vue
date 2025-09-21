@@ -119,7 +119,7 @@ const getAvatarUrl = (email: string): string => {
 .page-title {
   margin: 0;
   font-size: var(--font-size-xl);
-  color: var(--color-text);
+  color: var(--text-primary);
   font-weight: 600;
   line-height: 1.5;
 }

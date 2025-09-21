@@ -39,7 +39,6 @@ const stockTabs = reactive([
   height: 100%;
   display: flex;
   flex-direction: column;
-  // background-color: var(--color-background);
   :deep(.ant-tabs) {
     height: 100%;
     display: flex;

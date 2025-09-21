@@ -108,7 +108,7 @@ const columns = ref([
 .commit-hash {
   font-family: monospace;
   font-size: 12px;
-  color: var(--color-text-light);
+  color: var(--text-secondary);
 }
 
 .commit-author {

@@ -116,7 +116,7 @@ const { formatDate } = useFormatters()
 
 .contribution-stats {
   font-size: 12px;
-  color: var(--color-text-light);
+  color: var(--text-secondary);
   display: flex;
   gap: 8px;
 }
@@ -154,7 +154,7 @@ const { formatDate } = useFormatters()
 
 .branch-stats {
   font-size: 12px;
-  color: var(--color-text-light);
+  color: var(--text-secondary);
 }
 
 .branch-commit-count {

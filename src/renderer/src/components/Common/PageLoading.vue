@@ -15,7 +15,7 @@
   background: transparent;
   transform: rotate(calc(var(--rotation) * 1deg)) translate(0, calc(var(--translation) * 1%));
   animation: spinner-fzua35 1s calc(var(--delay) * 1s) infinite ease;
-  color: #3eb3c2;
+  color: var(--brand-primary);
   text-align: end;
   font-weight: 700;
   font-size: 20px;
@@ -32,7 +32,7 @@
   background: transparent;
   top: 15px;
   left: -30px;
-  color: #f09f9f;
+  color: var(--color-warning);
 }
 
 .spinner div:nth-child(2) {

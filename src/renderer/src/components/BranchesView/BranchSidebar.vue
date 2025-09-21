@@ -120,13 +120,13 @@ const branchGraphEl = ref<HTMLElement | null>(null)
 const getMrStatusType = (status: string) => {
   switch (status) {
     case '待合并':
-      return 'green'
+      return 'success'
     case '审核中':
-      return 'orange'
+      return 'warning'
     case '已通过':
-      return 'blue'
+      return 'info'
     default:
-      return 'blue'
+      return 'info'
   }
 }
 
@@ -135,7 +135,7 @@ const initBranchGraph = () => {
   setTimeout(() => {
     if (branchGraphEl.value) {
       branchGraphEl.value.innerHTML = `
-        <div style="display: flex; flex-direction: column; align-items: center; font-family: sans-serif; color: #666;">
+        <div style="display: flex; flex-direction: column; align-items: center; font-family: sans-serif; color: var(--text-secondary);">
           <div style="margin: 10px 0;">图表加载中，这里将显示分支关系图</div>
           <img src="https://git-scm.com/book/en/v2/images/advance-master.png"
                alt="Branch Graph Example"
@@ -163,7 +163,7 @@ onMounted(() => {
 }
 .branch-graph-container {
   height: 300px;
-  background-color: var(--color-background-soft);
+  background-color: var(--bg-container);
   border-radius: 4px;
   display: flex;
   justify-content: center;
@@ -183,15 +183,15 @@ onMounted(() => {
 .stat-value {
   font-size: 24px;
   font-weight: bold;
-  color: var(--color-primary);
+  color: var(--brand-primary);
 }
 .stat-label {
   font-size: 14px;
-  color: var(--color-text-light);
+  color: var(--text-secondary);
 }
 .merge-request-item {
   padding: 12px;
-  border-bottom: 1px solid var(--color-border);
+  border-bottom: 1px solid var(--border-secondary);
 }
 .merge-request-item:last-child {
   border-bottom: none;
@@ -211,7 +211,7 @@ onMounted(() => {
   gap: 10px;
   margin-bottom: 8px;
   font-size: 14px;
-  color: var(--color-text-light);
+  color: var(--text-secondary);
 }
 .mr-actions {
   display: flex;
@@ -220,6 +220,6 @@ onMounted(() => {
 }
 .mr-author {
   font-size: 13px;
-  color: var(--color-text-light);
+  color: var(--text-secondary);
 }
 </style>

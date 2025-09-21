@@ -138,7 +138,7 @@ defineProps({
 
 .stats-label {
   font-size: 14px;
-  color: var(--color-text-light);
+  color: var(--text-secondary);
 }
 
 @media (max-width: 768px) {

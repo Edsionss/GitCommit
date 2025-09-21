@@ -64,11 +64,11 @@ const marketStats = ref({
 })
 
 const upColor = computed(() => ({
-  color: effectiveTheme.value === 'dark' ? '#ff4d4f' : '#cf1322'
+  color: 'var(--color-error)'
 }))
 
 const downColor = computed(() => ({
-  color: effectiveTheme.value === 'dark' ? '#52c41a' : '#389e0d'
+  color: 'var(--color-success)'
 }))
 
 const indices = ref([
@@ -164,7 +164,7 @@ const getTextClass = (value: number) => {
 
 .index-card {
   border-radius: 8px;
-  border: 1px solid var(--boarder-color);
+  border: 1px solid var(--border-secondary);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.09);
   transition: all 0.3s ease;
   overflow: hidden;
@@ -200,7 +200,7 @@ const getTextClass = (value: number) => {
   }
   .index-en-name {
     font-size: 12px;
-    color: #888;
+    color: var(--text-secondary);
   }
 }
 
@@ -221,7 +221,7 @@ const getTextClass = (value: number) => {
 
 .index-country {
   font-size: 12px;
-  color: #888;
+  color: var(--text-secondary);
   margin-bottom: 16px;
 }
 
@@ -231,9 +231,9 @@ const getTextClass = (value: number) => {
 }
 
 .is-up {
-  color: #cf1322;
+  color: var(--color-error);
 }
 .is-down {
-  color: #389e0d;
+  color: var(--color-success);
 }
 </style>

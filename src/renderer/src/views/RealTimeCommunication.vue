@@ -108,8 +108,8 @@ onUnmounted(() => {
   display: flex;
   width: 100%;
   padding: 10px;
-  background-color: var(--color-background);
-  color: var(--color-text);
+  background-color: var(--bg-container);
+  color: var(--text-primary);
   overflow-y: auto;
   .chat-container {
     // width: 70%;
@@ -136,7 +136,7 @@ onUnmounted(() => {
         display: flex;
         flex-direction: column;
         gap: 10px;
-        background-color: var(--color-background-soft);
+        background-color: var(--bg-container);
       }
     }
   }

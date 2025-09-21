@@ -123,7 +123,7 @@ const joinRoom = (item: any) => {
   width: auto !important;
   // max-width: 300px !important;
   min-width: 0px !important;
-  border-left: 1px solid #f0f0f0;
+  border-left: 1px solid var(--border-secondary);
   padding: 10px;
   flex: none !important;
 }
@@ -139,7 +139,7 @@ const joinRoom = (item: any) => {
 
   .head-container {
     padding-bottom: 20px;
-    border-bottom: #f0f0f0 1px solid;
+    border-bottom: 1px solid var(--border-secondary);
     .head-actions {
       display: flex;
       gap: 8px;

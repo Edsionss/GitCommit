@@ -33,7 +33,7 @@ const chartOptions = computed(() => ({
     legend: {
       position: 'top',
       labels: {
-        color: effectiveTheme.value === 'dark' ? '#f0f0f0' : '#666'
+        color: 'var(--text-secondary)'
       }
     }
   }

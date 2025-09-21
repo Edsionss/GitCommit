@@ -275,7 +275,7 @@ const formatCurrency = (value: number) => {
   .ant-btn {
     font-size: 16px;
     &.active {
-      color: #1890ff;
+      color: var(--brand-primary);
       font-weight: 500;
     }
   }
@@ -304,7 +304,7 @@ const formatCurrency = (value: number) => {
   position: absolute;
   top: 0;
   left: 0;
-  background-color: #1890ff;
+  background-color: var(--brand-primary);
   color: white;
   padding: 2px 8px;
   border-bottom-right-radius: 8px;
@@ -324,12 +324,12 @@ const formatCurrency = (value: number) => {
   }
   .code {
     font-size: 12px;
-    color: #888;
+    color: var(--text-secondary);
     margin-left: 8px;
   }
   .hotness {
     font-size: 12px;
-    color: #ff7a45;
+    color: var(--color-warning);
   }
 }
 
@@ -347,7 +347,7 @@ const formatCurrency = (value: number) => {
     }
     .label {
       font-size: 12px;
-      color: #888;
+      color: var(--text-secondary);
       margin-top: 4px;
     }
   }
@@ -355,7 +355,7 @@ const formatCurrency = (value: number) => {
 
 .card-meta {
   font-size: 12px;
-  color: #888;
+  color: var(--text-secondary);
   display: flex;
   gap: 16px;
   margin-bottom: 12px;
@@ -368,7 +368,7 @@ const formatCurrency = (value: number) => {
 
 .topic-content {
   font-size: 14px;
-  color: #555;
+  color: var(--text-primary);
   line-height: 1.6;
   display: -webkit-box;
   -webkit-box-orient: vertical;
@@ -378,9 +378,9 @@ const formatCurrency = (value: number) => {
 }
 
 .is-up {
-  color: #cf1322;
+  color: var(--color-error);
 }
 .is-down {
-  color: #389e0d;
+  color: var(--color-success);
 }
 </style>

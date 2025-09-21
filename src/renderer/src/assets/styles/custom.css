@@ -3,7 +3,7 @@
   word-break: break-all;
   font-family: monospace;
   font-size: 12px;
-  background-color: var(--code--color);
+  background-color: var(--bg-layout);
   padding: 5px;
   border-radius: 3px;
 }

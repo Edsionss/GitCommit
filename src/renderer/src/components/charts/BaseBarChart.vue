@@ -39,10 +39,8 @@ defineProps({
   }
 })
 
-const chartTextColor = computed(() => (effectiveTheme.value === 'dark' ? '#f0f0f0' : '#666'))
-const chartGridColor = computed(() =>
-  effectiveTheme.value === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)'
-)
+const chartTextColor = computed(() => 'var(--text-secondary)')
+const chartGridColor = computed(() => 'var(--border-secondary)')
 
 const chartOptions = computed(() => ({
   responsive: true,

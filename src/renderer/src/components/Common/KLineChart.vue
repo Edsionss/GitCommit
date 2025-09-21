@@ -32,17 +32,17 @@ const chartData = computed(() => ({
       label: 'K线',
       data: props.klineData,
       color: {
-        up: effectiveTheme.value === 'dark' ? '#ff4d4f' : '#cf1322',
-        down: effectiveTheme.value === 'dark' ? '#52c41a' : '#389e0d',
-        unchanged: '#888'
+        up: 'var(--color-error)',
+        down: 'var(--color-success)',
+        unchanged: 'var(--text-tertiary)'
       }
     }
   ]
 }))
 
 const chartOptions = computed(() => {
-  const gridColor = effectiveTheme.value === 'dark' ? 'rgba(255, 255, 255, 0.1)' : '#f0f0f0'
-  const textColor = effectiveTheme.value === 'dark' ? 'rgba(255, 255, 255, 0.7)' : 'rgba(0, 0, 0, 0.7)'
+  const gridColor = 'var(--border-secondary)'
+  const textColor = 'var(--text-secondary)'
 
   return {
     responsive: true,

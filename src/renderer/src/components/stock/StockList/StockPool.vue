@@ -126,21 +126,21 @@ const handleStockClick = (stock) => {
   display: flex;
   flex-direction: column;
   height: 100%;
-  border-right: 1px dashed#eee;
+  border-right: 1px dashed var(--border-secondary);
 }
 
 .toolbar {
   display: flex;
   padding: 10px;
   gap: 10px;
-  border-bottom: 1px dashed#eee;
+  border-bottom: 1px dashed var(--border-secondary);
 }
 
 .stockPool-container {
   flex-grow: 1;
   overflow-y: auto;
   padding: 10px;
-  color: #333;
+  color: var(--text-primary);
 }
 
 .stock-item {
@@ -152,16 +152,16 @@ const handleStockClick = (stock) => {
   cursor: pointer;
   transition: background-color 0.3s ease;
   border-radius: 0.5rem;
-  color: var(--color-text);
+  color: var(--text-primary);
 
   &:hover {
-    background-color: var(--active-color);
-    color: var(--primary-color) !important;
+    background-color: var(--brand-primary-bg);
+    color: var(--brand-primary) !important;
   }
 
   &.active {
-    background-color: var(--active-color);
-    color: var(--primary-color) !important;
+    background-color: var(--brand-primary-bg);
+    color: var(--brand-primary) !important;
   }
 }
 
@@ -180,14 +180,14 @@ const handleStockClick = (stock) => {
   align-items: center;
   margin-top: 4px;
   font-size: 12px;
-  color: #999;
+  color: var(--text-secondary);
 }
 
 .stock-market {
   margin-right: 5px;
   padding: 2px 4px;
   border-radius: 3px;
-  background-color: #f0f0f0;
+  background-color: var(--bg-container);
   font-size: 10px;
 }
 
@@ -195,7 +195,7 @@ const handleStockClick = (stock) => {
   .stock-price {
     font-size: 16px;
     font-weight: bold;
-    color: #ff4d4f; // 红色表示价格，可以根据涨跌情况动态改变颜色
+    color: var(--color-error);
   }
 }
 </style>

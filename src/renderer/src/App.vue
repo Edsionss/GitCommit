@@ -88,7 +88,7 @@ body {
 }
 
 body {
-  background-color: var(--bg-color);
+  background-color: var(--bg-layout);
   color: var(--text-primary);
   transition:
     background-color 0.3s,

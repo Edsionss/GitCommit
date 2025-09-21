@@ -46,9 +46,9 @@
       <template #bodyCell="{ column, record }">
         <template v-if="column.key === 'status'">
           <div class="branch-status">
-            <StarOutlined v-if="record.name === 'main'" style="color: #67c23a" />
-            <LinkOutlined v-else-if="record.isRemote" style="color: #409eff" />
-            <ShareAltOutlined v-else style="color: #e6a23c" />
+            <StarOutlined v-if="record.name === 'main'" style="color: var(--color-success)" />
+            <LinkOutlined v-else-if="record.isRemote" style="color: var(--color-info)" />
+            <ShareAltOutlined v-else style="color: var(--color-warning)" />
           </div>
         </template>
         <template v-else-if="column.key === 'name'">

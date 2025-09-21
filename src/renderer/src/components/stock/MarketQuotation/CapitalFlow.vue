@@ -294,7 +294,7 @@ const getTextClass = (value: number) => {
 .market-card {
   :deep(.ant-statistic-title) {
     font-size: 14px;
-    color: var(--text-color-secondary);
+    color: var(--text-secondary);
   }
   :deep(.ant-statistic-content) {
     font-size: 24px;
@@ -307,7 +307,7 @@ const getTextClass = (value: number) => {
   justify-content: center;
   margin-bottom: 16px;
   .active-sort {
-    color: var(--ant-primary-color);
+    color: var(--brand-primary);
     font-weight: 500;
   }
 }
@@ -321,14 +321,14 @@ const getTextClass = (value: number) => {
 .stock-card {
   cursor: pointer;
   border-radius: 8px;
-  box-shadow: var(--box-shadow-base);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
   display: flex;
   position: relative;
   padding-left: 24px;
   overflow: hidden;
   transition: all 0.3s ease;
   &:hover {
-    box-shadow: var(--box-shadow-hover);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
     transform: translateY(-2px);
   }
 }
@@ -337,7 +337,7 @@ const getTextClass = (value: number) => {
   position: absolute;
   top: 0;
   left: 0;
-  background-color: var(--ant-primary-color);
+  background-color: var(--brand-primary);
   color: white;
   padding: 2px 8px;
   border-bottom-right-radius: 8px;
@@ -359,7 +359,7 @@ const getTextClass = (value: number) => {
   .stock-name {
     font-size: 18px;
     font-weight: 600;
-    color: var(--text-color-primary);
+    color: var(--text-primary);
   }
   .stock-change {
     font-size: 20px;
@@ -383,19 +383,19 @@ const getTextClass = (value: number) => {
   }
   .label {
     font-size: 13px;
-    color: var(--text-color-tertiary);
+    color: var(--text-tertiary);
   }
   .value {
     font-size: 14px;
     font-weight: 500;
-    color: var(--text-color-secondary);
+    color: var(--text-secondary);
   }
 }
 
 .meta-data {
   flex: 4;
   padding-left: 20px;
-  border-left: 2px dashed var(--border-color-split);
+  border-left: 2px dashed var(--border-secondary);
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -414,7 +414,7 @@ const getTextClass = (value: number) => {
   gap: 8px;
   .stock-code {
     font-size: 12px;
-    color: var(--text-color-tertiary);
+    color: var(--text-tertiary);
   }
 }
 
@@ -428,7 +428,7 @@ const getTextClass = (value: number) => {
     align-items: baseline;
   }
   .label {
-    color: var(--text-color-tertiary);
+    color: var(--text-tertiary);
     margin-right: 8px;
     flex-shrink: 0;
   }
@@ -437,7 +437,7 @@ const getTextClass = (value: number) => {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    color: var(--text-color-secondary);
+    color: var(--text-secondary);
   }
 }
 
@@ -446,18 +446,9 @@ const getTextClass = (value: number) => {
 }
 
 .is-up {
-  color: #cf1322;
+  color: var(--color-error);
 }
 .is-down {
-  color: #389e0d;
-}
-
-[data-theme='dark'] {
-  .is-up {
-    color: #ff4d4f;
-  }
-  .is-down {
-    color: #52c41a;
-  }
+  color: var(--color-success);
 }
 </style>

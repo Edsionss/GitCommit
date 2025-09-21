@@ -56,12 +56,12 @@ const layoutClasses = computed(() => ({
 .sidebar {
   height: 100%;
   z-index: 20;
-  border-right: 1px solid var(--color-border);
+  border-right: 1px solid var(--border-primary);
 }
 
 .layout-container.sidebar-right .sidebar {
   border-right: none;
-  border-left: 1px solid var(--color-border);
+  border-left: 1px solid var(--border-primary);
 }
 
 .body {

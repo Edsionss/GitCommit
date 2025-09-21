@@ -17,7 +17,7 @@ const chartData = computed(() => ({
   datasets: [
     {
       label: '提交数',
-      backgroundColor: '#6366f1',
+      backgroundColor: 'var(--brand-primary)',
       data: [11, 22, 18, 29, 34, 14, 7]
     }
   ]

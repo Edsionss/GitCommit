@@ -118,16 +118,16 @@ const handleMenuClick = () => {
   flex-direction: column;
   height: 100%;
   width: 100%;
-  border: 1px solid var(--color-border);
+  border: 1px solid var(--border-primary);
   border-radius: 8px;
   overflow: hidden;
-  background-color: var(--color-background-soft);
+  background-color: var(--bg-container);
 }
 
 .header {
   padding: 12px 24px;
-  background-color: var(--color-background);
-  border-bottom: 1px solid var(--color-border);
+  background-color: var(--bg-elevated);
+  border-bottom: 1px solid var(--border-primary);
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -143,7 +143,7 @@ const handleMenuClick = () => {
 
 .host-info {
   padding: 10px 24px;
-  background-color: var(--color-background);
+  background-color: var(--bg-elevated);
 }
 
 .host-info :deep(.ant-collapse) {
@@ -151,17 +151,17 @@ const handleMenuClick = () => {
   border: none;
 }
 .host-info :deep(.ant-collapse-item) {
-  background-color: var(--color-background-mute) !important;
-  border: 1px solid var(--color-primary) !important;
+  background-color: var(--bg-container) !important;
+  border: 1px solid var(--brand-primary) !important;
   border-radius: 4px !important;
 }
 .host-info :deep(.ant-collapse-header) {
-  color: var(--color-text-light);
+  color: var(--text-secondary);
 }
 .host-info :deep(.ant-collapse-content) {
   background-color: transparent !important;
-  color: var(--color-text);
-  border-top: 1px solid var(--color-primary) !important;
+  color: var(--text-primary);
+  border-top: 1px solid var(--brand-primary) !important;
 }
 
 .message-area {
@@ -178,23 +178,23 @@ const handleMenuClick = () => {
 .message-item .nickname {
   font-weight: bold;
   font-size: 14px;
-  color: var(--color-heading);
+  color: var(--text-primary);
 }
 
 .message-item .timestamp {
   font-size: 12px;
-  color: var(--color-text-light);
+  color: var(--text-secondary);
   margin-left: 8px;
 }
 
 .message-text {
   padding: 8px 12px;
-  background: var(--color-background);
+  background: var(--bg-elevated);
   border-radius: 8px;
   display: inline-block;
   max-width: 100%;
   word-wrap: break-word;
-  color: var(--color-text);
+  color: var(--text-primary);
 }
 
 .message-item.is-me {
@@ -214,15 +214,15 @@ const handleMenuClick = () => {
 }
 
 .message-item.is-me .message-text {
-  background: var(--color-primary);
-  color: #fff;
+  background: var(--brand-primary);
+  color: var(--text-on-brand);
 }
 
 .input-area {
   display: flex;
   padding: 12px 24px;
-  border-top: 1px solid var(--color-border);
-  background-color: var(--color-background);
+  border-top: 1px solid var(--border-primary);
+  background-color: var(--bg-elevated);
   gap: 10px;
 }
 </style>

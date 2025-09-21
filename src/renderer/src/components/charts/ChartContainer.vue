@@ -18,10 +18,10 @@ defineProps({
 
 <style scoped>
 .chart-container {
-  border: 1px solid var(--border-color);
+  border: 1px solid var(--border-secondary);
   border-radius: 8px;
   padding: 16px;
-  background-color: var(--bg-content);
+  background-color: var(--bg-container);
   display: flex;
   flex-direction: column;
   max-height: 400px; /* Or a suitable default height */

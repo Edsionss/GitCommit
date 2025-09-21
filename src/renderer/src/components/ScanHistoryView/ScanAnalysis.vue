@@ -31,7 +31,7 @@ const analysis = () => {
 
 <style scoped lang="scss">
 .analysis-container {
-  background-color: var(--color-background-soft);
+  background-color: var(--bg-layout);
   border-radius: var(--radius-sm);
   padding: var(--spacing-md);
   height: 100%;

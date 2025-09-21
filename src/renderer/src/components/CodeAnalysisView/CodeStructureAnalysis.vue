@@ -53,7 +53,14 @@ const fileTypeChartData = computed(() => ({
   labels: ['JavaScript', 'TypeScript', 'Vue', 'CSS/SCSS', 'JSON', '其他'],
   datasets: [
     {
-      backgroundColor: ['#4361ee', '#3a0ca3', '#4cc9f0', '#f72585', '#7209b7', '#fca311'],
+      backgroundColor: [
+        'var(--brand-primary)',
+        'var(--color-info)',
+        'var(--color-success)',
+        'var(--color-error)',
+        'var(--color-warning)',
+        'var(--text-tertiary)'
+      ],
       data: [148, 87, 56, 32, 21, 14]
     }
   ]
@@ -64,17 +71,17 @@ const codeLinesChartData = computed(() => ({
   datasets: [
     {
       label: '代码行',
-      backgroundColor: '#4361ee',
+      backgroundColor: 'var(--brand-primary)',
       data: [8420, 6780, 4320, 1560, 980, 540]
     },
     {
       label: '注释行',
-      backgroundColor: '#3a0ca3',
+      backgroundColor: 'var(--color-info)',
       data: [1240, 980, 640, 210, 120, 85]
     },
     {
       label: '空白行',
-      backgroundColor: '#4cc9f0',
+      backgroundColor: 'var(--color-success)',
       data: [920, 750, 520, 190, 45, 70]
     }
   ]
@@ -124,7 +131,7 @@ const chartOptions = {
 .module-chart {
   height: 400px;
   width: 100%;
-  background-color: var(--bg-secondary);
+  background-color: var(--bg-container);
   border-radius: 4px;
   display: flex;
   justify-content: center;

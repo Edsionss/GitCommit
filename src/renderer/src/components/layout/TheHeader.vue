@@ -114,8 +114,8 @@ const exitApp = () => {
   height: 64px;
   min-height: 64px;
   max-height: 64px;
-  background-color: var(--bg-content);
-  border-bottom: 1px solid var(--border-color);
+  background-color: var(--bg-container);
+  border-bottom: 1px solid var(--border-secondary);
   z-index: 100;
   box-sizing: border-box;
   overflow: hidden;
@@ -141,7 +141,7 @@ const exitApp = () => {
   font-size: 16px;
   color: var(--text-secondary);
   padding-left: 12px;
-  border-left: 1px solid var(--border-color);
+  border-left: 1px solid var(--border-secondary);
   pointer-events: none;
   user-select: none;
 }

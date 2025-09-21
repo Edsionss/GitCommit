@@ -44,7 +44,7 @@ const onTabClick = (key: string) => {
 
 .tabs-bar {
   width: 170px;
-  border-right: 2px solid var(--boarder-color);
+  border-right: 2px solid var(--border-secondary);
   padding: 10px 0;
   display: flex;
   flex-direction: column;
@@ -64,13 +64,13 @@ const onTabClick = (key: string) => {
   text-orientation: mixed;
 
   &:hover {
-    background-color: var(--active-color);
+    background-color: var(--brand-primary-bg);
   }
 
   &.active {
     // background-color: #e6f7ff;
-    background-color: var(--active-color);
-    color: #1890ff;
+    background-color: var(--brand-primary-bg);
+    color: var(--brand-primary);
     font-weight: bold;
   }
 }

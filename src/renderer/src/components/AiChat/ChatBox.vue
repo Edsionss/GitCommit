@@ -113,7 +113,7 @@ const chatHistoryRef = ref<HTMLElement | null>(null)
 const borderStyle = computed(() => {
   if (!props.isSidebarVisible) {
     return {
-      borderLeft: '1px solid var(--color-border)'
+      borderLeft: '1px solid var(--border-primary)'
     }
   }
   return { borderLeft: 'none' }
@@ -229,8 +229,8 @@ onMounted(() => {
   flex-grow: 1;
   overflow-y: auto;
   padding: 14px;
-  background-color: var(--color-background-soft);
-  border-right: 1px solid var(--color-border);
+  background-color: var(--bg-container);
+  border-right: 1px solid var(--border-secondary);
   position: relative;
   user-select: text;
 }
@@ -282,17 +282,17 @@ onMounted(() => {
 
 .chat-message.ai .message-content,
 .chat-message.user .message-content {
-  background: #fff;
-  color: var(--color-text);
+  background: var(--bg-elevated);
+  color: var(--text-primary);
 }
 
 .chat-input-area {
   padding: 16px;
-  border-top: 1px solid var(--color-border);
+  border-top: 1px solid var(--border-secondary);
   display: flex;
   gap: 8px;
   align-items: flex-end;
-  background-color: var(--color-background);
+  background-color: var(--bg-container);
 }
 
 /* Scoped styles for rendered markdown */
@@ -327,8 +327,8 @@ onMounted(() => {
 }
 
 :deep(.markdown-body pre) {
-  background-color: #2d2d2d;
-  color: #f8f8f2;
+  background-color: var(--bg-spotlight);
+  color: var(--text-primary);
   padding: 1em;
   border-radius: 6px;
   margin-bottom: 1em;
@@ -336,8 +336,8 @@ onMounted(() => {
 }
 
 :deep(.markdown-body code) {
-  /* background-color: #2d2d2d; */
-  /* color: #f8f8f2; */
+  /* background-color: var(--bg-spotlight); */
+  /* color: var(--text-primary); */
   padding: 0.2em 0.4em;
   border-radius: 3px;
   font-family: 'Courier New', Courier, monospace;
@@ -349,10 +349,10 @@ onMounted(() => {
 }
 
 :deep(.markdown-body blockquote) {
-  border-left: 4px solid #ccc;
+  border-left: 4px solid var(--border-secondary);
   padding-left: 1em;
   margin-left: 0;
-  color: #666;
+  color: var(--text-secondary);
 }
 
 :deep(.markdown-body table) {
@@ -362,11 +362,11 @@ onMounted(() => {
 }
 
 :deep(.markdown-body th, .markdown-body td) {
-  border: 1px solid #ddd;
+  border: 1px solid var(--border-secondary);
   padding: 8px;
 }
 
 :deep(.markdown-body th) {
-  background-color: #f2f2f2;
+  background-color: var(--bg-container);
 }
 </style>

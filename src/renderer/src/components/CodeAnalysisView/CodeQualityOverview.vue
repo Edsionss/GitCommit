@@ -134,7 +134,12 @@ const chartData = computed(() => ({
   labels: ['优', '良', '中', '差'],
   datasets: [
     {
-      backgroundColor: ['#67C23A', '#E6A23C', '#F56C6C', '#909399'],
+      backgroundColor: [
+        'var(--color-success)',
+        'var(--color-warning)',
+        'var(--color-error)',
+        'var(--text-tertiary)'
+      ],
       data: [216, 72, 28, 10]
     }
   ]
@@ -169,20 +174,20 @@ const columns = ref([
   font-size: 24px;
 }
 .stat-icon.quality-icon {
-  background-color: rgba(67, 97, 238, 0.1);
-  color: #4361ee;
+  background-color: rgba(var(--brand-primary-rgb), 0.1);
+  color: var(--brand-primary);
 }
 .stat-icon.complexity-icon {
-  background-color: rgba(52, 152, 219, 0.1);
-  color: #3498db;
+  background-color: rgba(var(--color-info-rgb), 0.1);
+  color: var(--color-info);
 }
 .stat-icon.issues-icon {
-  background-color: rgba(231, 76, 60, 0.1);
-  color: #e74c3c;
+  background-color: rgba(var(--color-error-rgb), 0.1);
+  color: var(--color-error);
 }
 .stat-icon.score-icon {
-  background-color: rgba(46, 204, 113, 0.1);
-  color: #2ecc71;
+  background-color: rgba(var(--color-success-rgb), 0.1);
+  color: var(--color-success);
 }
 .stat-info {
   flex: 1;

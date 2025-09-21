@@ -151,7 +151,7 @@ const clearLogs = () => {
   font-family: ' inherit', monospace;
   white-space: pre-wrap;
   font-size: 13px;
-  background-color: #f8f9fa;
+  background-color: var(--bg-container);
   border-radius: 4px;
   padding: 5px;
   user-select: text; /* Allow text selection */
@@ -164,7 +164,7 @@ const clearLogs = () => {
   justify-content: center;
   align-items: center;
   height: 100%;
-  color: #888;
+  color: var(--text-secondary);
 }
 
 .settings-card {
@@ -189,20 +189,20 @@ const clearLogs = () => {
 }
 
 .info {
-  color: #555;
-  border-left-color: #1890ff;
+  color: var(--text-primary);
+  border-left-color: var(--color-info);
 }
 
 .error {
-  color: #cf1322;
-  background-color: #fff1f0;
-  border-left-color: #cf1322;
+  color: var(--color-error);
+  background-color: rgba(var(--color-error-rgb), 0.1);
+  border-left-color: var(--color-error);
 }
 
 .success {
-  color: #389e0d;
-  background-color: #f6ffed;
-  border-left-color: #389e0d;
+  color: var(--color-success);
+  background-color: rgba(var(--color-success-rgb), 0.1);
+  border-left-color: var(--color-success);
 }
 
 .progress-card {

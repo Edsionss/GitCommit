@@ -156,7 +156,7 @@ const getStatusText = (status: 'success' | 'failed' | 'cancelled') => {
 
 .record-item {
   padding: var(--spacing-md);
-  /* border-bottom: 1px solid var(--color-border); */
+  /* border-bottom: 1px solid var(--border-primary); */
   cursor: pointer;
   transition: background-color 0.2s;
   padding: 10px;
@@ -169,7 +169,7 @@ const getStatusText = (status: 'success' | 'failed' | 'cancelled') => {
 }
 
 .record-item:hover {
-  background-color: var(--color-background-soft);
+  background-color: var(--bg-layout);
 }
 
 .record-item.active {

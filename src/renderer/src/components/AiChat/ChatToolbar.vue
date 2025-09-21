@@ -24,11 +24,11 @@ defineEmits(['toggleSidebar', 'saveSession'])
 <style scoped>
 .chat-toolbar {
   height: 50px;
-  border-bottom: 1px solid var(--color-border);
+  border-bottom: 1px solid var(--border-secondary);
   display: flex;
   align-items: center;
   padding: 0 16px;
-  background-color: var(--color-background);
+  background-color: var(--bg-container);
   flex-shrink: 0; /* Prevent toolbar from shrinking */
 }
 

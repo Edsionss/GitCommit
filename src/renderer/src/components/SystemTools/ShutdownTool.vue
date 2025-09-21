@@ -177,12 +177,12 @@ const formatTimestamp = (timestamp: number | null) => {
 }
 .countdown-title {
   font-size: 14px;
-  color: var(--color-text-secondary);
+  color: var(--text-secondary);
 }
 .countdown-time {
   font-size: 36px;
   font-weight: bold;
-  color: var(--color-primary);
+  color: var(--brand-primary);
   font-family: 'Courier New', Courier, monospace;
 }
 .target-time {

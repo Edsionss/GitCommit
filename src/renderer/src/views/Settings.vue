@@ -97,7 +97,7 @@ const resetRouterMenu = () => {
 .page-title {
   margin: 0 0 20px 0;
   font-size: var(--font-size-xl);
-  color: var(--color-text); /* 修改为正确的CSS变量 */
+  color: var(--text-primary); /* 修改为正确的CSS变量 */
   font-weight: var(--font-weight-semibold);
 }
 
@@ -129,7 +129,7 @@ const resetRouterMenu = () => {
   display: flex;
   align-items: center;
   gap: 8px;
-  color: var(--color-text); /* 修改为正确的CSS变量 */
+  color: var(--text-primary); /* 修改为正确的CSS变量 */
   font-weight: var(--font-weight-medium);
 }
 
