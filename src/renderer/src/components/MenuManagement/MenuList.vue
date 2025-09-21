@@ -78,7 +78,7 @@ defineProps({
 defineEmits<Emits>()
 
 const columns = [
-  { title: '菜单名称', dataIndex: ['meta', 'title'], key: 'title', width: '120px' },
+  { title: '菜单名称', dataIndex: ['meta', 'title'], key: 'title' },
   {
     title: '图标',
     dataIndex: 'menuIcon',
