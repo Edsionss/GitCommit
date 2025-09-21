@@ -11,7 +11,7 @@ import type { ChartData } from 'chart.js'
 
 ChartJS.register(Title, Tooltip, Legend, ArcElement)
 
-const { effectiveTheme } = useTheme()
+const { themeColors } = useTheme()
 
 const props = defineProps({
   chartData: {
@@ -26,16 +26,20 @@ const props = defineProps({
 
 const chartComponent = computed(() => (props.type === 'pie' ? Pie : Doughnut))
 
-const chartOptions = computed(() => ({
-  responsive: true,
-  maintainAspectRatio: false,
-  plugins: {
-    legend: {
-      position: 'top',
-      labels: {
-        color: 'var(--text-secondary)'
+const chartOptions = computed(() => {
+  const { textSecondary } = themeColors
+
+  return {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: {
+        position: 'top',
+        labels: {
+          color: textSecondary.value // 使用解析后的颜色值
+        }
       }
     }
   }
-}))
+})
 </script>

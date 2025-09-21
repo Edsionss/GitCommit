@@ -42,8 +42,11 @@ import {
   LinearScale,
   BarElement
 } from 'chart.js'
+import { useTheme } from '@/composables/useTheme'
 
 ChartJS.register(Title, Tooltip, Legend, ArcElement, CategoryScale, LinearScale, BarElement)
+
+const { themeColors } = useTheme()
 
 defineProps({
   loading: { type: Boolean, default: false }
@@ -87,29 +90,35 @@ const codeLinesChartData = computed(() => ({
   ]
 }))
 
-const chartOptions = {
-  responsive: true,
-  maintainAspectRatio: false,
-  plugins: {
-    legend: {
-      labels: {
-        color: 'var(--text-secondary)'
-      }
-    }
-  },
-  scales: {
-    x: {
-      grid: {
-        display: false
+const chartOptions = computed(() => {
+  const { textSecondary, borderSecondary } = themeColors
+
+  return {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: {
+        labels: {
+          color: textSecondary.value // 使用解析后的颜色值
+        }
       }
     },
-    y: {
-      grid: {
-        display: false
+    scales: {
+      x: {
+        grid: {
+          color: borderSecondary.value, // 使用解析后的颜色值
+          borderColor: borderSecondary.value // 使用解析后的颜色值
+        }
+      },
+      y: {
+        grid: {
+          color: borderSecondary.value, // 使用解析后的颜色值
+          borderColor: borderSecondary.value // 使用解析后的颜色值
+        }
       }
     }
   }
-}
+})
 </script>
 
 <style scoped>

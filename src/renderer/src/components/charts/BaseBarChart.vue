@@ -30,7 +30,7 @@ ChartJS.register(
   PointElement
 )
 
-const { effectiveTheme } = useTheme()
+const { themeColors } = useTheme()
 
 defineProps({
   chartData: {
@@ -39,33 +39,42 @@ defineProps({
   }
 })
 
-const chartOptions = computed(() => ({
-  responsive: true,
-  maintainAspectRatio: false,
-  plugins: {
-    legend: {
-      labels: {
-        color: 'var(--text-secondary)'
-      }
-    }
-  },
-  scales: {
-    x: {
-      ticks: {
-        color: 'var(--text-secondary)'
-      },
-      grid: {
-        display: false
+const chartOptions = computed(() => {
+  const { textSecondary, borderSecondary } = themeColors
+
+  // 现在，我们将具体的颜色值（如 '#9ca3af'）传递给 Chart.js
+  return {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: {
+        labels: {
+          color: textSecondary.value // 使用解析后的颜色值
+        }
       }
     },
-    y: {
-      ticks: {
-        color: 'var(--text-secondary)'
+    scales: {
+      x: {
+        ticks: {
+          color: textSecondary.value // 使用解析后的颜色值
+        },
+        grid: {
+          // Bonus: 让网格线也跟随主题变化
+          color: borderSecondary.value,
+          borderColor: borderSecondary.value
+        }
       },
-      grid: {
-        display: false
+      y: {
+        ticks: {
+          color: textSecondary.value // 使用解析后的颜色值
+        },
+        grid: {
+          // Bonus: 让网格线也跟随主题变化
+          color: borderSecondary.value,
+          borderColor: borderSecondary.value
+        }
       }
     }
   }
-}))
+})
 </script>

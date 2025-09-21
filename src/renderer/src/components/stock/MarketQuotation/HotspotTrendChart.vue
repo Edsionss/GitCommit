@@ -16,7 +16,7 @@ import {
 import { computed } from 'vue'
 import { useTheme } from '@/composables/useTheme'
 
-const { effectiveTheme } = useTheme()
+const { themeColors } = useTheme()
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Filler, Tooltip)
 
@@ -49,6 +49,8 @@ const chartData = computed(() => {
 })
 
 const chartOptions = computed(() => {
+  const { textSecondary } = themeColors
+
   return {
     responsive: true,
     maintainAspectRatio: false,
@@ -56,7 +58,7 @@ const chartOptions = computed(() => {
       legend: {
         display: false,
         labels: {
-          color: 'var(--text-secondary)'
+          color: textSecondary.value // 使用解析后的颜色值
         }
       },
       tooltip: {
@@ -67,13 +69,13 @@ const chartOptions = computed(() => {
       x: {
         display: false,
         ticks: {
-          color: 'var(--text-secondary)'
+          color: textSecondary.value // 使用解析后的颜色值
         }
       },
       y: {
         display: false,
         ticks: {
-          color: 'var(--text-secondary)'
+          color: textSecondary.value // 使用解析后的颜色值
         }
       }
     }
