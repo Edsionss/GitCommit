@@ -44,66 +44,63 @@
 
     <!-- 个股资金流向列表 -->
     <div class="stock-list">
-      <div
-        v-for="(stock, index) in sortedStocks"
-        :key="stock.code"
-        class="stock-card"
-        :style="getCardBackgroundByChange(stock.changePercent)"
-      >
-        <div class="ranking-number">{{ index + 1 }}</div>
+      <a-card v-for="(stock, index) in sortedStocks" :key="stock.code">
+        <div class="stock-card" :style="getCardBackgroundByChange(stock.changePercent)">
+          <div class="ranking-number">{{ index + 1 }}</div>
 
-        <!-- 左侧: 股票核心数据 -->
-        <div class="stock-data">
-          <div class="stock-header">
-            <span class="stock-name">{{ stock.name }}</span>
-            <span class="stock-change" :class="getTextClass(stock.changePercent)">
-              {{ stock.changePercent.toFixed(2) }}%
-            </span>
-            <span class="stock-handel">
-              <a-button size="small" type="dashed">+自选</a-button>
-            </span>
+          <!-- 左侧: 股票核心数据 -->
+          <div class="stock-data">
+            <div class="stock-header">
+              <span class="stock-name">{{ stock.name }}</span>
+              <span class="stock-change" :class="getTextClass(stock.changePercent)">
+                {{ stock.changePercent.toFixed(2) }}%
+              </span>
+              <span class="stock-handel">
+                <a-button size="small" type="dashed">+自选</a-button>
+              </span>
+            </div>
+            <div class="stock-details-row">
+              <div class="detail-item">
+                <span class="label">净流入</span>
+                <span class="value" :class="getTextClass(stock.netInflow)">{{
+                  formatCurrency(stock.netInflow)
+                }}</span>
+              </div>
+              <div class="detail-item">
+                <span class="label">现价</span>
+                <span class="value" :class="getTextClass(stock.changePercent)">{{
+                  stock.price.toFixed(2)
+                }}</span>
+              </div>
+              <div class="detail-item">
+                <span class="label">量比</span>
+                <span class="value">{{ stock.volumeRatio.toFixed(2) }}</span>
+              </div>
+            </div>
           </div>
-          <div class="stock-details-row">
-            <div class="detail-item">
-              <span class="label">净流入</span>
-              <span class="value" :class="getTextClass(stock.netInflow)">{{
-                formatCurrency(stock.netInflow)
-              }}</span>
+
+          <!-- 右侧: 股票元信息 -->
+          <div class="meta-data">
+            <div class="meta-header">
+              <div class="meta-line">
+                <a-tag>{{ stock.market }}</a-tag>
+                <span class="stock-code">{{ stock.code }}</span>
+              </div>
+              <a-button type="primary" size="small" @click="showDetails(stock)">详细信息</a-button>
             </div>
-            <div class="detail-item">
-              <span class="label">现价</span>
-              <span class="value" :class="getTextClass(stock.changePercent)">{{
-                stock.price.toFixed(2)
-              }}</span>
-            </div>
-            <div class="detail-item">
-              <span class="label">量比</span>
-              <span class="value">{{ stock.volumeRatio.toFixed(2) }}</span>
+            <div class="meta-details">
+              <div class="meta-item">
+                <span class="label">所属行业:</span>
+                <span class="value">{{ stock.industry }}</span>
+              </div>
+              <div class="meta-item">
+                <span class="label">最相关概念:</span>
+                <span class="value">{{ stock.concept }}</span>
+              </div>
             </div>
           </div>
         </div>
-
-        <!-- 右侧: 股票元信息 -->
-        <div class="meta-data">
-          <div class="meta-header">
-            <div class="meta-line">
-              <a-tag>{{ stock.market }}</a-tag>
-              <span class="stock-code">{{ stock.code }}</span>
-            </div>
-            <a-button type="primary" size="small" @click="showDetails(stock)">详细信息</a-button>
-          </div>
-          <div class="meta-details">
-            <div class="meta-item">
-              <span class="label">所属行业:</span>
-              <span class="value">{{ stock.industry }}</span>
-            </div>
-            <div class="meta-item">
-              <span class="label">最相关概念:</span>
-              <span class="value">{{ stock.concept }}</span>
-            </div>
-          </div>
-        </div>
-      </div>
+      </a-card>
     </div>
 
     <!-- 详细信息弹窗 -->
@@ -327,7 +324,6 @@ const getTextClass = (value: number) => {
   box-shadow: var(--box-shadow-base);
   display: flex;
   position: relative;
-  padding: 16px;
   padding-left: 24px;
   overflow: hidden;
   transition: all 0.3s ease;
@@ -463,4 +459,5 @@ const getTextClass = (value: number) => {
   .is-down {
     color: #52c41a;
   }
-}</style>
+}
+</style>

@@ -1,71 +1,72 @@
 <template>
   <div class="dragon-tiger-list-container">
     <div class="list-view">
-      <div
-        v-for="stock in stocks"
-        :key="stock.code"
-        class="stock-item"
-        :style="getCardBackgroundByChange(stock.changePercent)"
-      >
-        <!-- Top Row -->
-        <div class="top-row">
-          <div class="stock-identity">
-            <span class="stock-name">{{ stock.name }}</span>
-            <span class="stock-code-market">
-              <a-tag color="blue">{{ stock.market }}</a-tag>
-              <span>{{ stock.code }}</span>
-            </span>
-          </div>
-
-          <div class="price-summary">
-            <div class="current-price-group">
-              <span class="value price" :class="getPriceClass(stock.changePercent)">{{
-                stock.closePrice.toFixed(2)
-              }}</span>
-              <span class="value percent" :class="getPriceClass(stock.changePercent)"
-                >{{ stock.changePercent.toFixed(2) }}%</span
-              >
+      <a-card v-for="stock in stocks">
+        <div
+          :key="stock.code"
+          class="stock-item"
+          :style="getCardBackgroundByChange(stock.changePercent)"
+        >
+          <!-- Top Row -->
+          <div class="top-row">
+            <div class="stock-identity">
+              <span class="stock-name">{{ stock.name }}</span>
+              <span class="stock-code-market">
+                <a-tag color="blue">{{ stock.market }}</a-tag>
+                <span>{{ stock.code }}</span>
+              </span>
             </div>
-            <div class="opening-price-group">
-              <span class="label">开</span>
-              <span class="value opening-price">{{ stock.openingPrice.toFixed(2) }}</span>
+
+            <div class="price-summary">
+              <div class="current-price-group">
+                <span class="value price" :class="getPriceClass(stock.changePercent)">{{
+                  stock.closePrice.toFixed(2)
+                }}</span>
+                <span class="value percent" :class="getPriceClass(stock.changePercent)"
+                  >{{ stock.changePercent.toFixed(2) }}%</span
+                >
+              </div>
+              <div class="opening-price-group">
+                <span class="label">开</span>
+                <span class="value opening-price">{{ stock.openingPrice.toFixed(2) }}</span>
+              </div>
+            </div>
+
+            <div class="reason-item">
+              <a-tag color="purple" :title="stock.reason">{{ stock.reason }}</a-tag>
+            </div>
+
+            <div class="action-buttons">
+              <a-button type="primary" size="small">查看明细</a-button>
+              <a-button size="small" type="dashed">+自选</a-button>
             </div>
           </div>
 
-          <div class="reason-item">
-            <a-tag color="purple" :title="stock.reason">{{ stock.reason }}</a-tag>
-          </div>
-
-          <div class="action-buttons">
-            <a-button type="primary" size="small">查看明细</a-button>
-            <a-button size="small" type="dashed">+自选</a-button>
+          <!-- Bottom Row -->
+          <div class="bottom-row">
+            <div class="detail-item">
+              <span class="label">净买入额</span>
+              <span class="value buy">{{ formatCurrency(stock.netBuy) }}</span>
+            </div>
+            <div class="detail-item">
+              <span class="label">净卖出额</span>
+              <span class="value sell">{{ formatCurrency(stock.netSell) }}</span>
+            </div>
+            <div class="detail-item">
+              <span class="label">总成交额</span>
+              <span class="value">{{ formatCurrency(stock.totalVolume) }}</span>
+            </div>
+            <div class="detail-item">
+              <span class="label">换手率</span>
+              <span class="value">{{ stock.turnoverRate.toFixed(2) }}%</span>
+            </div>
+            <div class="detail-item">
+              <span class="label">流通市值</span>
+              <span class="value">{{ formatCurrency(stock.floatMarketCap) }}</span>
+            </div>
           </div>
         </div>
-
-        <!-- Bottom Row -->
-        <div class="bottom-row">
-          <div class="detail-item">
-            <span class="label">净买入额</span>
-            <span class="value buy">{{ formatCurrency(stock.netBuy) }}</span>
-          </div>
-          <div class="detail-item">
-            <span class="label">净卖出额</span>
-            <span class="value sell">{{ formatCurrency(stock.netSell) }}</span>
-          </div>
-          <div class="detail-item">
-            <span class="label">总成交额</span>
-            <span class="value">{{ formatCurrency(stock.totalVolume) }}</span>
-          </div>
-          <div class="detail-item">
-            <span class="label">换手率</span>
-            <span class="value">{{ stock.turnoverRate.toFixed(2) }}%</span>
-          </div>
-          <div class="detail-item">
-            <span class="label">流通市值</span>
-            <span class="value">{{ formatCurrency(stock.floatMarketCap) }}</span>
-          </div>
-        </div>
-      </div>
+      </a-card>
     </div>
   </div>
 </template>
@@ -250,8 +251,8 @@ const getPriceClass = (change) => {
 .stock-item {
   cursor: pointer;
   border-radius: 8px;
-  padding: 15px;
   box-shadow: var(--box-shadow-base);
+
   display: flex;
   flex-direction: column;
   gap: 8px;

@@ -18,122 +18,127 @@
     <div class="hotspot-list">
       <!-- 个股 -->
       <template v-if="activeCategory === 'stock'">
-        <div
-          v-for="(item, index) in stockData"
-          :key="item.code"
-          class="hotspot-card stock-card"
-          :style="getCardBackgroundByChange(item.changePercent)"
-        >
-          <div class="ranking-number">{{ index + 1 }}</div>
-          <div class="card-header">
-            <div class="stock-info">
-              <span class="name">{{ item.name }}</span>
-              <span class="code">{{ item.market }}:{{ item.code }}</span>
+        <a-card v-for="(item, index) in stockData">
+          <div
+            :key="item.code"
+            class="hotspot-card stock-card"
+            :style="getCardBackgroundByChange(item.changePercent)"
+          >
+            <div class="ranking-number">{{ index + 1 }}</div>
+            <div class="card-header">
+              <div class="stock-info">
+                <span class="name">{{ item.name }}</span>
+                <span class="code">{{ item.market }}:{{ item.code }}</span>
+              </div>
+              <div class="hotness">热度: {{ item.hotness }}</div>
             </div>
-            <div class="hotness">热度: {{ item.hotness }}</div>
-          </div>
-          <div class="card-body">
-            <div class="stat-item price" :class="getTextClass(item.changePercent)">
-              <span class="value">{{ item.closePrice.toFixed(2) }}</span>
-              <span class="label">收盘价</span>
+            <div class="card-body">
+              <div class="stat-item price" :class="getTextClass(item.changePercent)">
+                <span class="value">{{ item.closePrice.toFixed(2) }}</span>
+                <span class="label">收盘价</span>
+              </div>
+              <div class="stat-item change" :class="getTextClass(item.changePercent)">
+                <span class="value">{{ item.changePercent.toFixed(2) }}%</span>
+                <span class="label">涨幅</span>
+              </div>
+              <div class="stat-item inflow" :class="getTextClass(item.netInflow)">
+                <span class="value">{{ formatCurrency(item.netInflow) }}</span>
+                <span class="label">净流入</span>
+              </div>
             </div>
-            <div class="stat-item change" :class="getTextClass(item.changePercent)">
-              <span class="value">{{ item.changePercent.toFixed(2) }}%</span>
-              <span class="label">涨幅</span>
+            <div class="card-meta">
+              <span>行业: {{ item.industry }}</span>
+              <span>概念: {{ item.concept }}</span>
             </div>
-            <div class="stat-item inflow" :class="getTextClass(item.netInflow)">
-              <span class="value">{{ formatCurrency(item.netInflow) }}</span>
-              <span class="label">净流入</span>
+            <div class="chart-container">
+              <HotspotTrendChart :trend-data="item.trend" :change="item.changePercent" />
             </div>
           </div>
-          <div class="card-meta">
-            <span>行业: {{ item.industry }}</span>
-            <span>概念: {{ item.concept }}</span>
-          </div>
-          <div class="chart-container">
-            <HotspotTrendChart :trend-data="item.trend" :change="item.changePercent" />
-          </div>
-        </div>
+        </a-card>
       </template>
 
       <!-- 板块 -->
       <template v-if="activeCategory === 'sector'">
-        <div
-          v-for="(item, index) in sectorData"
-          :key="item.name"
-          class="hotspot-card sector-card"
-          :style="getCardBackgroundByChange(item.changePercent)"
-        >
-          <div class="ranking-number">{{ index + 1 }}</div>
-          <div class="card-header">
-            <span class="name">{{ item.name }}</span>
-            <div class="hotness">热度: {{ item.hotness }}</div>
-          </div>
-          <div class="card-body">
-            <div class="stat-item change" :class="getTextClass(item.changePercent)">
-              <span class="value">{{ item.changePercent.toFixed(2) }}%</span>
-              <span class="label">涨幅</span>
+        <a-card v-for="(item, index) in sectorData">
+          <div
+            :key="item.name"
+            class="hotspot-card sector-card"
+            :style="getCardBackgroundByChange(item.changePercent)"
+          >
+            <div class="ranking-number">{{ index + 1 }}</div>
+            <div class="card-header">
+              <span class="name">{{ item.name }}</span>
+              <div class="hotness">热度: {{ item.hotness }}</div>
             </div>
-            <div class="stat-item inflow" :class="getTextClass(item.netInflow)">
-              <span class="value">{{ formatCurrency(item.netInflow) }}</span>
-              <span class="label">净流入</span>
+            <div class="card-body">
+              <div class="stat-item change" :class="getTextClass(item.changePercent)">
+                <span class="value">{{ item.changePercent.toFixed(2) }}%</span>
+                <span class="label">涨幅</span>
+              </div>
+              <div class="stat-item inflow" :class="getTextClass(item.netInflow)">
+                <span class="value">{{ formatCurrency(item.netInflow) }}</span>
+                <span class="label">净流入</span>
+              </div>
+            </div>
+            <div class="chart-container">
+              <HotspotTrendChart :trend-data="item.trend" :change="item.changePercent" />
             </div>
           </div>
-          <div class="chart-container">
-            <HotspotTrendChart :trend-data="item.trend" :change="item.changePercent" />
-          </div>
-        </div>
+        </a-card>
       </template>
 
       <!-- ETF -->
       <template v-if="activeCategory === 'etf'">
-        <div
-          v-for="(item, index) in etfData"
-          :key="item.code"
-          class="hotspot-card etf-card"
-          :style="getCardBackgroundByChange(item.changePercent)"
-        >
-          <div class="ranking-number">{{ index + 1 }}</div>
-          <div class="card-header">
-            <div class="stock-info">
-              <span class="name">{{ item.name }}</span>
-              <span class="code">{{ item.code }}</span>
+        <a-card v-for="(item, index) in etfData">
+          <div
+            :key="item.code"
+            class="hotspot-card etf-card"
+            :style="getCardBackgroundByChange(item.changePercent)"
+          >
+            <div class="ranking-number">{{ index + 1 }}</div>
+            <div class="card-header">
+              <div class="stock-info">
+                <span class="name">{{ item.name }}</span>
+                <span class="code">{{ item.code }}</span>
+              </div>
+              <a-tag v-if="item.isT0" color="orange">T+0</a-tag>
+              <div class="hotness">热度: {{ item.hotness }}</div>
             </div>
-            <a-tag v-if="item.isT0" color="orange">T+0</a-tag>
-            <div class="hotness">热度: {{ item.hotness }}</div>
+            <div class="card-body">
+              <div class="stat-item price" :class="getTextClass(item.changePercent)">
+                <span class="value">{{ item.closePrice.toFixed(2) }}</span>
+                <span class="label">收盘价</span>
+              </div>
+              <div class="stat-item change" :class="getTextClass(item.changePercent)">
+                <span class="value">{{ item.changePercent.toFixed(2) }}%</span>
+                <span class="label">涨幅</span>
+              </div>
+              <div class="stat-item inflow" :class="getTextClass(item.netInflow)">
+                <span class="value">{{ formatCurrency(item.netInflow) }}</span>
+                <span class="label">净流入</span>
+              </div>
+            </div>
+            <div class="chart-container">
+              <HotspotTrendChart :trend-data="item.trend" :change="item.changePercent" />
+            </div>
           </div>
-          <div class="card-body">
-            <div class="stat-item price" :class="getTextClass(item.changePercent)">
-              <span class="value">{{ item.closePrice.toFixed(2) }}</span>
-              <span class="label">收盘价</span>
-            </div>
-            <div class="stat-item change" :class="getTextClass(item.changePercent)">
-              <span class="value">{{ item.changePercent.toFixed(2) }}%</span>
-              <span class="label">涨幅</span>
-            </div>
-            <div class="stat-item inflow" :class="getTextClass(item.netInflow)">
-              <span class="value">{{ formatCurrency(item.netInflow) }}</span>
-              <span class="label">净流入</span>
-            </div>
-          </div>
-          <div class="chart-container">
-            <HotspotTrendChart :trend-data="item.trend" :change="item.changePercent" />
-          </div>
-        </div>
+        </a-card>
       </template>
 
       <!-- 话题 -->
       <template v-if="activeCategory === 'topic'">
-        <div v-for="(item, index) in topicData" :key="item.title" class="hotspot-card topic-card">
-          <div class="ranking-number">{{ index + 1 }}</div>
-          <div class="card-header">
-            <span class="name">{{ item.title }}</span>
-            <div class="hotness">热度: {{ item.hotness }}</div>
+        <a-card v-for="(item, index) in topicData" :key="item.title">
+          <div class="hotspot-card topic-card">
+            <div class="ranking-number">{{ index + 1 }}</div>
+            <div class="card-header">
+              <span class="name">{{ item.title }}</span>
+              <div class="hotness">热度: {{ item.hotness }}</div>
+            </div>
+            <div class="topic-content">
+              {{ item.content }}
+            </div>
           </div>
-          <div class="topic-content">
-            {{ item.content }}
-          </div>
-        </div>
+        </a-card>
       </template>
     </div>
   </div>
@@ -286,9 +291,9 @@ const formatCurrency = (value: number) => {
 
 .hotspot-card {
   // background: #fff;
+
   border-radius: 8px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.09);
-  padding: 16px;
   position: relative;
   overflow: hidden;
   display: flex;
@@ -311,7 +316,7 @@ const formatCurrency = (value: number) => {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin: 10px 0;
+  margin: 25px 0 10px 0;
 
   .name {
     font-size: 16px;

@@ -12,17 +12,11 @@
   --color-text: #374151;
   --color-text-light: #6b7280;
 
-  --section-gap: 160px;
-
-  --color-primary: #409eff;
-  --color-success: #67c23a;
-  --color-warning: #e6a23c;
-  --color-danger: #f56c6c;
-  --color-info: #909399;
-
-  --el-color-primary: var(--color-primary);
-
   --primary-bg-hover: rgba(var(--primary-color-rgb), 0.1);
+
+  --boarder-color: #f0f0f0;
+
+  --active-color: #e6f4ff;
 }
 
 /* 深色主题变量 */
@@ -38,39 +32,8 @@
   --color-text: #e5e7eb;
   --color-text-light: #9ca3af;
 
-  --section-gap: 160px;
-
-  --color-primary: #409eff;
-  --color-success: #67c23a;
-  --color-warning: #e6a23c;
-  --color-danger: #f56c6c;
-  --color-info: #909399;
-
-  --el-color-primary: var(--color-primary);
-
-  /* Element Plus 深色模式变量覆盖 */
-  --el-bg-color: var(--color-background);
-  --el-bg-color-overlay: var(--color-background-soft);
-  --el-text-color-primary: var(--color-text);
-  --el-text-color-regular: var(--color-text-light);
-  --el-border-color: var(--color-border);
-  --el-border-color-light: var(--color-border);
-  --el-fill-color-blank: var(--color-background);
-  --el-fill-color: var(--color-background-soft);
-  --el-mask-color: rgba(0, 0, 0, 0.7);
-}
-
-[data-theme='light'] {
-  /* Element Plus 浅色模式变量覆盖 */
-  --el-bg-color: var(--color-background);
-  --el-bg-color-overlay: var(--color-background-soft);
-  --el-text-color-primary: var(--color-text);
-  --el-text-color-regular: var(--color-text-light);
-  --el-border-color: var(--color-border);
-  --el-border-color-light: var(--color-border);
-  --el-fill-color-blank: var(--color-background);
-  --el-fill-color: var(--color-background-soft);
-  --el-mask-color: rgba(0, 0, 0, 0.3);
+  --boarder-color: #303030;
+  --active-color: #111a2c;
 }
 
 body {

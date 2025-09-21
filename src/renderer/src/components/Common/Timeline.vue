@@ -94,7 +94,7 @@ const props = defineProps({
 })
 
 const getColor = (type: string) => {
-  return type == 'important' ? '#FF6600' : '#333'
+  return type == 'important' ? '#FF6600' : 'var(--color-text)'
   // '#00CCFF'
 }
 </script>
@@ -108,7 +108,7 @@ const getColor = (type: string) => {
     font-size: 15px;
     padding: 10px;
     // background-color: #f5f5f5;
-    border-bottom: 1px solid #eee;
+    border-bottom: 1px solid var(--boarder-color);
     // border-radius: 0.5rem;
     .content {
       &.important {

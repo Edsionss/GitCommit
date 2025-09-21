@@ -6,11 +6,7 @@
         <a-statistic title="上涨家数" :value="marketStats.up" :value-style="upColor" />
       </a-card>
       <a-card size="small" class="summary-card">
-        <a-statistic
-          title="下跌家数"
-          :value="marketStats.down"
-          :value-style="downColor"
-        />
+        <a-statistic title="下跌家数" :value="marketStats.down" :value-style="downColor" />
       </a-card>
     </div>
 
@@ -168,6 +164,7 @@ const getTextClass = (value: number) => {
 
 .index-card {
   border-radius: 8px;
+  border: 1px solid var(--boarder-color);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.09);
   transition: all 0.3s ease;
   overflow: hidden;

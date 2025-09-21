@@ -21,86 +21,87 @@
     </div>
 
     <div class="sector-list">
-      <div
-        v-for="(sector, index) in sortedSectors"
-        :key="sector.name"
-        class="sector-card"
-        :style="getCardBackgroundByChange(sector.change)"
-      >
-        <div class="ranking-number">{{ index + 1 }}</div>
+      <a-card v-for="(sector, index) in sortedSectors">
+        <div
+          :key="sector.name"
+          class="sector-card"
+          :style="getCardBackgroundByChange(sector.change)"
+        >
+          <div class="ranking-number">{{ index + 1 }}</div>
 
-        <!-- Left Side: Industry Data -->
-        <div class="industry-data">
-          <div class="industry-header">
-            <span class="sector-name">{{ sector.name }}</span>
-            <span class="sector-change" :class="getChangeClass(sector.change)">
-              {{ sector.change.toFixed(2) }}%
-            </span>
-            <span class="sector-handel">
-              <a-button type="primary" size="small">查看明细</a-button>
-            </span>
+          <!-- Left Side: Industry Data -->
+          <div class="industry-data">
+            <div class="industry-header">
+              <span class="sector-name">{{ sector.name }}</span>
+              <span class="sector-change" :class="getChangeClass(sector.change)">
+                {{ sector.change.toFixed(2) }}%
+              </span>
+              <span class="sector-handel">
+                <a-button type="primary" size="small">查看明细</a-button>
+              </span>
+            </div>
+            <div class="industry-details-row">
+              <div class="detail-item">
+                <span class="label">热度</span>
+                <span class="value">{{ sector.hotness }}</span>
+              </div>
+              <div class="detail-item">
+                <span class="label">5日</span>
+                <span class="value" :class="getChangeClass(sector.change_5d)"
+                  >{{ sector.change_5d.toFixed(2) }}%</span
+                >
+              </div>
+              <div class="detail-item">
+                <span class="label">20日</span>
+                <span class="value" :class="getChangeClass(sector.change_20d)"
+                  >{{ sector.change_20d.toFixed(2) }}%</span
+                >
+              </div>
+              <div class="detail-item">
+                <span class="label">净流入</span>
+                <span class="value" :class="getChangeClass(sector.netInflow)">{{
+                  formatCurrency(sector.netInflow)
+                }}</span>
+              </div>
+            </div>
           </div>
-          <div class="industry-details-row">
-            <div class="detail-item">
-              <span class="label">热度</span>
-              <span class="value">{{ sector.hotness }}</span>
+
+          <!-- Right Side: Leading Stock Data -->
+          <div class="leading-stock-data">
+            <div class="stock-header">
+              <div>
+                <div class="stock-name-line">
+                  <span class="stock-name">{{ sector.leadingStock.name }}</span>
+                  <a-tag color="gold">领涨</a-tag>
+                </div>
+                <div class="stock-market-code">
+                  <a-tag>{{ sector.leadingStock.market }}</a-tag>
+                  <span class="stock-code">{{ sector.leadingStock.code }}</span>
+                </div>
+              </div>
+              <a-button size="small" type="dashed">+自选</a-button>
             </div>
-            <div class="detail-item">
-              <span class="label">5日</span>
-              <span class="value" :class="getChangeClass(sector.change_5d)"
-                >{{ sector.change_5d.toFixed(2) }}%</span
-              >
-            </div>
-            <div class="detail-item">
-              <span class="label">20日</span>
-              <span class="value" :class="getChangeClass(sector.change_20d)"
-                >{{ sector.change_20d.toFixed(2) }}%</span
-              >
-            </div>
-            <div class="detail-item">
-              <span class="label">净流入</span>
-              <span class="value" :class="getChangeClass(sector.netInflow)">{{
-                formatCurrency(sector.netInflow)
-              }}</span>
+            <div class="stock-details">
+              <div class="price-item">
+                <span class="price-value" :class="getChangeClass(sector.leadingStock.change)">{{
+                  sector.leadingStock.price.toFixed(2)
+                }}</span>
+                <span class="price-label">现价</span>
+              </div>
+              <div class="price-item">
+                <span class="price-value" :class="getChangeClass(sector.leadingStock.change)"
+                  >{{ sector.leadingStock.change.toFixed(2) }}%</span
+                >
+                <span class="price-label">涨幅</span>
+              </div>
+              <div class="price-item">
+                <span class="price-value">{{ sector.leadingStock.openingPrice.toFixed(2) }}</span>
+                <span class="price-label">开盘</span>
+              </div>
             </div>
           </div>
         </div>
-
-        <!-- Right Side: Leading Stock Data -->
-        <div class="leading-stock-data">
-          <div class="stock-header">
-            <div>
-              <div class="stock-name-line">
-                <span class="stock-name">{{ sector.leadingStock.name }}</span>
-                <a-tag color="gold">领涨</a-tag>
-              </div>
-              <div class="stock-market-code">
-                <a-tag>{{ sector.leadingStock.market }}</a-tag>
-                <span class="stock-code">{{ sector.leadingStock.code }}</span>
-              </div>
-            </div>
-            <a-button size="small" type="dashed">+自选</a-button>
-          </div>
-          <div class="stock-details">
-            <div class="price-item">
-              <span class="price-value" :class="getChangeClass(sector.leadingStock.change)">{{
-                sector.leadingStock.price.toFixed(2)
-              }}</span>
-              <span class="price-label">现价</span>
-            </div>
-            <div class="price-item">
-              <span class="price-value" :class="getChangeClass(sector.leadingStock.change)"
-                >{{ sector.leadingStock.change.toFixed(2) }}%</span
-              >
-              <span class="price-label">涨幅</span>
-            </div>
-            <div class="price-item">
-              <span class="price-value">{{ sector.leadingStock.openingPrice.toFixed(2) }}</span>
-              <span class="price-label">开盘</span>
-            </div>
-          </div>
-        </div>
-      </div>
+      </a-card>
     </div>
   </div>
 </template>
@@ -285,18 +286,19 @@ const formatCurrency = (value: number): string => {
 }
 
 .sector-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
   overflow-y: auto;
   height: calc(100% - 50px);
 }
 
 .sector-card {
-  margin-bottom: 16px;
   cursor: pointer;
   border-radius: 8px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
   display: flex;
   position: relative;
-  padding: 16px;
   padding-left: 24px; // Space for ranking number
   overflow: hidden;
   transition: background-color 0.3s ease;
