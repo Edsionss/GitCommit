@@ -1,4 +1,6 @@
 import { networkInterfaces } from 'os'
+import { Notification } from 'electron'
+import { flashMainWindow, getMainWindow } from '@main/index'
 
 /**
  * 强大的通用 DOM 解析函数 (在 page.evaluate 中执行)
@@ -146,4 +148,29 @@ export function autoTransformKeys<T>(input: T, mode: 'camel' | 'snake'): T {
   }
 
   return input
+}
+
+export const loadSystemNotify = (
+  msg: string = `收到一条广播，请打开应用查看`,
+  title: string = 'New Notify'
+) => {
+  if (Notification.isSupported()) {
+    const notification = new Notification({
+      title: title,
+      body: msg,
+      icon: '/path/to/icon.png' // 可选：添加图标
+    })
+    flashMainWindow()
+    notification.on('click', () => {
+      const mainWindow = getMainWindow() // 假设这是你获取主窗口的函数
+      if (mainWindow) {
+        if (mainWindow.isMinimized()) {
+          mainWindow.restore() // 如果最小化了，就恢复
+        }
+        mainWindow.focus() // 聚焦窗口
+      }
+    })
+
+    notification.show()
+  }
 }

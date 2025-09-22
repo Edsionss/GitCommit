@@ -3,15 +3,19 @@ import http from 'http'
 import type { ChatMessage } from '@sharedType/WebSocket'
 import { nanoid } from 'nanoid'
 import { getLocalIpAddress } from '@nodeUtils/index'
-import { flashMainWindow, getMainWindow } from '@main/index'
+import { getMainWindow } from '@main/index'
 import { networkInterfaces } from 'os'
+import { loadSystemNotify } from '@nodeUtils/index'
 
 const PORT = 8888
 const HOST = '0.0.0.0'
 
 let wss: WebSocketServer | null = null
 let httpServer: http.Server | null = null
+// 一个 Map 来存储客户端的 ID
 const clients = new Map<WebSocket, string>()
+// 用一个集合来存放已经处理过的广播ID，防止重复处理
+const processedBroadcasts = new Set<string>()
 
 export function startWebSocketServer() {
   if (wss) {
@@ -35,20 +39,56 @@ export function startWebSocketServer() {
     const clientId = nanoid()
     clients.set(ws, clientId)
     console.log(`A new client connected with ID: ${clientId}`)
-
     ws.on('message', (message: string) => {
       try {
         const incomingData = JSON.parse(message.toString())
+        const { broadcastType, originIp, id } = incomingData
+        const myIp = getLocalIpAddress() || 'unknown'
+        // 检查是否是广播消息
+        if (broadcastType) {
+          if (originIp === myIp) {
+            console.log(`[Broadcast] 忽略来自我自己的消息 ${id}.`)
+            return
+          }
 
-        // 检查是否是直接广播消息
-        if (incomingData.type === 'direct-broadcast') {
-          console.log('Received direct broadcast:', incomingData)
-          flashMainWindow()
-          getMainWindow()?.webContents.send('direct-broadcast-received', incomingData)
-          return // 不再继续处理
+          if (broadcastType === 'global') {
+            // **防止重复处理同一个广播消息**
+            if (processedBroadcasts.has(id)) {
+              console.log(`[Global Broadcast] Ignoring duplicate broadcast ${id}`)
+              return
+            }
+            loadSystemNotify()
+            console.log(`[Global Broadcast] Received broadcast ${id} from ${originIp}`)
+            // 记录已处理
+            processedBroadcasts.add(id)
+            // 可选：定时清理这个 Set，防止内存无限增长
+            setTimeout(() => processedBroadcasts.delete(id), 60000) // 1分钟后清理
+
+            // 准备要在本地广播的消息
+            const localMessage: ChatMessage = {
+              id: nanoid(),
+              text: incomingData.text,
+              sender: 'global-broadcaster', // 或使用 originIp
+              nickname: incomingData.nickname,
+              timestamp: Date.now(),
+              broadcastType: 'global',
+              originIp: incomingData.originIp
+            }
+            // **核心：在本地进行广播**
+            broadcast(localMessage)
+            // **重要：不再向其他网络节点转发！**
+            // 这样就切断了消息风暴的循环。
+            return // 处理完毕
+          } else if (broadcastType === 'direct') {
+            // 检查是否是直接广播消息
+            console.log('Received direct broadcast:', incomingData)
+            loadSystemNotify()
+            getMainWindow()?.webContents.send('direct-broadcast-received', incomingData)
+            return // 不再继续处理
+          }
         }
-
         // 处理普通聊天室消息
+        loadSystemNotify('收到一条消息，点击查看')
         const processedMessage = handleMessage(message.toString(), clientId)
         broadcast(processedMessage)
       } catch (error) {
@@ -88,7 +128,6 @@ export function stopWebSocketServer() {
 
 function broadcast(message: ChatMessage) {
   if (!wss) return
-  flashMainWindow()
   clients.forEach((clientId, ws) => {
     if (ws.readyState === WebSocket.OPEN) {
       const messageToSend = { ...message, isMe: message.sender === clientId }
@@ -104,8 +143,12 @@ export function handleSendRoomBroadcast(
   try {
     const globalSenderId = 'room-broadcaster'
     const processedMessage = handleMessage(JSON.stringify(message), globalSenderId)
-    const globalMessage = { ...processedMessage, isGlobal: true, token: undefined }
-    broadcast(globalMessage)
+    const broadcastMessage: ChatMessage = {
+      ...processedMessage,
+      broadcastType: 'room',
+      token: undefined
+    }
+    broadcast(broadcastMessage)
   } catch (error) {
     console.error('Failed to send room broadcast:', error)
   }
@@ -125,7 +168,7 @@ export function handleMessage(message: string, clientId: string): ChatMessage {
   }
 
   const processedMessage: ChatMessage = {
-    id: `msg-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+    id: nanoid(),
     text: incomingData.text,
     sender: clientId, // 使用一个唯一标识符来代表发送者
     nickname: incomingData.nickname, // 使用客户端传来的昵称
@@ -142,15 +185,16 @@ export function handleSendDirectBroadcast(
   _event: Electron.IpcMainEvent,
   { targets, message }: { targets: string[]; message: { text: string; nickname: string } }
 ): void {
-  const sourceIp = getLocalIpAddress() // 获取本机IP
+  const originIp = getLocalIpAddress() // 获取本机IP
   targets.forEach((ip) => {
     const ws = new WebSocket(`ws://${ip}:${PORT}`)
-
     ws.on('open', () => {
       const payload = {
         ...message,
-        type: 'direct-broadcast',
-        sourceIp // 添加源IP地址
+        broadcastType: 'direct',
+        timestamp: Date.now(),
+        id: nanoid(), // **为每次广播创建一个唯一ID，防止重复处理**
+        originIp // 添加源IP地址
       }
       ws.send(JSON.stringify(payload))
       ws.close() // 发送后立即关闭
@@ -162,6 +206,67 @@ export function handleSendDirectBroadcast(
       getMainWindow()?.webContents.send('direct-broadcast-failed', { ip, error: err.message })
     })
   })
+}
+
+// 新增一个函数，专门用于发起全局广播
+export async function handleSendGlobalBroadcast(
+  _event: Electron.IpcMainEvent,
+  message: { text: string; nickname: string }
+): Promise<void> {
+  try {
+    // 1. 发现网络中的所有伙伴节点
+    const allHosts = await findAppHosts(PORT)
+
+    // 2. 获取本机IP，以便过滤掉自己
+    const myIp = getLocalIpAddress() || 'unknown'
+
+    // 3. 准备要发送的负载 (payload)
+    const payload = {
+      ...message,
+      timestamp: Date.now(),
+      broadcastType: 'global',
+      sender: 'global-broadcaster', // 发起者不需要特定ID
+      // type: 'global-broadcast', // **使用新的消息类型**
+      originIp: myIp, // **标记消息的原始来源IP**
+      id: nanoid() // **为每次广播创建一个唯一ID，防止重复处理**
+    }
+
+    console.log(`[Global Broadcast] Initiating broadcast ${payload.id} to hosts:`, allHosts)
+
+    // 4. 向所有【其他】节点发送这个全局广播消息
+    allHosts.forEach((ip) => {
+      // **关键：过滤掉自己，不要向自己发送网络消息**
+      if (ip === myIp) {
+        return
+      }
+
+      const ws = new WebSocket(`ws://${ip}:${PORT}`)
+
+      ws.on('open', () => {
+        ws.send(JSON.stringify(payload))
+        ws.close() // 发送后立即关闭
+      })
+
+      ws.on('error', (err) => {
+        console.error(`[Global Broadcast] Failed to send to ${ip}:`, err.message)
+      })
+    })
+
+    // 5. **重要：发起者自己也需要在本地进行广播**
+    // 这样发起者自己的UI也能立即看到消息
+    const localMessage: ChatMessage = {
+      id: nanoid(),
+      text: message.text,
+      sender: 'global-broadcaster',
+      nickname: message.nickname,
+      timestamp: Date.now(),
+      broadcastType: 'global',
+      originIp: myIp
+    }
+    broadcast(localMessage) // 使用你现有的 broadcast 函数
+  } catch (error) {
+    console.error('Failed to initiate global broadcast:', error)
+  }
 }
 
 export function handleGetWsAddress() {

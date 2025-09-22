@@ -56,3 +56,20 @@ export const buildTree = (list: any[]): any[] => {
 export const copyNormalize = (target: any) => {
   return JSON.parse(JSON.stringify(target))
 }
+
+export const loadSystemNotify = ({
+  msg,
+  option,
+  title = 'New Notify'
+}: {
+  msg: string
+  option?: any
+  title?: string
+}) => {
+  new Notification(title, {
+    body: msg,
+    ...option,
+    placement: 'BottomRight',
+    duration: 0
+  })
+}

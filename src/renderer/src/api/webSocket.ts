@@ -9,7 +9,8 @@ export const webSocketApi = {
     window.api.sendRoomBroadcast(message),
   sendDirectBroadcast: (payload: DirectBroadcastPayload): void =>
     window.api.sendDirectBroadcast(payload),
-
+  sendGlobalBroadcast: (payload: DirectBroadcastPayload): void =>
+    window.api.sendGlobalBroadcast(payload),
   onDirectBroadcastReceived: (callback: (data: any) => void): (() => void) =>
     window.api.onDirectBroadcastReceived(callback)
 }

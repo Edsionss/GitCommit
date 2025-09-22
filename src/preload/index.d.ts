@@ -82,6 +82,7 @@ interface ExposedAPI {
   getWsAddress: () => Promise<string>
   sendRoomBroadcast: (message: { text: string; nickname: string; token: string }) => void
   sendDirectBroadcast: (payload: DirectBroadcastPayload) => void
+  sendGlobalBroadcast: (payload: DirectBroadcastPayload) => void
   onDirectBroadcastReceived: (callback: (data: any) => void) => () => void
 
   // Menu Management API

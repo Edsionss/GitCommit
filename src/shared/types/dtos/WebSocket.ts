@@ -6,6 +6,9 @@ export interface ChatMessage {
   nickname: string // 发送者的昵称
   token?: string // 新增：用于房间验证的令牌
   isMe?: boolean // 新增：标记消息是否由当前客户端发送
+  originIp?: string // 新增：标记消息的原始来源IP
+  broadcastType?: 'room' | 'direct' | 'global' // 新增：标记广播类型
+  isBroadcast?: boolean // 新增：标记是否为广播消息
 }
 
 export interface DirectBroadcastPayload {

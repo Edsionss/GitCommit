@@ -4,6 +4,7 @@ import type { ChatMessage } from '@sharedType/WebSocket'
 import { webSocketApi } from '@api/webSocket'
 import { message as antMessage, notification } from 'ant-design-vue'
 import { nanoid } from 'nanoid'
+import { loadSystemNotify } from '@utils/index'
 
 export const useWebSocketStore = defineStore('websocket', () => {
   // --- State ---
@@ -27,10 +28,8 @@ export const useWebSocketStore = defineStore('websocket', () => {
   // 监听来自主进程的直接广播
   const listenForDirectBroadcasts = () => {
     webSocketApi.onDirectBroadcastReceived((data) => {
-      const myNotification = new Notification('标题', {
-        body: '这是一条带有声音的通知消息！'
-        // 关键点：不要设置 silent 为 true
-        // silent: false, // 这是默认值，所以可以不写
+      loadSystemNotify({
+        msg: `收到一条广播，请打开应用查看`
       })
       notification.info({
         message: `收到来自 ${data.sourceIp} 的广播`,
@@ -62,9 +61,9 @@ export const useWebSocketStore = defineStore('websocket', () => {
         const message: ChatMessage = JSON.parse(event.data)
 
         // 检查是否是房间内的全局广播
-        if (message.isGlobal) {
+        if (message.broadcastType) {
           notification.info({
-            message: `房间广播 - 来自: ${message.nickname}`,
+            message: `收到广播 - 来自: ${message.nickname}`,
             description: message.text,
             placement: 'topRight'
           })

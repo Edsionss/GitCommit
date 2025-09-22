@@ -110,6 +110,7 @@ const api = {
     ipcRenderer.invoke('network:scan', port),
   sendRoomBroadcast: (message) => ipcRenderer.send('send-room-broadcast', message),
   sendDirectBroadcast: (payload) => ipcRenderer.send('send-direct-broadcast', payload),
+  sendGlobalBroadcast: (payload) => ipcRenderer.send('send-global-broadcast', payload),
 
   // Menu Management API
   getAllMenus: () => ipcRenderer.invoke('routes-menu:get-all'),
@@ -128,7 +129,8 @@ const api = {
     ipcRenderer.invoke('system-tools:schedule-shutdown', seconds),
   cancelShutdown: () => ipcRenderer.invoke('system-tools:cancel-shutdown'),
   getEnvVar: (key: string) => ipcRenderer.invoke('system-tools:get-env-var', key),
-  setEnvVar: (key: string, value: string) => ipcRenderer.invoke('system-tools:set-env-var', key, value)
+  setEnvVar: (key: string, value: string) =>
+    ipcRenderer.invoke('system-tools:set-env-var', key, value)
 }
 
 // 暴露API
