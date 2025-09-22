@@ -60,14 +60,14 @@ export const useWebSocketStore = defineStore('websocket', () => {
       try {
         const message: ChatMessage = JSON.parse(event.data)
 
-        // 检查是否是房间内的全局广播
+        // 检查是否是广播
         if (message.broadcastType) {
           notification.info({
             message: `收到广播 - 来自: ${message.nickname}`,
             description: message.text,
             placement: 'topRight'
           })
-          return // 全局消息不添加到聊天列表
+          return // 广播消息不添加到聊天列表
         }
 
         messages.value.push(message)

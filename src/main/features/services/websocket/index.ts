@@ -38,7 +38,7 @@ export function startWebSocketServer() {
   wss.on('connection', (ws: WebSocket) => {
     const clientId = nanoid()
     clients.set(ws, clientId)
-    console.log(`A new client connected with ID: ${clientId}`)
+    console.log(`A new client connected with ID: ${clientId} `)
     ws.on('message', (message: string) => {
       try {
         const incomingData = JSON.parse(message.toString())
