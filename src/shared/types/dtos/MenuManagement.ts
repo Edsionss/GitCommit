@@ -177,7 +177,7 @@ export const mockFlatRoutes: RouteRecordWithOptionalId[] = [
   {
     id: '0RFZKpv4szQ-BxhBQ-wpj',
     parentId: 'AnusIQBdiS5ZbLx4E8ata',
-    path: 'stock/stockList',
+    path: 'stockList',
     name: 'StockList',
     componentPath: 'components/Stock/StockList/index',
     meta: {
@@ -191,7 +191,7 @@ export const mockFlatRoutes: RouteRecordWithOptionalId[] = [
   {
     id: '_GpOkXJWmoxP-_cIhH-9F',
     parentId: 'AnusIQBdiS5ZbLx4E8ata',
-    path: 'stock/marketQuotation',
+    path: 'marketQuotation',
     name: 'MarketQuotation',
     componentPath: 'components/Stock/MarketQuotation/index',
     meta: {
