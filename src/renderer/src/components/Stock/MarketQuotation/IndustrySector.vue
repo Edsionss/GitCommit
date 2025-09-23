@@ -68,7 +68,7 @@
               <div>
                 <div class="stock-name-line">
                   <span class="stock-name">{{ sector.leadingStock.name }}</span>
-                  <a-tag color="gold">领涨</a-tag>
+                  <a-tag color="red">领涨</a-tag>
                 </div>
                 <div class="stock-market-code">
                   <a-tag>{{ sector.leadingStock.market }}</a-tag>
