@@ -145,8 +145,7 @@ export function handleSendRoomBroadcast(
     const processedMessage = handleMessage(JSON.stringify(message), globalSenderId)
     const broadcastMessage: ChatMessage = {
       ...processedMessage,
-      broadcastType: 'room',
-      token: undefined
+      broadcastType: 'room'
     }
     broadcast(broadcastMessage)
   } catch (error) {
