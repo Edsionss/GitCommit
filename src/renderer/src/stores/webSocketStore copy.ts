@@ -18,9 +18,6 @@ export const useWebSocketStore = defineStore('websocket', () => {
   const hostIpForDisplay = ref('')
   const roomToken = ref('')
   const inputToken = ref('')
-  //
-  const isInPrivateRoom = ref(false) // 新增：标记是否在私密房间中
-  const currentRoomId = ref('') // 新增：存储当前房间ID
 
   let ws: WebSocket | null = null
   let serverAddress = ''
@@ -43,7 +40,6 @@ export const useWebSocketStore = defineStore('websocket', () => {
     })
   }
 
-  //连接 WebSocket 服务器
   const connectWebSocket = () => {
     if (ws || !serverAddress) return
 
@@ -107,7 +103,6 @@ export const useWebSocketStore = defineStore('websocket', () => {
     }
   }
 
-  // 启动 WebSocket 主机服务器
   const startHosting = async () => {
     try {
       await webSocketApi.startWsServer()
@@ -194,121 +189,6 @@ export const useWebSocketStore = defineStore('websocket', () => {
     inputToken.value = ''
     connectionStatus.value = '未连接'
   }
-
-  /**
-   * 改造：作为房主创建并进入一个私密房间
-   */
-  const hostPrivateRoom = async () => {
-    // 1. 先启动本地WebSocket服务 (复用旧逻辑)
-    await startHosting()
-    if (!isConnected.value) {
-      antMessage.error('启动主机服务失败，无法创建房间')
-      return
-    }
-
-    // 2. 通过IPC请求主进程创建房间
-    const result = await webSocketApi.createPrivateRoom() // webSocketApi 需封装 preload 接口
-    if (result.success) {
-      currentRoomId.value = result.roomId
-      isInPrivateRoom.value = true
-      antMessage.success('私密房间创建成功！')
-
-      // 清空可能存在的大厅消息
-      messages.value = []
-
-      // 显示房间ID和本机IP，以便分享
-      notification.success({
-        message: '房间创建成功!',
-        description: `请将你的IP [${hostIpForDisplay.value}] 和房间ID [${result.roomId}] 分享给朋友。`,
-        duration: 0
-      })
-
-      // 作为房主，自己也需要“加入”自己的房间逻辑，以便接收广播
-      // 可以在连接成功后自动把自己注册为房主
-    }
-  }
-
-  /**
-   * 改造：作为客户端加入一个私密房间
-   */
-  const joinPrivateRoom = (hostIp: string, roomId: string) => {
-    if (!hostIp || !roomId) {
-      antMessage.warn('请输入房主IP和房间ID')
-      return
-    }
-
-    // 1. 连接到房主的 WebSocket 服务 (复用旧逻辑)
-    serverAddress = `ws://${hostIp.trim()}:8888`
-    connectWebSocket() // 这是你原来的 connectWebSocket 逻辑
-
-    // 2. onopen 时发送加入请求
-    const onOpenHandler = () => {
-      console.log('成功连接到房主，发送加入请求...')
-      const joinRequestPayload = {
-        type: 'roomCommand',
-        command: 'join',
-        payload: { roomId, nickname: nickname.value }
-      }
-      ws?.send(JSON.stringify(joinRequestPayload))
-    }
-
-    // 监听 onopen 事件来发送请求
-    const interval = setInterval(() => {
-      if (ws && ws.readyState === WebSocket.OPEN) {
-        clearInterval(interval)
-        onOpenHandler()
-      }
-    }, 100)
-  }
-
-  /**
-   * 改造：处理来自 WebSocket 的消息
-   */
-  const ws_onmessage_handler = (event) => {
-    // 提取 ws.onmessage 的逻辑
-    const message = JSON.parse(event.data)
-
-    // 新增：处理房间相关的系统消息
-    if (message.type === 'roomJoined') {
-      isInPrivateRoom.value = true
-      currentRoomId.value = message.roomId
-      messages.value = [] // 清空大厅消息
-      antMessage.success('成功加入房间！')
-      return
-    }
-    if (message.type === 'roomError') {
-      antMessage.error(message.message)
-      disconnect() // 加入失败，断开连接
-      return
-    }
-
-    // 接受系统消息和聊天消息
-    if (message.type === 'system' || message.type === 'chat') {
-      // 通过 sender 判断 isMe
-      // message.isMe = message.sender === myClientId; // 需要一个 myClientId 状态
-      messages.value.push(message)
-    }
-
-    // ... nextTick 滚动逻辑
-  }
-
-  /**
-   * 改造：发送房间内聊天消息
-   */
-  const sendPrivateMessage = (text: string) => {
-    if (text.trim() && ws && isConnected.value && isInPrivateRoom.value) {
-      const messagePayload = {
-        type: 'roomCommand',
-        command: 'chat',
-        payload: { text }
-      }
-      ws.send(JSON.stringify(messagePayload))
-    }
-  }
-
-  // 你需要将原来的 startHosting 和 connectWebSocket 改名为 internal 版本，
-  // 供新的 hostPrivateRoom 和 joinPrivateRoom 调用。
-  // sendMessage 也应改名为 sendPrivateMessage，以明确其作用。
 
   return {
     messages,

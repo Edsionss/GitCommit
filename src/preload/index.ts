@@ -111,6 +111,7 @@ const api = {
   sendRoomBroadcast: (message) => ipcRenderer.send('send-room-broadcast', message),
   sendDirectBroadcast: (payload) => ipcRenderer.send('send-direct-broadcast', payload),
   sendGlobalBroadcast: (payload) => ipcRenderer.send('send-global-broadcast', payload),
+  createPrivateRoom: () => ipcRenderer.invoke('create-private-room'),
 
   // Menu Management API
   getAllMenus: () => ipcRenderer.invoke('routes-menu:get-all'),

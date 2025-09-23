@@ -1,11 +1,13 @@
 import { ipcMain } from 'electron'
+import { nanoid } from 'nanoid'
 import {
   handleGetWsAddress,
   startWebSocketServer,
   findAppHosts,
   handleSendRoomBroadcast,
   handleSendDirectBroadcast,
-  handleSendGlobalBroadcast
+  handleSendGlobalBroadcast,
+  createNewRoom
 } from '@services/websocket'
 
 export function initializeWebSocket() {
@@ -27,4 +29,16 @@ export function initializeWebSocket() {
   ipcMain.on('send-direct-broadcast', handleSendDirectBroadcast)
   // 用于向所有扫描到的IP地址发送一次性广播
   ipcMain.on('send-global-broadcast', handleSendGlobalBroadcast)
+
+  ipcMain.handle('create-private-room', (_event) => {
+    const roomId = nanoid(8) // 生成8位随机ID
+    try {
+      createNewRoom(roomId)
+      console.log(`Private room created with ID: ${roomId}`)
+      return { success: true, roomId }
+    } catch (error) {
+      console.error('Failed to create private room:', error)
+      return { success: false, error: (error as Error).message }
+    }
+  })
 }

@@ -12,5 +12,6 @@ export const webSocketApi = {
   sendGlobalBroadcast: (payload: DirectBroadcastPayload): void =>
     window.api.sendGlobalBroadcast(payload),
   onDirectBroadcastReceived: (callback: (data: any) => void): (() => void) =>
-    window.api.onDirectBroadcastReceived(callback)
+    window.api.onDirectBroadcastReceived(callback),
+  createPrivateRoom: async (): Promise<any> => window.api.createPrivateRoom()
 }

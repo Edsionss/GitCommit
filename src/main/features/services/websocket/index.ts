@@ -1,6 +1,6 @@
 import { WebSocketServer, WebSocket } from 'ws'
 import http from 'http'
-import type { ChatMessage } from '@sharedType/WebSocket'
+import type { ChatMessage, RoomMember } from '@sharedType/WebSocket'
 import { nanoid } from 'nanoid'
 import { getLocalIpAddress } from '@nodeUtils/index'
 import { getMainWindow } from '@main/index'
@@ -16,7 +16,9 @@ let httpServer: http.Server | null = null
 const clients = new Map<WebSocket, string>()
 // 用一个集合来存放已经处理过的广播ID，防止重复处理
 const processedBroadcasts = new Set<string>()
-
+// 全局变量，用于存储由本机创建的房间信息
+// Key: roomId, Value: Map of members
+const localCreatedRooms = new Map<string, Map<string, RoomMember>>()
 export function startWebSocketServer() {
   if (wss) {
     console.log('WebSocket server is already running.')
@@ -42,8 +44,13 @@ export function startWebSocketServer() {
     ws.on('message', (message: string) => {
       try {
         const incomingData = JSON.parse(message.toString())
-        const { broadcastType, originIp, id } = incomingData
+        const { broadcastType, originIp, id, type } = incomingData
         const myIp = getLocalIpAddress() || 'unknown'
+        // --- 新增：处理房间相关的命令 ---
+        if (type && type === 'roomCommand') {
+          handleRoomCommand(ws, clientId, incomingData)
+          return // 命令处理后结束
+        }
         // 检查是否是广播消息
         if (broadcastType) {
           if (originIp === myIp) {
@@ -98,6 +105,29 @@ export function startWebSocketServer() {
 
     ws.on('close', () => {
       console.log(`Client ${clients.get(ws)} disconnected.`)
+
+      // 遍历所有本机创建的房间
+      localCreatedRooms.forEach((members) => {
+        if (members.has(clientId)) {
+          const member = members.get(clientId)
+          members.delete(clientId)
+          console.log(`Member ${member?.nickname} removed from a room.`)
+          // 向该房间广播成员离开的消息
+          broadcastToRoom(
+            {
+              /* 离开的系统消息 */
+              id: nanoid(),
+              text: `${member?.nickname} 离开了房间。`,
+              sender: 'system',
+              nickname: '系统',
+              timestamp: Date.now(),
+              broadcastType: 'room'
+            },
+            Array.from(members.values()).map((m) => m.ws) // 传入 ws 实例数组
+          )
+        }
+      })
+
       clients.delete(ws)
     })
 
@@ -111,6 +141,7 @@ export function startWebSocketServer() {
   })
 }
 
+// 停止 WebSocket 服务器
 export function stopWebSocketServer() {
   if (wss) {
     wss.close(() => {
@@ -126,6 +157,7 @@ export function stopWebSocketServer() {
   }
 }
 
+// 广播消息给所有连接的客户端
 function broadcast(message: ChatMessage) {
   if (!wss) return
   clients.forEach((clientId, ws) => {
@@ -135,7 +167,7 @@ function broadcast(message: ChatMessage) {
     }
   })
 }
-
+// 处理发送给房间内所有成员的广播
 export function handleSendRoomBroadcast(
   _event: Electron.IpcMainEvent,
   message: { text: string; nickname: string; token: string }
@@ -268,6 +300,102 @@ export async function handleSendGlobalBroadcast(
   }
 }
 
+/**
+ * 处理来自客户端的房间相关命令
+ */
+function handleRoomCommand(ws: WebSocket, clientId: string, incomingData: any) {
+  const { command, payload } = incomingData
+  switch (command) {
+    case 'join':
+      const { roomId, nickname } = payload
+      const roomMembers = localCreatedRooms.get(roomId)
+
+      // 校验：房间是否存在于本机
+      if (!roomMembers) {
+        ws.send(JSON.stringify({ type: 'roomError', message: '房间不存在或房主不在线' }))
+        ws.close()
+        return
+      }
+
+      // 将新成员加入房间
+      const newMember: RoomMember = { id: clientId, ws, nickname }
+      roomMembers.set(clientId, newMember)
+
+      console.log(`[Room ${roomId}] Member ${nickname} joined.`)
+
+      // 向房间内所有成员广播“加入”消息
+      const joinMessage: ChatMessage = {
+        id: nanoid(),
+        sender: 'system',
+        nickname: 'system',
+        text: `${nickname} 已加入房间。`,
+        timestamp: Date.now()
+      }
+      broadcastToRoom(
+        joinMessage,
+        Array.from(roomMembers.values()).map((m) => m.ws)
+      )
+
+      // 向新成员单独发送成功加入的消息
+      ws.send(JSON.stringify({ type: 'roomJoined', roomId, success: true }))
+      break
+
+    case 'chat':
+      const senderMember = findMemberInRooms(clientId)
+      if (!senderMember) return
+
+      const chatMessage: ChatMessage = {
+        id: nanoid(),
+        type: 'chat',
+        text: payload.text,
+        sender: clientId,
+        nickname: senderMember.nickname,
+        timestamp: Date.now()
+      }
+      // 转发消息给同房间的所有人
+      const members = localCreatedRooms.get(senderMember.roomId)?.values() ?? []
+      broadcastToRoom(
+        chatMessage,
+        Array.from(members).map((m) => m.ws)
+      )
+      break
+  }
+}
+
+/**
+ * 在本机创建的所有房间中查找一个成员
+ */
+function findMemberInRooms(clientId: string): (RoomMember & { roomId: string }) | null {
+  for (const [roomId, members] of localCreatedRooms.entries()) {
+    if (members.has(clientId)) {
+      return { ...members.get(clientId)!, roomId }
+    }
+  }
+  return null
+}
+
+/**
+ * 向指定的 WebSocket 连接列表广播消息
+ */
+function broadcastToRoom(message: ChatMessage, targets: WebSocket[]) {
+  targets.forEach((ws) => {
+    // isMe 的逻辑需要客户端自己判断，或在发送时附加发送者ID
+    if (ws.readyState === WebSocket.OPEN) {
+      ws.send(JSON.stringify({ ...message }))
+    }
+  })
+}
+
+export function createNewRoom(roomId: string) {
+  if (!localCreatedRooms.has(roomId)) {
+    localCreatedRooms.set(roomId, new Map<string, RoomMember>())
+    return true
+  }
+  return false
+}
+
+//#region
+// 获取 WebSocket 服务器地址
 export function handleGetWsAddress() {
   const ip = getLocalIpAddress()
   if (ip) {
@@ -276,7 +404,7 @@ export function handleGetWsAddress() {
   return `ws://localhost:${PORT}`
 }
 
-// Function to find CognitoOcean hosts on the local network
+/// 通过扫描局域网内的 IP 地址，寻找运行在指定端口的 CognitoOcean 实例
 export async function findAppHosts(port: number): Promise<string[]> {
   const nets = networkInterfaces()
   const results: string[] = []
@@ -342,3 +470,5 @@ export async function findAppHosts(port: number): Promise<string[]> {
   await Promise.all(promises)
   return results
 }
+
+//#endregion

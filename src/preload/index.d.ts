@@ -84,6 +84,7 @@ interface ExposedAPI {
   sendDirectBroadcast: (payload: DirectBroadcastPayload) => void
   sendGlobalBroadcast: (payload: DirectBroadcastPayload) => void
   onDirectBroadcastReceived: (callback: (data: any) => void) => () => void
+  createPrivateRoom: () => Promise<any>
 
   // Menu Management API
   getAllMenus: () => Promise<RouteRecord[]>
