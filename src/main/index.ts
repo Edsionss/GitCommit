@@ -1,31 +1,11 @@
 import { app, shell, BrowserWindow, ipcMain, dialog, session } from 'electron'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
-// import icon from '../../resources/icon.png?asset'
-import { promises as fs } from 'fs'
-import * as path from 'path'
 import icon from '../../build/CognitoOcean1.png?asset' // Vite/TypeScript 可能会帮你处理这个导入，但路径更可靠
-import { execSync } from 'child_process'
-import { registerIpcHandlers } from '@handlers/ipcHandlers'
-import { db } from '@features/database'
-import { startWebSocketServer, stopWebSocketServer } from '@services/websocket'
-import { settingsService } from '@features/services/settings'
+import { beforeCreate, customCreateWindow, whenReady, willQuit, activate } from './main'
 
-// 如果是 Windows，尝试设置控制台编码为 UTF-8
-if (process.platform === 'win32') {
-  try {
-    execSync('chcp 65001')
-  } catch (e) {
-    console.warn('Failed to set console code page:', e)
-  }
-}
-// 确保 stdout/stderr 默认用 utf-8
-process.stdout.setDefaultEncoding('utf8')
-process.stderr.setDefaultEncoding('utf8')
-
-// 在开发模式下，设置远程调试端口
-const DEBUG_PORT = '9222' // 选择一个未被占用的端口
-app.commandLine.appendSwitch('remote-debugging-port', DEBUG_PORT)
+//创建窗口前的周期
+beforeCreate()
 
 // 将 mainWindow 声明在函数外部，以便在其他地方访问
 let mainWindow: BrowserWindow | null = null
@@ -74,41 +54,18 @@ function createWindow(): void {
     }
   })
 
+  // 创建窗口时的周期
+  customCreateWindow()
+
   // 在窗口获得焦点时停止闪烁
   mainWindow.on('focus', stopFlashMainWindow)
 
-  // 修改会话的 CSP
-  session.defaultSession.webRequest.onHeadersReceived((details, callback) => {
-    // 根据开发环境和生产环境构建动态的 script-src 策略
-    const scriptSrc = ["'self'"]
-    if (is.dev) {
-      // Vite 的 HMR 需要 'unsafe-eval'
-      scriptSrc.push("'unsafe-eval'")
-    }
-
-    // 整合所有的 CSP 策略
-    const cspPolicies = [
-      "default-src 'self'",
-      `script-src ${scriptSrc.join(' ')}`,
-      "style-src 'self' 'unsafe-inline'",
-      "img-src 'self' data: https://i.pravatar.cc https://*.cdn.com https://*.element-plus.org",
-      // 允许连接到任意 WebSocket 地址，修复局域网连接问题
-      "connect-src 'self' ws:"
-    ]
-
-    // 设置响应头
-    callback({
-      responseHeaders: {
-        ...details.responseHeaders,
-        'Content-Security-Policy': [cspPolicies.join('; ')]
-      }
-    })
-  })
-
+  // 当窗口准备好显示时再显示它，以避免白屏
   mainWindow.on('ready-to-show', () => {
     mainWindow?.show()
   })
 
+  // 打开外部链接时使用默认浏览器，而不是在应用内打开新窗口
   mainWindow.webContents.setWindowOpenHandler((details) => {
     shell.openExternal(details.url)
     return { action: 'deny' }
@@ -140,39 +97,23 @@ app.whenReady().then(() => {
     optimizer.watchWindowShortcuts(window)
   })
 
-  // WebSocket 服务器启动
-  startWebSocketServer()
+  // 运行就绪时的周期
+  whenReady()
 
-  // IPC 注册
-  registerIpcHandlers()
-
-  // 同步开机自启设置
-  const storedAutoStart = settingsService.getStoredAutoStartSetting()
-  const actualAutoStart = settingsService.getAutoStartStatus()
-  if (storedAutoStart && !actualAutoStart) {
-    settingsService.setAutoStart(true) // 重新应用设置
-  }
-
+  // 创建主窗口
   createWindow()
   app.on('activate', function () {
     // On macOS it's common to re-create a window in the app when the
     // dock icon is clicked and there are no other windows open.
+    activate()
     if (BrowserWindow.getAllWindows().length === 0) createWindow()
   })
 })
 
 // 监听应用即将退出的事件
 app.on('will-quit', () => {
-  // 停止 WebSocket 服务器
-  stopWebSocketServer()
-
-  // 在这里关闭数据库连接
-  if (db) {
-    // 您的 db 实例
-    console.log('Closing database connection...')
-    db.close()
-    console.log('Database connection closed.')
-  }
+  // 即将退出的周期
+  willQuit()
 })
 
 // Quit when all windows are closed, except on macOS. There, it's common
