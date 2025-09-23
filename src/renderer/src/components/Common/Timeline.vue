@@ -7,7 +7,7 @@
         </template>
         <div class="timeline-content" :style="'color:' + getColor(item?.type)">
           <div class="content" :class="{ important: item.type === 'important' ? true : false }">
-            <a-tag :bordered="false" color="red">{{ item.time }}</a-tag>
+            <a-tag :bordered="false" color="gold">{{ item.time }}</a-tag>
             {{ item?.content }}
           </div>
         </div>
