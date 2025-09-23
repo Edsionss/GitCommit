@@ -88,7 +88,6 @@ export const whenReady = () => {
       } else {
         newsBox = contentBox.querySelector('div')
       }
-      // const news: HTMLElement | null = titleBox?.nextSibling as HTMLElement
       const isImportant = contentBox.classList.contains('c-de0422')
       result.push({
         time: timeBox?.textContent?.trim() || '',
