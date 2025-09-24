@@ -39,8 +39,10 @@ export async function executeScrapingTask<T>(
     beforeExecution && (await beforeExecution(page))
     //  执行核心的抓取逻辑
     if (url) {
-      await page.goto(url, { waitUntil: 'networkidle2' })
+      // await page.goto(url, { waitUntil: 'networkidle2' })
+      await page.goto(url, { waitUntil: 'networkidle0' })
     }
+
     // 传递参数给 scrapingLogic
     const data = await page.evaluate(scrapingLogic, ...logicArgs)
     // 返回结果

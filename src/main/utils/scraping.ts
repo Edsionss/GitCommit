@@ -38,12 +38,23 @@ export const telegraphTest = () => {
 }
 
 export const thsTest = () => {
+  const stockName = '亚太药业'
+  // 对查询字符串进行编码
+  const encodedStockName: string = encodeURIComponent(stockName)
+  console.log('https://www.iwencai.com/unifiedwap/result?tid=stockpick&qs=box_main_ths&w=亚太药业')
+
   // 测试爬虫任务
   executeScrapingTask({
-    url: 'https://www.iwencai.com/unifiedwap/result?tid=stockpick&qs=box_main_ths&w=%E4%BA%9A%E5%A4%AA%E8%8D%AF%E4%B8%9A',
+    url: `https://www.iwencai.com/unifiedwap/result?tid=stockpick&qs=box_main_ths&w=${'亚太药业'}`,
     scrapingLogic: () => {
       const result: any[] = []
-      const elements: HTMLElement[] = Array.from(document.querySelectorAll('.jgy_item_box'))
+      const elementsBox: HTMLElement | null = document.querySelector('.jgy_sdk')
+      if (!elementsBox) return
+      const elements: HTMLElement[] = Array.from(elementsBox.querySelectorAll('.jgy_item_box'))
+      elements.forEach((el) => {
+        result.push(el.textContent.trim())
+      })
+      return result
     }
   }).then((data) => {
     console.log('Scraped data:', data)
