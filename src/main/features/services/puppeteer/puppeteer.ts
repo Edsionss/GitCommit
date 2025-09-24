@@ -1,82 +1,92 @@
-// src/puppeteer-util.ts
+import puppeteer, { Browser, Page, Target } from 'puppeteer-core'
 
-import puppeteer, { Browser, Page } from 'puppeteer-core'
+export interface PuppeteerServiceOptions {
+  browserURL: string
+}
 
-export interface ScrapeOptions {
+class PuppeteerService {
+  private browser: Browser | null = null
+  private options: PuppeteerServiceOptions
+
+  constructor(options: PuppeteerServiceOptions = { browserURL: 'http://localhost:9222' }) {
+    this.options = options
+  }
+
   /**
-   * 唯一的目标 URL，用于识别要附加到的后台窗口。
-   * 必须是一个能唯一标识窗口的 URL。
+   * 连接到浏览器实例。如果已连接，则不执行任何操作。
    */
-  targetUrl: string
-}
-
-export async function scrapeData<T>(
-  urlToScrape: string, // 要爬取的目标网页
-  scrapingLogic: () => T,
-  options: ScrapeOptions
-): Promise<any> {
-  if (!options.targetUrl) {
-    throw new Error('must provide targetUrl for get window')
-  }
-
-  let browser: Browser | undefined
-
-  try {
-    browser = await puppeteer.connect({
-      browserURL: 'http://localhost:9222'
-    })
-
-    // 轮询查找目标，直到找到或者超时
-    const target = await findTarget(browser, options.targetUrl)
-
-    if (!target) {
-      throw new Error(`not found  URL:  "${options.targetUrl}"  window`)
+  public async connect(): Promise<void> {
+    if (this.isConnected()) {
+      console.log('[PuppeteerService] Already connected.')
+      return
     }
-
-    const page = await target.page()
-    if (!page) {
-      throw new Error(
-        `found  URL:  "${options.targetUrl}"  window, but no page associated with it。`
-      )
-    }
-
-    // 后续逻辑不变...
-    await page.setUserAgent(
-      'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
-    )
-
-    await page.goto(urlToScrape, { waitUntil: 'networkidle2' })
-    const data = await page.evaluate(scrapingLogic)
-
-    return data
-  } catch (error) {
-    console.error(`[Puppeteer Util] scraping to error :`, error)
-    throw error
-  } finally {
-    if (browser) {
-      browser.disconnect()
+    try {
+      this.browser = await puppeteer.connect({ browserURL: this.options.browserURL })
+      this.browser.on('disconnected', () => {
+        console.log('[PuppeteerService] Browser disconnected.')
+        this.browser = null
+      })
+      console.log('[PuppeteerService] Successfully connected to browser.')
+    } catch (error) {
+      console.error('[PuppeteerService] Failed to connect to browser:', error)
+      this.browser = null // 确保状态正确
+      throw error
     }
   }
-}
 
-/**
- * 带有重试和超时的目标查找函数
- * 因为主进程创建窗口和 Puppeteer 发现它之间可能存在微小的延迟
- */
-async function findTarget(browser: Browser, url: string) {
-  const timeout = 5000 // 5秒超时
-  const interval = 100 // 每100毫秒检查一次
-  let elapsedTime = 0
-
-  while (elapsedTime < timeout) {
-    const targets = await browser.targets()
-    const found = targets.find((t) => t.url() === url)
-    if (found) {
-      console.log(`[Puppeteer Util] 找到了目标! URL: ${url}`)
-      return found
+  /**
+   * 断开与浏览器的连接。
+   */
+  public async disconnect(): Promise<void> {
+    if (!this.isConnected()) {
+      return
     }
-    await new Promise((resolve) => setTimeout(resolve, interval))
-    elapsedTime += interval
+    await this.browser?.disconnect()
+    this.browser = null
+    console.log('[PuppeteerService] Disconnected from browser.')
   }
-  return undefined
+
+  /**
+   * 检查是否已连接。
+   */
+  public isConnected(): boolean {
+    return this.browser?.isConnected() ?? false
+  }
+
+  /**
+   * 根据 URL 查找一个 Page 对象，带有重试和超时。
+   * @param url 要查找的页面的 URL
+   * @param timeout 超时时间（毫秒）
+   * @returns Promise<Page>
+   */
+  public async findPageByUrl(url: string, timeout: number = 5000): Promise<Page> {
+    if (!this.isConnected()) {
+      throw new Error('Browser not connected. Call connect() first.')
+    }
+
+    const interval = 100
+    let elapsedTime = 0
+
+    while (elapsedTime < timeout) {
+      const targets = await this.browser!.targets()
+
+      const foundTarget = targets.find((t) => t.type() === 'page' && t.url() === url)
+
+      if (foundTarget) {
+        const page = await foundTarget.page()
+        if (page) {
+          console.log(`[PuppeteerService] Found page: ${url}`)
+          return page
+        }
+      }
+
+      await new Promise((resolve) => setTimeout(resolve, interval))
+      elapsedTime += interval
+    }
+
+    throw new Error(`Timeout: Could not find page with URL "${url}" within ${timeout}ms.`)
+  }
 }
+
+// 导出一个单例，方便在整个应用中使用
+export const puppeteerService = new PuppeteerService()
