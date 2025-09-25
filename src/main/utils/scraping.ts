@@ -52,6 +52,7 @@ export const thsTest = () => {
       elements.forEach((el) => {
         const titleEl: HTMLElement | null = el.querySelector('.title-content .title-text')
         const textContent: HTMLElement | null = el.querySelector('.jgy_txt ')
+        if (!titleEl || !textContent) return
         result.push({
           title: titleEl?.textContent.trim() || '',
           content: textContent?.textContent.trim() || ''
@@ -68,6 +69,13 @@ export const thsTest = () => {
         })
         result.push({ title: '标签', content: JSON.stringify(tags) })
       }
+      //提取支撑和压力
+      const supportResistanceContainer: HTMLElement | null =
+        document.querySelector('.kline_markline')
+      if (supportResistanceContainer) {
+        result.push({ title: '支撑和压力', content: supportResistanceContainer.innerText.trim() })
+      }
+
       return result
     }
   }).then((data) => {
