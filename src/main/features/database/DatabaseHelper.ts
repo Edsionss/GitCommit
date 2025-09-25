@@ -43,7 +43,7 @@ export class DatabaseHelper {
     const sql = `INSERT INTO ${tableName} (${columns}) VALUES (${placeholders})`
     const stmt = this.db.prepare(sql)
     const info = stmt.run(values)
-
+    console.log(`[DB insert from table  ${tableName}] `)
     return info
   }
 
@@ -70,6 +70,8 @@ export class DatabaseHelper {
 
     // return insertManyTransaction(dataArray)
     // 用你封装好的 transaction 来执行
+    console.log(`[DB insertMany from table  ${tableName}] `)
+
     return this.transaction(() => {
       return dataArray.map((row) => stmt.run(Object.values(row)))
     })
@@ -87,6 +89,8 @@ export class DatabaseHelper {
     const { text, params } = this.formatWhereClause(where)
     const sql = `SELECT ${columns} FROM ${tableName} ${text}`
     const stmt = this.db.prepare(sql)
+    console.log(`[DB find from table  ${tableName}] `)
+
     return stmt.all(params) as T[]
   }
 
@@ -103,6 +107,8 @@ export class DatabaseHelper {
     const sql = `SELECT ${columns} FROM ${tableName} ${text} LIMIT 1`
     const stmt = this.db.prepare(sql)
     const result = stmt.get(params) as T | undefined
+    console.log(`[DB findOne from table  ${tableName}] `)
+
     return result || null
   }
 
@@ -137,6 +143,8 @@ export class DatabaseHelper {
     const stmt = this.db.prepare(sql)
     const info = stmt.run([...dataValues, ...whereValues])
 
+    console.log(`[DB update from table  ${tableName}] `)
+
     return { changes: info.changes }
   }
 
@@ -155,6 +163,7 @@ export class DatabaseHelper {
     const stmt = this.db.prepare(sql)
     const info = stmt.run(params)
 
+    console.log(`[DB delete from table  ${tableName}] `)
     return { changes: info.changes }
   }
 
@@ -184,6 +193,8 @@ export class DatabaseHelper {
         this.db.prepare(resetSql).run(tableName)
       }
 
+      console.log(`[DB clearTable from table  ${tableName}] `)
+
       return { changes: info.changes }
     })
   }
@@ -195,6 +206,7 @@ export class DatabaseHelper {
    * @returns - 结果数组
    */
   public query<T>(sql: string, params: any[] = []): T[] {
+    console.log(`[DB query] `)
     return this.db.prepare(sql).all(params) as T[]
   }
 
@@ -206,6 +218,7 @@ export class DatabaseHelper {
    */
   public execute(sql: string, params: any[] = []): { changes: number } {
     const info = this.db.prepare(sql).run(params)
+    console.log(`[DB execute] `)
     return { changes: info.changes }
   }
 
@@ -215,6 +228,7 @@ export class DatabaseHelper {
    */
   public transaction<T>(callback: () => T): T {
     const runTransaction = this.db.transaction(callback)
+    console.log(`[DB transaction] `)
     return runTransaction()
   }
 }

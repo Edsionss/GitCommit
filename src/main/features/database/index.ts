@@ -6,7 +6,7 @@ import { DatabaseHelper } from './DatabaseHelper'
 import { schema } from './schema'
 // 1. 创建唯一的数据库连接实例
 const dbPath = path.join(app.getPath('userData'), 'CognitoOcean.db')
-const db: SqliteDatabase = new Database(dbPath, { verbose: console.log }) // 加上 verbose 方便调试
+const db: SqliteDatabase = new Database(dbPath, {}) // 加上 verbose 方便调试
 db.pragma('journal_mode = WAL') // 开启 WAL 模式 “读”和“写”可以并发进行，极大地减少了数据库锁定的问题。你可以在数据库连接初始化时，执行一条 pragma 指令来开启它：
 // 2. 初始化数据库表结构
 export function initializeDatabase() {
