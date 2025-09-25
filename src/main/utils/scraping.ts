@@ -41,19 +41,33 @@ export const thsTest = () => {
   const stockName = '亚太药业'
   // 对查询字符串进行编码
   const encodedStockName: string = encodeURIComponent(stockName)
-  console.log('https://www.iwencai.com/unifiedwap/result?tid=stockpick&qs=box_main_ths&w=亚太药业')
-
   // 测试爬虫任务
   executeScrapingTask({
-    url: `https://www.iwencai.com/unifiedwap/result?tid=stockpick&qs=box_main_ths&w=${'亚太药业'}`,
+    url: `https://www.iwencai.com/unifiedwap/result?tid=stockpick&qs=box_main_ths&w=${encodedStockName}`,
     scrapingLogic: () => {
       const result: any[] = []
       const elementsBox: HTMLElement | null = document.querySelector('.jgy_sdk')
       if (!elementsBox) return
       const elements: HTMLElement[] = Array.from(elementsBox.querySelectorAll('.jgy_item_box'))
       elements.forEach((el) => {
-        result.push(el.textContent.trim())
+        const titleEl: HTMLElement | null = el.querySelector('.title-content .title-text')
+        const textContent: HTMLElement | null = el.querySelector('.jgy_txt ')
+        result.push({
+          title: titleEl?.textContent.trim() || '',
+          content: textContent?.textContent.trim() || ''
+        })
       })
+      // 提取标签
+      const tagContainer: HTMLElement | null = document.querySelector('.impression_list')
+      if (tagContainer) {
+        const tags: any[] = []
+        const tagElements: NodeListOf<HTMLElement> = tagContainer.querySelectorAll('.list_item')
+        tagElements.forEach((tagEl) => {
+          const isGood = tagEl.classList.contains('good')
+          tags.push({ value: tagEl.textContent.trim(), good: isGood })
+        })
+        result.push({ title: '标签', content: JSON.stringify(tags) })
+      }
       return result
     }
   }).then((data) => {

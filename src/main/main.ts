@@ -5,7 +5,7 @@ import { registerIpcHandlers } from '@handlers/ipcHandlers'
 import { startWebSocketServer, stopWebSocketServer } from '@services/websocket'
 import { db } from '@features/database'
 import { is } from '@electron-toolkit/utils'
-import { telegraphTest, thsTest } from '@nodeUtils/scraping'
+import { telegraphTest, thsTest } from '@nodeUtils/Scraping'
 // 创建窗口前的周期函数
 export const beforeCreate = () => {
   // 在开发模式下，设置远程调试端口
