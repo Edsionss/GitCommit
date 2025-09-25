@@ -60,8 +60,6 @@ export async function executeScrapingTask<T>(
       await page.goto(url, { waitUntil: 'networkidle0' })
     }
 
-    await page.waitForSelector('.123123', { timeout: 3000 })
-
     // 传递参数给 scrapingLogic 并执行
     const data = await page.evaluate(scrapingLogic, ...logicArgs)
 
