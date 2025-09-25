@@ -20,7 +20,6 @@ export const telegraphTest = () => {
         } else {
           newsBox = contentBox.querySelector('div')
         }
-        // const news: HTMLElement | null = titleBox?.nextSibling as HTMLElement
         const isImportant = contentBox.classList.contains('c-de0422')
         result.push({
           time: timeBox?.textContent?.trim() || '',
@@ -34,7 +33,6 @@ export const telegraphTest = () => {
   }).then((data) => {
     console.log('Scraped data:', data)
   })
-  //------------------------------
 }
 
 export const thsTest = () => {
