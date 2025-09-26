@@ -1,0 +1,481 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd"><html><head>
+<title>综合治税平台</title>
+<script type="text/javascript" src="../js/jquery.min.js"></script>
+<script type="text/javascript" src="../js/operamasks-ui.min.js"></script>
+<script type="text/javascript" src="../js/common.js"></script>
+<script type="text/javascript" src="../js/dialogbox.js"></script>
+<link rel="stylesheet" type="text/css" href="../css/default/om-default.css">
+<link rel="stylesheet" type="text/css" href="../css/manage.css">
+<link rel="stylesheet" href="../css/main.css" type="text/css">
+<!-- 
+	    <link rel="stylesheet" type="text/css" href="../css/default/om-tree.css" />
+	     -->
+<style type="text/css">
+html,body {
+	width: 100%;
+	height: 100%;
+	padding: 0;
+	margin: 0;
+}
+
+#center-tab .om-panel-body {
+	padding: 0;
+}
+</style>
+<style>
+body {
+	margin: 0px;
+	padding: 0px
+}
+
+.header {
+	background: url(../images/bj1108-03.jpg) repeat-x;
+	height: 50px;
+	min-width: 930px
+}
+
+.header .logo {
+	float: left;
+	padding: 0px;
+	height: 30px
+}
+
+.header .logo img {
+	margin: 0px auto;
+	border: 0;
+	height: 65px
+}
+
+.header .account {
+	float: right;
+	padding: 6px;
+	margin-right: 20px
+}
+</style>
+</head>
+<body class="om-borderlayout">
+	<script type="text/javascript" charset="GBK">
+		var tabElement;
+		var ifh;
+		var fmainUrl;
+		var blinkBool = false;
+		var menuFlag = false;
+		$(document).ready(
+				function() {
+					loadDialogBox();
+					$('body').omBorderLayout({
+						panels : [ {
+							id : "top-panel",
+							header : false,
+							region : "north",
+							height : 85
+						}, {
+							id : "center-panel",
+							header : false,
+							region : "center"
+						}, {
+							id : "west-panel",
+							resizable : true,
+							collapsible : true,
+							title : "综合治税业务流程系统",
+							region : "west",
+							width : 220
+						} ]
+					});
+					tabElement = $('#center-tab').omTabs({
+						height : "fit",
+						closable : false,
+						tabMenu : true,
+						active : 0,
+						onClose : function(n, event) {
+							var total = $('#center-tab').omTabs('getLength');
+							if (total <= 0) {
+								initDefaultFrame();
+							}
+						},
+						onCloseAll : function(event) {
+							initDefaultFrame();
+						}
+					});
+					loadTree();
+					ifh = tabElement.height()
+							- tabElement.find(".om-tabs-headers").outerHeight()
+							- 4; //为了照顾apusic皮肤，apusic没有2px的padding，只有边框，所以多减去2px
+					loadMain();
+					getMessageInfo();
+					Setlinkblink();
+					$('body').omBorderLayout('collapseRegion', 'west');//设置panel隐藏
+					$('#main').height(ifh);
+				});
+		//初始化第一个页签
+		function initDefaultFrame() {
+			/** 关闭所有页签以后不能重新打开bug  add by qingfeng_li 2014-1-2**/
+			var idx = Math.round(Math.random() * 10000);
+			var tab = document.getElementById('center-tab');
+			var divs = tab.getElementsByTagName("div");
+			/** 追加首页frame（匹配div的innerHTML） **/
+			divs[1].innerHTML = '<div class="om-widget om-panel"><div class="om-panel-body om-widget-content om-panel-noheader om-state-nobd" id="tab1" style="overflow: hidden;">'
+					+ '<iframe style="height: 598px;" id="main" border="0" src="'
+					+ fmainUrl
+					+ '" frameborder="no" width="100%"></iframe></div></div>';
+
+			tabElement
+					.omTabs(
+							'add',
+							{
+								title : '主页',
+								tabId : 'tab_main',
+								content : "<iframe id='"
+										+ idx
+										+ "' border=0 frameBorder='no' name='inner-frame' src='"
+										+ fmainUrl + "' height='" + ifh
+										+ "' width='100%'></iframe>",
+								closable : true
+							});
+			$('#center-tab').omTabs({});
+		}
+		function loadTree() {
+			$("#myTree")
+					.omTree(
+							{
+								dataSource : 'findCacheMenu.action',
+								simpleDataModel : true,
+								onSelect : function(nodeData) {
+									if (nodeData.furl == "") {
+										if ($("#" + nodeData.nid).attr("class")
+												.indexOf("collapsable") >= 0) {
+											if ($("#" + nodeData.nid + ">span")
+													.attr("class").indexOf(
+															"FirstLayer") >= 0) {
+												$("#" + nodeData.nid + ">span")
+														.css("background",
+																"url(../css/default/images/tree/Item1_BG.png) no-repeat");
+											} else {
+												$("#" + nodeData.nid + ">span")
+														.css("background",
+																"url(../css/default/images/tree/Item2_BG.jpg) no-repeat");
+											}
+
+											$('#myTree').omTree('collapse',
+													nodeData);
+
+										} else if ($("#" + nodeData.nid).attr(
+												"class").indexOf("expandable") >= 0) {
+											if ($("#" + nodeData.nid + ">span")
+													.attr("class").indexOf(
+															"FirstLayer") >= 0) {
+												$("#" + nodeData.nid + ">span")
+														.css("background",
+																"url(../css/default/images/tree/Item1_BG_Select.png) no-repeat");
+											} else {
+												$("#" + nodeData.nid + ">span")
+														.css("background",
+																"url(../css/default/images/tree/Item2_BG_Select.jpg) no-repeat");
+											}
+
+											$('#myTree').omTree('expand',
+													nodeData);
+										}
+									}
+								},
+								onClick : showLink,
+								onDblClick : function(nodeData, event) {
+									return;
+								},
+								onSuccess : function(data, testStatus,
+										XMLHttpRequest, event) {
+									$("#myTree")
+											.find(".listIcon")
+											.each(
+													function(index, domEle) {
+														if ($(domEle)
+																.attr("class")
+																.indexOf(
+																		'ui-icon-') >= 0) {
+															var iconName = $(
+																	domEle)
+																	.attr(
+																			"class")
+																	.split(' ');
+															for ( var i = 0; i < iconName.length; i++) {
+																if (iconName[i]
+																		.indexOf("ui-icon-") >= 0) {
+																	$(domEle)
+																			.prepend(
+																					"<span class='ui-icon " + iconName[i] + "'></span>");
+																	$(domEle)
+																			.removeClass(
+																					"ui-icon "
+																							+ iconName[i]);
+																	break;
+																}
+															}
+														}
+													});
+								}
+							});
+
+		};
+
+		var menuManage = {
+			id : 10000,
+			text : "菜单管理",
+			fisleaf : 1,
+			furl : 'menumanage.jsp'
+		};
+		function showLink(nodeData, event) {
+			if (nodeData == null) {
+				nodeData = menuManage;
+			}
+			if (nodeData.fisleaf == '1') {
+				//如果页签已打开则激活页签，否则新增页签
+				var tabId = tabElement.omTabs('getAlter', 'tab_' + nodeData.id);
+				if (tabId) {
+					tabElement.omTabs('activate', tabId);
+				} else {
+					if (nodeData.furl != null && nodeData.furl != "") {
+						var url = nodeData.furl;
+						if (nodeData.furl.indexOf("?") == -1) {
+							url += "?";
+						} else {
+							url += "&";
+						}
+						url += "title=" + escape(nodeData.text) + "&menuid="
+								+ escape(nodeData.fid);//新增界面别名参数，以便在界面显示  add by qingfeng_li 2013-12-25
+						//var idx = Math.round(Math.random()*10000);
+						tabElement
+								.omTabs(
+										'add',
+										{
+											title : nodeData.text,
+											tabId : 'tab_' + nodeData.id,
+											//tabId : idx,
+											content : "<iframe id='"
+													+ nodeData.id
+													+ "' border=0 frameBorder='no' name='inner-frame' src='"
+													+ url
+													+ "' height='"
+													+ ifh
+													+ "' width='100%'></iframe>",
+											closable : true
+										});
+					}
+				}
+			} else {
+				if (nodeData.expanded) {
+					$('#myTree').omTree('collapse', nodeData);
+					nodeData.expanded = false;
+				} else {
+					$('#myTree').omTree('expand', nodeData);
+					nodeData.expanded = true;
+				}
+			}
+		};
+		function loadMain() {
+			$
+					.ajax({
+						type : 'POST',
+						url : 'getMainUrl',
+						dataType : 'json',
+						contentType : 'application/x-www-form-urlencoded; charset=utf-8',
+						success : function(request) {
+							fmainUrl = request.fmainUrl;
+							if (!!fmainUrl) {
+								var mainIf = document.getElementById("main");
+								mainIf.src = fmainUrl;
+							} else {
+								alert("主页加载失败");
+							}
+						}
+					});
+		}
+		//打开修改密码界面
+		function openUpdatePassword() {
+			openNewTabByName("密码修改", "../admin/system/updateUserPassword.jsp",
+					'password');
+		}
+
+		//修改个人信息
+		function openUserinfo() {
+			sendAjaxReq("post", "getCurUserInfo", "", function(request) {
+				var jsonstr = request.responseText;
+				var json = eval('(' + jsonstr + ')');
+				var url = "system/userDialog.jsp";
+				url += "?fid=" + json['fid'] + "&recordJsonStr="
+						+ escape(jsonstr) + "&type=1";
+				openNewTabByName("个人信息", url, 'userinfo');
+				//openDialogBox(url);
+			}, null, null, null);
+		}
+
+		function openHelp() {
+			var url = "../baseinfo/Help.jsp";
+			openNewTabByName("帮助", url, 'help');
+		}
+
+		//打开消息界面
+		function openSys() {
+			blinkBool = true;
+			var ftask = $("#ftask").val();
+			var fmsg = $("#fmsg").val();
+			openNewTabByName("消息中心", "../jbpm/messageCenter.jsp?ftaskMsg="
+					+ ftask + "&fmsg=" + fmsg, 'message');
+		}
+		//打开主页
+		function openMain() {
+			openNewTabByName("主页", fmainUrl, 'main');
+		}
+		function getMessageInfo() {
+			$
+					.ajax({
+						type : 'POST',
+						url : 'getMessage',
+						async : false,
+						dataType : 'json',
+						contentType : 'application/x-www-form-urlencoded; charset=utf-8',
+						success : function(request) {
+							var total = request.fsum;
+							if (!!total) {
+								var message = $("#fmessage").html(
+										"消息(" + total + ")");
+								$("#fmessage").val(total);
+							}
+							var ftask = request.ftask;
+							var fmsg = request.fmsg;
+							$("#ftask").val(ftask);
+							$("#fmsg").val(fmsg);
+						}
+					});
+		}
+		//消息闪烁
+		function Setlinkblink() {
+			var message = document.getElementById('fmessage');
+			var val = message.value;
+			if (val != 0 && blinkBool == false) {
+				if (!message.style.color) {
+					message.style.color = "white"
+				}
+				if (message.style.color == "red") {
+					message.style.color = "white"
+				} else {
+					message.style.color = "red"
+				}
+				setTimeout("Setlinkblink()", 800);
+			}
+		}
+		//展开/隐藏菜单
+		function openMenuPanel() {
+			if (!menuFlag) {
+				$('body').omBorderLayout('expandRegion', 'west');//设置panel展开
+				menuFlag = true;
+			} else {
+				$('body').omBorderLayout('collapseRegion', 'west');//设置panel隐藏
+				menuFlag = false;
+			}
+		}
+	</script>
+
+	<div class="om-widget om-panel om-borderlayout-region om-borderlayout-region-north" style="height: 85px; width: 800px; margin: 0px; left: 0px;" region="north"><div id="top-panel" class="header om-panel-body om-widget-content om-panel-noheader om-borderlayout-region-body" style="height: 83px; width: 798px;">
+		<div class="logo">
+			<a><img src="../images/bplogin.png"> </a> <a></a>
+		</div>
+		<div align="right" style="float:right;">
+			<table style="margin:-5px 0px;width:200px;padding:0px 10px 0px 5px">
+				<tbody><tr>
+					<td style="text-align:center;width:25%;">
+						<div>
+							<img src="../images/sy1118-04.png" onclick="openMain()">
+						</div>
+						<div style="margin:-5px 0px;cursor:pointer;">
+							<a href="javascript:void(0)" onclick="openMain()"><span style="color:white">首页</span> </a>
+						</div>
+					</td>
+					<td style="text-align:center;width:25%;">
+						<div>
+							<img src="../images/help.png">
+						</div>
+						<div style="margin:-5px 0px;cursor:pointer;">
+							<a href="javascript:void(0)" onclick="openHelp()"><span style="color:white">帮助</span> </a>
+						</div>
+					</td>
+					<td style="text-align:center;width:25%;">
+						<div>
+							<img src="../images/sy1118-01.png">
+						</div>
+						<div style="margin:-5px;cursor:pointer;">
+							<a href="javascript:void(0)" onclick="openSys()"><span style="color:white;" id="fmessage" value="">消息(0)</span> </a>
+						</div>
+					</td>
+					<td style="text-align:center;width:25%;">
+						<div>
+							<img src="../images/sy1118-05.png">
+						</div>
+						<div style="margin:-5px;cursor:pointer;">
+							<a href="javascript:void(0)" onclick="openUserinfo()"><span style="color:white">个人信息</span> </a>
+						</div>
+					</td>
+					<td style="text-align:center;width:25%;">
+						<div>
+							<img src="../images/sy1118-03.png">
+						</div>
+						<div style="margin:-5px;cursor:pointer;">
+							<a href="javascript:void(0)" onclick="openUpdatePassword()"><span style="color:white">密码修改</span> </a>
+						</div>
+					</td>
+					<td style="text-align:center;width:25%;">
+						<div>
+							<img src="../images/sy1118-02.png;">
+						</div>
+						<div style="margin:-5px;cursor:pointer;">
+							<a href="../logout.action"> <span style="color:white">系统退出
+							</span> </a>
+						</div>
+					</td>
+				</tr>
+			</tbody></table>
+
+		</div>
+		<div>
+			<div style="float:left;margin:63px 0px 0px -700px;">
+				<a onclick="openMenuPanel()">展开/隐藏菜单</a>&nbsp;&nbsp;
+				<!-- 
+				您当前所在:
+				 -->
+			</div>
+			<div style="float:left;margin:60px 0px 0px -290px;"></div>
+			<div style="float:right;margin:63px -360px;">
+				今天是
+				
+				2025年9月26日 星期五
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+			</div>
+		</div>
+	</div></div>
+
+
+	<div class="om-widget om-panel om-borderlayout-region om-borderlayout-region-center" region="center" style="margin: 0px; top: 85px; left: 28px; height: 515px; width: 772px;"><div id="center-panel" class="om-panel-body om-widget-content om-panel-noheader om-borderlayout-region-body" style="height: 513px; width: 770px;">
+		<div id="center-tab" class="om-tabs om-widget om-widget-content om-corner-all" style="height: 511px;">
+			<div class="om-tabs-headers om-helper-reset om-helper-clearfix om-widget-header om-corner-all header-no-border" style="height: 28px;"><ul style="height: 28px; line-height: 28px;">
+				<span class="left-placeholder" style=""></span><li class="om-state-default om-corner-top om-tabs-activated om-state-active"><span class="lileft"></span><a href="#tab1" tabid="om-tabs-18ee-0" class="om-tabs-inner" style="width: auto; height: 27px;">主页</a><span class="liright"></span></li><span class="right-placeholder" style=""></span>
+			</ul></div>
+			
+		<div class="om-tabs-panels om-widget-content om-corner-bottom" style="height: 479px;"><div class="om-widget om-panel"><div id="tab1" style="overflow:hidden" class="om-panel-body om-widget-content om-panel-noheader om-state-nobd">
+				<iframe id="main" border="0" frameborder="no" src="main.jsp" width="100%" style="height: 475px;"></iframe>
+			</div></div></div></div>
+	</div></div>
+	<div class="om-widget om-panel om-resizable om-borderlayout-region om-borderlayout-region-west" region="west" style="width: 220px; margin: 0px 5px 0px 0px; top: 85px; height: 515px; display: none;"><div class="om-panel-header om-borderlayout-region-header" style="width: 208px;"><div class="om-panel-title">综合治税业务流程系统</div><div class="om-panel-tool"><div class="om-icon panel-tool-collapse"></div></div></div><div id="west-panel" class="om-panel-body om-widget-content om-borderlayout-region-body" style="width: 218px; height: 488px;">
+		<ul id="myTree" class="om-tree om-widget"><li id="myTree_1" class="om-tree-node expandable "><div class="hitarea om-tree-node-hitarea expandable-hitarea -hitarea "></div><span class="FirstLayer folder "><a href="#">标普管理</a></span><ul style="display:none"><li id="myTree_2" class="om-tree-node expandable "><div class="hitarea om-tree-node-hitarea expandable-hitarea -hitarea "></div><span class="SecondLayer folder "><a href="#">项目管理</a></span><ul style="display:none"><li id="myTree_3" class="om-tree-node last"><span class="ThirdLayer file "><a href="#">项目台账列表</a></span></li></ul></li><li id="myTree_4" class="om-tree-node expandable "><div class="hitarea om-tree-node-hitarea expandable-hitarea -hitarea "></div><span class="SecondLayer folder "><a href="#">订餐管理</a></span><ul style="display:none"><li id="myTree_5" class="om-tree-node "><span class="ThirdLayer file "><a href="#">每日订餐管理</a></span></li><li id="myTree_6" class="om-tree-node "><span class="ThirdLayer file "><a href="#">每日订餐管理列表</a></span></li><li id="myTree_7" class="om-tree-node last"><span class="ThirdLayer file "><a href="#">每月订餐统计</a></span></li></ul></li><li id="myTree_8" class="om-tree-node expandable lastExpandable"><div class="hitarea om-tree-node-hitarea expandable-hitarea lastExpandable-hitarea "></div><span class="SecondLayer folder "><a href="#">任务管理</a></span><ul style="display:none"><li id="myTree_9" class="om-tree-node "><span class="ThirdLayer file "><a href="#">开发任务一览</a></span></li><li id="myTree_10" class="om-tree-node "><span class="ThirdLayer file "><a href="#">开发需求人天补充表</a></span></li><li id="myTree_11" class="om-tree-node last"><span class="ThirdLayer file "><a href="#">开发需求人天补充表列表</a></span></li></ul></li></ul></li><li id="myTree_12" class="om-tree-node expandable lastExpandable"><div class="hitarea om-tree-node-hitarea expandable-hitarea lastExpandable-hitarea "></div><span class="SecondLayer folder "><a href="#">通用接口平台</a></span><ul style="display:none"><li id="myTree_13" class="om-tree-node "><span class="ThirdLayer file "><a href="#">数据接口列表</a></span></li><li id="myTree_14" class="om-tree-node "><span class="ThirdLayer file "><a href="#">周计划报表</a></span></li><li id="myTree_15" class="om-tree-node last"><span class="ThirdLayer file "><a href="#">月计划报表</a></span></li></ul></li></ul>
+		<!-- 
+    	    <br><a href="#" style="color: red;" onclick="showLink(null,null)" >菜单管理</a>&nbsp;
+    	    <a href="#" style="color: red;" onclick="loadTree()" >刷新菜单</a>
+    	 -->
+	</div><div class="om-resizable-handle om-resizable-e" style="width: 5px; right: -5px;"></div></div>
+	<div>
+		<input type="hidden" id="ftask" value="0"> <input type="hidden" id="fmsg" value="0">
+	</div>
+	<div>
+		<form action="exportDataModel" method="post" id="hiddenForm" name="hiddenForm">
+			<input id="fileName" name="fileName" type="hidden"> <input id="fpath" name="fpath" type="hidden"> <input id="frealName" name="frealName" type="hidden">
+		</form>
+	</div>
+<div class="om-borderlayout-proxy om-borderlayout-proxy-west" proxy="west" style="top: 85px; height: 513px; display: block;"><div class="om-panel-title"></div><div class="om-panel-tool"><div class="om-icon panel-tool-expand"></div></div></div><div></div></body></html>

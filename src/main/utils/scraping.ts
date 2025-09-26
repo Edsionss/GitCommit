@@ -80,3 +80,50 @@ export const thsTest = () => {
     console.log('Scraped data:', data)
   })
 }
+
+export const AutomaticallyFillWorkSheet = () => {
+  executeScrapingTask({
+    windowOptions: { show: true },
+    beforeExecution: async (page) => {
+      // 1. 导航到登录页面 (请替换为你的实际网址)
+      await page.goto('http://www.bpsip.com/BPGL/userlogin.jsp', { waitUntil: 'networkidle0' })
+      console.log('navigated to login page.')
+
+      // 2. 填写用户名和密码
+      await page.type('#username', 'longhai_shen', { delay: 100 }) // delay 模拟真实输入
+      await page.type('#password', 'Biaopu@20241031', { delay: 100 })
+      console.log('credentials filled.')
+
+      // 3. 点击登录按钮并等待导航完成
+      await page.click('.login')
+      // await page.waitForNavigation({ waitUntil: 'networkidle2' })
+      await page.waitForSelector('.panel-tool-expand', { visible: true })
+      console.log('logged in successfully.')
+
+      // 4. 导航到日志填写页面
+      // 点开折叠栏
+      await page.click('.panel-tool-expand')
+      // 等待两秒
+      await new Promise((r) => setTimeout(r, 1000))
+      // 点开日志菜单
+      await page.click('.FirstLayer')
+      await new Promise((r) => setTimeout(r, 1000))
+      await page.click('.lastExpandable')
+      await new Promise((r) => setTimeout(r, 1000))
+      await page.click('text/开发需求人天补充表')
+      const response = await page.waitForResponse(
+        (response) => response.url().includes('/action_show') && response.status() === 200
+      )
+      const responseBody = await response.json()
+      const [linkHandle] = await page.$x(
+        '/html/body/form/div/div[2]/table/tbody/tr[2]/td[2]/textarea'
+      )
+      if (linkHandle) {
+        await linkHandle.click()
+        console.log('通过 XPath 成功点击了链接。')
+      } else {
+        throw new Error('未找到指定的链接！')
+      }
+    }
+  })
+}

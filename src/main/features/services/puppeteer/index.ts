@@ -59,11 +59,13 @@ export async function executeScrapingTask<T>(
       // 使用更长的超时和更合适的等待条件
       await page.goto(url, { waitUntil: 'networkidle0' })
     }
+    let data
+    if (scrapingLogic) {
+      // 传递参数给 scrapingLogic 并执行
+      data = await page.evaluate(scrapingLogic, ...logicArgs)
 
-    // 传递参数给 scrapingLogic 并执行
-    const data = await page.evaluate(scrapingLogic, ...logicArgs)
-
-    // 返回结果
+      // 返回结果
+    }
     return data
   } catch (error) {
     console.error('[PuppeteerService] Error occurred while executing scraping task:', error)
