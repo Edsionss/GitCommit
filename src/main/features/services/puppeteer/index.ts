@@ -17,13 +17,13 @@ export async function executeScrapingTask<T>(
   const uniquePartition = `persist:scraper_${crypto.randomBytes(8).toString('hex')}`
 
   const scrapeWindow = new BrowserWindow({
-    ...windowOptions, // 合并传入的配置
     show: false, // 关键：必须为 true，让窗口在操作系统层面被渲染
     webPreferences: {
       partition: uniquePartition, // !! 使用隔离的会话 !!
       backgroundThrottling: false // !! 禁用后台节流，确保JS全速运行 !!
       // 根据需要可以添加其他 webPreferences
-    }
+    },
+    ...windowOptions // 合并传入的配置
   })
 
   let page: Page | null = null
