@@ -110,19 +110,25 @@ export const AutomaticallyFillWorkSheet = () => {
       await new Promise((r) => setTimeout(r, 1000))
       await page.click('.lastExpandable')
       await new Promise((r) => setTimeout(r, 1000))
-      await page.click('text/开发需求人天补充表')
-      const response = await page.waitForResponse(
-        (response) => response.url().includes('/action_show') && response.status() === 200
-      )
-      const responseBody = await response.json()
-      const [linkHandle] = await page.$$(
-        '/html/body/form/div/div[2]/table/tbody/tr[2]/td[2]/textarea'
-      )
-      if (linkHandle) {
-        await linkHandle.click()
-        console.log('通过 XPath 成功点击了链接。')
-      } else {
-        throw new Error('未找到指定的链接！')
+
+      page.click('text/开发需求人天补充表')
+      const iframeSelector = 'iframe[name="inner-frame"]'
+      await page.waitForSelector(iframeSelector, { visible: true })
+      console.log('iframe loading success')
+      const iframeElementHandle = await page.$(iframeSelector)
+      if (iframeElementHandle) {
+        console.log('iframe get success')
+        const frame = await iframeElementHandle.contentFrame()
+        console.log(frame.name)
+
+        if (frame) {
+          console.log('iframe contentFrame success')
+          await frame.waitForSelector('#defaultTablediv')
+          await frame.type('[name="C_fxmmc"]', 'longhai_shen', { delay: 100 }) // delay 模拟真实输入
+          await frame.type('[name="C_fbz"]', 'longhai_shen', { delay: 100 }) // delay 模拟真实输入
+          await frame.type('[name="C_frt"]', 'longhai_shen', { delay: 100 }) // delay 模拟真实输入
+          await new Promise((r) => setTimeout(r, 100000))
+        }
       }
     }
   })

@@ -13,7 +13,14 @@ export async function executeScrapingTask<T>(
   ScrapingTaskOptions: ScrapingTaskOptions<T>
 ): Promise<T> {
   // 从 ScrapingTaskOptions 解构出参数
-  const { beforeExecution, scrapingLogic, logicArgs = [], url, windowOptions } = ScrapingTaskOptions
+  const {
+    beforeExecution,
+    scrapingLogic,
+    logicArgs = [],
+    url,
+    windowOptions,
+    captureError
+  } = ScrapingTaskOptions
 
   // 为本次爬虫任务创建一个完全隔离的会话
   const uniquePartition = `persist:scraper_${crypto.randomBytes(8).toString('hex')}`
@@ -71,7 +78,7 @@ export async function executeScrapingTask<T>(
     return data
   } catch (error) {
     console.error('[PuppeteerService] Error occurred while executing scraping task:', error)
-    if (page) {
+    if (page && captureError) {
       // --- 准备工作：创建目录和初始化日志内容 ---
       const errorLogDir = path.join(process.cwd(), 'puppeteerError')
       if (!fs.existsSync(errorLogDir)) {

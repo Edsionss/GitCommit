@@ -6,4 +6,5 @@ export interface ScrapingTaskOptions<T> {
   logicArgs?: any[]
   url?: string
   windowOptions?: Electron.BrowserWindowConstructorOptions
+  captureError?: boolean
 }
