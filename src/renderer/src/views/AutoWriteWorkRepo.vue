@@ -70,6 +70,7 @@ import { message } from 'ant-design-vue'
 import type { Rule } from 'ant-design-vue/es/form'
 import dayjs from 'dayjs'
 import type { Dayjs } from 'dayjs'
+import { automaticallyFillApi } from '@api/automaticallyFill'
 
 // 使用 TypeScript 定义表单数据的接口，提供类型安全
 interface FormState {
@@ -98,9 +99,15 @@ const rules: Record<string, Rule[]> = {
 }
 
 // 表单提交成功的回调
-const onFinish = (values: FormState) => {
-  console.log('Success:', values)
-  message.success('表单提交成功!')
+const onFinish = async (values: FormState) => {
+  const data = { ...values, completionDate: dayjs(values.completionDate).format('YYYY-MM-DD') }
+  console.log('Success:', data)
+  const state = await automaticallyFillApi.writeWorkRepo(data)
+  if (state == 'success') {
+    message.success('自动填写报告成功!')
+  } else {
+    message.success('自动填写报告失败!')
+  }
 }
 
 // 表单提交失败的回调

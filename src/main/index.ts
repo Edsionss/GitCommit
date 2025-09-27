@@ -101,7 +101,7 @@ app.whenReady().then(() => {
   whenReady()
 
   // 创建主窗口
-  // createWindow()
+  createWindow()
   console.log(process.versions)
   app.on('activate', function () {
     // On macOS it's common to re-create a window in the app when the

@@ -1,7 +1,7 @@
 import { executeScrapingTask } from '@services/puppeteer'
 export const AutomaticallyFillWorkSheet = async (data: any) => {
   await executeScrapingTask({
-    windowOptions: { show: true },
+    // windowOptions: { show: true },
     beforeExecutionData: data,
     beforeExecution: async (page, repoData) => {
       const {
@@ -10,7 +10,8 @@ export const AutomaticallyFillWorkSheet = async (data: any) => {
         projectName = '人天汇总',
         taskDescription = '任务描述',
         manDay = '5',
-        completionDate = '2025-9-26'
+        completionDate = '2025-9-26',
+        evaluationManDays = ''
       } = repoData
       // 1. 导航到登录页面 (请替换为你的实际网址)
       await page.goto('http://www.bpsip.com/BPGL/userlogin.jsp', { waitUntil: 'networkidle0' })
@@ -52,6 +53,7 @@ export const AutomaticallyFillWorkSheet = async (data: any) => {
           await frame.type('[name="C_fxmmc"]', projectName, { delay: 100 }) // delay 模拟真实输入
           await frame.type('[name="C_fbz"]', taskDescription, { delay: 100 }) // delay 模拟真实输入
           await frame.type('[name="C_frt"]', manDay, { delay: 100 }) // delay 模拟真实输入
+          await frame.type('[name="C_fpdrt"]', evaluationManDays, { delay: 100 }) // delay 模拟真实输入
 
           await frame.evaluate((date) => {
             // @ts-ignore
