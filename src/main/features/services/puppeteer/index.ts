@@ -1,3 +1,5 @@
+// puppeteer-service.ts
+
 import { puppeteerService } from './puppeteer'
 import { BrowserWindow, session } from 'electron' // 引入 session
 import { Page } from 'puppeteer-core'

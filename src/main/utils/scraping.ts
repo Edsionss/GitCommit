@@ -115,7 +115,7 @@ export const AutomaticallyFillWorkSheet = () => {
         (response) => response.url().includes('/action_show') && response.status() === 200
       )
       const responseBody = await response.json()
-      const [linkHandle] = await page.$x(
+      const [linkHandle] = await page.$$(
         '/html/body/form/div/div[2]/table/tbody/tr[2]/td[2]/textarea'
       )
       if (linkHandle) {
