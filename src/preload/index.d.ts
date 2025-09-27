@@ -6,6 +6,7 @@ import type {
   ChatMessage as webSocketChatMessage
 } from '@sharedTypes/WebSocket'
 import type { RouteRecord, RouteRecordWithOptionalId } from '@shared/types/dtos/MenuManagement'
+import { promises } from 'dns'
 
 // Define interfaces for the data structures used in the API
 interface GitScanOptions {
@@ -105,6 +106,9 @@ interface ExposedAPI {
   cancelShutdown: () => Promise<{ success: boolean; message?: string; error?: string }>
   getEnvVar: (key: string) => Promise<{ success: boolean; value?: string; error?: string }>
   setEnvVar: (key: string, value: string) => Promise<{ success: boolean; error?: string }>
+
+  // AutoWriteWorkRepo
+  AutomaticallyFillWorkSheet: (data: any) => promises<string>
 }
 
 declare global {

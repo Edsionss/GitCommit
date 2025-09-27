@@ -131,7 +131,10 @@ const api = {
   cancelShutdown: () => ipcRenderer.invoke('system-tools:cancel-shutdown'),
   getEnvVar: (key: string) => ipcRenderer.invoke('system-tools:get-env-var', key),
   setEnvVar: (key: string, value: string) =>
-    ipcRenderer.invoke('system-tools:set-env-var', key, value)
+    ipcRenderer.invoke('system-tools:set-env-var', key, value),
+
+  // AutoWriteWorkRepo
+  AutomaticallyFillWorkSheet: (data: any) => ipcRenderer.invoke('autoWrite-WorkRepo', data)
 }
 
 // 暴露API

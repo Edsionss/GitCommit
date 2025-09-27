@@ -15,6 +15,7 @@ export async function executeScrapingTask<T>(
   // 从 ScrapingTaskOptions 解构出参数
   const {
     beforeExecution,
+    beforeExecutionData,
     scrapingLogic,
     logicArgs = [],
     url,
@@ -59,7 +60,7 @@ export async function executeScrapingTask<T>(
 
     // 🎉 在这里执行你所有的准备工作！
     if (beforeExecution) {
-      await beforeExecution(page)
+      await beforeExecution(page, beforeExecutionData)
     }
 
     // 执行核心的抓取逻辑
@@ -75,7 +76,7 @@ export async function executeScrapingTask<T>(
 
       // 返回结果
     }
-    return data
+    return data || 'success'
   } catch (error) {
     console.error('[PuppeteerService] Error occurred while executing scraping task:', error)
     if (page && captureError) {

@@ -72,7 +72,7 @@ export const whenReady = () => {
 
   // telegraphTest()
   // thsTest()
-  AutomaticallyFillWorkSheet()
+  // AutomaticallyFillWorkSheet({})
 }
 // 应用即将退出的周期函数
 export const willQuit = () => {

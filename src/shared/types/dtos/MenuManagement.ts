@@ -341,6 +341,20 @@ export const mockFlatRoutes: RouteRecordWithOptionalId[] = [
     menuOrder: 10000,
     menuIcon: 'CommentOutlined',
     hide: '0'
+  },
+  {
+    id: '',
+    parentId: null,
+    path: 'autoWriteWorkRepo',
+    name: 'AutoWriteWorkRepo',
+    componentPath: 'AutoWriteWorkRepo',
+    meta: {
+      title: '自动化工作日志',
+      keepAlive: '1'
+    },
+    menuOrder: 10000,
+    menuIcon: 'CommentOutlined',
+    hide: '0'
   }
 ]
 
