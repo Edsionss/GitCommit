@@ -27,8 +27,9 @@
       <div class="user-menu">
         <a-dropdown trigger="click">
           <div class="user-avatar">
-            <a-avatar :size="40" :src="CognitoOcean"></a-avatar>
-            <DownOutlined />
+            <!-- <a-avatar :size="40" :src="CognitoOcean"></a-avatar> -->
+            <!-- <DownOutlined /> -->
+            <MenuOutlined />
           </div>
           <template #overlay>
             <a-menu>
@@ -48,12 +49,15 @@
           </template>
         </a-dropdown>
       </div>
+      <a-divider style="border-color: #87868673; height: 20px" type="vertical" />
+      <TitleBar />
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import CognitoOcean from '@/assets/img/logo/CognitoOcean.png'
+import TitleBar from '@components/TitleBar/TitleBar.vue'
 
 import { BulbOutlined, MenuUnfoldOutlined, MenuFoldOutlined } from '@ant-design/icons-vue'
 import { ref, computed } from 'vue'
@@ -63,6 +67,7 @@ import { storeToRefs } from 'pinia'
 import {
   PlusOutlined,
   DownOutlined,
+  MenuOutlined,
   SettingOutlined,
   ReloadOutlined,
   LogoutOutlined
@@ -120,6 +125,9 @@ const exitApp = () => {
   box-sizing: border-box;
   overflow: hidden;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+
+  /* -webkit-app-region: drag; */
+  -webkit-app-region: no-drag;
 }
 
 .header-title {

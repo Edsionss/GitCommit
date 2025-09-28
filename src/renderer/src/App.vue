@@ -1,6 +1,6 @@
 <template>
   <a-config-provider :theme="themeConfig">
-    <TitleBar />
+    <!-- <TitleBar /> -->
     <router-view />
   </a-config-provider>
 </template>
