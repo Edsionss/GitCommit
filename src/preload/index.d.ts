@@ -109,6 +109,12 @@ interface ExposedAPI {
 
   // AutoWriteWorkRepo
   AutomaticallyFillWorkSheet: (data: any) => promises<string>
+
+  // Window Management API
+  minimizeWindow: () => Promise<void>
+  maximizeWindow: () => Promise<void>
+  closeWindow: () => Promise<void>
+  onWindowStateChange: (callback: (state: 'maximized' | 'unmaximized') => void) => () => void
 }
 
 declare global {

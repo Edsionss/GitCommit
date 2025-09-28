@@ -134,7 +134,22 @@ const api = {
     ipcRenderer.invoke('system-tools:set-env-var', key, value),
 
   // AutoWriteWorkRepo
-  AutomaticallyFillWorkSheet: (data: any) => ipcRenderer.invoke('autoWrite-WorkRepo', data)
+  AutomaticallyFillWorkSheet: (data: any) => ipcRenderer.invoke('autoWrite-WorkRepo', data),
+
+  // Window Management API
+  minimizeWindow: () => ipcRenderer.send('window:minimize'),
+  maximizeWindow: () => ipcRenderer.send('window:maximize'),
+  closeWindow: () => ipcRenderer.send('window:close'),
+  onWindowStateChange: (callback) => {
+    const listener = (_, state) => callback(state)
+    ipcRenderer.on('window:maximized', () => callback('maximized'))
+    ipcRenderer.on('window:unmaximized', () => callback('unmaximized'))
+
+    return () => {
+      ipcRenderer.removeListener('window:maximized', listener)
+      ipcRenderer.removeListener('window:unmaximized', listener)
+    }
+  }
 }
 
 // 暴露API

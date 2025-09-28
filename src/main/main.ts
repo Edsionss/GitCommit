@@ -26,6 +26,8 @@ export const beforeCreate = () => {
 }
 // 创建窗口时的周期函数
 export const customCreateWindow = () => {
+  // IPC 注册
+  registerIpcHandlers()
   // 修改会话的 CSP
   session.defaultSession.webRequest.onHeadersReceived((details, callback) => {
     // 根据开发环境和生产环境构建动态的 script-src 策略
@@ -59,9 +61,6 @@ export const customCreateWindow = () => {
 export const whenReady = () => {
   // WebSocket 服务器启动
   startWebSocketServer()
-
-  // IPC 注册
-  registerIpcHandlers()
 
   // 同步开机自启设置
   const storedAutoStart = settingsService.getStoredAutoStartSetting()
