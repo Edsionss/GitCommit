@@ -10,7 +10,7 @@ import { computed, watchEffect, onMounted } from 'vue'
 import { theme as antTheme } from 'ant-design-vue'
 import { useTheme } from './composables/useTheme'
 import { useWebSocketStore } from '@/stores/webSocketStore'
-import TitleBar from './components/TitleBar.vue'
+import TitleBar from '@components/TitleBar/TitleBar.vue'
 
 // 初始化 WebSocket store
 const wsStore = useWebSocketStore()

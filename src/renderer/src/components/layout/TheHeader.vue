@@ -55,7 +55,7 @@
 <script setup lang="ts">
 import CognitoOcean from '@/assets/img/logo/CognitoOcean.png'
 
-import {  BulbOutlined, MenuUnfoldOutlined, MenuFoldOutlined } from '@ant-design/icons-vue'
+import { BulbOutlined, MenuUnfoldOutlined, MenuFoldOutlined } from '@ant-design/icons-vue'
 import { ref, computed } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useSettingsStore } from '@/stores/settingsStore'
@@ -115,7 +115,7 @@ const exitApp = () => {
   min-height: 64px;
   max-height: 64px;
   background-color: var(--bg-container);
-  border-bottom: 1px solid var(--border-secondary);
+  /* border-bottom: 1px solid var(--border-secondary); */
   z-index: 100;
   box-sizing: border-box;
   overflow: hidden;

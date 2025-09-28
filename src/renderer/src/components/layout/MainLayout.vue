@@ -56,7 +56,7 @@ const layoutClasses = computed(() => ({
 .sidebar {
   height: 100%;
   z-index: 20;
-  border-right: 1px solid var(--border-primary);
+  /* border-right: 1px solid var(--border-primary); */
 }
 
 .layout-container.sidebar-right .sidebar {
@@ -90,6 +90,7 @@ const layoutClasses = computed(() => ({
 }
 
 .content-area {
+  border: 1px solid var(--border-primary);
   flex: 1;
   padding: 10px;
   width: 100%;

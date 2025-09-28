@@ -24,14 +24,14 @@
 
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted } from 'vue'
-import { windowApi } from '../api/windowApi'
+import { applicationApi } from '@api/application'
 
 const isMaximized = ref(false)
 
 let unlisten: () => void
 
 onMounted(() => {
-  unlisten = windowApi.onWindowStateChange((state) => {
+  unlisten = applicationApi.onWindowStateChange((state) => {
     isMaximized.value = state === 'maximized'
   })
 })
@@ -43,15 +43,15 @@ onUnmounted(() => {
 })
 
 const minimize = () => {
-  windowApi.minimizeWindow()
+  applicationApi.minimizeWindow()
 }
 
 const maximize = () => {
-  windowApi.maximizeWindow()
+  applicationApi.maximizeWindow()
 }
 
 const close = () => {
-  windowApi.closeWindow()
+  applicationApi.closeWindow()
 }
 </script>
 

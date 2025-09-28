@@ -98,13 +98,16 @@ const handleMenuClick: MenuProps['onClick'] = ({ item, key, keyPath }) => {
   flex-direction: column;
   height: 100%;
   background-color: var(--bg-container);
-  border-right: 1px solid var(--border-color);
+  //border-right: 1px solid var(--border-color);
   transition: width 0.3s ease;
   :deep(.ant-layout-sider) {
     height: 100%;
   }
   :deep(.ant-layout-sider-children) {
     height: 100%;
+  }
+  :deep(.ant-menu) {
+    border: none;
   }
   .logo {
     padding: 10px 0;
