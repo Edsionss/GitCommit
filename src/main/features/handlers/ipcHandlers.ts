@@ -13,7 +13,7 @@ import { registerRoutesMenuHandlers } from '@handlers/routes_menu'
 import { registerSettingsHandlers } from '@handlers/settings'
 import { registerSystemToolsHandlers } from '@handlers/system_tools'
 import { registerAutoWriteWorkRepoHandlers } from '@handlers/autoWriteWorkRepo'
-import { registerWindowHandlers } from './windows'
+import { registerApplicationHandlers } from '@handlers/application'
 
 export function registerIpcHandlers() {
   // Register handlers from other modules
@@ -32,6 +32,6 @@ export function registerIpcHandlers() {
   registerSettingsHandlers()
   registerSystemToolsHandlers()
   registerAutoWriteWorkRepoHandlers()
-  registerWindowHandlers()
+  registerApplicationHandlers()
   // 注册 IPC 处理器
 }

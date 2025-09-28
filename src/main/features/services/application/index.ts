@@ -1,6 +1,6 @@
 import { BrowserWindow } from 'electron'
 
-class WindowService {
+class ApplicationService {
   public minimize(browserWindow: BrowserWindow): void {
     if (browserWindow) {
       browserWindow.minimize()
@@ -36,4 +36,4 @@ class WindowService {
   }
 }
 
-export const windowService = new WindowService()
+export const applicationService = new ApplicationService()

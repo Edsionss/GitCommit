@@ -1,29 +1,29 @@
 import { BrowserWindow, ipcMain } from 'electron'
-import { windowService } from '@services/windows'
+import { applicationService } from '@services/application'
 import { getMainWindow } from '@main/index'
-export function registerWindowHandlers(): void {
+export function registerApplicationHandlers(): void {
   let browserWindow: BrowserWindow | null = getMainWindow()
   if (!browserWindow) {
     return
   }
 
   ipcMain.on('window:minimize', () => {
-    windowService.minimize(browserWindow)
+    applicationService.minimize(browserWindow)
   })
 
   ipcMain.on('window:maximize', () => {
-    windowService.maximize(browserWindow)
+    applicationService.maximize(browserWindow)
   })
 
   ipcMain.on('window:close', () => {
-    windowService.close(browserWindow)
+    applicationService.close(browserWindow)
   })
 
-  windowService.onMaximized(browserWindow, () => {
+  applicationService.onMaximized(browserWindow, () => {
     browserWindow.webContents.send('window:maximized')
   })
 
-  windowService.onUnmaximized(browserWindow, () => {
+  applicationService.onUnmaximized(browserWindow, () => {
     browserWindow.webContents.send('window:unmaximized')
   })
 }
