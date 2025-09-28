@@ -43,6 +43,7 @@ function createWindow(): void {
     width: 2000,
     height: 800,
     show: false,
+    frame: false,
     autoHideMenuBar: true,
     icon: join(__dirname, '../../build/CognitoOcean1.png'), // Windows和Linux会使用这个
     ...(process.platform === 'linux' ? { icon } : {}),
