@@ -3,20 +3,24 @@
     <div class="title-bar__drag-region"></div>
     <div class="title-bar__controls">
       <div class="title-bar__control" @click="minimize">
-        <svg width="12" height="12" viewBox="0 0 12 12"><path d="M0 5 H12 V7 H0z"></path></svg>
+        <!-- <svg width="12" height="12" viewBox="0 0 12 12"><path d="M0 5 H12 V7 H0z"></path></svg> -->
+        <LineOutlined />
       </div>
       <div class="title-bar__control" @click="maximize">
-        <svg v-if="!isMaximized" width="12" height="12" viewBox="0 0 12 12">
+        <!-- <svg v-if="!isMaximized" width="12" height="12" viewBox="0 0 12 12">
           <path d="M0 0 H12 V12 H0z M2 2 V10 H10 V2z"></path>
-        </svg>
-        <svg v-else width="12" height="12" viewBox="0 0 12 12">
+        </svg> -->
+        <ExpandOutlined v-if="!isMaximized" />
+        <CompressOutlined v-else />
+        <!-- <svg v-else width="12" height="12" viewBox="0 0 12 12">
           <path d="M2 0 H10 V2 H2z M0 2 H2 V10 H0z M2 10 H10 V12 H2z M10 2 H12 V10 H10z"></path>
-        </svg>
+        </svg> -->
       </div>
       <div class="title-bar__control title-bar__control--close" @click="close">
-        <svg width="12" height="12" viewBox="0 0 12 12">
+        <!-- <svg width="12" height="12" viewBox="0 0 12 12">
           <path d="M0 0 L12 12 M0 12 L12 0"></path>
-        </svg>
+        </svg> -->
+        <CloseOutlined />
       </div>
     </div>
   </div>
@@ -25,7 +29,12 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted } from 'vue'
 import { applicationApi } from '@api/application'
-
+import {
+  LineOutlined,
+  CloseOutlined,
+  CompressOutlined,
+  ExpandOutlined
+} from '@ant-design/icons-vue'
 const isMaximized = ref(false)
 
 let unlisten: () => void
@@ -82,11 +91,12 @@ const close = () => {
 }
 
 .title-bar__control:hover {
-  background-color: rgba(255, 255, 255, 0.1);
+  background-color: var(--bg-hover);
 }
 
 .title-bar__control--close:hover {
-  background-color: #e81123;
+  background-color: var(--color-danger);
+  color: #fff;
 }
 
 .title-bar__control svg {
