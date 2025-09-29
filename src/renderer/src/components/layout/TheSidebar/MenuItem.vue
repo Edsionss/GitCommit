@@ -3,7 +3,7 @@
     <a-sub-menu v-if="item.children && item.children.length" :key="item.path">
       <template #title>
         <span>
-          <component :is="item.icon" />
+          <component :is="iconMap[item.menuIcon]" />
           <span>{{ item.meta.title }}</span>
         </span>
       </template>
@@ -12,7 +12,7 @@
     <template v-else>
       <a-menu-item :key="item.path">
         <template #icon>
-          <component :is="item.icon" />
+          <component :is="iconMap[item.menuIcon]" />
         </template>
         <span>{{ item.meta.title }}</span>
       </a-menu-item>
@@ -21,6 +21,8 @@
 </template>
 
 <script setup lang="ts">
+import * as iconMap from '@ant-design/icons-vue' // 引入所有图标
+
 defineOptions({
   name: 'MenuItem'
 })
