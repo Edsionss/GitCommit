@@ -29,7 +29,7 @@ import { useSettingsStore } from '@/stores/settingsStore'
 import TheSidebar from './TheSidebar/index.vue'
 import TheHeader from './TheHeader.vue'
 
-const isExpanded = ref(false)
+const isExpanded = ref(true)
 
 const settingsStore = useSettingsStore()
 const { DisplayConfig } = storeToRefs(settingsStore)
