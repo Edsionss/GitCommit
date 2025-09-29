@@ -73,3 +73,36 @@ export const loadSystemNotify = ({
     duration: 0
   })
 }
+
+/**
+ * 递归处理菜单/路由数组，生成完整的路径
+ * @param nodes - 要处理的菜单项数组
+ * @param parentPath - 父节点的路径 (内部递归使用)
+ * @returns 返回一个带有完整路径的新数组
+ */
+export function formatPathsAndFilter(nodes: any[], parentPath: string = ''): any[] {
+  // 使用 map 来遍历数组，并返回一个新数组，避免修改原始数据
+  return (
+    nodes
+      // 步骤 1: 过滤掉 hide === "0" 的节点
+      .filter((node) => node.hide !== '1')
+      // 步骤 2: 对过滤后的数组进行路径格式化
+      .map((node) => {
+        // 创建节点的副本，以保持原数据不变
+        const newNode = { ...node }
+
+        // 根据规则计算当前节点的完整路径
+        const fullPath = parentPath ? `${parentPath}/${newNode.path}` : `/${newNode.path}`
+
+        newNode.path = fullPath
+
+        // 如果存在 children 数组，则递归调用自身进行过滤和格式化
+        if (newNode.children && newNode.children.length > 0) {
+          // 将当前节点的 fullPath 作为下一次递归的 parentPath 传入
+          newNode.children = formatPathsAndFilter(newNode.children, fullPath)
+        }
+
+        return newNode
+      })
+  )
+}

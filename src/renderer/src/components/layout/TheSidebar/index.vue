@@ -13,30 +13,7 @@
         class="menu-content"
         :style="menuContentStyle"
       >
-        <div v-for="item in menuItems" :key="item.path">
-          <a-sub-menu :key="item.path" v-if="item.children && item.children.length">
-            <template #title>
-              <span>
-                <component :is="item.icon" />
-                <span>{{ item.meta.title }}</span>
-              </span>
-            </template>
-            <a-menu-item v-for="menu in item.children" :key="item.path + '/' + menu.path">
-              <template #icon>
-                <component :is="menu.icon" />
-              </template>
-              <span>{{ menu.meta.title }}</span>
-            </a-menu-item>
-          </a-sub-menu>
-          <div v-else>
-            <a-menu-item :key="item.path">
-              <template #icon>
-                <component :is="item.icon" />
-              </template>
-              <span>{{ item.meta.title }}</span>
-            </a-menu-item>
-          </div>
-        </div>
+        <MenuItem :menus="menuItems"></MenuItem>
       </a-menu>
     </a-layout-sider>
   </div>
@@ -50,6 +27,8 @@ import { storeToRefs } from 'pinia'
 import { useRoutesStore } from '@/stores/routesStore'
 import * as iconMap from '@ant-design/icons-vue' // 引入所有图标
 import type { MenuProps } from 'ant-design-vue'
+import MenuItem from './MenuItem.vue'
+import { formatPathsAndFilter } from '@/utils'
 
 const isExpanded = defineModel<boolean>()
 
@@ -68,16 +47,23 @@ watch(
   { immediate: true }
 )
 
+const loadRouteArray = (array: any[]) => {
+  array.map((item) => {
+    item.path = `/${item.path}`
+    if (item && item.children && item.children.length) {
+      item.children.map((child) => {
+        child.path = `${item.path}/${child.path}`
+      })
+      loadRouteArray(item.children)
+    }
+  })
+}
+
 // Dynamically generate menu items from the routes store
 const menuItems = computed(() => {
-  return routes.value
-    .filter((route) => route.hide !== '1')
-    .map((r) => ({
-      ...r,
-      path: r.path === '' ? '/' : `/${r.path}`,
-      // label: r.meta.title,
-      icon: iconMap[r.menuIcon || 'FileTextOutlined']
-    }))
+  console.log(formatPathsAndFilter(routes.value))
+
+  return formatPathsAndFilter(routes.value)
 })
 
 const logoStyle = computed(() => {
@@ -98,7 +84,6 @@ const handleMenuClick: MenuProps['onClick'] = ({ item, key, keyPath }) => {
   flex-direction: column;
   height: 100%;
   background-color: var(--bg-container);
-  //border-right: 1px solid var(--border-color);
   transition: width 0.3s ease;
   :deep(.ant-layout-sider) {
     height: 100%;

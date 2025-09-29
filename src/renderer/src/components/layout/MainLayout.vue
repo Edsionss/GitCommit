@@ -25,7 +25,8 @@
 import { computed, onMounted, ref } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useSettingsStore } from '@/stores/settingsStore'
-import TheSidebar from './TheSidebar.vue'
+// import TheSidebar from './TheSidebar.vue'
+import TheSidebar from './TheSidebar/index.vue'
 import TheHeader from './TheHeader.vue'
 
 const isExpanded = ref(false)
