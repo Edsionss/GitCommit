@@ -3,6 +3,11 @@ import { defineConfig, externalizeDepsPlugin } from 'electron-vite'
 import vue from '@vitejs/plugin-vue'
 import packageJson from './package.json'
 
+// 1. 引入插件
+import Icons from 'unplugin-icons/vite'
+import IconsResolver from 'unplugin-icons/resolver'
+import Components from 'unplugin-vue-components/vite'
+
 // 您的自定义 htmlPlugin 保持不变
 function htmlPlugin() {
   return {
@@ -65,6 +70,30 @@ export default defineConfig({
         '@utils': resolve('src/renderer/src/utils')
       }
     },
-    plugins: [vue(), htmlPlugin()]
+    plugins: [
+      vue(),
+      htmlPlugin(),
+      // 2. 配置 unplugin-vue-components
+      Components({
+        // resolvers 用来自动解析图标，将其视为组件
+        resolvers: [
+          IconsResolver({
+            prefix: 'i', // 可选，给图标组件加个前缀，比如 <i-ant-design-home-outlined />
+            enabledCollections: ['heroicons-solid'] // 可选，只启用你需要的图标库
+          })
+        ]
+      }),
+
+      // 3. 配置 unplugin-icons
+      Icons({
+        autoInstall: true, // 核心功能：检测到你使用了尚未安装的图标库时，会自动通过 npm/yarn/pnpm 安装
+        compiler: 'vue3', // 编译成 Vue 3 组件
+        // 添加这个 transform 回调
+        transform(svg) {
+          // 给所有图标的 <svg> 标签都加上 class="anticon"
+          return svg.replace('<svg', '<svg class="anticon"')
+        }
+      })
+    ]
   }
 })

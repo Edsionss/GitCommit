@@ -58,7 +58,6 @@ const close = () => {
 .title-bar {
   display: flex;
   height: 32px;
-  -webkit-app-region: drag;
   background-color: var(--bg-container);
 }
 
@@ -68,14 +67,13 @@ const close = () => {
 
 .title-bar__controls {
   display: flex;
-  -webkit-app-region: no-drag;
+  gap: 20px;
 }
 
 .title-bar__control {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 46px;
   height: 32px;
   cursor: pointer;
 }

@@ -16,19 +16,15 @@
       <span class="code-container">{{ route.fullPath }}</span>
     </div>
     <div class="header-actions">
-      <a-tooltip :title="DisplayConfig.theme === 'dark' ? '切换到亮色主题' : '切换到暗色主题'">
-        <a-button class="action-button" type="text" @click="toggleTheme">
-          <template #icon>
-            <BulbOutlined />
-          </template>
-        </a-button>
-      </a-tooltip>
+      <div class="application-menu">
+        <div class="theme" @click="toggleTheme">
+          <i-heroicons-solid-sun v-if="DisplayConfig.theme === 'dark'" />
+          <i-heroicons-solid-moon v-else />
+        </div>
 
-      <div class="user-menu">
         <a-dropdown trigger="click">
           <div class="user-avatar">
             <!-- <a-avatar :size="40" :src="CognitoOcean"></a-avatar> -->
-            <!-- <DownOutlined /> -->
             <MenuOutlined />
           </div>
           <template #overlay>
@@ -50,15 +46,14 @@
         </a-dropdown>
       </div>
       <a-divider style="border-color: #87868673; height: 20px" type="vertical" />
-      <TitleBar />
+      <TheTitleBar />
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import CognitoOcean from '@/assets/img/logo/CognitoOcean.png'
-import TitleBar from '@components/TitleBar/TitleBar.vue'
-
+import TheTitleBar from './TheTitleBar.vue'
 import { BulbOutlined, MenuUnfoldOutlined, MenuFoldOutlined } from '@ant-design/icons-vue'
 import { ref, computed } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
@@ -110,7 +105,7 @@ const exitApp = () => {
 }
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .header {
   display: flex;
   justify-content: space-between;
@@ -126,14 +121,14 @@ const exitApp = () => {
   overflow: hidden;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 
-  /* -webkit-app-region: drag; */
-  -webkit-app-region: no-drag;
+  -webkit-app-region: drag;
 }
 
 .header-title {
   display: flex;
   align-items: center;
   gap: 12px;
+  -webkit-app-region: no-drag;
 }
 
 .app-title {
@@ -157,12 +152,21 @@ const exitApp = () => {
 .header-actions {
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 20px;
+  -webkit-app-region: no-drag;
 }
 
-.user-menu {
+.application-menu {
   display: flex;
   align-items: center;
+  gap: 20px;
+  cursor: pointer;
+
+  .theme {
+    display: flex;
+    align-items: center;
+  }
 }
 
 .user-avatar {
