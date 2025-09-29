@@ -1,7 +1,7 @@
 {
   "name": "cognitoocean",
   "project": "CognitoOcean",
-  "version": "0.0.8",
+  "version": "0.5",
   "description": "Charting Your Path to Clarity.By Electron with Vue and TypeScript",
   "main": "./out/main/index.js",
   "author": "Bocean.com",
