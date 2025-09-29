@@ -203,6 +203,20 @@ export const mockFlatRoutes: RouteRecordWithOptionalId[] = [
     hide: '0'
   },
   {
+    id: '',
+    parentId: '_GpOkXJWmoxP-_cIhH-9F',
+    path: 'industrySector',
+    name: 'IndustrySector',
+    componentPath: 'components/Stock/MarketQuotation/IndustrySector',
+    meta: {
+      title: '行业板块',
+      keepAlive: '0'
+    },
+    menuOrder: 0,
+    menuIcon: 'SafetyCertificateOutlined',
+    hide: '0'
+  },
+  {
     id: 'bbsyp1V2agdfeTKGK8KoX',
     parentId: null,
     path: 'scan',

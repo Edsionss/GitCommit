@@ -47,22 +47,8 @@ watch(
   { immediate: true }
 )
 
-const loadRouteArray = (array: any[]) => {
-  array.map((item) => {
-    item.path = `/${item.path}`
-    if (item && item.children && item.children.length) {
-      item.children.map((child) => {
-        child.path = `${item.path}/${child.path}`
-      })
-      loadRouteArray(item.children)
-    }
-  })
-}
-
 // Dynamically generate menu items from the routes store
 const menuItems = computed(() => {
-  console.log(formatPathsAndFilter(routes.value))
-
   return formatPathsAndFilter(routes.value)
 })
 
