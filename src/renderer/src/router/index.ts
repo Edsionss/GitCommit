@@ -65,6 +65,7 @@ async function addDynamicRoutes(routerInstance: Router) {
     name: 'NotFound',
     component: NotFound
   })
+
   routerInstance.addRoute(mainLayoutRoute)
 }
 

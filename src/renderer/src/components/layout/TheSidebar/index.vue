@@ -49,6 +49,8 @@ watch(
 
 // Dynamically generate menu items from the routes store
 const menuItems = computed(() => {
+  console.log(formatPathsAndFilter(routes.value))
+
   return formatPathsAndFilter(routes.value)
 })
 
