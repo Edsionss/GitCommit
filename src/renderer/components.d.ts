@@ -9,6 +9,7 @@ export {}
 declare module 'vue' {
   export interface GlobalComponents {
     ActionPanel: typeof import('./src/components/BasicSettings/ActionPanel.vue')['default']
+    AddStock: typeof import('./src/components/Stock/StockList/AddStock.vue')['default']
     AddStockWizard: typeof import('./src/components/Stock/AddStockWizard.vue')['default']
     AiConfig: typeof import('./src/components/SettingsView/AiConfig.vue')['default']
     AiDiagnosis: typeof import('./src/components/Stock/StockList/StockDetail/components/AiDiagnosis.vue')['default']

@@ -2,7 +2,7 @@
   <div class="stock-pool-wrapper">
     <div class="toolbar">
       <a-input-search placeholder="搜索股票..." style="width: 100%" />
-      <a-button type="primary">
+      <a-button type="primary" @click="showAddStockModal">
         <template #icon><PlusOutlined /></template>
       </a-button>
     </div>
@@ -30,6 +30,7 @@
         </div>
       </div>
     </div>
+    <add-stock v-model:visible="isAddStockModalVisible" @add-stock="handleAddStock" />
   </div>
 </template>
 
@@ -37,6 +38,7 @@
 import { reactive, ref } from 'vue'
 import { InputSearch as AInputSearch, Button as AButton } from 'ant-design-vue'
 import { PlusOutlined } from '@ant-design/icons-vue'
+import AddStock from './AddStock.vue'
 
 const emit = defineEmits(['stock-selected'])
 
@@ -114,6 +116,17 @@ const stockList = reactive([
 ])
 
 const selectedStock = ref(null)
+const isAddStockModalVisible = ref(false)
+
+const showAddStockModal = () => {
+  isAddStockModalVisible.value = true
+}
+
+const handleAddStock = (stock) => {
+  if (!stockList.some((item) => item.code === stock.code)) {
+    stockList.push(stock)
+  }
+}
 
 const handleStockClick = (stock) => {
   selectedStock.value = stock
