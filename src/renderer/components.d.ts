@@ -59,7 +59,6 @@ declare module 'vue' {
     MenuItem: typeof import('./src/components/layout/TheSidebar/MenuItem.vue')['default']
     MenuList: typeof import('./src/components/MenuManagement/MenuList.vue')['default']
     MenuModal: typeof import('./src/components/MenuManagement/MenuModal.vue')['default']
-    'MenuModal copy': typeof import('./src/components/MenuManagement/MenuModal copy.vue')['default']
     MergeBranchDialog: typeof import('./src/components/BranchesView/MergeBranchDialog.vue')['default']
     MonthlyK: typeof import('./src/components/Stock/StockList/StockDetail/components/MonthlyK.vue')['default']
     NetWorkTool: typeof import('./src/components/RealTimeCommunication/NetWorkTool.vue')['default']

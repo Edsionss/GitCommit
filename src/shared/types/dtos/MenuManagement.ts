@@ -269,7 +269,7 @@ export const mockFlatRoutes: RouteRecordWithOptionalId[] = [
     },
     menuOrder: 1000,
     menuIcon: 'SettingOutlined',
-    hide: '0'
+    hide: '1'
   },
   {
     id: '3xPTToKm4_uwjHAHGX1C7',

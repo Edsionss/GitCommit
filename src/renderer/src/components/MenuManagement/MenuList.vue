@@ -31,7 +31,13 @@
       <!-- 操作列 -->
       <template v-if="column.key === 'action'">
         <a-space>
-          <a-button @click="$emit('edit', record)" type="dashed" size="small">编辑</a-button>
+          <a-button
+            @click="$emit('edit', record)"
+            type="dashed"
+            size="small"
+            :disabled="record.name == 'Settings'"
+            >编辑</a-button
+          >
           <a-button
             size="small"
             type="primary"
