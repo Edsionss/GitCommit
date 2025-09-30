@@ -170,7 +170,7 @@ const close = () => {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 20px;
+  gap: 10px;
   -webkit-app-region: no-drag;
 }
 
@@ -184,7 +184,8 @@ const close = () => {
   .menu-box {
     display: flex;
     align-items: center;
-    padding: 8px 15px;
+    padding: 12px;
+    border-radius: 50%;
   }
   .menu-box:hover {
     background-color: var(--bg-hover);
@@ -194,13 +195,6 @@ const close = () => {
     background-color: var(--color-danger);
     color: #fff;
   }
-}
-
-.user-avatar {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  cursor: pointer;
 }
 
 /* 当侧边栏展开时调整头部位置 */
