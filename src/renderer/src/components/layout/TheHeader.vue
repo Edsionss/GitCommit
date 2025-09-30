@@ -17,55 +17,51 @@
     </div>
     <div class="header-actions">
       <div class="application-menu">
-        <div class="theme" @click="toggleTheme">
+        <div class="theme menu-box" @click="toggleTheme">
           <i-heroicons-solid-sun v-if="DisplayConfig.theme === 'dark'" />
           <i-heroicons-solid-moon v-else />
         </div>
-
-        <a-dropdown trigger="click">
-          <div class="user-avatar">
-            <!-- <a-avatar :size="40" :src="CognitoOcean"></a-avatar> -->
-            <MenuOutlined />
-          </div>
-          <template #overlay>
-            <a-menu>
-              <a-menu-item key="settings" @click="goToSettings">
-                <SettingOutlined />
-                <span>设置</span>
-              </a-menu-item>
-              <a-menu-item key="refresh" @click="refreshApp">
-                <ReloadOutlined />
-                <span>刷新</span>
-              </a-menu-item>
-              <a-menu-item key="exit" @click="exitApp">
-                <LogoutOutlined />
-                <span>退出</span>
-              </a-menu-item>
-            </a-menu>
-          </template>
-        </a-dropdown>
+        <div class="menu-box">
+          <SettingOutlined @click="goToSettings" />
+        </div>
+        <div class="menu-box">
+          <ReloadOutlined @click="refreshApp" />
+        </div>
+        <!-- <div class="menu-box"></div> -->
       </div>
       <a-divider style="border-color: #87868673; height: 20px" type="vertical" />
-      <TheTitleBar />
+      <div class="window-menu">
+        <div class="menu-box">
+          <LineOutlined @click="minimize" />
+        </div>
+        <div class="menu-box" @click="maximize">
+          <ExpandOutlined v-if="!isMaximized" />
+          <CompressOutlined v-else />
+        </div>
+        <div class="menu-box danger">
+          <CloseOutlined @click="close" />
+        </div>
+      </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import CognitoOcean from '@/assets/img/logo/CognitoOcean.png'
-import TheTitleBar from './TheTitleBar.vue'
-import { BulbOutlined, MenuUnfoldOutlined, MenuFoldOutlined } from '@ant-design/icons-vue'
-import { ref, computed } from 'vue'
+// import CognitoOcean from '@/assets/img/logo/CognitoOcean.png'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useSettingsStore } from '@/stores/settingsStore'
 import { storeToRefs } from 'pinia'
+import { applicationApi } from '@api/application'
 import {
-  PlusOutlined,
-  DownOutlined,
-  MenuOutlined,
   SettingOutlined,
   ReloadOutlined,
-  LogoutOutlined
+  LineOutlined,
+  CloseOutlined,
+  CompressOutlined,
+  ExpandOutlined,
+  MenuUnfoldOutlined,
+  MenuFoldOutlined
 } from '@ant-design/icons-vue'
 const PROJECT_NAME = import.meta.env.NAME
 const PROJECT_VERSION = import.meta.env.VERSION
@@ -98,10 +94,32 @@ const refreshApp = () => {
   window.location.reload()
 }
 
-// 退出应用
-const exitApp = () => {
-  // 在实际的Electron应用中，这里可以调用window.electron.ipcRenderer.send('quit-app')
-  console.log('Exit application')
+const isMaximized = ref(false)
+
+let unlisten: () => void
+
+onMounted(() => {
+  unlisten = applicationApi.onWindowStateChange((state) => {
+    isMaximized.value = state === 'maximized'
+  })
+})
+
+onUnmounted(() => {
+  if (unlisten) {
+    unlisten()
+  }
+})
+
+const minimize = () => {
+  applicationApi.minimizeWindow()
+}
+
+const maximize = () => {
+  applicationApi.maximizeWindow()
+}
+
+const close = () => {
+  applicationApi.closeWindow()
 }
 </script>
 
@@ -115,7 +133,6 @@ const exitApp = () => {
   min-height: 64px;
   max-height: 64px;
   background-color: var(--bg-container);
-  /* border-bottom: 1px solid var(--border-secondary); */
   z-index: 100;
   box-sizing: border-box;
   overflow: hidden;
@@ -157,15 +174,25 @@ const exitApp = () => {
   -webkit-app-region: no-drag;
 }
 
-.application-menu {
+.application-menu,
+.window-menu {
   display: flex;
   align-items: center;
-  gap: 20px;
   cursor: pointer;
 
-  .theme {
+  .theme,
+  .menu-box {
     display: flex;
     align-items: center;
+    padding: 8px 15px;
+  }
+  .menu-box:hover {
+    background-color: var(--bg-hover);
+  }
+
+  .danger:hover {
+    background-color: var(--color-danger);
+    color: #fff;
   }
 }
 
