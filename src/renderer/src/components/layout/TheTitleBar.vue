@@ -67,13 +67,13 @@ const close = () => {
 
 .title-bar__controls {
   display: flex;
-  gap: 20px;
 }
 
 .title-bar__control {
   display: flex;
   align-items: center;
   justify-content: center;
+  padding: 0 15px;
   height: 32px;
   cursor: pointer;
 }
