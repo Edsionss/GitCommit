@@ -2,7 +2,7 @@
   <div v-if="stockData" class="stock-detail-container">
     <!-- 顶部导航 -->
     <div class="detail-nav">
-      <a-button
+      <!-- <a-button
         v-for="item in navItems"
         :key="item.key"
         type="text"
@@ -10,7 +10,14 @@
         @click="activeView = item.key"
       >
         {{ item.label }}
-      </a-button>
+      </a-button> -->
+      <a-segmented v-model:value="activeView" :options="navItems">
+        <template #label="{ payload }">
+          <div style="padding: 4px 4px">
+            <div>{{ payload.label }}</div>
+          </div>
+        </template>
+      </a-segmented>
     </div>
 
     <!-- 动态内容区 -->
@@ -28,7 +35,6 @@
 <script setup lang="ts">
 import { ref, computed, defineAsyncComponent } from 'vue'
 
-// 定义 props
 // 定义 props
 const props = defineProps({
   stockData: {
@@ -50,16 +56,16 @@ const props = defineProps({
 
 // 导航项
 const navItems = [
-  { key: 'TimeSharing', label: '分时' },
-  { key: 'DailyK', label: '日K' },
-  { key: 'WeeklyK', label: '周K' },
-  { key: 'MonthlyK', label: '月K' },
-  { key: 'FiveDay', label: '五日' },
-  { key: 'Profile', label: '概况' },
-  { key: 'Capital', label: '资金' },
-  { key: 'Announcements', label: '公告' },
-  { key: 'News', label: '资讯' },
-  { key: 'AiDiagnosis', label: 'AI诊股' }
+  { value: 'TimeSharing', label: '分时' },
+  { value: 'DailyK', label: '日K' },
+  { value: 'WeeklyK', label: '周K' },
+  { value: 'MonthlyK', label: '月K' },
+  { value: 'FiveDay', label: '五日' },
+  { value: 'Profile', label: '概况' },
+  { value: 'Capital', label: '资金' },
+  { value: 'Announcements', label: '公告' },
+  { value: 'News', label: '资讯' },
+  { value: 'AiDiagnosis', label: 'AI诊股' }
 ]
 
 const activeView = ref('TimeSharing')
@@ -93,7 +99,7 @@ const activeComponent = computed(() => components[activeView.value])
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
-  border-bottom: 1px solid #f0f0f0;
+  // border-bottom: 1px solid #f0f0f0;
   margin-bottom: 16px;
   .ant-btn {
     &.active {
