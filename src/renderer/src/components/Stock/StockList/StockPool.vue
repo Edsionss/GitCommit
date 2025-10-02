@@ -30,13 +30,12 @@
         </div>
       </div>
     </div>
-    <add-stock v-model:visible="isAddStockModalVisible" @add-stock="handleAddStock" />
+    <add-stock v-model="isAddStockModalVisible" @add-stock="handleAddStock" />
   </div>
 </template>
 
 <script setup lang="ts">
 import { reactive, ref } from 'vue'
-import { InputSearch as AInputSearch, Button as AButton } from 'ant-design-vue'
 import { PlusOutlined } from '@ant-design/icons-vue'
 import AddStock from './AddStock.vue'
 

@@ -37,7 +37,7 @@ export async function executeScrapingTask<T>(
   })
 
   let page: Page | null = null
-
+  let resultData: any = 'none'
   try {
     // 确保服务已连接
     if (!puppeteerService.isConnected()) {
@@ -60,7 +60,7 @@ export async function executeScrapingTask<T>(
 
     // 🎉 在这里执行你所有的准备工作！
     if (beforeExecution) {
-      await beforeExecution(page, beforeExecutionData)
+      resultData = await beforeExecution(page, beforeExecutionData)
     }
 
     // 执行核心的抓取逻辑
@@ -69,14 +69,15 @@ export async function executeScrapingTask<T>(
       // 使用更长的超时和更合适的等待条件
       await page.goto(url, { waitUntil: 'networkidle0' })
     }
-    let data
     if (scrapingLogic) {
       // 传递参数给 scrapingLogic 并执行
-      data = await page.evaluate(scrapingLogic, ...logicArgs)
-
+      const data = await page.evaluate(scrapingLogic, ...logicArgs)
+      resultData = Object.assign(resultData, data)
       // 返回结果
     }
-    return data || 'success'
+    console.log(resultData)
+
+    return resultData
   } catch (error) {
     console.error('[PuppeteerService] Error occurred while executing scraping task:', error)
     if (page && captureError) {

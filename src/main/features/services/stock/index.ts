@@ -7,6 +7,8 @@ export const searchStock = async (keyword) => {
     console.error('请输入搜索关键字')
     return []
   }
+  console.log(await getStockBasicInfo('600519'))
+
   // 东方财富的搜索建议接口 URL
   const url = `http://searchapi.eastmoney.com/api/suggest/get`
   try {
@@ -280,4 +282,82 @@ export async function getStockInfoByCode(code: string, name?: string) {
   const news = await fetchNews(code, name || '')
 
   return { klineData, indicators: dataWithIndicators, news }
+}
+
+/**
+ * 根据股票代码从东方财富获取基本信息。
+ * @param {string} stockCode 6位股票代码，如 '600519'
+ * @returns {Promise<object|null>} 包含所需信息的对象，或在失败时返回 null
+ */
+async function getStockBasicInfo(stockCode) {
+  // 1. 根据股票代码前缀判断市场，并构造东方财富所需的 secid
+  let secid
+  let marketName
+
+  if (stockCode.startsWith('6')) {
+    secid = `1.${stockCode}`
+    marketName = 'SH' // 上海
+  } else if (stockCode.startsWith('0') || stockCode.startsWith('3')) {
+    secid = `0.${stockCode}`
+    marketName = 'SZ' // 深圳
+  } else if (stockCode.startsWith('8') || stockCode.startsWith('4')) {
+    secid = `0.${stockCode}`
+    marketName = 'BJ' // 北京
+  } else {
+    console.error(`未知的股票代码前缀: ${stockCode}`)
+    return null
+  }
+
+  // 2. 构造请求URL和参数
+  // f57:代码, f58:名称, f120:公司简介, f124:上市日期, f127:所属行业, f128:所属板块/概念
+  const fields = 'f57,f58,f120,f124,f127,f128'
+  const url = `http://push2.eastmoney.com/api/qt/stock/get`
+  const params = {
+    secid: secid,
+    fields: fields,
+    // 添加一个时间戳参数防止缓存
+    _: Date.now()
+  }
+
+  // 模拟浏览器的 User-Agent，防止被屏蔽
+  const headers = {
+    'User-Agent':
+      'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+  }
+
+  try {
+    // 3. 发送GET请求
+    const response = await axios.get(url, { params, headers })
+    console.log(response)
+
+    const data = response.data
+    if (!data || !data.data) {
+      console.error(`未能获取到股票 ${stockCode} 的有效数据。`)
+      return null
+    }
+
+    const stockData = data.data
+
+    // 4. 整理数据以匹配您的数据库 schema
+    const listDateNum = stockData.f124
+    let formattedDate: string | null = null
+    if (listDateNum) {
+      const dateStr = String(listDateNum)
+      formattedDate = `${dateStr.substring(0, 4)}-${dateStr.substring(4, 6)}-${dateStr.substring(6, 8)}`
+    }
+
+    const result = {
+      company_name: stockData.f58,
+      market: `${marketName}.${stockData.f57}`, // 构造市场代码，如 SH.600519
+      company_profile: stockData.f120,
+      industry_name: stockData.f127, // 这是行业名称，需要您自己映射到ID
+      sector_names: stockData.f128, // 这是板块名称列表(字符串)，需要您自己映射到ID
+      list_date: formattedDate
+    }
+
+    return result
+  } catch (error) {
+    console.error(`请求股票 ${stockCode} 数据时发生错误:`, error.message)
+    return null
+  }
 }

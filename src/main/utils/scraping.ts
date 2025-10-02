@@ -147,3 +147,51 @@ export const AutomaticallyFillWorkSheet = async (data: any) => {
     }
   })
 }
+
+export const scrapingStockInfo = (stockName: string) => {
+  executeScrapingTask({
+    beforeExecution: async (page) => {
+      await page.goto(`https://so.eastmoney.com/web/s?keyword=${stockName}`, {
+        waitUntil: 'networkidle2'
+      })
+      const companyName = await page.evaluate(() => {
+        return document.querySelector('.amodule .ib_title a span')?.textContent.trim()
+      })
+
+      await page.goto(`https://baike.eastmoney.com/item/${companyName}`, {
+        waitUntil: 'networkidle2'
+      })
+      return await page.evaluate(() => {
+        let result: any
+        try {
+          const companyName = document.querySelector('.profile')?.textContent.trim()
+          const companyProfile = document.querySelector('.company_intro')?.textContent.trim()
+          const infoListEl = document.querySelector('.basic_info_items')?.querySelectorAll('li')
+          const infoList: any[] = []
+          infoListEl?.forEach((el) => {
+            const title = el.querySelector('.info')?.textContent.trim()
+            const value = el.querySelector('.name')?.textContent.trim()
+            infoList.push({
+              title,
+              value
+            })
+          })
+          const coreTheme: any[] = []
+          const coreThemeList = document
+            .querySelector('#coretheme')
+            ?.nextElementSibling?.querySelectorAll('.p_div ')
+          coreThemeList?.forEach((El, index) => {
+            const title = El.querySelector('font')?.textContent.trim()
+            const value = El.querySelector('font')?.nextSibling?.textContent?.trim()
+            coreTheme.push({ index: '要点' + (index + 1), title, value })
+          })
+          result = { companyName, companyProfile, infoList, coreTheme }
+          return result
+        } catch (error) {
+          console.log(` scrapingStockInfo  by  ${stockName} fail `)
+          throw error
+        }
+      })
+    }
+  })
+}
