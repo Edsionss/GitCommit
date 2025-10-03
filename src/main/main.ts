@@ -84,7 +84,7 @@ export const whenReady = () => {
 
   // thsTest()
   // AutomaticallyFillWorkSheet({})
-  console.log(scrapingStockInfo('贵州茅台', extractTableDataByColumn))
+  console.log(scrapingStockInfo('亚太药业', extractTableDataByColumn))
 }
 // 应用即将退出的周期函数
 export const willQuit = () => {
