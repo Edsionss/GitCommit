@@ -2,7 +2,14 @@ import { app, shell, BrowserWindow, ipcMain, dialog, session } from 'electron'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../build/CognitoOcean1.png?asset' // Vite/TypeScript 可能会帮你处理这个导入，但路径更可靠
-import { beforeCreate, customCreateWindow, whenReady, willQuit, activate } from './main'
+import {
+  beforeCreate,
+  customCreateWindow,
+  whenReady,
+  willQuit,
+  activate,
+  showMainWindow
+} from './main'
 
 //创建窗口前的周期
 beforeCreate()
@@ -102,7 +109,7 @@ app.whenReady().then(() => {
   whenReady()
 
   // 创建主窗口
-  createWindow()
+  showMainWindow && createWindow()
   app.on('activate', function () {
     // On macOS it's common to re-create a window in the app when the
     // dock icon is clicked and there are no other windows open.

@@ -37,7 +37,7 @@ export async function executeScrapingTask<T>(
   })
 
   let page: Page | null = null
-  let resultData: any = 'none'
+  let resultData: any = {}
   try {
     // 确保服务已连接
     if (!puppeteerService.isConnected()) {
@@ -60,7 +60,7 @@ export async function executeScrapingTask<T>(
 
     // 🎉 在这里执行你所有的准备工作！
     if (beforeExecution) {
-      resultData = await beforeExecution(page, beforeExecutionData)
+      resultData = await beforeExecution(page, beforeExecutionData, scrapeWindow)
     }
 
     // 执行核心的抓取逻辑
@@ -76,7 +76,6 @@ export async function executeScrapingTask<T>(
       // 返回结果
     }
     console.log(resultData)
-
     return resultData
   } catch (error) {
     console.error('[PuppeteerService] Error occurred while executing scraping task:', error)

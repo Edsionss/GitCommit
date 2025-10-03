@@ -174,3 +174,68 @@ export const loadSystemNotify = (
     notification.show()
   }
 }
+
+/**
+ * 描述单列表格数据的结构（用于文档说明）
+ * @typedef {object} TableColumnData
+ * @property {string} title - 表格该列的表头标题 (来自于 <th>)
+ * @property {string[]} value - 一个包含该列所有行数据的数组 (来自于 <td>)
+ */
+
+/**
+ * 从一个 HTML <table> 元素中按列提取数据。
+ *
+ * @param {HTMLTableElement} tableElement - 你想要爬取数据的 HTMLTableElement 对象。
+ * @returns {TableColumnData[]} 一个数组，每个元素代表一列数据。
+ *          格式为 { title: string, value: string[] }。
+ *          如果表格没有表头 (thead > tr > th)，则返回一个空数组。
+ *
+ * @example
+ * const myTable = document.getElementById('my-data-table');
+ * if (myTable) {
+ *   const tableData = extractTableDataByColumn(myTable);
+ *   console.log(tableData);
+ * }
+ *
+ * @note
+ * - 此函数假设表格结构标准，即表头在 `<thead>` 中，数据在 `<tbody>` 中。
+ * - 不支持复杂的表格结构，如 `colspan` 或 `rowspan`。
+ * - 提取的内容是元素的 `textContent`，并进行了 `.trim()` 处理。
+ */
+export function extractTableDataByColumn(tableElement) {
+  // 1. 获取表头 <th> 元素
+  // 我们只查找 thead 中的 th，这是最规范的结构
+  const headerCells = tableElement.querySelectorAll('thead tr th')
+
+  if (headerCells.length === 0) {
+    console.warn('未在 <thead> 中找到任何表头 <th> 元素，无法提取数据。')
+    return []
+  }
+
+  // 2. 初始化结果数组
+  // 根据表头创建每一列的基础结构
+  const columns = Array.from(headerCells).map((header) => ({
+    title: header?.textContent?.trim() ?? '',
+    value: ``
+  }))
+
+  // 3. 获取所有数据行 <tr>
+  // 我们只查找 tbody 中的 tr
+  const dataRows = tableElement.querySelectorAll('tbody tr')
+
+  // 4. 遍历每一行，并将单元格数据填充到对应的列中
+  dataRows.forEach((row) => {
+    const cells = row.querySelectorAll('td')
+    cells.forEach((cell, cellIndex) => {
+      // 确保单元格索引在 columns 数组的范围内
+      if (cellIndex < columns.length) {
+        // 将当前单元格的文本内容推入对应列的 value 数组中
+        const value = []
+        value.push(cell.textContent?.trim() ?? '')
+        columns[cellIndex].value = JSON.stringify(value)
+      }
+    })
+  })
+
+  return columns
+}
