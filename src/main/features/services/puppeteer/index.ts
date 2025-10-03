@@ -1,7 +1,7 @@
 // puppeteer-service.ts
 
 import { puppeteerService } from './puppeteer'
-import { BrowserWindow, session } from 'electron' // 引入 session
+import { BrowserWindow } from 'electron' // 引入 session
 import { Page } from 'puppeteer-core'
 import { ScrapingTaskOptions } from '@sharedType/Puppeteer'
 import crypto from 'crypto' // 使用内置的 crypto 模块生成唯一 ID
@@ -60,7 +60,12 @@ export async function executeScrapingTask<T>(
 
     // 🎉 在这里执行你所有的准备工作！
     if (beforeExecution) {
-      resultData = await beforeExecution(page, beforeExecutionData, scrapeWindow)
+      try {
+        resultData = await beforeExecution(page, beforeExecutionData, scrapeWindow)
+      } catch (error) {
+        console.error('[PuppeteerService] Error occurred during beforeExecution:', error)
+        throw error
+      }
     }
 
     // 执行核心的抓取逻辑
@@ -89,7 +94,7 @@ export async function executeScrapingTask<T>(
       const errorTimestamp = now.format('YYYYMMDD-HHmmss')
       const specificErrorDir = path.join(errorLogDir, errorTimestamp)
       fs.mkdirSync(specificErrorDir)
-      const screenshotPath = path.join(specificErrorDir, 'screenshot.png')
+      const screenshotPath = path.join(specificErrorDir, 'screenshot.png') as `${string}.png`
       const htmlPath = path.join(specificErrorDir, 'page.html')
       const logPath = path.join(specificErrorDir, 'error.log')
       console.log(`[PuppeteerService] Saving debug info to: ${specificErrorDir}`)
