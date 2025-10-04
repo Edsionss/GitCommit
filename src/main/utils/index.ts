@@ -113,41 +113,48 @@ export function getLocalIpAddress(): string | null {
 }
 
 /**
- * 下划线转驼峰
+ * 将下划线式字符串转换为驼峰式。
+ * @example 'hello_world' -> 'helloWorld'
  */
-export function toCamelCase(str: string): string {
-  return str.replace(/_([a-z])/g, (_, letter) => letter.toUpperCase())
+function toCamelCase(str: string): string {
+  return str.replace(/_([a-z])/g, (g) => g[1].toUpperCase())
 }
 
 /**
- * 驼峰转下划线
+ * 将驼峰式字符串转换为下划线式。
+ * @example 'helloWorld' -> 'hello_world'
  */
-export function toSnakeCase(str: string): string {
-  return str.replace(/([A-Z])/g, '_$1').toLowerCase()
+function toSnakeCase(str: string): string {
+  return str.replace(/[A-Z]/g, (letter) => `_${letter.toLowerCase()}`)
 }
 
 /**
- * 自动转换对象/数组的所有 key
- * @param input - 输入对象或数组
- * @param mode - 'camel' | 'snake' 自动选择目标格式
+ * 递归地转换对象或数组中所有键的命名风格。
+ * @param input - 要转换的对象或数组。
+ * @param mode - 'camel' 表示转为驼峰式, 'snake' 表示转为下划线式。
+ * @returns 转换后的新对象或数组。
  */
 export function autoTransformKeys<T>(input: T, mode: 'camel' | 'snake'): T {
+  // 基本类型或 null 直接返回
+  if (input === null || typeof input !== 'object') {
+    return input
+  }
+
+  // 递归处理数组
   if (Array.isArray(input)) {
     return input.map((item) => autoTransformKeys(item, mode)) as unknown as T
   }
 
-  if (input && typeof input === 'object') {
-    const transformer = mode === 'camel' ? toCamelCase : toSnakeCase
-    return Object.fromEntries(
-      Object.entries(input as Record<string, any>).map(([key, value]) => {
-        const newKey = transformer(key)
-        const newValue = autoTransformKeys(value, mode)
-        return [newKey, newValue]
-      })
-    ) as T
-  }
-
-  return input
+  // 递归处理对象
+  const transformer = mode === 'camel' ? toCamelCase : toSnakeCase
+  return Object.fromEntries(
+    Object.entries(input as Record<string, any>).map(([key, value]) => {
+      const newKey = transformer(key)
+      // 对值也进行递归转换，以处理嵌套对象
+      const newValue = autoTransformKeys(value, mode)
+      return [newKey, newValue]
+    })
+  ) as T
 }
 
 export const loadSystemNotify = (
@@ -202,9 +209,8 @@ export const loadSystemNotify = (
  * - 不支持复杂的表格结构，如 `colspan` 或 `rowspan`。
  * - 提取的内容是元素的 `textContent`，并进行了 `.trim()` 处理。
  */
-export function extractTableDataByColumn(tableElement) {
+export function extractTableDataByColumn(tableElement: HTMLTableElement) {
   // 1. 获取表头 <th> 元素
-  // 我们只查找 thead 中的 th，这是最规范的结构
   const headerCells = tableElement.querySelectorAll('thead tr th')
 
   if (headerCells.length === 0) {
@@ -213,29 +219,53 @@ export function extractTableDataByColumn(tableElement) {
   }
 
   // 2. 初始化结果数组
-  // 根据表头创建每一列的基础结构
   const columns = Array.from(headerCells).map((header) => ({
     title: header?.textContent?.trim() ?? '',
-    value: ``
+    value: [] as string[] // <-- 初始化为数组
   }))
 
-  // 3. 获取所有数据行 <tr>
-  // 我们只查找 tbody 中的 tr
+  // 3. 获取所有数据行
   const dataRows = tableElement.querySelectorAll('tbody tr')
 
-  // 4. 遍历每一行，并将单元格数据填充到对应的列中
+  // 4. 遍历每一行，把数据 push 进去
   dataRows.forEach((row) => {
     const cells = row.querySelectorAll('td')
     cells.forEach((cell, cellIndex) => {
-      // 确保单元格索引在 columns 数组的范围内
       if (cellIndex < columns.length) {
-        // 将当前单元格的文本内容推入对应列的 value 数组中
-        const value = []
-        value.push(cell.textContent?.trim() ?? '')
-        columns[cellIndex].value = JSON.stringify(value)
+        columns[cellIndex].value.push(cell.textContent?.trim() ?? '')
       }
     })
   })
 
+  // 5. 最后统一转成字符串（如果你一定要 JSON）
+  columns.forEach((col) => {
+    // @ts-ignore
+    col.value = JSON.stringify(col.value)
+  })
+
   return columns
+}
+
+type ColumnData = {
+  title: string
+  value: string // JSON 字符串
+}
+
+export function mergeColumnArrayList(list: ColumnData[][]): ColumnData[] {
+  const map = new Map<string, string[]>()
+
+  list.forEach((arr) => {
+    arr.forEach((col) => {
+      const values = JSON.parse(col.value) as string[]
+      if (!map.has(col.title)) {
+        map.set(col.title, [])
+      }
+      map.get(col.title)!.push(...values)
+    })
+  })
+
+  return Array.from(map.entries()).map(([title, values]) => ({
+    title,
+    value: JSON.stringify(values)
+  }))
 }

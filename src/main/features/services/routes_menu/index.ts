@@ -1,7 +1,7 @@
 import { dbHelper } from '@features/database'
 import type { RouteRecord, RouteRecordWithOptionalId } from '@shared/types/dtos/MenuManagement'
-import { nanoid } from 'nanoid' // 使用 uuid 生成唯一ID
-import { autoTransformKeys } from '@nodeUtils/index'
+import { nanoid } from 'nanoid'
+
 // 将从数据库取出的记录（meta是字符串）转换为前端需要的格式（meta是对象）
 function formatMenuRecord(record: any): RouteRecord {
   return {
@@ -16,7 +16,6 @@ function prepareRecordForDb(record: Partial<RouteRecord>): any {
   if (dbRecord.meta) {
     dbRecord.meta = JSON.stringify(dbRecord.meta) as any
   }
-  // 删除 children 属性，因为它不存在于数据库表中
   if (dbRecord.children) {
     delete dbRecord.children
   }
@@ -32,11 +31,12 @@ export class RoutesMenuService {
    */
   public async getAllMenus(): Promise<RouteRecord[]> {
     try {
+      // dbHelper.find 会自动返回驼峰式键的结果
       const flatMenus = await dbHelper.find<any>(RoutesMenuService.TABLE_NAME, {}, '*')
       const formattedMenus = flatMenus.map(formatMenuRecord)
-      // 按 menu_order 排序
       formattedMenus.sort((a, b) => a.menuOrder - b.menuOrder)
-      return autoTransformKeys(formattedMenus, 'camel')
+      // 不再需要手动转换
+      return formattedMenus
     } catch (error) {
       console.error('Error fetching all menus:', error)
       return []
@@ -46,15 +46,12 @@ export class RoutesMenuService {
   /**
    * 添加一个新菜单
    * @param {RouteRecord} menu - 要添加的菜单数据
-   * @returns {Promise<RunResult>}
    */
   public async addMenu(menu: Omit<RouteRecord, 'id'>) {
     try {
       const dbRecord = prepareRecordForDb({ ...menu, id: nanoid() })
-      return await dbHelper.insert(
-        RoutesMenuService.TABLE_NAME,
-        autoTransformKeys(dbRecord, 'snake')
-      )
+      // 直接将驼峰式对象传递给 dbHelper，它会自动转换
+      return await dbHelper.insert(RoutesMenuService.TABLE_NAME, dbRecord)
     } catch (error) {
       console.error('Error adding menu:', error)
       throw error
@@ -64,18 +61,14 @@ export class RoutesMenuService {
   /**
    * 批量添加菜单
    * @param {RouteRecordWithOptionalId[]} menus - 要添加的菜单数据数组
-   * @returns {Promise<RunResult[]>}
    */
   public async addMenus(menus: RouteRecordWithOptionalId[]) {
     try {
       const dbRecords = menus.map((menu) =>
         prepareRecordForDb({ ...menu, id: menu.id || nanoid() })
       )
-
-      // 使用批量插入 + 事务
-      return await Promise.resolve(
-        dbHelper.insertMany(RoutesMenuService.TABLE_NAME, autoTransformKeys(dbRecords, 'snake'))
-      )
+      // 直接将驼峰式对象数组传递给 dbHelper
+      return await Promise.resolve(dbHelper.insertMany(RoutesMenuService.TABLE_NAME, dbRecords))
     } catch (error) {
       console.error('Error adding menus:', error)
       throw error
@@ -85,7 +78,6 @@ export class RoutesMenuService {
   /**
    * 更新一个现有菜单
    * @param {RouteRecord} menu - 要更新的菜单数据
-   * @returns {Promise<{ changes: number }>}
    */
   public async updateMenu(menu: Partial<RouteRecord>) {
     if (!menu.id) {
@@ -94,11 +86,8 @@ export class RoutesMenuService {
     try {
       const { id, ...dataToUpdate } = menu
       const dbRecord = prepareRecordForDb(dataToUpdate)
-      return await dbHelper.update(
-        RoutesMenuService.TABLE_NAME,
-        autoTransformKeys(dbRecord, 'snake'),
-        { id }
-      )
+      // 直接将驼峰式对象传递给 dbHelper
+      return await dbHelper.update(RoutesMenuService.TABLE_NAME, dbRecord, { id })
     } catch (error) {
       console.error('Error updating menu:', error)
       throw error
@@ -108,7 +97,6 @@ export class RoutesMenuService {
   /**
    * 删除一个菜单
    * @param {string} id - 要删除的菜单ID
-   * @returns {Promise<{ changes: number }>}
    */
   public async deleteMenu(id: string) {
     try {
@@ -120,8 +108,7 @@ export class RoutesMenuService {
   }
 
   /**
-   * 删除一个菜单
-   * @returns {Promise<{ changes: number }>}
+   * 清空所有菜单
    */
   public async cleanMenu() {
     try {
