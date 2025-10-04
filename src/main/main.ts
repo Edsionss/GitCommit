@@ -18,6 +18,8 @@ import { scrapingThsIndustry } from '@services/stock/scraping/sectors'
 import { transformDataForDB } from '@services/stock/sectors'
 import { autoTransformKeys } from '@nodeUtils/index' // 引入自动转换键的函数
 
+import { stockSectorService } from '@services/stock/sectors'
+
 //控制是否展示主窗口
 export const showMainWindow = true
 
@@ -89,9 +91,10 @@ export const whenReady = () => {
   // thsTest()
   // AutomaticallyFillWorkSheet({})
   // console.log(scrapingStockInfo('亚太药业', extractTableDataByColumn))
-
+  stockSectorService.clearAllSectors()
   scrapingThsIndustry(extractTableDataByColumn).then((data: any) => {
-    console.log(autoTransformKeys(transformDataForDB(data || []), 'snake'))
+    stockSectorService.addSectors(transformDataForDB(data || []))
+    // console.log(transformDataForDB(data || []))
   })
 }
 // 应用即将退出的周期函数

@@ -63,6 +63,12 @@ export const scrapingThsIndustry = async (extractTableDataByColumn: Function) =>
           // columnTitles,
           extractTableDataByColumn.toString()
         ) // 将 columnTitles 作为参数传入 evaluate
+        pageData.map((item, index) => {
+          if (item.title.includes('涨跌幅') && index > 2) {
+            item.title = '领涨股' + item.title
+          }
+          return item
+        })
         allData.push(pageData)
         console.log(`✅ 第 ${currentPage} 页处理完毕，获得 ${pageData.length} 条数据。`)
       }

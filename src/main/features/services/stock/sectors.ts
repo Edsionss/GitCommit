@@ -156,14 +156,15 @@ export function transformDataForDB(rawData: any[]): StockSectorCamelCase[] {
   const titleToKeyMap: { [key: string]: keyof StockSectorCamelCase } = {
     板块: 'sectorName',
     '涨跌幅(%)': 'changePercentage',
-    '总成交量 (万手)': 'totalVolumeLots',
-    '总成交额 (亿元)': 'totalTurnoverYuan',
-    '净流入 (亿元)': 'netInflowYuan',
+    '总成交量（万手）': 'totalVolumeLots',
+    '总成交额（亿元）': 'totalTurnoverYuan',
+    '净流入（亿元）': 'netInflowYuan',
     上涨家数: 'risingStocksCount',
     下跌家数: 'fallingStocksCount',
     均价: 'averagePrice',
     领涨股: 'leadingStockName',
-    最新价: 'leadingStockLatestPrice'
+    最新价: 'leadingStockLatestPrice',
+    '领涨股涨跌幅(%)': 'leadingStockChangePercentage'
     // 注意：领涨股的涨跌幅标题可能与板块的重复，这里假设它就是第二个'涨跌幅(%)'
     // 在实际应用中，您可能需要更可靠的方式来区分它们，例如顺序。
     // 如果无法区分，需要调整数据源或处理逻辑。
@@ -239,3 +240,5 @@ export function transformDataForDB(rawData: any[]): StockSectorCamelCase[] {
 
   return results
 }
+
+export const stockSectorService = new StockSectorCamelCasesService()
