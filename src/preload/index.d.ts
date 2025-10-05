@@ -115,6 +115,26 @@ interface ExposedAPI {
   maximizeWindow: () => Promise<void>
   closeWindow: () => Promise<void>
   onWindowStateChange: (callback: (state: 'maximized' | 'unmaximized') => void) => () => void
+
+  // Audit Log API
+  auditLogGet: (
+    page: number,
+    pageSize: number
+  ) => Promise<{ records: AuditLog[]; total: number }>
+  auditLogDelete: (ids: number[]) => Promise<{ changes: number }>
+}
+
+// AuditLog a new interface
+interface AuditLog {
+  id: number
+  timestamp: string
+  actionType: 'INSERT' | 'UPDATE' | 'DELETE'
+  tableName: string
+  recordId?: string
+  userId?: string
+  oldData?: string
+  newData?: string
+  remarks?: string
 }
 
 declare global {

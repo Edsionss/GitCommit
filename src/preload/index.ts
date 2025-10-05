@@ -149,7 +149,11 @@ const api = {
       ipcRenderer.removeListener('window:maximized', listener)
       ipcRenderer.removeListener('window:unmaximized', listener)
     }
-  }
+  },
+
+  // Audit Log API
+  auditLogGet: (page: number, pageSize: number) => ipcRenderer.invoke('auditLog:get', page, pageSize),
+  auditLogDelete: (ids: number[]) => ipcRenderer.invoke('auditLog:delete', ids)
 }
 
 // 暴露API

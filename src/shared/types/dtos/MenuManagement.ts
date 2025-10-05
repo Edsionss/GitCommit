@@ -312,6 +312,20 @@ export const mockFlatRoutes: RouteRecordWithOptionalId[] = [
     menuOrder: 10000,
     menuIcon: 'CommentOutlined',
     hide: '0'
+  },
+  {
+    id: '',
+    parentId: null,
+    path: 'auditLog',
+    name: 'AuditLog',
+    componentPath: 'AuditLog',
+    meta: {
+      title: '日志管理',
+      keepAlive: '1'
+    },
+    menuOrder: 10000,
+    menuIcon: 'CommentOutlined',
+    hide: '0'
   }
 ]
 
