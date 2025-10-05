@@ -153,7 +153,8 @@ const api = {
 
   // Audit Log API
   auditLogGet: (page: number, pageSize: number) => ipcRenderer.invoke('auditLog:get', page, pageSize),
-  auditLogDelete: (ids: number[]) => ipcRenderer.invoke('auditLog:delete', ids)
+  auditLogDelete: (ids: number[]) => ipcRenderer.invoke('auditLog:delete', ids),
+  auditLogClear: () => ipcRenderer.invoke('auditLog:clear')
 }
 
 // 暴露API

@@ -122,6 +122,7 @@ interface ExposedAPI {
     pageSize: number
   ) => Promise<{ records: AuditLog[]; total: number }>
   auditLogDelete: (ids: number[]) => Promise<{ changes: number }>
+  auditLogClear: () => Promise<{ changes: number }>
 }
 
 // AuditLog a new interface

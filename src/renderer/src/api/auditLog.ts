@@ -20,3 +20,11 @@ export const getAuditLogsApi = (page: number, pageSize: number) => {
 export const deleteAuditLogsApi = (ids: number[]) => {
   return window.api.auditLogDelete(ids)
 }
+
+/**
+ * 清除所有审计日志
+ * @returns 删除结果
+ */
+export const clearAuditLogsApi = () => {
+  return window.api.auditLogClear()
+}

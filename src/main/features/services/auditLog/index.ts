@@ -67,6 +67,20 @@ class AuditLogService {
       return { changes: 0 }
     }
   }
+
+  /**
+   * 清除所有审计日志
+   * @returns 返回成功删除的记录数
+   */
+  public async clearAllAuditLogs(): Promise<{ changes: number }> {
+    try {
+      const result = await dbHelper.clearTable(AuditLogService.TABLE_NAME)
+      return result
+    } catch (error) {
+      console.error('Error clearing audit logs:', error)
+      return { changes: 0 }
+    }
+  }
 }
 
 // 导出服务实例

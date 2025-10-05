@@ -14,6 +14,10 @@
             <template #icon><DeleteOutlined /></template>
             批量删除
           </a-button>
+          <a-button type="primary" danger @click="handleClearAll" :loading="loading">
+            <template #icon><ClearOutlined /></template>
+            清空日志
+          </a-button>
           <a-button @click="fetchLogs">
             <template #icon><ReloadOutlined /></template>
             刷新
@@ -88,9 +92,8 @@
 <script setup lang="ts">
 import { ref, onMounted, computed } from 'vue'
 import { message, Modal } from 'ant-design-vue'
-import { DeleteOutlined, ReloadOutlined } from '@ant-design/icons-vue'
-import { getAuditLogsApi, deleteAuditLogsApi } from '@/api/auditLog'
-
+import { DeleteOutlined, ReloadOutlined, ClearOutlined } from '@ant-design/icons-vue'
+import { getAuditLogsApi, deleteAuditLogsApi, clearAuditLogsApi } from '@/api/auditLog'
 import { AuditLog } from '@sharedType/auditLog'
 
 // 表格列定义
@@ -188,6 +191,29 @@ const handleBatchDelete = () => {
   })
 }
 
+const handleClearAll = () => {
+  Modal.confirm({
+    title: '确定要清空所有审计日志吗？',
+    content: '此操作将永久删除所有日志，且不可恢复。请谨慎操作！',
+    okText: '确定清空',
+    okType: 'danger',
+    cancelText: '取消',
+    onOk: async () => {
+      try {
+        const { changes } = await clearAuditLogsApi()
+        if (changes > 0) {
+          message.success(`成功清空 ${changes} 条日志`)
+          fetchLogs()
+        } else {
+          message.warning('日志已为空，无需清空')
+        }
+      } catch (error) {
+        message.error('清空日志失败')
+      }
+    }
+  })
+}
+
 const showDetails = (record: AuditLog) => {
   selectedLog.value = record
   isModalVisible.value = true
@@ -229,7 +255,6 @@ onMounted(() => {
 
 <style scoped>
 .audit-log-container {
-  padding: 20px;
 }
 pre {
   background-color: #f5f5f5;
