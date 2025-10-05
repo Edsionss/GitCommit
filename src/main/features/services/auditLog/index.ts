@@ -49,7 +49,7 @@ class AuditLogService {
    * @param ids - 要删除的日志 ID 数组
    * @returns 返回成功删除的记录数
    */
-  public async deleteAuditLogs(ids: number[]): Promise<{ changes: number }> {
+  public deleteAuditLogs(ids: number[]): { changes: number } {
     if (!ids || ids.length === 0) {
       return { changes: 0 }
     }
@@ -64,7 +64,8 @@ class AuditLogService {
       return result
     } catch (error) {
       console.error('Error deleting audit logs:', error)
-      return { changes: 0 }
+      // 抛出错误，让调用者能够捕获并处理
+      throw new Error(`删除审计日志失败: ${error instanceof Error ? error.message : String(error)}`)
     }
   }
 

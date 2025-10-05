@@ -95,6 +95,7 @@ import { message, Modal } from 'ant-design-vue'
 import { DeleteOutlined, ReloadOutlined, ClearOutlined } from '@ant-design/icons-vue'
 import { getAuditLogsApi, deleteAuditLogsApi, clearAuditLogsApi } from '@/api/auditLog'
 import { AuditLog } from '@sharedType/auditLog'
+import { copyNormalize } from '@utils/index'
 
 // 表格列定义
 const columns = [
@@ -163,7 +164,9 @@ const handleDelete = async (id: number) => {
       message.warning('未删除任何记录')
     }
   } catch (error) {
-    message.error('删除失败')
+    const errorMessage = error instanceof Error ? error.message : '删除失败'
+    message.error(errorMessage)
+    console.error('删除失败:', error)
   }
 }
 
@@ -176,7 +179,7 @@ const handleBatchDelete = () => {
     cancelText: '取消',
     onOk: async () => {
       try {
-        const { changes } = await deleteAuditLogsApi(selectedRowKeys.value)
+        const { changes } = await deleteAuditLogsApi(copyNormalize(selectedRowKeys.value))
         if (changes > 0) {
           message.success(`成功删除 ${changes} 条记录`)
           selectedRowKeys.value = []
@@ -185,7 +188,9 @@ const handleBatchDelete = () => {
           message.warning('未删除任何记录')
         }
       } catch (error) {
-        message.error('批量删除失败')
+        const errorMessage = error instanceof Error ? error.message : '批量删除失败'
+        message.error(errorMessage)
+        console.error('批量删除失败:', error)
       }
     }
   })
@@ -208,7 +213,9 @@ const handleClearAll = () => {
           message.warning('日志已为空，无需清空')
         }
       } catch (error) {
-        message.error('清空日志失败')
+        const errorMessage = error instanceof Error ? error.message : '清空日志失败'
+        message.error(errorMessage)
+        console.error('清空日志失败:', error)
       }
     }
   })

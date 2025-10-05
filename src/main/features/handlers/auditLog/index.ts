@@ -11,7 +11,11 @@ export function registerAuditLogHandlers(): void {
       return await auditLogService.getAuditLogs(page, pageSize)
     } catch (error) {
       console.error('Failed to get audit logs:', error)
-      return Promise.reject(error)
+      // 确保错误信息是可序列化的字符串
+      if (error instanceof Error) {
+        return Promise.reject(error.message)
+      }
+      return Promise.reject(String(error))
     }
   })
 
@@ -21,7 +25,11 @@ export function registerAuditLogHandlers(): void {
       return await auditLogService.deleteAuditLogs(ids)
     } catch (error) {
       console.error('Failed to delete audit logs:', error)
-      return Promise.reject(error)
+      // 确保错误信息是可序列化的字符串
+      if (error instanceof Error) {
+        return Promise.reject(error.message)
+      }
+      return Promise.reject(String(error))
     }
   })
 
@@ -31,7 +39,11 @@ export function registerAuditLogHandlers(): void {
       return await auditLogService.clearAllAuditLogs()
     } catch (error) {
       console.error('Failed to clear audit logs:', error)
-      return Promise.reject(error)
+      // 确保错误信息是可序列化的字符串
+      if (error instanceof Error) {
+        return Promise.reject(error.message)
+      }
+      return Promise.reject(String(error))
     }
   })
 }
