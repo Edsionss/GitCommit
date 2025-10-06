@@ -4,6 +4,7 @@ import scan_gitcommit from './schema/scan_gitcommit'
 import stock_sectors from './schema/stock/stock_sectors'
 import stock_news from './schema/stock/stock_news'
 import stock_funds from './schema/stock/stock_funds'
+import stock_hot_rank from './schema/stock/stock_hot_rank'
 
 export const schema = mergeSchema([
   audit_logs,
@@ -11,7 +12,8 @@ export const schema = mergeSchema([
   scan_gitcommit,
   stock_sectors,
   stock_news,
-  stock_funds
+  stock_funds,
+  stock_hot_rank
 ])
 function mergeSchema(schemaArray) {
   let resultSchema = ``
