@@ -1,6 +1,10 @@
 import { networkInterfaces } from 'os'
 import { Notification } from 'electron'
 import { flashMainWindow, getMainWindow } from '@main/index'
+import dayjs from 'dayjs'
+import 'dayjs/locale/zh-cn' // 导入中文语言包
+import fs from 'fs'
+import path from 'path'
 
 /**
  * 强大的通用 DOM 解析函数 (在 page.evaluate 中执行)
@@ -268,4 +272,65 @@ export function mergeColumnArrayList(list: ColumnData[][]): ColumnData[] {
     title,
     value: JSON.stringify(values)
   }))
+}
+
+export function getYesterdayCN() {
+  return dayjs().subtract(1, 'day').locale('zh-cn').format('YYYY.MM.DD dddd')
+}
+
+export function isTimeAfter(t1, t2) {
+  const toSeconds = (t) => {
+    const [h, m, s] = t.split(':').map(Number)
+    return h * 3600 + m * 60 + s
+  }
+  return toSeconds(t1) > toSeconds(t2)
+}
+
+/**
+ * 将数据写入指定目录下的新文件
+ * - 支持相对/绝对路径
+ * - 自动创建目录
+ * - 自动序列化对象
+ * - 支持写入文本或 Buffer
+ */
+export function writeResultFile(
+  targetDir: string,
+  data: unknown,
+  fileName?: string,
+  ext: string = 'js'
+): string {
+  // 1️⃣ 确保是绝对路径
+  const absDir = path.isAbsolute(targetDir) ? targetDir : path.join(process.cwd(), targetDir)
+
+  // 2️⃣ 确保目录存在
+  if (!fs.existsSync(absDir)) {
+    fs.mkdirSync(absDir, { recursive: true })
+  }
+
+  // 3️⃣ 生成文件名
+  const timestamp = Date.now()
+  const safeFileName = fileName || timestamp.toString()
+  const filePath = path.join(absDir, `${safeFileName}.${ext}`)
+
+  // 4️⃣ 处理数据类型
+  let content: string | Buffer
+
+  if (typeof data === 'string') {
+    content = data
+  } else if (Buffer.isBuffer(data)) {
+    content = data
+  } else {
+    // 对象、数组等情况，序列化为 JS 文件
+    content = `export default ${JSON.stringify(data, null, 2)}`
+  }
+
+  // 5️⃣ 写入文件
+  if (typeof content === 'string') {
+    fs.writeFileSync(filePath, content, 'utf-8')
+  } else {
+    fs.writeFileSync(filePath, content)
+  }
+
+  console.log(`✅ 文件已写入: ${filePath}`)
+  return filePath
 }

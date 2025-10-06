@@ -21,7 +21,7 @@ import { autoTransformKeys } from '@nodeUtils/index' // 引入自动转换键的
 import { stockSectorService } from '@services/stock/sectors'
 
 //控制是否展示主窗口
-export const showMainWindow = true
+export const showMainWindow = false
 
 // 创建窗口前的周期函数
 export const beforeCreate = () => {
@@ -86,16 +86,16 @@ export const whenReady = () => {
     settingsService.setAutoStart(true) // 重新应用设置
   }
 
-  // telegraphTest()
+  telegraphTest()
 
   // thsTest()
   // AutomaticallyFillWorkSheet({})
-  // console.log(scrapingStockInfo('亚太药业', extractTableDataByColumn))
-  stockSectorService.clearAllSectors()
-  scrapingThsIndustry(extractTableDataByColumn).then((data: any) => {
-    stockSectorService.addSectors(transformDataForDB(data || []))
-    // console.log(transformDataForDB(data || []))
-  })
+  // console.log(scrapingStockInfo('亚太药业')
+  // stockSectorService.clearAllSectors()
+  // scrapingThsIndustry(extractTableDataByColumn).then((data: any) => {
+  //   stockSectorService.addSectors(transformDataForDB(data || []))
+  //   // console.log(transformDataForDB(data || []))
+  // })
 }
 // 应用即将退出的周期函数
 export const willQuit = () => {
