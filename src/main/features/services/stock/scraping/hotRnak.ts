@@ -12,6 +12,11 @@ export const scrapingHotRank = () => {
           waitUntil: 'networkidle2'
         }
       )
+      page.click('text/热股')
+      // page.click('text/ETF')
+      await page.waitForResponse(
+        (response) => response.url().includes('stat.10jqka.com') && response.status() === 200
+      )
       await page.evaluate(() => {
         const spans = document.querySelectorAll('#hot-stock .time-type span')
         const lastSpan = spans[spans.length - 1] as HTMLElement
@@ -51,8 +56,12 @@ export const scrapingHotRank = () => {
             })
             const tagBox = El?.querySelectorAll('.tabBorder')
             const tagList: any[] = []
+            let stockCode = ''
             if (tagBox && tagBox.length) {
               tagBox.forEach((child, index) => {
+                if (index == 0) {
+                  stockCode = child.parentElement?.previousElementSibling?.textContent?.trim() || ''
+                }
                 tagList.push(child?.nextSibling?.textContent?.trim())
               })
             }
@@ -62,6 +71,7 @@ export const scrapingHotRank = () => {
               ...rouw1Data,
               tagList,
               hotspot,
+              stockCode,
               summary,
               rankType: 'stock'
             })
