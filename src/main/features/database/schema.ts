@@ -3,13 +3,15 @@ import audit_logs from './schema/audit_logs'
 import scan_gitcommit from './schema/scan_gitcommit'
 import stock_sectors from './schema/stock/stock_sectors'
 import stock_news from './schema/stock/stock_news'
+import stock_funds from './schema/stock/stock_funds'
 
 export const schema = mergeSchema([
   audit_logs,
   routes_menu,
   scan_gitcommit,
   stock_sectors,
-  stock_news
+  stock_news,
+  stock_funds
 ])
 function mergeSchema(schemaArray) {
   let resultSchema = ``

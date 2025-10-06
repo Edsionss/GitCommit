@@ -95,11 +95,11 @@ export const whenReady = () => {
   //   // console.log(transformDataForDB(data || []))
   // })
 
-  scrapingThsStockFunds().then((data: any) => {
-    // stockSectorService.addSectors(transformDataForDB(data || []))
-    // console.log(transformDataForDB(data || []))
-    console.log(data)
-  })
+  // scrapingThsStockFunds().then((data: any) => {
+  //   // stockSectorService.addSectors(transformDataForDB(data || []))
+  //   // console.log(transformDataForDB(data || []))
+  //   console.log(data)
+  // })
 }
 // 应用即将退出的周期函数
 export const willQuit = () => {
