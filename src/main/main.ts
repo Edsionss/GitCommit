@@ -21,7 +21,7 @@ import { autoTransformKeys } from '@nodeUtils/index' // 引入自动转换键的
 import { stockSectorService } from '@services/stock/sectors'
 
 //控制是否展示主窗口
-export const showMainWindow = false
+export const showMainWindow = true
 
 // 创建窗口前的周期函数
 export const beforeCreate = () => {

@@ -4,7 +4,7 @@ export const telegraphTest = (timeStr?: string) => {
   // 测试爬虫任务
   timeStr = timeStr || '15:00:00'
   executeScrapingTask({
-    debuggerMode: true,
+    // debuggerMode: true,
     beforeExecutionData: { isTimeAfter, timeStr },
     beforeExecution: async (page, { isTimeAfter, timeStr }) => {
       await page.goto('https://www.cls.cn/telegraph', { waitUntil: 'networkidle2' })
@@ -33,19 +33,29 @@ export const telegraphTest = (timeStr?: string) => {
                 const lastTime = lastTelegraph
                   .querySelector('.telegraph-time-box')
                   ?.textContent.trim()
-                console.log('✅ 检测时间', lastTime, timeStr, isTimeAfterFn(lastTime, timeStr))
+                console.log(
+                  '✅ 检测最后一条时间',
+                  lastTime,
+                  timeStr,
+                  isTimeAfterFn(lastTime, timeStr)
+                )
                 if (!isTimeAfterFn(lastTime, timeStr)) {
                   console.log('✅ 时间小于截止时间， 停止滚动')
                   stopScroll = false
                   const lastTelegraph20 = allTelegraph.slice(-20)
                   for (const [index, El] of lastTelegraph20.entries()) {
-                    // lastTelegraph20.forEach((El, index) => {
                     const time = El.querySelector('.telegraph-time-box')?.textContent.trim()
+                    console.log(
+                      '✅ 时间对比 当前时间 和 截止时间',
+                      time,
+                      timeStr,
+                      isTimeAfterFn(time, timeStr)
+                    )
                     if (!isTimeAfterFn(time, timeStr)) {
-                      const effectiveLength = allTelegraph.length - 20 - index - 1
+                      const effectiveLength = allTelegraph.length - (20 - index)
                       const effectiveTelegraphs = allTelegraph.slice(0, effectiveLength)
                       console.log(
-                        `✅ 时间小于截止时间,停止循环，当前下标 ${index} 有效数据长度 ${effectiveLength}`
+                        `✅ 时间小于截止时间,停止循环，当前下标 ${index} 有效数据长度 ${effectiveLength},总长度${allTelegraph.length}`
                       )
                       const currentDateBox = document.querySelector(
                         '.telegraph-top-switch-box'
@@ -80,7 +90,6 @@ export const telegraphTest = (timeStr?: string) => {
                       })
                       break
                     }
-                    // })
                   }
                 }
               }

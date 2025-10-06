@@ -88,9 +88,9 @@ export async function executeScrapingTask<T>(
       resultData = Object.assign(resultData, data)
       // 返回结果
     }
-    writeResultFile('puppeteer/result', resultData)
 
     if (debuggerMode) {
+      writeResultFile('puppeteer/result', resultData)
       await new Promise((r) => setTimeout(r, 500000000)) // ✅ 稳定性等待
     }
 
