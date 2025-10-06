@@ -7,14 +7,10 @@ import { db } from '@features/database'
 import { is } from '@electron-toolkit/utils'
 import { extractTableDataByColumn } from '@nodeUtils/index'
 
-import {
-  telegraphTest,
-  thsTest,
-  AutomaticallyFillWorkSheet,
-  scrapingStockInfo
-} from '@nodeUtils/scraping'
+import { AutomaticallyFillWorkSheet } from '@nodeUtils/scraping'
 
 import { scrapingThsIndustry } from '@services/stock/scraping/sectors'
+import { scrapingThsStockFunds } from '@services/stock/scraping/stockFunds'
 import { transformDataForDB } from '@services/stock/sectors'
 import { autoTransformKeys } from '@nodeUtils/index' // 引入自动转换键的函数
 
@@ -40,6 +36,10 @@ export const beforeCreate = () => {
   // 确保 stdout/stderr 默认用 utf-8
   process.stdout.setDefaultEncoding('utf8')
   process.stderr.setDefaultEncoding('utf8')
+
+  // 忽略 HTTPS 证书错误（仅用于调试环境）
+  app.commandLine.appendSwitch('ignore-certificate-errors')
+  app.commandLine.appendSwitch('allow-insecure-localhost')
 }
 // 创建窗口时的周期函数
 export const customCreateWindow = () => {
@@ -86,16 +86,20 @@ export const whenReady = () => {
     settingsService.setAutoStart(true) // 重新应用设置
   }
 
-  telegraphTest()
-
   // thsTest()
   // AutomaticallyFillWorkSheet({})
   // console.log(scrapingStockInfo('亚太药业')
   // stockSectorService.clearAllSectors()
-  // scrapingThsIndustry(extractTableDataByColumn).then((data: any) => {
-  //   stockSectorService.addSectors(transformDataForDB(data || []))
+  // scrapingThsIndustry().then((data: any) => {
+  //   // stockSectorService.addSectors(transformDataForDB(data || []))
   //   // console.log(transformDataForDB(data || []))
   // })
+
+  scrapingThsStockFunds().then((data: any) => {
+    // stockSectorService.addSectors(transformDataForDB(data || []))
+    // console.log(transformDataForDB(data || []))
+    console.log(data)
+  })
 }
 // 应用即将退出的周期函数
 export const willQuit = () => {

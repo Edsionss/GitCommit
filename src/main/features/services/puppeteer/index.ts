@@ -98,7 +98,7 @@ export async function executeScrapingTask<T>(
   } catch (error) {
     console.error('[PuppeteerService] Error occurred while executing scraping task:', error)
     if (page && captureError) {
-      const errorLogDir = path.join(process.cwd(), 'puppeteerError')
+      const errorLogDir = path.join(process.cwd(), 'puppeteer', 'puppeteerError')
 
       const now = dayjs()
       const errorTimestamp = now.format('YYYYMMDD-HHmmss')

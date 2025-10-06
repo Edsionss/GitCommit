@@ -1,27 +1,21 @@
 import { executeScrapingTask } from '@services/puppeteer'
 import { mergeColumnArrayList, scrapePaginatedTable } from '@nodeUtils/index'
 
-//爬取同花顺行业排行表
-export const scrapingThsIndustry = async () => {
+//爬取同花顺个股资金前两页数据
+export const scrapingThsStockFunds = async () => {
   return executeScrapingTask({
     beforeExecutionData: {},
     beforeExecution: async (page, {}) => {
-      const homeUrl = 'https://q.10jqka.com.cn/thshy/'
+      const homeUrl = 'https://data.10jqka.com.cn/funds/ggzjl/#refCountId=data_55f13c2c_254'
       // 设置一个较长的超时时间，并等待网络空闲
       await page.goto(homeUrl, { waitUntil: 'networkidle2', timeout: 60000 })
       console.log(`📄 正在访问首页: ${homeUrl}`)
       const allData: any[] = await scrapePaginatedTable({
-        page,
-        processPageDataCallback: (pageData: any[]) => {
-          return pageData.map((item, index) => {
-            if (item.title.includes('涨跌幅') && index > 2) {
-              item.title = '领涨股' + item.title
-            }
-            return item
-          })
-        }
+        dataTableSelector: '#J-ajax-main .m-table',
+        maxPages: 2,
+        nextPageSelector: 'text/下一页',
+        page
       })
-
       console.log(`🎉 抓取完成！共获得 ${allData.length} 条数据。`)
       return mergeColumnArrayList(allData)
     }

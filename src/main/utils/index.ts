@@ -334,3 +334,108 @@ export function writeResultFile(
   console.log(`✅ 文件已写入: ${filePath}`)
   return filePath
 }
+
+/**
+ * @typedef {import('puppeteer').Page} Page
+ */
+
+/**
+ * 通用的分页表格数据抓取函数
+ * @param {object} options - 配置对象
+ * @param {Page} options.page - Puppeteer 的 Page 对象
+ * @param {string} options.totalPagesSelector - 用于获取总页数信息的选择器 (例如: '.page_info')
+ * @param {string} options.nextPageSelector - “下一页”按钮的选择器 (例如: '.changePage')
+ * @param {string} options.dataTableSelector - 需要提取数据的表格的选择器 (例如: '#maincont table')
+ * @param {Function} options.dataExtractionFn - 在浏览器上下文中执行的、用于从表格元素中提取数据的函数。
+ * @param {Function} options.processPageDataCallback - 一个回调函数，用于处理从每一页提取到的原始数据。
+ * @param {string} [options.waitForResponseUrlIncludes] - 点击下一页后，需要等待的 Ajax 请求 URL 中包含的字符串。
+ * @returns {Promise<any[]>} - 返回一个包含所有页面数据的扁平化数组。
+ */
+export async function scrapePaginatedTable({
+  page,
+  dataTableSelector = '#maincont',
+  maxPages = null,
+  processPageDataCallback,
+  waitForResponseUrlIncludes = '/ajax/',
+  totalPagesSelector = '.page_info',
+  nextPageSelector = '.changePage',
+  dataExtractionFn = extractTableDataByColumn
+}: {
+  page: any
+  dataTableSelector?: string
+  maxPages?: number | null
+  processPageDataCallback?: ((pageData: any, currentPage: number) => any) | null
+  waitForResponseUrlIncludes?: string
+  totalPagesSelector?: string
+  nextPageSelector?: string
+  dataExtractionFn?: (...args: any[]) => any
+}) {
+  // 使用可选链调用}
+  const allData: any[] = []
+
+  // --- 1. 获取总页数 ---
+  const totalPages = await page.evaluate((selector) => {
+    const pageText = document.querySelector(selector)?.textContent.trim() // "1/33"
+    if (!pageText) {
+      console.warn(`未找到总页数元素，选择器: ${selector}。将只处理当前页。`)
+      return 1
+    }
+    // 假设格式为 "当前页/总页数"
+    return parseInt(pageText.split('/')[1], 10) || 1
+  }, totalPagesSelector)
+
+  console.log(`📄 共 ${totalPages} 页`)
+
+  // --- 2. 循环所有分页 ---
+  for (let currentPage = 1; currentPage <= (maxPages || totalPages); currentPage++) {
+    console.log(`🔎 正在处理第 ${currentPage} 页...`)
+
+    try {
+      // 对于第一页之后的所有页，执行点击和等待操作
+      if (currentPage > 1) {
+        console.log(`🖱️ 点击下一页 (选择器: ${nextPageSelector})...`)
+        await page.click(nextPageSelector)
+
+        // 等待 Ajax 请求完成，这是比固定等待时间更可靠的方法
+        await page.waitForResponse(
+          (response) => response.url().includes(waitForResponseUrlIncludes),
+          { timeout: 30000 }
+        )
+        // 额外等待一小段时间，确保前端框架完成 DOM 渲染
+        await new Promise((resolve) => setTimeout(resolve, 500))
+      }
+
+      // --- 3. 提取当前页的数据 ---
+      const pageData = await page.evaluate(
+        (tableSelector, extractionFnString) => {
+          // 在浏览器环境中，将字符串形式的函数重新构造为可执行函数
+          const extractFn = new Function('tableEl', `return (${extractionFnString})(tableEl);`)
+
+          const tableEl = document.querySelector(tableSelector)
+          if (!tableEl) {
+            console.error(`在页面上未找到表格，选择器: ${tableSelector}`)
+            return [] // 如果找不到表格，返回空数组
+          }
+          return extractFn(tableEl)
+        },
+        dataTableSelector,
+        dataExtractionFn.toString() // 将函数转换为字符串，以便传递到浏览器上下文
+      )
+
+      // --- 4. 使用回调函数处理并合并数据 ---
+      // 回调函数负责处理（如修改标题）并返回处理后的数据
+      let processedData = processPageDataCallback?.(pageData, currentPage) ?? pageData
+
+      allData.push(processedData as any[]) // 将处理后的数据合并到总数组中
+
+      console.log(`✅ 第 ${currentPage} 页处理完毕，获得 ${processedData.length} 条数据。`)
+    } catch (error) {
+      console.error(`❌ 处理第 ${currentPage} 页时发生错误:`)
+      console.log('跳过此页，继续处理下一页...')
+      throw error
+      // continue // 如果某一页出错，可以选择跳过
+    }
+  }
+
+  return allData
+}
