@@ -21,7 +21,8 @@ export async function executeScrapingTask<T>(
     url,
     windowOptions,
     captureError,
-    debuggerMode = false
+    debuggerMode = false,
+    isWriter
   } = ScrapingTaskOptions
 
   // 为本次爬虫任务创建一个完全隔离的会话
@@ -89,7 +90,7 @@ export async function executeScrapingTask<T>(
       // 返回结果
     }
 
-    if (debuggerMode) {
+    if (debuggerMode || isWriter) {
       writeResultFile('puppeteer/result', resultData)
       await new Promise((r) => setTimeout(r, 500000000)) // ✅ 稳定性等待
     }

@@ -9,4 +9,5 @@ export interface ScrapingTaskOptions<T> {
   windowOptions?: Electron.BrowserWindowConstructorOptions
   captureError?: boolean
   debuggerMode?: boolean
+  isWriter?: boolean
 }
