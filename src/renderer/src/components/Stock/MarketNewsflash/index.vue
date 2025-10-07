@@ -1,37 +1,54 @@
 <template>
   <div class="market-newsflash-container">
-    <Tabs v-model="activeTab" :tabs="tabItems">
-      <template #default="{ activeTab }">
-        <div v-show="activeTab === 'Telegraph'" class="content-panel">
-          <Timeline></Timeline>
-        </div>
-        <div v-show="activeTab === 'jinShi'" class="content-panel">
-          <p>这里是快讯内容区。</p>
-        </div>
-      </template>
-    </Tabs>
+    <div class="header">
+      <div class="hand-btns">
+        <a-button type="primary" @click="stockApi.scrapeStockNews()">爬取咨询</a-button>
+        <a-button danger @click="stockApi.cleanStockNews()">清空咨询</a-button>
+      </div>
+    </div>
+    <div class="content-panel">
+      <Timeline :data="stockNews"></Timeline>
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
-import Timeline from '@components/common/Timeline.vue'
-import Tabs from '@components/common/Tabs.vue'
+import { ref, reactive } from 'vue'
+import Timeline from '@components/Common/Timeline.vue'
+import { stockApi } from '@api/stock'
+import { getYesterdayCN } from '@utils/index'
 
-const activeTab = ref('Telegraph')
-const tabItems = ref([
-  { key: 'Telegraph', title: '财联社' },
-  { key: 'jinShi', title: '金十数据' }
-])
+const stockNews = reactive([])
+stockApi.getStockNews(getYesterdayCN()).then((res) => {
+  console.log(res)
+
+  Object.assign(stockNews, res)
+})
 </script>
 
 <style scoped lang="scss">
 .market-newsflash-container {
   height: 100%;
   width: 100%;
-}
+  background-color: var(--bg-container);
+  padding: 10px;
+  overflow: hidden;
+  .header {
+    .hand-btns {
+      position: fixed;
+      margin: 10px 0;
+      display: flex;
+      gap: 10px;
+      justify-content: end;
+      right: 30px;
+    }
+    height: 60px;
+  }
 
-.content-panel {
-  height: 100%;
+  .content-panel {
+    height: 100%;
+    overflow-y: auto;
+    margin-bottom: 30px;
+  }
 }
 </style>

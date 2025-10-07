@@ -43,6 +43,7 @@ declare module 'vue' {
     HotspotTrendChart: typeof import('./src/components/Stock/MarketQuotation/HotspotTrendChart.vue')['default']
     IHeroiconsSolidMoon: typeof import('~icons/heroicons-solid/moon')['default']
     IHeroiconsSolidSun: typeof import('~icons/heroicons-solid/sun')['default']
+    'Index copy': typeof import('./src/components/Stock/MarketNewsflash/index copy.vue')['default']
     IndexChart: typeof import('./src/components/Stock/MarketQuotation/IndexChart.vue')['default']
     IndicatorChart: typeof import('./src/components/Common/IndicatorChart.vue')['default']
     IndustrySector: typeof import('./src/components/Stock/MarketQuotation/IndustrySector.vue')['default']

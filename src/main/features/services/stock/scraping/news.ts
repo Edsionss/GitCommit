@@ -1,12 +1,14 @@
 import { executeScrapingTask } from '@services/puppeteer'
-import { getYesterdayCN, isTimeAfter } from '@nodeUtils/index'
-export const telegraphTest = (timeStr?: string) => {
-  // 测试爬虫任务
+import { getYesterdayCN, isTimeAfter, addIdsFast } from '@nodeUtils/index'
+import type { StockNews } from '@sharedType/stockNews'
+
+export const telegraphTest = async (dateStr?: string, timeStr?: string) => {
   timeStr = timeStr || '15:00:00'
-  executeScrapingTask({
-    // debuggerMode: true,
-    beforeExecutionData: { isTimeAfter, timeStr },
-    beforeExecution: async (page, { isTimeAfter, timeStr }) => {
+  dateStr = dateStr || getYesterdayCN()
+
+  return await executeScrapingTask({
+    beforeExecutionData: { isTimeAfter, timeStr, dateStr },
+    beforeExecution: async (page, { isTimeAfter, timeStr, dateStr }) => {
       await page.goto('https://www.cls.cn/telegraph', { waitUntil: 'networkidle2' })
       await Promise.all([
         page.click('.more-button'),
@@ -15,11 +17,9 @@ export const telegraphTest = (timeStr?: string) => {
         )
       ])
       console.log('✅ 加载更多完成')
-
       const getStopScroll = () => {
-        const yesterdayCN = getYesterdayCN()
         return page.evaluate(
-          (yesterdayCN: string, timeStr: string, isTimeAfterStr: string) => {
+          (dateStr: string, timeStr: string, isTimeAfterStr: string) => {
             let stopScroll: boolean = true
             const result: any[] = []
             const isTimeAfterFn = new Function('t1,t2', `return (${isTimeAfterStr})(t1,t2);`)
@@ -27,9 +27,9 @@ export const telegraphTest = (timeStr?: string) => {
             const lastTelegraph = allTelegraph[allTelegraph.length - 1]
             if (lastTelegraph && lastTelegraph.children.length > 1) {
               const data = lastTelegraph.firstElementChild?.textContent.trim()
-              if (data == yesterdayCN) {
+              if (data == dateStr) {
                 // ✅ 到达昨天，
-                console.log('✅ 到达昨天', data, yesterdayCN)
+                console.log('✅ 到达昨天', data, dateStr)
                 const lastTime = lastTelegraph
                   .querySelector('.telegraph-time-box')
                   ?.textContent.trim()
@@ -74,18 +74,19 @@ export const telegraphTest = (timeStr?: string) => {
                         } else {
                           newsBox = contentBox.querySelector('div')
                         }
-                        const isImportant = contentBox.classList.contains('c-de0422')
+                        const isImportant = contentBox.classList.contains('c-de0422') ? 1 : 0
                         result.push({
-                          data:
+                          newsDate:
                             dataBox?.textContent?.trim() ||
                             currentDateBox?.textContent
                               ?.trim()
-                              .match(/\d{4}\.\d{2}\.\d{2}\s星期./) ||
+                              .match(/\d{4}\.\d{2}\.\d{2}\s星期./)?.[0] ||
                             '',
-                          time: timeBox?.textContent?.trim() || '',
+                          newsTime: timeBox?.textContent?.trim() || '',
                           content: newsBox?.textContent?.trim() || '',
                           title: titleBox?.textContent?.trim() || '',
-                          isImportant
+                          isImportant,
+                          tradeDate: dateStr
                         })
                       })
                       break
@@ -96,13 +97,13 @@ export const telegraphTest = (timeStr?: string) => {
             }
             return { stopScroll, result }
           },
-          yesterdayCN,
+          dateStr,
           timeStr,
           isTimeAfter.toString()
         )
       }
       let stopScroll: boolean = true
-      let result: any[] = []
+      let result: Omit<StockNews, 'createdAt'>[] = []
       while (stopScroll) {
         // 滚动到页面底部以触发“加载更多”
         await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight))
@@ -123,10 +124,7 @@ export const telegraphTest = (timeStr?: string) => {
         if (!stopScroll) break
       }
 
-      return result
+      return addIdsFast(result, 'stock_news') as Omit<StockNews, 'createdAt'>[]
     }
-  }).then((data) => {
-    console.log('Scraped data:', data.length, data[0], data[data.length - 1])
-    console.log(getYesterdayCN())
   })
 }

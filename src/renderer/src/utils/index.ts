@@ -1,3 +1,4 @@
+import dayjs from 'dayjs'
 export const MergeArray = (arr1: any[], arr2: any[], isCover?: boolean, where?: string): any[] => {
   const mergeArray = [...arr1, ...arr2]
   if (!isCover) {
@@ -105,4 +106,8 @@ export function formatPathsAndFilter(nodes: any[], parentPath: string = ''): any
         return newNode
       })
   )
+}
+
+export function getYesterdayCN() {
+  return dayjs().subtract(1, 'day').locale('zh-cn').format('YYYY.MM.DD dddd')
 }

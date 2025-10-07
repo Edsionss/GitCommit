@@ -17,7 +17,7 @@ export class StockNewsService {
    * @param newsData - 快讯数据，不包含 id 和 createdAt
    * @returns better-sqlite3 的 RunResult 对象
    */
-  public insert(newsData: Omit<StockNews, 'id' | 'createdAt'>): RunResult {
+  public insert(newsData: Omit<StockNews, 'createdAt'>): RunResult {
     return this.dbHelper.insert(this.tableName, newsData)
   }
 
@@ -26,7 +26,7 @@ export class StockNewsService {
    * @param newsDataArray - 快讯数据对象的数组
    * @returns an array of better-sqlite3's RunResult objects, one for each row inserted.
    */
-  public insertMany(newsDataArray: Omit<StockNews, 'id' | 'createdAt'>[]): RunResult[] {
+  public insertMany(newsDataArray: Omit<StockNews, 'createdAt'>[]): RunResult[] {
     // dbHelper.insertMany 内部会处理空数组的情况，这里直接调用即可
     return this.dbHelper.insertMany(this.tableName, newsDataArray)
   }
@@ -114,6 +114,14 @@ export class StockNewsService {
    */
   public clearAllNews(): { changes: number } {
     return this.dbHelper.clearTable(this.tableName, { resetAutoIncrement: true })
+  }
+
+  /**
+   * 根据交易日期进行查询
+   * @returns 操作结果，包含变化的行数
+   */
+  public findByTradeDate(tradeDate: string): StockNews[] {
+    return this.dbHelper.find<StockNews>(this.tableName, { tradeDate })
   }
 }
 export const stockNewsService = new StockNewsService()

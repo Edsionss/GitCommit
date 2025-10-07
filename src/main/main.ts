@@ -10,6 +10,7 @@ import { extractTableDataByColumn } from '@nodeUtils/index'
 import { AutomaticallyFillWorkSheet } from '@nodeUtils/scraping'
 
 import { scrapingThsIndustry } from '@services/stock/scraping/sectors'
+import { telegraphTest } from '@services/stock/scraping/news'
 import { scrapingThsStockFunds } from '@services/stock/scraping/stockFunds'
 import { transformDataForDB } from '@services/stock/sectors'
 import { autoTransformKeys } from '@nodeUtils/index' // 引入自动转换键的函数
@@ -103,7 +104,9 @@ export const whenReady = () => {
   // })
 
   // scrapingHotStock()
-  hot.scrapingHotIndustry()
+  // hot.scrapingHotIndustry()
+
+  // telegraphTest()
 }
 // 应用即将退出的周期函数
 export const willQuit = () => {

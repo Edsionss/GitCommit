@@ -5,6 +5,7 @@ import dayjs from 'dayjs'
 import 'dayjs/locale/zh-cn' // 导入中文语言包
 import fs from 'fs'
 import path from 'path'
+import { nanoid } from 'nanoid'
 
 /**
  * 强大的通用 DOM 解析函数 (在 page.evaluate 中执行)
@@ -438,4 +439,21 @@ export async function scrapePaginatedTable({
   }
 
   return allData
+}
+
+export function generateId(prefix: string, length = 10) {
+  return `${prefix}-${nanoid(length)}`
+}
+
+export function addIdsFast(data, prefix: string) {
+  const len = data.length
+  const result = new Array(len) // 预分配内存，防止数组动态扩容
+
+  for (let i = 0; i < len; i++) {
+    // 原地生成新对象并放入 result
+    const item = data[i]
+    result[i] = { id: generateId(prefix), ...item }
+  }
+
+  return result
 }

@@ -7,6 +7,7 @@ import type {
 } from '@sharedTypes/WebSocket'
 import type { RouteRecord, RouteRecordWithOptionalId } from '@shared/types/dtos/MenuManagement'
 import { promises } from 'dns'
+import type { StockNews, StockNewsQueryOptions } from '@sharedType/stockNews'
 
 // Define interfaces for the data structures used in the API
 interface GitScanOptions {
@@ -117,12 +118,15 @@ interface ExposedAPI {
   onWindowStateChange: (callback: (state: 'maximized' | 'unmaximized') => void) => () => void
 
   // Audit Log API
-  auditLogGet: (
-    page: number,
-    pageSize: number
-  ) => Promise<{ records: AuditLog[]; total: number }>
+  auditLogGet: (page: number, pageSize: number) => Promise<{ records: AuditLog[]; total: number }>
   auditLogDelete: (ids: number[]) => Promise<{ changes: number }>
   auditLogClear: () => Promise<{ changes: number }>
+
+  // Stock API---------------------------------
+  // News
+  scrapeStockNews: (dateStr?: string, timeStr?: string) => Promise<any>
+  getStockNews: (tradeDate: string) => Promise<StockNews[]>
+  cleanStockNews: () => Promise<any>
 }
 
 // AuditLog a new interface

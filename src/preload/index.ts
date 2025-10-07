@@ -1,6 +1,7 @@
 import { contextBridge, ipcRenderer } from 'electron'
 import { electronAPI } from '@electron-toolkit/preload'
 import type { AiConfig } from '@shared/types/dtos/ai'
+import type { StockNews, StockNewsQueryOptions } from '@sharedType/stockNews'
 
 // Git扫描选项
 interface GitScanOptions {
@@ -152,9 +153,17 @@ const api = {
   },
 
   // Audit Log API
-  auditLogGet: (page: number, pageSize: number) => ipcRenderer.invoke('auditLog:get', page, pageSize),
+  auditLogGet: (page: number, pageSize: number) =>
+    ipcRenderer.invoke('auditLog:get', page, pageSize),
   auditLogDelete: (ids: number[]) => ipcRenderer.invoke('auditLog:delete', ids),
-  auditLogClear: () => ipcRenderer.invoke('auditLog:clear')
+  auditLogClear: () => ipcRenderer.invoke('auditLog:clear'),
+
+  // Stock API---------------------------------
+  // News
+  scrapeStockNews: (dateStr?: string, timeStr?: string) =>
+    ipcRenderer.invoke('stock:scrape_news', dateStr, timeStr),
+  getStockNews: (tradeDate: string) => ipcRenderer.invoke('stock:get_news', tradeDate),
+  cleanStockNews: () => ipcRenderer.invoke('stock:clean_news')
 }
 
 // 暴露API

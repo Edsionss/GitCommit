@@ -5,11 +5,13 @@
 export interface StockNews {
   id: number
   newsTime: string // 快讯时间
+  newsDate: string
   isImportant: number // 是否重要 (0: 否, 1: 是)
   title: string
   content: string
   source: string
   createdAt: string // 记录创建时间
+  tradeDate: string // 所属交易日 (yyyy-MM-dd)
 }
 
 /**
