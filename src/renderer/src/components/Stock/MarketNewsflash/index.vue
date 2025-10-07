@@ -42,6 +42,7 @@ stockApi.getStockNews(getYesterdayCN()).then((res) => {
       right: 30px;
     }
     height: 60px;
+    border-bottom: 1px solid var(--border-primary);
   }
 
   .content-panel {
