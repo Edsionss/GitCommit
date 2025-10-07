@@ -19,11 +19,8 @@ import { stockApi } from '@api/stock'
 import { getYesterdayCN } from '@utils/index'
 
 const stockNews = reactive([])
-console.log(getYesterdayCN())
 
 stockApi.getStockNews(getYesterdayCN()).then((res) => {
-  console.log(res)
-
   Object.assign(stockNews, res)
 })
 </script>
@@ -48,9 +45,8 @@ stockApi.getStockNews(getYesterdayCN()).then((res) => {
   }
 
   .content-panel {
-    height: 100%;
+    height: calc(100% - 60px);
     overflow-y: auto;
-    margin-bottom: 30px;
   }
 }
 </style>
