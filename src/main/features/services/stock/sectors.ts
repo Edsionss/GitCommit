@@ -25,7 +25,7 @@ export class StockSectorCamelCasesService {
    * @param sectors - 要插入的板块数据对象数组 (每个对象都必须包含一个唯一的 `id`)。
    * @returns better-sqlite3 的执行结果数组。
    */
-  public addSectors(sectors: StockSectorCamelCaseCreationData[]) {
+  public insertMany(sectors: StockSectorCamelCaseCreationData[]) {
     if (!sectors || sectors.length === 0) {
       return []
     }

@@ -26,7 +26,7 @@ export class StockNewsService {
    * @param newsDataArray - 快讯数据对象的数组
    * @returns an array of better-sqlite3's RunResult objects, one for each row inserted.
    */
-  public insertManyNews(newsDataArray: Omit<StockNews, 'id' | 'createdAt'>[]): RunResult[] {
+  public insertMany(newsDataArray: Omit<StockNews, 'id' | 'createdAt'>[]): RunResult[] {
     // dbHelper.insertMany 内部会处理空数组的情况，这里直接调用即可
     return this.dbHelper.insertMany(this.tableName, newsDataArray)
   }
