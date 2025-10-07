@@ -1,30 +1,44 @@
 {
   "extends": "@electron-toolkit/tsconfig/tsconfig.node.json",
+
   "include": [
     "electron.vite.config.*",
     "src/main/**/*",
     "src/preload/**/*",
     "src/shared/**/*"
   ],
-  "compilerOptions": {
-    "composite": true,
-    "module": "CommonJS",
-    "moduleResolution": "Bundler",
-    "esModuleInterop": true,
-    "types": ["electron-vite/node"],
-    "target": "ESNext", // 目标可以是新的ES版本，但模块系统是CJS
-    "baseUrl": ".",
-    "paths": {
-      "@shared/*": ["src/shared/*"],
-      "@sharedType/*": ["src/shared/types/dtos/*"],
-      "@features/*": ["src/main/features/*"],
-      "@handlers/*": ["src/main/features/handlers/*"],
-      "@services/*": ["src/main/features/services/*"],
-      "@main/*": ["src/main/*"],
-      "@preload/*": ["src/preload/*"],
-      "@nodeUtils/*": ["src/main/utils/*"],
-    },
-    
-  },
 
+  "compilerOptions": {
+    // 启用 Bundler 模式解析（取代 baseUrl）
+    "moduleResolution": "bundler",
+
+    // 指定模块系统
+    "module": "CommonJS",
+    "target": "ESNext",
+
+    // 兼容 ESM 和 CommonJS 导入
+    "esModuleInterop": true,
+
+    // Electron-Vite 类型
+    "types": ["electron-vite/node"],
+
+    // 启用项目引用
+    "composite": true,
+
+    // 为暂时兼容 TypeScript 6 警告（静音 baseUrl 弃用提示）
+    "ignoreDeprecations": "6.0",
+
+    // === ⚡ 新的路径别名写法 ===
+    // 在 moduleResolution: "bundler" 模式下，paths 仍然生效
+    "paths": {
+      "@shared/*": ["./src/shared/*"],
+      "@sharedType/*": ["./src/shared/types/dtos/*"],
+      "@features/*": ["./src/main/features/*"],
+      "@handlers/*": ["./src/main/features/handlers/*"],
+      "@services/*": ["./src/main/features/services/*"],
+      "@main/*": ["./src/main/*"],
+      "@preload/*": ["./src/preload/*"],
+      "@nodeUtils/*": ["./src/main/utils/*"]
+    }
+  }
 }
