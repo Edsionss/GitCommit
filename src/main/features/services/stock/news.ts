@@ -17,7 +17,7 @@ export class StockNewsService {
    * @param newsData - 快讯数据，不包含 id 和 createdAt
    * @returns better-sqlite3 的 RunResult 对象
    */
-  public createNews(newsData: Omit<StockNews, 'id' | 'createdAt'>): RunResult {
+  public insert(newsData: Omit<StockNews, 'id' | 'createdAt'>): RunResult {
     return this.dbHelper.insert(this.tableName, newsData)
   }
 
