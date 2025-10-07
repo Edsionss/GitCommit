@@ -7,7 +7,10 @@ import Antd from 'ant-design-vue'
 import 'ant-design-vue/dist/reset.css'
 import ContextMenu from '@imengyu/vue3-context-menu'
 import '@imengyu/vue3-context-menu/lib/vue3-context-menu.css'
+import dayjs from 'dayjs'
+import 'dayjs/locale/zh-cn'
 
+dayjs.locale('zh-cn') // 👈 全局设置一次即可
 async function bootstrap() {
   const app = createApp(App)
 

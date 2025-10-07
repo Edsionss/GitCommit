@@ -2,7 +2,6 @@ import { networkInterfaces } from 'os'
 import { Notification } from 'electron'
 import { flashMainWindow, getMainWindow } from '@main/index'
 import dayjs from 'dayjs'
-import 'dayjs/locale/zh-cn' // 导入中文语言包
 import fs from 'fs'
 import path from 'path'
 import { nanoid } from 'nanoid'
@@ -276,7 +275,7 @@ export function mergeColumnArrayList(list: ColumnData[][]): ColumnData[] {
 }
 
 export function getYesterdayCN() {
-  return dayjs().subtract(1, 'day').locale('zh-cn').format('YYYY.MM.DD dddd')
+  return dayjs().subtract(1, 'day').format('YYYY.MM.DD dddd')
 }
 
 export function isTimeAfter(t1, t2) {

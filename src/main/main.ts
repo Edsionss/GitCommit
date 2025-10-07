@@ -5,6 +5,9 @@ import { registerIpcHandlers } from '@handlers/ipcHandlers'
 import { startWebSocketServer, stopWebSocketServer } from '@services/websocket'
 import { db } from '@features/database'
 import { is } from '@electron-toolkit/utils'
+import dayjs from 'dayjs'
+import 'dayjs/locale/zh-cn'
+
 import { extractTableDataByColumn } from '@nodeUtils/index'
 
 import { AutomaticallyFillWorkSheet } from '@nodeUtils/scraping'
@@ -42,6 +45,8 @@ export const beforeCreate = () => {
   // 忽略 HTTPS 证书错误（仅用于调试环境）
   app.commandLine.appendSwitch('ignore-certificate-errors')
   app.commandLine.appendSwitch('allow-insecure-localhost')
+
+  dayjs.locale('zh-cn') // 👈 全局设置一次即可
 }
 // 创建窗口时的周期函数
 export const customCreateWindow = () => {

@@ -19,6 +19,8 @@ import { stockApi } from '@api/stock'
 import { getYesterdayCN } from '@utils/index'
 
 const stockNews = reactive([])
+console.log(getYesterdayCN())
+
 stockApi.getStockNews(getYesterdayCN()).then((res) => {
   console.log(res)
 

@@ -82,6 +82,7 @@ export class DatabaseHelper {
     const sql = `SELECT ${columns} FROM "${tableName}" ${text}`
     const stmt = this.db.prepare(sql)
     const results = stmt.all(params)
+
     console.log(`[DB find from table  ${tableName}] `)
 
     // --> 转换: 将从数据库返回的下划线式结果转换为应用层使用的驼峰式
