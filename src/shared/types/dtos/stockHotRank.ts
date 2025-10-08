@@ -11,7 +11,7 @@ export interface StockHotRank {
   hotnessScore: number | null
   summary: string | null
   stockCode: string | null
-  rankType: string
+  rankType: string | 'stock' | 'ETF' | 'topic' | 'concept' | 'industry'
   tradeDate: string // 格式: 'YYYY-MM-DD'
   createdAt: string // 格式: ISO 8601
 }
