@@ -163,7 +163,13 @@ const api = {
   scrapeStockNews: (dateStr?: string, timeStr?: string) =>
     ipcRenderer.invoke('stock:scrape_news', dateStr, timeStr),
   getStockNews: (tradeDate: string) => ipcRenderer.invoke('stock:get_news', tradeDate),
-  cleanStockNews: () => ipcRenderer.invoke('stock:clean_news')
+  cleanStockNews: () => ipcRenderer.invoke('stock:clean_news'),
+
+  // hotRank
+  scrapeAllHotRank: () => ipcRenderer.invoke('stock:scrape_all_hotRank'),
+  getStockAllHotRank: (tradeDate?: string) =>
+    ipcRenderer.invoke('stock:get_all_hotRank', tradeDate),
+  cleanStockAllHotRank: () => ipcRenderer.invoke('stock:clean_all_hotRank')
 }
 
 // 暴露API

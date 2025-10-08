@@ -1,7 +1,8 @@
 //爬取同花顺热榜
 
 import { executeScrapingTask } from '@services/puppeteer'
-
+import { addIdsFast } from '@nodeUtils/index'
+import { getLastTradingDay } from '@shared/utils/'
 //爬取热榜基础方法
 export const scrapingHotRank = async (typeText: string, scraping: (page) => {}) => {
   return await executeScrapingTask({
@@ -249,4 +250,26 @@ export const scrapingHotIndustry = async () => {
   return await scrapingHotConcept('行业板块', '#plate-container-industry', '.border')
 }
 
-export const scrapingAllHotRank = () => {}
+export const scrapingAllHotRank = async () => {
+  try {
+    // 并行执行所有爬取任务
+    const [hotStock, hotETF, hotTopic, hotConcept, hotIndustry] = await Promise.all([
+      scrapingHotStock(),
+      scrapingHotETF(),
+      scrapingHotTopic(),
+      scrapingHotConcept(),
+      scrapingHotIndustry()
+    ])
+
+    // 合并所有结果
+    const allResults = [...hotStock, ...hotETF, ...hotTopic, ...hotConcept, ...hotIndustry]
+    const tradeDate = await getLastTradingDay()
+    // 为每个结果添加 ID
+    const resultsWithIds = addIdsFast(allResults, 'hotRank', { tradeDate })
+
+    return resultsWithIds
+  } catch (error) {
+    console.error('爬取所有热榜数据失败:', error)
+    throw error
+  }
+}

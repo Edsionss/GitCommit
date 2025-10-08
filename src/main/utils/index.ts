@@ -444,14 +444,14 @@ export function generateId(prefix: string, length = 10) {
   return `${prefix}-${nanoid(length)}`
 }
 
-export function addIdsFast(data, prefix: string) {
+export function addIdsFast(data, prefix: string, otherField?: {}) {
   const len = data.length
   const result = new Array(len) // 预分配内存，防止数组动态扩容
 
   for (let i = 0; i < len; i++) {
     // 原地生成新对象并放入 result
     const item = data[i]
-    result[i] = { id: generateId(prefix), ...item }
+    result[i] = { id: generateId(prefix), ...item, ...otherField }
   }
 
   return result

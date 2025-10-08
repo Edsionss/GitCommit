@@ -8,6 +8,7 @@ import type {
 import type { RouteRecord, RouteRecordWithOptionalId } from '@shared/types/dtos/MenuManagement'
 import { promises } from 'dns'
 import type { StockNews, StockNewsQueryOptions } from '@sharedType/stockNews'
+import type { StockHotRank, CreateStockHotRankDto } from '@sharedType/stockHotRank'
 
 // Define interfaces for the data structures used in the API
 interface GitScanOptions {
@@ -127,6 +128,11 @@ interface ExposedAPI {
   scrapeStockNews: (dateStr?: string, timeStr?: string) => Promise<any>
   getStockNews: (tradeDate: string) => Promise<StockNews[]>
   cleanStockNews: () => Promise<any>
+
+  // hot rank
+  scrapeAllHotRank: () => Promise<any[]>
+  getStockAllHotRank: (tradeDate?: string) => Promise<StockHotRank[]>
+  cleanStockAllHotRank: () => Promise<any>
 }
 
 // AuditLog a new interface
