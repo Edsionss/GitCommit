@@ -485,3 +485,68 @@ export function mergeScrapedResult<T extends Record<string, any>, D = unknown>(
 
   return target
 }
+
+/**
+ * 智能合并函数 v4
+ * -------------------------------------------------------
+ * 自动根据目标/来源类型智能合并。
+ * 1️⃣ 当目标为空(null/undefined/空对象/空数组/空字符串) → 直接返回来源
+ * 2️⃣ 当目标为基础类型或数组 → 转换为 { beforeData, [fieldName]: source }
+ * 3️⃣ 当来源为基础类型/数组/Map → 使用 { [fieldName]: source }
+ * 4️⃣ 当目标和来源都是对象 → 直接 Object.assign 合并
+ * 5️⃣ 支持是否修改原对象（mutable）
+ */
+export function smartMerge<T extends any, S = unknown>(
+  target: T,
+  source: S,
+  fieldName: string = 'data',
+  mutable: boolean = true
+): any {
+  const isPlainObject = (val: any): val is Record<string, any> =>
+    val !== null && typeof val === 'object' && !Array.isArray(val) && !(val instanceof Map)
+
+  // 🔹 情况 1: 目标为空 → 直接返回来源
+  if (
+    target == null ||
+    (typeof target === 'object' && Object.keys(target as any).length === 0) ||
+    (Array.isArray(target) && (target as any).length === 0) ||
+    (typeof target === 'string' && target === '')
+  ) {
+    return source
+  }
+
+  // 🔹 情况 2: 目标是基础类型 或 数组 → 封装为对象
+  const isTargetPrimitiveOrArray =
+    typeof target !== 'object' || Array.isArray(target) || target instanceof Map
+
+  const isSourcePrimitiveOrArray =
+    typeof source !== 'object' || Array.isArray(source) || source instanceof Map
+
+  if (isTargetPrimitiveOrArray && isSourcePrimitiveOrArray) {
+    return {
+      beforeData: target,
+      [fieldName]: source
+    }
+  }
+
+  // 🔹 情况 3: 来源是基础类型、数组或 Map
+  const baseResult = mutable
+    ? isPlainObject(target)
+      ? target
+      : { beforeData: target }
+    : { ...(isPlainObject(target) ? target : { beforeData: target }) }
+
+  if (isSourcePrimitiveOrArray) {
+    Object.assign(baseResult, { [fieldName]: source })
+    return baseResult
+  }
+
+  // 🔹 情况 4: 普通对象合并
+  if (isPlainObject(source)) {
+    Object.assign(baseResult, source)
+    return baseResult
+  }
+
+  // 默认返回
+  return baseResult
+}

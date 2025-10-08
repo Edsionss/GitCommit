@@ -7,7 +7,7 @@ import { ScrapingTaskOptions } from '@sharedType/Puppeteer'
 import crypto from 'crypto' // 使用内置的 crypto 模块生成唯一 ID
 import dayjs from 'dayjs'
 import path from 'path'
-import { writeResultFile, mergeScrapedResult } from '@nodeUtils/index'
+import { writeResultFile, mergeScrapedResult, smartMerge } from '@nodeUtils/index'
 // 这是一个通用的爬取任务执行函数
 export async function executeScrapingTask<T>(
   ScrapingTaskOptions: ScrapingTaskOptions<T>
@@ -70,7 +70,7 @@ export async function executeScrapingTask<T>(
     if (beforeExecution) {
       try {
         let beforeData = await beforeExecution(page, beforeExecutionData, scrapeWindow)
-        mergeScrapedResult(resultData, beforeData, 'beforeData')
+        resultData = smartMerge(resultData, beforeData)
       } catch (error) {
         console.error('[PuppeteerService] Error occurred during beforeExecution:', error)
         throw error
@@ -87,13 +87,14 @@ export async function executeScrapingTask<T>(
       // 传递参数给 scrapingLogic 并执行
       let scrapData = await page.evaluate(scrapingLogic, ...logicArgs)
 
-      mergeScrapedResult(resultData, scrapData, 'scrapData')
+      resultData = smartMerge(resultData, scrapData, 'scrapData')
 
       // 返回结果
     }
 
-    if (debuggerMode || isWriter) {
-      writeResultFile('puppeteer/result', resultData)
+    ;(isWriter || debuggerMode) && writeResultFile('puppeteer/result', resultData)
+
+    if (debuggerMode) {
       await new Promise((r) => setTimeout(r, 500000000)) // ✅ 稳定性等待
     }
 

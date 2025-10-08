@@ -2,6 +2,7 @@ import { contextBridge, ipcRenderer } from 'electron'
 import { electronAPI } from '@electron-toolkit/preload'
 import type { AiConfig } from '@shared/types/dtos/ai'
 import type { StockNews, StockNewsQueryOptions } from '@sharedType/stockNews'
+import type { StockHotRank, CreateStockHotRankDto } from '@sharedType/stockHotRank'
 
 // Git扫描选项
 interface GitScanOptions {
@@ -162,12 +163,13 @@ const api = {
   // News
   scrapeStockNews: (dateStr?: string, timeStr?: string) =>
     ipcRenderer.invoke('stock:scrape_news', dateStr, timeStr),
-  getStockNews: (tradeDate: string) => ipcRenderer.invoke('stock:get_news', tradeDate),
+  getStockNews: (tradeDate: string): Promise<StockNews[]> =>
+    ipcRenderer.invoke('stock:get_news', tradeDate),
   cleanStockNews: () => ipcRenderer.invoke('stock:clean_news'),
 
   // hotRank
   scrapeAllHotRank: () => ipcRenderer.invoke('stock:scrape_all_hotRank'),
-  getStockAllHotRank: (tradeDate?: string) =>
+  getStockAllHotRank: (tradeDate?: string): Promise<StockHotRank[]> =>
     ipcRenderer.invoke('stock:get_all_hotRank', tradeDate),
   cleanStockAllHotRank: () => ipcRenderer.invoke('stock:clean_all_hotRank')
 }

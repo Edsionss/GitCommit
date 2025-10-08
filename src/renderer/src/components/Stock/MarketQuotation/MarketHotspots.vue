@@ -12,6 +12,7 @@
       >
         {{ category.label }}
       </a-button>
+      <a-button @click="stockApi.scrapeAllHotRank()">爬取热榜数据</a-button>
     </div>
 
     <!-- 内容列表 -->
@@ -144,9 +145,17 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { reactive, ref } from 'vue'
 import { getCardBackgroundByChange } from '@/utils'
 import HotspotTrendChart from './HotspotTrendChart.vue'
+import { stockApi } from '@api/stock'
+import type { StockHotRank, CreateStockHotRankDto } from '@sharedType/stockHotRank'
+
+const hotRankData = reactive<StockHotRank[]>([])
+stockApi.getStockAllHotRank().then((data) => {
+  Object.assign(hotRankData, data)
+  console.log(data)
+})
 
 type CategoryKey = 'stock' | 'sector' | 'etf' | 'topic'
 

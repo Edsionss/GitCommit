@@ -7,6 +7,7 @@ import { getLastTradingDay } from '@shared/utils/'
 export const scrapingHotRank = async (typeText: string, scraping: (page) => {}) => {
   return await executeScrapingTask({
     beforeExecutionData: { typeText, scraping },
+    isWriter: true,
     beforeExecution: async (page, { typeText, scraping }) => {
       await page.goto(
         `https://eq.10jqka.com.cn/frontend/thsTopRank/index.html?client_userid=JnStB&back_source=hyperlink&share_hxapp=isc&fontzoom=no#/`,
@@ -63,21 +64,21 @@ export const scrapingHotStock = async () => {
             rouw1Data[row1Dict[index]] = child.textContent?.trim()
           })
           const tagBox = El?.querySelectorAll('.tabBorder')
-          const tagList: any[] = []
+          const tags: any[] = []
           let stockCode = ''
           if (tagBox && tagBox.length) {
             tagBox.forEach((child, index) => {
               if (index == 0) {
                 stockCode = child.parentElement?.previousElementSibling?.textContent?.trim() || ''
               }
-              tagList.push(child?.nextSibling?.textContent?.trim())
+              tags.push(child?.nextSibling?.textContent?.trim())
             })
           }
-          const hotspot = El?.querySelector('.hot_news_content')?.textContent.trim()
-          const summary = El?.querySelector('.analyse')?.textContent.trim()
+          const hotspot = El?.querySelector('.hot_news_content')?.textContent.trim() || ''
+          const summary = El?.querySelector('.analyse')?.textContent.trim() || ''
           result.push({
             ...rouw1Data,
-            tagList,
+            tags: JSON.stringify(tags),
             hotspot,
             stockCode,
             summary,
@@ -109,21 +110,21 @@ export const scrapingHotETF = async () => {
             rouw1Data[row1Dict[index]] = child.textContent?.trim()
           })
           const tagBox = El?.querySelectorAll('.tabBorder')
-          const tagList: any[] = []
+          const tags: any[] = []
           let stockCode = ''
           if (tagBox && tagBox.length) {
             tagBox.forEach((child, index) => {
               if (index == 0) {
                 stockCode = child.parentElement?.previousElementSibling?.textContent?.trim() || ''
               }
-              tagList.push(child?.nextSibling?.textContent?.trim())
+              tags.push(child?.nextSibling?.textContent?.trim())
             })
           }
-          const hotspot = El?.querySelector('.hot_news_content')?.textContent.trim()
-          const summary = El?.querySelector('.analyse')?.textContent.trim()
+          const hotspot = El?.querySelector('.hot_news_content')?.textContent.trim() || ''
+          const summary = El?.querySelector('.analyse')?.textContent.trim() || ''
           result.push({
             ...rouw1Data,
-            tagList,
+            tags: JSON.stringify(tags),
             hotspot,
             stockCode,
             summary,
@@ -155,20 +156,21 @@ export const scrapingHotTopic = async () => {
             rouw1Data[row1Dict[index]] = child.textContent?.trim()
           })
           const tagBox = El?.querySelectorAll('.tag')
-          const tagList: any[] = []
+          const tags: any[] = []
           let stockCode = ''
           if (tagBox && tagBox.length) {
             tagBox.forEach((child, index) => {
-              tagList.push(child?.textContent?.trim())
+              tags.push(child?.textContent?.trim())
             })
           }
-          const hotspot = El?.querySelector('.hot_news_content')?.textContent.trim()
-          const summary = El?.querySelector('.analyse')?.textContent.trim()
+          const hotspot = El?.querySelector('.hot_news_content')?.textContent.trim() || ''
+          const summary = El?.querySelector('.analyse')?.textContent.trim() || ''
           result.push({
             ...rouw1Data,
-            tagList,
+            tags: JSON.stringify(tags),
             hotspot,
             stockCode,
+            priceChangePercentage: '',
             summary,
             rankType: 'topic'
           })
@@ -183,19 +185,18 @@ export const scrapingHotTopic = async () => {
 export const scrapingHotConcept = async (
   typeText?: string,
   selector?: string,
-  childSelector?: string
+  childSelector?: string,
+  typeName?: string
 ) => {
   return await scrapingHotRank('板块', async (page) => {
     if (typeText) {
-      console.log('cnm')
       await page.evaluate(() => {
         const btn = document.querySelector('[name="industry"]') as HTMLElement
         btn?.click()
       })
     }
-    console.log('csnm')
     return await page.evaluate(
-      (selector, childSelector) => {
+      (selector, childSelector, typeName) => {
         const result: any[] = []
         const stock24HourHOtBox = document
           .querySelector(selector || '#plate-container-concept')
@@ -217,43 +218,44 @@ export const scrapingHotConcept = async (
               }
             })
             const tagBox = El?.querySelectorAll('.tag')
-            const tagList: any[] = []
+            const tags: any[] = []
             let stockCode = ''
             if (tagBox && tagBox.length) {
               tagBox.forEach((child, index) => {
-                tagList.push(child?.textContent?.trim())
+                tags.push(child?.textContent?.trim())
               })
             }
-            const hotspot = El?.querySelector('.hot_news_content')?.textContent.trim()
-            const summary = El?.querySelector('.analyse')?.textContent.trim()
-            const tagListMap = [...new Set(tagList)]
+            const hotspot = El?.querySelector('.hot_news_content')?.textContent.trim() || ''
+            const summary = El?.querySelector('.analyse')?.textContent.trim() || ''
+            const tagListMap = [...new Set(tags)]
             result.push({
               ...rouw1Data,
-              tagList: tagListMap,
+              tags: JSON.stringify(tagListMap),
               hotspot,
               stockCode,
               summary,
-              rankType: 'concept'
+              rankType: typeName || 'concept'
             })
           }
         }
         return result
       },
       selector,
-      childSelector
+      childSelector,
+      typeName
     )
   })
 }
 
 //爬取热点行业
 export const scrapingHotIndustry = async () => {
-  return await scrapingHotConcept('行业板块', '#plate-container-industry', '.border')
+  return await scrapingHotConcept('行业板块', '#plate-container-industry', '.border', 'industry')
 }
 
 export const scrapingAllHotRank = async () => {
   try {
-    // 并行执行所有爬取任务
-    const [hotStock, hotETF, hotTopic, hotConcept, hotIndustry] = await Promise.all([
+    // 使用 Promise.allSettled 并行执行所有任务
+    const results = await Promise.allSettled([
       scrapingHotStock(),
       scrapingHotETF(),
       scrapingHotTopic(),
@@ -261,15 +263,33 @@ export const scrapingAllHotRank = async () => {
       scrapingHotIndustry()
     ])
 
-    // 合并所有结果
-    const allResults = [...hotStock, ...hotETF, ...hotTopic, ...hotConcept, ...hotIndustry]
+    // 处理结果：筛选成功的数据并记录失败的
+    const successfulResults: any[] = []
+    results.forEach((result, index) => {
+      if (result.status === 'fulfilled') {
+        // 如果成功，将结果添加到数组中
+        // result.value 就是爬取到的数据数组，例如 hotStock
+        successfulResults.push(...result.value)
+      } else {
+        // 如果失败，记录错误
+        console.error(`爬取任务 ${index} 失败:`, result.reason)
+      }
+    })
+
+    // 如果所有任务都失败了，可以提前返回或抛出错误
+    if (successfulResults.length === 0) {
+      throw new Error('所有热榜数据爬取失败')
+    }
+
     const tradeDate = await getLastTradingDay()
-    // 为每个结果添加 ID
-    const resultsWithIds = addIdsFast(allResults, 'hotRank', { tradeDate })
+    // 为每个成功的结果添加 ID
+    const resultsWithIds = addIdsFast(successfulResults, 'hotRank', { tradeDate })
 
     return resultsWithIds
   } catch (error) {
-    console.error('爬取所有热榜数据失败:', error)
+    // 这里的 catch 现在主要捕获 allSettled 本身的错误（很少见）
+    // 或者我们自己抛出的 '所有任务失败' 的错误
+    console.error('处理热榜数据时发生严重错误:', error)
     throw error
   }
 }
