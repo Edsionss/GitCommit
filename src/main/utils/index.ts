@@ -456,3 +456,32 @@ export function addIdsFast(data, prefix: string) {
 
   return result
 }
+
+/**
+ * 合并 Puppeteer evaluate 返回的数据到 resultData
+ *
+ * - 如果 data 是普通对象（纯 JSON 对象），则直接合并其属性；
+ * - 否则，将 data 封装为 { data } 后再合并；
+ * - 永不抛错（null、数组、函数等都会安全处理）。
+ */
+export function mergeScrapedResult<T extends Record<string, any>, D = unknown>(
+  resultData: T,
+  data: D,
+  dataName?: string,
+  immutable = false
+): T & Record<string, any> {
+  const target = immutable ? { ...resultData } : resultData
+
+  if (
+    data !== null &&
+    typeof data === 'object' &&
+    !Array.isArray(data) &&
+    (data as any).constructor === Object
+  ) {
+    Object.assign(target, data)
+  } else {
+    Object.assign(target, { [dataName || 'data']: data })
+  }
+
+  return target
+}

@@ -19,7 +19,9 @@ import { transformDataForDB } from '@services/stock/sectors'
 import { autoTransformKeys } from '@nodeUtils/index' // 引入自动转换键的函数
 
 import { stockSectorService } from '@services/stock/sectors'
-import * as hot from '@services/stock/scraping/hotRnak'
+import * as hot from '@features/services/stock/scraping/hotRank'
+
+import { getLastTradingDay } from '@shared/utils'
 
 //控制是否展示主窗口
 export const showMainWindow = true
@@ -112,6 +114,8 @@ export const whenReady = () => {
   // hot.scrapingHotIndustry()
 
   // telegraphTest()
+
+  // getLastTradingDay()
 }
 // 应用即将退出的周期函数
 export const willQuit = () => {

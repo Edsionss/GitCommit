@@ -7,7 +7,6 @@ export const scrapingHotRank = async (typeText: string, scraping: (page) => {}) 
   return await executeScrapingTask({
     beforeExecutionData: { typeText, scraping },
     beforeExecution: async (page, { typeText, scraping }) => {
-      let result: any
       await page.goto(
         `https://eq.10jqka.com.cn/frontend/thsTopRank/index.html?client_userid=JnStB&back_source=hyperlink&share_hxapp=isc&fontzoom=no#/`,
         {
@@ -249,3 +248,5 @@ export const scrapingHotConcept = async (
 export const scrapingHotIndustry = async () => {
   return await scrapingHotConcept('行业板块', '#plate-container-industry', '.border')
 }
+
+export const scrapingAllHotRank = () => {}
