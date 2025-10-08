@@ -86,6 +86,8 @@ export const scrapingHotStock = async () => {
           })
         }
       }
+      console.log(`${result[0].rankType} 爬取到${result.length}`)
+
       return result
     })
   })
@@ -132,6 +134,8 @@ export const scrapingHotETF = async () => {
           })
         }
       }
+      console.log(`${result[0].rankType} 爬取到${result.length}`)
+
       return result
     })
   })
@@ -176,6 +180,8 @@ export const scrapingHotTopic = async () => {
           })
         }
       }
+      console.log(`${result[0].rankType} 爬取到${result.length}`)
+
       return result
     })
   })
@@ -238,6 +244,8 @@ export const scrapingHotConcept = async (
             })
           }
         }
+        console.log(`${result[0].rankType} 爬取到${result.length}`)
+
         return result
       },
       selector,
@@ -284,7 +292,7 @@ export const scrapingAllHotRank = async () => {
     const tradeDate = await getLastTradingDay()
     // 为每个成功的结果添加 ID
     const resultsWithIds = addIdsFast(successfulResults, 'hotRank', { tradeDate })
-
+    console.log(`成功爬取热榜到 ${resultsWithIds.length} 条数据`)
     return resultsWithIds
   } catch (error) {
     // 这里的 catch 现在主要捕获 allSettled 本身的错误（很少见）

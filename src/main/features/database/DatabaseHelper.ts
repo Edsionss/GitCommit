@@ -56,12 +56,12 @@ export class DatabaseHelper {
   public insertMany(tableName: string, dataArray: Record<string, any>[]): RunResult[] {
     if (dataArray.length === 0) return []
 
-    // --> 转换: 将传入的驼峰式 data 数组转换为下划线式
     const snakeCaseDataArray = autoTransformKeys(dataArray, 'snake')
 
     const keys = Object.keys(snakeCaseDataArray[0])
     const columns = keys.map((key) => `"${key}"`).join(', ')
-    const placeholders = keys.map(() => '?').join(', ')
+    // 使用命名占位符, 例如: @key, :key, $key (better-sqlite3 默认用 @)
+    const placeholders = keys.map((key) => `@${key}`).join(', ')
 
     const sql = `INSERT INTO "${tableName}" (${columns}) VALUES (${placeholders})`
     const stmt = this.db.prepare(sql)
@@ -69,7 +69,8 @@ export class DatabaseHelper {
     console.log(`[DB insertMany from table  ${tableName}] `)
 
     return this.transaction(() => {
-      return snakeCaseDataArray.map((row) => stmt.run(Object.values(row)))
+      // 直接将整个对象传递给 run()，驱动会自动匹配命名占位符和对象属性
+      return snakeCaseDataArray.map((row) => stmt.run(row))
     })
   }
 
