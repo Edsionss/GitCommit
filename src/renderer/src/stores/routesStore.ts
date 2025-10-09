@@ -6,7 +6,7 @@ import {
   mockFlatRoutes,
   type RouteRecord,
   RouteRecordWithOptionalId
-} from '@shared/types/dtos/MenuManagement'
+} from '@sharedType/MenuManagement'
 import { message as AntMessage } from 'ant-design-vue'
 
 export const useRoutesStore = defineStore('routes', () => {

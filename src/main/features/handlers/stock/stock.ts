@@ -1,6 +1,6 @@
 import { ipcMain } from 'electron'
 // import { StockAnalysisService } from '@services/stock/stock'
-import { StockFetchConfig } from '@shared/types/dtos/stock'
+import { StockFetchConfig } from '@sharedType/stock'
 import { searchStock, getStockInfoByCode } from '@services/stock/index'
 export function initializeStockHandlers() {
   // const stockService = new StockAnalysisService()

@@ -1,7 +1,7 @@
 import { ref, watch, reactive, computed, ToRefs, onMounted } from 'vue'
 import { message } from 'ant-design-vue'
 import dayjs, { Dayjs } from 'dayjs'
-import type { RepoHistoryItem } from '@shared/types/dtos/git'
+import type { RepoHistoryItem } from '@sharedType/git'
 
 import { gitApi } from '@renderer/api/git'
 // import { historyApi } from '@renderer/api/history'

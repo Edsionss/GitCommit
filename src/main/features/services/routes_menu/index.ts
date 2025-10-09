@@ -1,5 +1,5 @@
 import { dbHelper } from '@features/database'
-import type { RouteRecord, RouteRecordWithOptionalId } from '@shared/types/dtos/MenuManagement'
+import type { RouteRecord, RouteRecordWithOptionalId } from '@sharedType/MenuManagement'
 import { nanoid } from 'nanoid'
 
 // 将从数据库取出的记录（meta是字符串）转换为前端需要的格式（meta是对象）

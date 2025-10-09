@@ -2,13 +2,13 @@ import _ from 'lodash'
 import { useSettingsStore } from '@/stores/settingsStore'
 import { storeToRefs } from 'pinia'
 import { message as antMessage } from 'ant-design-vue'
-import type { AiConfig, ChatMessage } from '@shared/types/dtos/ai'
+import type { AiConfig, ChatMessage } from '@sharedType/ai'
 import { aiApi } from '@/api/ai'
 
 interface SendAiMessageParams {
   prompt: string
   history?: ChatMessage[]
-  config?: AiConfig
+  aiConfig?: AiConfig
   Stream?: boolean
   successFn?: (message: string) => void
   errorFn?: (message: string) => void
@@ -21,7 +21,7 @@ export function useAi() {
   const sendAiMessage = async ({
     prompt,
     history,
-    config,
+    aiConfig,
     Stream = AiConfig.value?.enableStreaming,
     successFn,
     errorFn,
@@ -32,12 +32,12 @@ export function useAi() {
         antMessage.error('请设置AI源和API密钥')
         return
       }
-      const result = await aiApi.aiChat(
+      const result = await aiApi.aiChat({
         prompt,
-        _.cloneDeep(config || AiConfig.value),
+        aiConfig: _.cloneDeep(aiConfig || AiConfig.value),
         history,
-        Stream
-      )
+        isStream: Stream
+      })
       if (result.success) {
         successFn && successFn(result.message)
         return result.message

@@ -28,20 +28,12 @@ export interface SystemConfig {
   telemetry: boolean
 }
 
-export interface AiConfig {
-  provider: string | null
-  apiKey: string
-  endpoint: string
-  model: string
-  enableAiHistory: boolean
-  enableAutoSave: boolean
-  enableStreaming: boolean
-}
+import type { AiConfig } from '@sharedType/ai'
 
 export interface AppSettings {
-  DisplayConfig: DisplayConfig
-  Preferences: Preferences
-  GitConfig: GitConfig
-  SystemConfig: SystemConfig
-  AiConfig: AiConfig
+  ai: AiConfig
+  git: GitConfig
+  theme: DisplayConfig
+  preferences: Preferences
+  system: SystemConfig
 }

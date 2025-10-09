@@ -1,6 +1,6 @@
 import { contextBridge, ipcRenderer } from 'electron'
 import { electronAPI } from '@electron-toolkit/preload'
-import type { AiConfig } from '@shared/types/dtos/ai'
+import type { AiConfig, ChatMessage } from '@sharedType/ai'
 import type { StockNews, StockNewsQueryOptions } from '@sharedType/stockNews'
 import type { StockHotRank, CreateStockHotRankDto } from '@sharedType/stockHotRank'
 
@@ -25,11 +25,6 @@ interface GetSubReposResult {
   success: boolean
   repos?: string[]
   error?: string
-}
-
-interface ChatMessage {
-  sender: 'user' | 'ai'
-  text: string
 }
 
 // 暴露给渲染进程的API
@@ -62,8 +57,9 @@ const api = {
   cancelScan: () => ipcRenderer.send('cancel-scan'),
 
   // AI Chat
-  aiChat: (prompt: string, aiConfig: AiConfig, history?: ChatMessage[]): Promise<any> =>
-    ipcRenderer.invoke('ai:chat', prompt, aiConfig, history),
+  // AI Chat
+    aiChat: (params: { prompt: string, aiConfig: AiConfig, history?: ChatMessage[], isStream?: boolean }): Promise<any> =>
+      ipcRenderer.invoke('ai:chat', params),
   onChatStreamChunk: (callback: (chunk: string) => void) =>
     ipcRenderer.on('ai:chatStream:chunk', (_, chunk) => callback(chunk)),
 

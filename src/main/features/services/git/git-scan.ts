@@ -9,8 +9,8 @@ import type {
   GitScanOptions,
   ProgressCallback,
   ScanProgress
-} from '@shared/types/dtos/git'
-import type { AiConfig } from '@shared/types/dtos/ai'
+} from '@sharedType/git'
+import type { AiConfig } from '@sharedType/ai'
 
 let cancelScanFlag = false
 
@@ -31,7 +31,7 @@ const aiAnalysisCommits = async (
     请根据如下规则进行分析并给出结果
     ${rules}
     `
-    const result = await generateChatResponse(null, prompt, aiConfig)
+    const result = await generateChatResponse({ _: null, prompt, aiConfig })
     if (result) {
       return result
     }

@@ -2,7 +2,15 @@ import { GoogleGenAI } from '@google/genai'
 import { OpenAI } from 'openai'
 import { Stream } from 'openai/streaming'
 import type { ChatCompletionChunk } from 'openai/resources/chat/completions'
-import type { AiConfig, ChatMessage } from '@sharedType/ai'
+import type {
+  AiConfig,
+  ChatMessage,
+  GenerateCommitMessageParams,
+  GenerateChatResponseParams,
+  CallOpenAIParams,
+  CallKiMiParams,
+  CallGeminiParams
+} from '@sharedType/ai'
 /**
  * @file AI Service
  * @description Handles interactions with various AI providers.
@@ -12,47 +20,56 @@ import type { AiConfig, ChatMessage } from '@sharedType/ai'
 /**
  * Generates a commit message using the configured AI provider.
  *
- * @param prompt The prompt to send to the AI.
- * @param aiConfig The AI configuration.
+ * @param params The parameters for generating a commit message.
  * @returns The generated commit message.
  */
-export async function generateCommitMessage(
-  _: any = null,
-  prompt: string,
-  aiConfig: AiConfig,
-  isStream: boolean
-): Promise<string> {
+export async function generateCommitMessage(params: GenerateCommitMessageParams): Promise<string> {
+  const { _, prompt, aiConfig, isStream } = params
   // For commit messages, we generally don't need history.
   // So we call the chat response function with an empty history.
-  return generateChatResponse(_, prompt, aiConfig, [], isStream)
+  return generateChatResponse({ _, prompt, aiConfig, history: [], isStream })
 }
 
 /**
  * Generates a commit message using the configured AI provider.
  *
- * @param prompt The prompt to send to the AI.
- * @param history The chat history.
- * @param aiConfig The AI configuration.
+ * @param params The parameters for generating a chat response.
  * @returns The generated commit message.
  */
-export async function generateChatResponse(
-  _: any = null,
-  prompt: string,
-  aiConfig: AiConfig,
-  history: ChatMessage[] = [],
-  isStream: boolean = true
-): Promise<string> {
+export async function generateChatResponse(params: GenerateChatResponseParams): Promise<string> {
+  const { _, prompt, aiConfig, history = [], isStream = true } = params
   if (!aiConfig.provider || !aiConfig.apiKey) {
     throw new Error('AI provider or API key is not configured.')
   }
 
   switch (aiConfig.provider) {
     case 'openai':
-      return await callOpenAI(_, prompt, aiConfig.apiKey, aiConfig.model, history, isStream)
+      return await callOpenAI({
+        _,
+        prompt,
+        apiKey: aiConfig.apiKey,
+        model: aiConfig.model,
+        history,
+        isStream
+      })
     case 'gemini':
-      return await callGemini(_, prompt, aiConfig.apiKey, aiConfig.model, history, isStream)
+      return await callGemini({
+        _,
+        prompt,
+        apiKey: aiConfig.apiKey,
+        model: aiConfig.model,
+        history,
+        isStream
+      })
     case 'kimi':
-      return await callKiMi(_, prompt, aiConfig.apiKey, aiConfig.model, history, isStream)
+      return await callKiMi({
+        _,
+        prompt,
+        apiKey: aiConfig.apiKey,
+        model: aiConfig.model,
+        history,
+        isStream
+      })
     case 'anthropic':
     case 'custom':
       throw new Error(`${aiConfig.provider} is not yet supported.`)
@@ -64,19 +81,11 @@ export async function generateChatResponse(
 /**
  * Calls the OpenAI API.
  *
- * @param prompt The prompt to send.
- * @param apiKey The OpenAI API key.
- * @param model The model to use.
+ * @param params The parameters for calling OpenAI.
  * @returns The generated text.
  */
-async function callOpenAI(
-  _: any = null,
-  prompt: string,
-  apiKey: string,
-  model = 'gpt-3.5-turbo',
-  history: ChatMessage[] = [],
-  isStream: boolean
-): Promise<string> {
+async function callOpenAI(params: CallOpenAIParams): Promise<string> {
+  const { _, prompt, apiKey, model = 'gpt-3.5-turbo', history = [], isStream } = params
   const endpoint = 'https://api.openai.com/v1/chat/completions'
 
   const response = await fetch(endpoint, {
@@ -100,14 +109,8 @@ async function callOpenAI(
   return data.choices[0]?.message?.content || ''
 }
 
-async function callKiMi(
-  _: any = null,
-  prompt: string,
-  apiKey: string,
-  model = 'gpt-3.5-turbo',
-  history: ChatMessage[] = [],
-  isStream: boolean = true
-): Promise<string> {
+async function callKiMi(params: CallKiMiParams): Promise<string> {
+  const { _, prompt, apiKey, model = 'gpt-3.5-turbo', history = [], isStream = true } = params
   const client = new OpenAI({ apiKey, baseURL: 'https://api.moonshot.cn/v1' })
 
   const messages = history.map((msg) => ({
@@ -142,14 +145,8 @@ async function callKiMi(
   }
 }
 
-async function callGemini(
-  _: any = null,
-  prompt: string,
-  apiKey: string,
-  model = 'gemini-2.5-flash',
-  history: ChatMessage[] = [],
-  isStream: boolean = true
-) {
+async function callGemini(params: CallGeminiParams) {
+  const { _, prompt, apiKey, model = 'gemini-2.5-flash', history = [], isStream = true } = params
   let messages = history.map((m) => `${m.sender}: ${m.text}`).join('\n')
   messages += `${messages}\n user:${prompt}`
   const client = new GoogleGenAI({ apiKey })

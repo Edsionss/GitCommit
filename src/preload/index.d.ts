@@ -1,11 +1,11 @@
 import { ElectronAPI } from '@electron-toolkit/preload'
 import type { GitCommit, RepoHistoryItem } from '@sharedType/git'
-import type { AiConfig } from '@sharedType/ai'
+import type { AiConfig, ChatMessage, AiChatResponse } from '@sharedType/ai'
 import type {
   DirectBroadcastPayload,
   ChatMessage as webSocketChatMessage
-} from '@sharedTypes/WebSocket'
-import type { RouteRecord, RouteRecordWithOptionalId } from '@shared/types/dtos/MenuManagement'
+} from '@sharedType/WebSocket'
+import type { RouteRecord, RouteRecordWithOptionalId } from '@sharedType/MenuManagement'
 import { promises } from 'dns'
 import type { StockNews, StockNewsQueryOptions } from '@sharedType/stockNews'
 import type { StockHotRank, CreateStockHotRankDto } from '@sharedType/stockHotRank'
@@ -31,17 +31,6 @@ interface GetSubReposResult {
   error?: string
 }
 
-interface AiChatResponse {
-  success: boolean
-  message?: string
-  error?: string
-}
-
-interface ChatMessage {
-  sender: 'user' | 'ai'
-  text: string
-}
-
 // Define the shape of the API object
 interface ExposedAPI {
   selectDirectory: () => Promise<SelectDirectoryResult | null>
@@ -51,12 +40,12 @@ interface ExposedAPI {
   getSubRepos: (repoPath: string) => Promise<GetSubReposResult>
   scanGitRepo: (repoPath: string, options?: GitScanOptions, aiConfig?: AiConfig) => Promise<any>
   cancelScan: () => void
-  aiChat: (
-    prompt: string,
-    aiConfig: AiConfig,
-    history?: ChatMessage[],
+  aiChat: (params: {
+    prompt: string
+    aiConfig: AiConfig
+    history?: ChatMessage[]
     isStream?: boolean
-  ) => Promise<AiChatResponse>
+  }) => Promise<AiChatResponse>
   onScanProgress: (callback: (data: any) => void) => () => void
   onScanError: (callback: (data: any) => void) => () => void
   onScanCancelled: (callback: () => void) => () => void

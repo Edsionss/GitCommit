@@ -1,4 +1,4 @@
-import type { GitCommit } from '@shared/types/dtos/git'
+import type { GitCommit } from '@sharedType/git'
 
 export const exportApi = {
   exportCommits: (commits: GitCommit[], format: 'json' | 'csv'): Promise<string | null> =>

@@ -71,7 +71,7 @@ export class StockAnalysisService {
 
     // 6. 调用AI进行分析
     const aiConfig = { provider: 'openai', model: 'gpt-4' } // 从用户配置中读取
-    const aiAnalysisReport = await this.aiService.generateCommitMessage(summaryDocument, aiConfig) // 复用或新增一个通用方法
+    const aiAnalysisReport = await this.aiService.generateCommitMessage({ prompt: summaryDocument, aiConfig, isStream: false }) // 复用或新增一个通用方法
 
     return {
       summaryDocument,

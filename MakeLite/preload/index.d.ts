@@ -1,6 +1,6 @@
 import { ElectronAPI } from '@electron-toolkit/preload'
-import type { GitCommit, RepoHistoryItem } from '@shared/types/dtos/git'
-import type { AiConfig } from '@shared/types/dtos/ai'
+import type { GitCommit, RepoHistoryItem } from '@sharedType/git'
+import type { AiConfig } from '@sharedType/ai'
 import type { DirectBroadcastPayload } from '@sharedType/WebSocket'
 
 // Define interfaces for the data structures used in the API

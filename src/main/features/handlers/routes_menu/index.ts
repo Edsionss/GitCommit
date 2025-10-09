@@ -1,6 +1,6 @@
 import { ipcMain } from 'electron'
 import { routesMenuService } from '@features/services/routes_menu'
-import type { RouteRecord } from '@shared/types/dtos/MenuManagement'
+import type { RouteRecord } from '@sharedType/MenuManagement'
 
 export function registerRoutesMenuHandlers() {
   // 获取所有菜单
