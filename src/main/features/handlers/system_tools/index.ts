@@ -1,5 +1,6 @@
 
 import { ipcMain } from 'electron'
+import { getMainWindow } from '@main/index'
 import { systemToolsService } from '@features/services/system_tools'
 
 export function registerSystemToolsHandlers() {
@@ -53,13 +54,20 @@ export function registerSystemToolsHandlers() {
     }
   })
 
-  // 移除系统启动项
-  ipcMain.handle('system-tools:remove-startup-app', async (_event, { name, path }) => {
+  // 移除系统启动项（单向）
+  ipcMain.on('system-tools:remove-startup-app', async (_event, { name, path }) => {
     try {
       await systemToolsService.removeSystemStartupApp(name, path)
-      return { success: true }
+      // 成功后，重新获取列表并通知前端更新
+      const apps = await systemToolsService.getSystemStartupApps()
+      getMainWindow()?.webContents.send('startup-apps-updated', apps)
     } catch (error) {
-      return { success: false, error: (error as Error).message }
+      // 可以在这里向前端发送一个错误通知
+      console.error(`Failed to remove startup app ${name}:`, error)
+      getMainWindow()?.webContents.send('error-notification', {
+        title: '删除失败',
+        body: `删除启动项 ${name} 时出错。`
+      })
     }
   })
 }

@@ -1,6 +1,13 @@
 <template>
   <a-card title="系统开机启动项管理" :bordered="false">
-    <a-table :columns="columns" :data-source="startupApps" :loading="loading" row-key="name">
+    <a-table
+      :columns="columns"
+      :data-source="startupApps"
+      :loading="loading"
+      row-key="name"
+      :virtual="true"
+      :scroll="{ y: 400 }"
+    >
       <template #bodyCell="{ column, record }">
         <template v-if="column.key === 'action'">
           <a-popconfirm
@@ -26,7 +33,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, onUnmounted } from 'vue'
 import { message } from 'ant-design-vue'
 
 interface StartupApp {
@@ -38,6 +45,7 @@ interface StartupApp {
 
 const loading = ref(false)
 const startupApps = ref<StartupApp[]>([])
+let cleanupListener: () => void
 
 const columns = [
   {
@@ -75,23 +83,33 @@ const fetchStartupApps = async () => {
   }
 }
 
-const handleRemove = async (item: StartupApp) => {
+// 修改为单向发送指令
+const handleRemove = (item: StartupApp) => {
   try {
-    const result = await window.api.removeSystemStartupApp({ name: item.name, path: item.path })
-    if (result.success) {
-      message.success(`已删除启动项: ${item.name}`)
-      fetchStartupApps() // Refresh the list
-    } else {
-      throw new Error(result.error)
-    }
+    window.api.removeSystemStartupApp({ name: item.name, path: item.path })
+    message.loading({ content: `正在删除: ${item.name}...`, key: 'remove-startup-app' })
   } catch (error) {
-    message.error('删除启动项失败')
+    message.error('发送删除指令失败')
     console.error(error)
   }
 }
 
 onMounted(() => {
+  // 初始加载
   fetchStartupApps()
+
+  // 设置监听器，接收后端推送的更新
+  cleanupListener = window.api.onStartupAppsUpdated((updatedApps) => {
+    startupApps.value = updatedApps
+    message.success({ content: '列表已更新', key: 'remove-startup-app', duration: 2 })
+  })
+})
+
+onUnmounted(() => {
+  // 组件卸载时清理监听器
+  if (cleanupListener) {
+    cleanupListener()
+  }
 })
 </script>
 

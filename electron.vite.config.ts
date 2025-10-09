@@ -1,5 +1,6 @@
 import { resolve } from 'path'
 import { defineConfig, externalizeDepsPlugin } from 'electron-vite'
+import { visualizer } from 'rollup-plugin-visualizer'
 import vue from '@vitejs/plugin-vue'
 import packageJson from './package.json'
 
@@ -93,6 +94,10 @@ export default defineConfig({
           // 给所有图标的 <svg> 标签都加上 class="anticon"
           return svg.replace('<svg', '<svg class="anticon"')
         }
+      }),
+      visualizer({
+        open: true, // 打包后自动在浏览器打开报告
+        filename: 'dist/stats.html' // 输出报告的位置
       })
     ]
   }

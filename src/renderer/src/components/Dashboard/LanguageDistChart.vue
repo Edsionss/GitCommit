@@ -8,7 +8,7 @@
 
 <script setup lang="ts">
 import { computed } from 'vue'
-import { Card as ACard } from 'ant-design-vue'
+
 import ChartContainer from '../charts/ChartContainer.vue'
 import BasePieChart from '../charts/BasePieChart.vue'
 

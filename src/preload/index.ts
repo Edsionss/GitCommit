@@ -141,7 +141,14 @@ const api = {
   // Startup Apps
   getSystemStartupApps: () => ipcRenderer.invoke('system-tools:get-startup-apps'),
   removeSystemStartupApp: (item: { name: string; path: string }) =>
-    ipcRenderer.invoke('system-tools:remove-startup-app', item),
+    ipcRenderer.send('system-tools:remove-startup-app', item),
+  onStartupAppsUpdated: (callback: (apps: any[]) => void) => {
+    const listener = (_, apps) => callback(apps)
+    ipcRenderer.on('startup-apps-updated', listener)
+    return () => {
+      ipcRenderer.removeListener('startup-apps-updated', listener)
+    }
+  },
 
   // AutoWriteWorkRepo
   AutomaticallyFillWorkSheet: (data: any) => ipcRenderer.invoke('autoWrite-WorkRepo', data),

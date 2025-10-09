@@ -1,4 +1,4 @@
-import { app, shell, BrowserWindow, ipcMain, dialog, session } from 'electron'
+import { app, BrowserWindow } from 'electron'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import { applicationService } from '@services/application'
@@ -79,6 +79,7 @@ function createWindow(): void {
 
   // 打开外部链接时使用默认浏览器，而不是在应用内打开新窗口
   mainWindow.webContents.setWindowOpenHandler((details) => {
+    const { shell } = require('electron')
     shell.openExternal(details.url)
     return { action: 'deny' }
   })

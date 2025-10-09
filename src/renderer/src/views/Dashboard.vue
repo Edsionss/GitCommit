@@ -29,16 +29,11 @@
 
 <script setup lang="ts">
 import { reactive, ref } from 'vue'
-import { useRouter } from 'vue-router'
 import StatsCards from '@/components/Dashboard/StatsCards.vue'
 import CommitTrendChart from '@/components/Dashboard/CommitTrendChart.vue'
 import LanguageDistChart from '@/components/Dashboard/LanguageDistChart.vue'
 import RecentActivity from '@/components/Dashboard/RecentActivity.vue'
 import RepoOverview from '@components/Dashboard/RepoOverview.vue'
-import { Row as ARow, Col as ACol } from 'ant-design-vue'
-import dayjs from 'dayjs'
-
-const router = useRouter()
 
 // 统计数据
 const stats = reactive({
