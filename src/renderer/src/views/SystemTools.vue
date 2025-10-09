@@ -1,11 +1,13 @@
 <template>
   <div class="system-tools-container">
+    <SystemStartupManager />
     <ShutdownTool />
     <EnvVarTool />
   </div>
 </template>
 
 <script setup lang="ts">
+import SystemStartupManager from '@/components/SystemTools/SystemStartupManager.vue'
 import ShutdownTool from '@/components/SystemTools/ShutdownTool.vue'
 import EnvVarTool from '@/components/SystemTools/EnvVarTool.vue'
 </script>

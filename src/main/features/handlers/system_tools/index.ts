@@ -42,4 +42,24 @@ export function registerSystemToolsHandlers() {
       return { success: false, error: (error as Error).message }
     }
   })
+
+  // 获取系统启动项
+  ipcMain.handle('system-tools:get-startup-apps', async () => {
+    try {
+      const apps = await systemToolsService.getSystemStartupApps()
+      return { success: true, apps }
+    } catch (error) {
+      return { success: false, error: (error as Error).message }
+    }
+  })
+
+  // 移除系统启动项
+  ipcMain.handle('system-tools:remove-startup-app', async (_event, { name, path }) => {
+    try {
+      await systemToolsService.removeSystemStartupApp(name, path)
+      return { success: true }
+    } catch (error) {
+      return { success: false, error: (error as Error).message }
+    }
+  })
 }

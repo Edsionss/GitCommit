@@ -135,6 +135,11 @@ const api = {
   setEnvVar: (key: string, value: string) =>
     ipcRenderer.invoke('system-tools:set-env-var', key, value),
 
+  // Startup Apps
+  getSystemStartupApps: () => ipcRenderer.invoke('system-tools:get-startup-apps'),
+  removeSystemStartupApp: (item: { name: string; path: string }) =>
+    ipcRenderer.invoke('system-tools:remove-startup-app', item),
+
   // AutoWriteWorkRepo
   AutomaticallyFillWorkSheet: (data: any) => ipcRenderer.invoke('autoWrite-WorkRepo', data),
 

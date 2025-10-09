@@ -90,6 +90,79 @@ export class SystemToolsService {
   public async setEnvVar(key: string, value: string): Promise<void> {
     await setPermanentEnvVar(key, value)
   }
+
+  /**
+   * 获取系统开机启动项列表
+   * @returns Promise<any[]>
+   */
+  public getSystemStartupApps(): Promise<any[]> {
+    return new Promise((resolve, reject) => {
+      if (process.platform !== 'win32') {
+        return resolve([]) // 非Windows系统返回空
+      }
+
+      const paths = [
+        'HKEY_CURRENT_USER\\Software\\Microsoft\\Windows\\CurrentVersion\\Run',
+        'HKEY_LOCAL_MACHINE\\Software\\Microsoft\\Windows\\CurrentVersion\\Run'
+      ]
+      let pending = paths.length
+      const results: any[] = []
+
+      const parseOutput = (output: string, path: string) => {
+        const lines = output.split('\r\n').filter((line) => line.trim() !== '')
+        lines.shift() // 移除路径标题行
+        for (const line of lines) {
+          const parts = line.trim().split(/\s{4,}/) // 按4个以上空格分割
+          if (parts.length >= 3) {
+            results.push({
+              name: parts[0],
+              command: parts[2],
+              path: path,
+              enabled: true // 默认在Run路径下的都是启用的
+            })
+          }
+        }
+      }
+
+      paths.forEach((path) => {
+        exec(`reg query "${path}"`, (error, stdout, stderr) => {
+          console.log(`Querying registry path: ${path}\nRaw stdout:\n${stdout}`)
+          if (error) {
+            // 打印警告而不是让整个Promise失败，这样可以返回部分成功的结果
+            console.warn(`无法查询启动项路径 ${path}: ${stderr}`)
+          }
+          if (stdout) {
+            parseOutput(stdout, path)
+          }
+          if (--pending === 0) {
+            resolve(results)
+          }
+        })
+      })
+    })
+  }
+
+  /**
+   * 从注册表中删除一个开机启动项
+   * @param name {string} 启动项的名称
+   * @param path {string} 启动项所在的注册表路径
+   * @returns Promise<void>
+   */
+  public removeSystemStartupApp(name: string, path: string): Promise<void> {
+    return new Promise((resolve, reject) => {
+      if (process.platform !== 'win32') {
+        return reject(new Error('此功能仅支持 Windows 系统。'))
+      }
+      const command = `reg delete "${path}" /v "${name}" /f`
+      exec(command, (error, stdout, stderr) => {
+        if (error) {
+          console.error(`删除启动项 "${name}" 时出错:`, error, stderr)
+          return reject(error)
+        }
+        resolve()
+      })
+    })
+  }
 }
 
 export const systemToolsService = new SystemToolsService()

@@ -85,6 +85,7 @@ declare module 'vue' {
     StockList: typeof import('./src/components/Stock/StockList/index.vue')['default']
     StockPool: typeof import('./src/components/Stock/StockList/StockPool.vue')['default']
     SystemConfig: typeof import('./src/components/SettingsView/SystemConfig.vue')['default']
+    SystemStartupManager: typeof import('./src/components/SystemTools/SystemStartupManager.vue')['default']
     Tabs: typeof import('./src/components/Common/Tabs.vue')['default']
     Telegraph: typeof import('./src/components/Stock/MarketNewsflash/Telegraph.vue')['default']
     TheHeader: typeof import('./src/components/layout/TheHeader.vue')['default']
