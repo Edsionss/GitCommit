@@ -7,7 +7,7 @@ import { getLastTradingDay } from '@shared/utils/'
 export const scrapingHotRank = async (typeText: string, scraping: (page) => {}) => {
   return await executeScrapingTask({
     beforeExecutionData: { typeText, scraping },
-    isWriter: true,
+    // isWriter: true,
     beforeExecution: async (page, { typeText, scraping }) => {
       await page.goto(
         `https://eq.10jqka.com.cn/frontend/thsTopRank/index.html?client_userid=JnStB&back_source=hyperlink&share_hxapp=isc&fontzoom=no#/`,

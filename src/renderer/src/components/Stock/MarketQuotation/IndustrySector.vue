@@ -1,23 +1,29 @@
 <template>
   <div class="industry-sector-container">
-    <div class="sorter-wrapper">
-      <a-space>
-        <a-button
-          v-for="btn in sortOptions"
-          :key="btn.key"
-          type="text"
-          :class="{ 'active-sort': sortState.key === btn.key }"
-          @click="handleSort(btn.key)"
-        >
-          {{ btn.label }}
-          <template #icon>
-            <span v-if="sortState.key === btn.key">
-              <arrow-up-outlined v-if="sortState.order === 'asc'" />
-              <arrow-down-outlined v-else />
-            </span>
-          </template>
-        </a-button>
-      </a-space>
+    <div class="category-switcher">
+      <div class="sorter-wrapper">
+        <a-space>
+          <a-button
+            v-for="btn in sortOptions"
+            :key="btn.key"
+            type="text"
+            :class="{ 'active-sort': sortState.key === btn.key }"
+            @click="handleSort(btn.key)"
+          >
+            {{ btn.label }}
+            <template #icon>
+              <span v-if="sortState.key === btn.key">
+                <arrow-up-outlined v-if="sortState.order === 'asc'" />
+                <arrow-down-outlined v-else />
+              </span>
+            </template>
+          </a-button>
+        </a-space>
+      </div>
+      <div class="action-buttons">
+        <a-button danger size="small" @click="clearIndustryData()">清除行业数据</a-button>
+        <a-button size="small" @click="scrapeIndustryData()">爬取行业数据</a-button>
+      </div>
     </div>
 
     <div class="sector-list">
@@ -264,6 +270,16 @@ const formatCurrency = (value: number): string => {
   if (Math.abs(value) >= 1e4) return `${(value / 1e4).toFixed(2)}万`
   return value.toFixed(2)
 }
+
+const clearIndustryData = () => {
+  // 清除行业数据的逻辑
+  console.log('清除行业数据')
+}
+
+const scrapeIndustryData = () => {
+  // 爬取行业数据的逻辑
+  console.log('爬取行业数据')
+}
 </script>
 
 <style scoped lang="scss">
@@ -271,14 +287,34 @@ const formatCurrency = (value: number): string => {
   height: 100%;
 }
 
-.sorter-wrapper {
+.category-switcher {
   display: flex;
-  justify-content: center;
-  margin-bottom: 10px;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+  position: relative;
+}
+
+.sorter-wrapper {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 8px;
   .active-sort {
     color: var(--brand-primary);
     font-weight: 500;
   }
+}
+
+.action-buttons {
+  display: flex;
+  gap: 8px;
+  margin-left: auto;
+}
+
+.ant-btn {
+  font-size: 14px;
 }
 
 .sector-list {

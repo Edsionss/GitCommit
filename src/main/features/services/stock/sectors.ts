@@ -172,7 +172,8 @@ export function transformDataForDB(rawData: any[]): StockSectorCamelCase[] {
     均价: 'averagePrice',
     领涨股: 'leadingStockName',
     最新价: 'leadingStockLatestPrice',
-    '领涨股涨跌幅(%)': 'leadingStockChangePercentage'
+    '领涨股涨跌幅(%)': 'leadingStockChangePercentage',
+    id: 'id'
     // 注意：领涨股的涨跌幅标题可能与板块的重复，这里假设它就是第二个'涨跌幅(%)'
     // 在实际应用中，您可能需要更可靠的方式来区分它们，例如顺序。
     // 如果无法区分，需要调整数据源或处理逻辑。
