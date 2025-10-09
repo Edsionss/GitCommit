@@ -61,7 +61,7 @@ class ApplicationService {
       const memoryUsage = process.memoryUsage().heapUsed
 
       // Log the metrics before sending
-      console.log(`Sending metrics: CPU: ${cpuPercent.toFixed(1)}%, Memory: ${(memoryUsage / 1024 / 1024).toFixed(0)}MB`)
+      // console.log(`Sending metrics: CPU: ${cpuPercent.toFixed(1)}%, Memory: ${(memoryUsage / 1024 / 1024).toFixed(0)}MB`)
 
       // Send metrics to renderer process
       if (browserWindow && !browserWindow.isDestroyed()) {
