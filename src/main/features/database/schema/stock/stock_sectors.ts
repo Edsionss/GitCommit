@@ -36,6 +36,11 @@ CREATE TABLE IF NOT EXISTS stock_sectors (
     -- 涨跌幅(%): Rise/Fall Percentage of the leading gainer stock
     leading_stock_change_percentage REAL,
 
+    -- 交易日期: 格式为 'YYYY-MM-DD'
+    trade_date TEXT NOT NULL,
+
+
+
     -- 创建时间: 在插入数据时自动设置为当前时间戳
     --created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
     -- 推荐：使用整数存储 Unix 时间戳
@@ -66,6 +71,7 @@ BEGIN
             'rising_stocks_count', NEW.rising_stocks_count,
             'falling_stocks_count', NEW.falling_stocks_count,
             'average_price', NEW.average_price,
+            'trade_date', NEW.trade_date,
             'leading_stock_name', NEW.leading_stock_name,
             'leading_stock_latest_price', NEW.leading_stock_latest_price,
             'leading_stock_change_percentage', NEW.leading_stock_change_percentage,
@@ -95,6 +101,7 @@ BEGIN
             'total_volume_lots', OLD.total_volume_lots,
             'total_turnover_yuan', OLD.total_turnover_yuan,
             'net_inflow_yuan', OLD.net_inflow_yuan,
+            'trade_date', OLD.trade_date,
             'rising_stocks_count', OLD.rising_stocks_count,
             'falling_stocks_count', OLD.falling_stocks_count,
             'average_price', OLD.average_price,
@@ -110,6 +117,7 @@ BEGIN
             'total_volume_lots', NEW.total_volume_lots,
             'total_turnover_yuan', NEW.total_turnover_yuan,
             'net_inflow_yuan', NEW.net_inflow_yuan,
+            'trade_date', NEW.trade_date,
             'rising_stocks_count', NEW.rising_stocks_count,
             'falling_stocks_count', NEW.falling_stocks_count,
             'average_price', NEW.average_price,
@@ -137,6 +145,7 @@ BEGIN
         json_object(
             'id', OLD.id,
             'sector_name', OLD.sector_name,
+            'trade_date', OLD.trade_date,
             'change_percentage', OLD.change_percentage,
             'total_volume_lots', OLD.total_volume_lots,
             'total_turnover_yuan', OLD.total_turnover_yuan,

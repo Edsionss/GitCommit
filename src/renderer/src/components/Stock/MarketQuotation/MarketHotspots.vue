@@ -107,7 +107,7 @@ const filteredHotRankData = computed(() =>
 
 const fetchHotspotData = async () => {
   try {
-    const data = await stockApi.getStockAllHotRank()
+    const data = await stockApi.getStockAllHotRankByTradeDate()
     hotRankData.value = data
     message.success('热榜数据爬取成功')
     console.log(data)

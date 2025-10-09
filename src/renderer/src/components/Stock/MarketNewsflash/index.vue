@@ -20,7 +20,7 @@ import { getYesterdayCN } from '@utils/index'
 
 const stockNews = reactive([])
 
-stockApi.getStockNews(getYesterdayCN()).then((res) => {
+stockApi.getStockNewsByTradeDate(getYesterdayCN()).then((res) => {
   Object.assign(stockNews, res)
 })
 </script>

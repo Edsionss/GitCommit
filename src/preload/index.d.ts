@@ -9,6 +9,7 @@ import type { RouteRecord, RouteRecordWithOptionalId } from '@sharedType/MenuMan
 import { promises } from 'dns'
 import type { StockNews, StockNewsQueryOptions } from '@sharedType/stockNews'
 import type { StockHotRank, CreateStockHotRankDto } from '@sharedType/stockHotRank'
+import type { StockSectorCamelCase } from '@sharedType/stock'
 
 // Define interfaces for the data structures used in the API
 interface GitScanOptions {
@@ -115,13 +116,18 @@ interface ExposedAPI {
   // Stock API---------------------------------
   // News
   scrapeStockNews: (dateStr?: string, timeStr?: string) => Promise<any>
-  getStockNews: (tradeDate: string) => Promise<StockNews[]>
+  getStockNewsByTradeDate: (tradeDate: string) => Promise<StockNews[]>
   cleanStockNews: () => Promise<any>
 
   // hot rank
   scrapeAllHotRank: () => Promise<any[]>
-  getStockAllHotRank: (tradeDate?: string) => Promise<StockHotRank[]>
+  getStockAllHotRankByTradeDate: (tradeDate?: string) => Promise<StockHotRank[]>
   cleanStockAllHotRank: () => Promise<any>
+
+  // sectors
+  scrapeStockSectors: () => Promise<StockSectorCamelCase[]>
+  getStockSectorsByTradeDate: (tradeDate: string) => Promise<StockSectorCamelCase[]>
+  cleanStockSectors: () => Promise<any>
 }
 
 // AuditLog a new interface

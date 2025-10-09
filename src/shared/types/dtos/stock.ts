@@ -111,6 +111,11 @@ export interface StockSectorCamelCase {
   leadingStockChangePercentage: number | null
 
   /**
+   * 交易日期 (YYYY-MM-DD 格式的字符串)
+   */
+  tradeDate: string
+
+  /**
    * 记录创建时间 (ISO 8601 格式的字符串, e.g., '2023-10-27 10:00:00')
    */
   createdAt: string

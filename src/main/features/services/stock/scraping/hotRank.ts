@@ -51,7 +51,7 @@ export const scrapingHotStock = async () => {
         .querySelector('#stock-container-a')
         ?.querySelectorAll('.pt-22')
       if (stock24HourHOtBox && stock24HourHOtBox.length) {
-        for (const [index, El] of stock24HourHOtBox.entries()) {
+        for (const [, El] of stock24HourHOtBox.entries()) {
           const row1 = El?.firstChild?.childNodes
           const row1Dict = {
             0: 'rank',
@@ -99,7 +99,7 @@ export const scrapingHotETF = async () => {
       const result: any[] = []
       const stock24HourHOtBox = document.querySelector('#hot-etf')?.querySelectorAll('.pb-20')
       if (stock24HourHOtBox && stock24HourHOtBox.length) {
-        for (const [index, El] of stock24HourHOtBox.entries()) {
+        for (const [, El] of stock24HourHOtBox.entries()) {
           const row1 = El?.firstChild?.childNodes
           const row1Dict = {
             0: 'rank',
@@ -148,7 +148,7 @@ export const scrapingHotTopic = async () => {
       const result: any[] = []
       const stock24HourHOtBox = document.querySelector('#hot-topic')?.querySelectorAll('.pt-24')
       if (stock24HourHOtBox && stock24HourHOtBox.length) {
-        for (const [index, El] of stock24HourHOtBox.entries()) {
+        for (const [, El] of stock24HourHOtBox.entries()) {
           const row1 = El?.firstChild?.childNodes
           const row1Dict = {
             0: 'rank',
@@ -163,7 +163,7 @@ export const scrapingHotTopic = async () => {
           const tags: any[] = []
           let stockCode = ''
           if (tagBox && tagBox.length) {
-            tagBox.forEach((child, index) => {
+            tagBox.forEach((child) => {
               tags.push(child?.textContent?.trim())
             })
           }
@@ -208,7 +208,7 @@ export const scrapingHotConcept = async (
           .querySelector(selector || '#plate-container-concept')
           ?.firstElementChild?.querySelectorAll(childSelector || '.pb-24')
         if (stock24HourHOtBox && stock24HourHOtBox.length) {
-          for (const [index, El] of stock24HourHOtBox.entries()) {
+          for (const [, El] of stock24HourHOtBox.entries()) {
             const row1 = El?.firstChild?.childNodes
             const row1Dict = {
               0: 'rank',
@@ -227,7 +227,7 @@ export const scrapingHotConcept = async (
             const tags: any[] = []
             let stockCode = ''
             if (tagBox && tagBox.length) {
-              tagBox.forEach((child, index) => {
+              tagBox.forEach((child) => {
                 tags.push(child?.textContent?.trim())
               })
             }

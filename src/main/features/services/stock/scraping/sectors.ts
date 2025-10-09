@@ -1,6 +1,7 @@
 import { executeScrapingTask } from '@services/puppeteer'
-import { mergeColumnArrayList, scrapePaginatedTable } from '@nodeUtils/index'
-
+import { mergeColumnArrayList, scrapePaginatedTable, addIdsFast } from '@nodeUtils/index'
+import { getLastTradingDay } from '@shared/utils/'
+import { transformDataForDB } from '@services/stock/sectors'
 //爬取同花顺行业排行表
 export const scrapingThsIndustry = async () => {
   return executeScrapingTask({
@@ -23,7 +24,11 @@ export const scrapingThsIndustry = async () => {
       })
 
       console.log(`🎉 抓取完成！共获得 ${allData.length} 条数据。`)
-      return mergeColumnArrayList(allData)
+      const tradeDate = await getLastTradingDay()
+      console.log(`📅 最近交易日: ${tradeDate}`)
+      return transformDataForDB(
+        addIdsFast(mergeColumnArrayList(allData), 'thsIndustryId', { tradeDate })
+      )
     }
   })
 }

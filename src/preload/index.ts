@@ -1,8 +1,8 @@
 import { contextBridge, ipcRenderer } from 'electron'
 import { electronAPI } from '@electron-toolkit/preload'
 import type { AiConfig, ChatMessage } from '@sharedType/ai'
-import type { StockNews, StockNewsQueryOptions } from '@sharedType/stockNews'
-import type { StockHotRank, CreateStockHotRankDto } from '@sharedType/stockHotRank'
+import type { StockNews } from '@sharedType/stockNews'
+import type { StockHotRank } from '@sharedType/stockHotRank'
 
 // Git扫描选项
 interface GitScanOptions {
@@ -58,8 +58,12 @@ const api = {
 
   // AI Chat
   // AI Chat
-    aiChat: (params: { prompt: string, aiConfig: AiConfig, history?: ChatMessage[], isStream?: boolean }): Promise<any> =>
-      ipcRenderer.invoke('ai:chat', params),
+  aiChat: (params: {
+    prompt: string
+    aiConfig: AiConfig
+    history?: ChatMessage[]
+    isStream?: boolean
+  }): Promise<any> => ipcRenderer.invoke('ai:chat', params),
   onChatStreamChunk: (callback: (chunk: string) => void) =>
     ipcRenderer.on('ai:chatStream:chunk', (_, chunk) => callback(chunk)),
 
@@ -159,15 +163,21 @@ const api = {
   // News
   scrapeStockNews: (dateStr?: string, timeStr?: string) =>
     ipcRenderer.invoke('stock:scrape_news', dateStr, timeStr),
-  getStockNews: (tradeDate: string): Promise<StockNews[]> =>
+  getStockNewsByTradeDate: (tradeDate: string): Promise<StockNews[]> =>
     ipcRenderer.invoke('stock:get_news', tradeDate),
   cleanStockNews: () => ipcRenderer.invoke('stock:clean_news'),
 
   // hotRank
   scrapeAllHotRank: () => ipcRenderer.invoke('stock:scrape_all_hotRank'),
-  getStockAllHotRank: (tradeDate?: string): Promise<StockHotRank[]> =>
+  getStockAllHotRankByTradeDate: (tradeDate?: string): Promise<StockHotRank[]> =>
     ipcRenderer.invoke('stock:get_all_hotRank', tradeDate),
-  cleanStockAllHotRank: () => ipcRenderer.invoke('stock:clean_all_hotRank')
+  cleanStockAllHotRank: () => ipcRenderer.invoke('stock:clean_all_hotRank'),
+
+  // sectors
+  scrapeStockSectors: () => ipcRenderer.invoke('stock:scrape_sectors'),
+  getStockSectorsByTradeDate: (tradeDate: string) =>
+    ipcRenderer.invoke('stock:get_sectors', tradeDate),
+  cleanStockSectors: () => ipcRenderer.invoke('stock:clean_sectors')
 }
 
 // 暴露API

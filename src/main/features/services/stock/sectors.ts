@@ -1,6 +1,5 @@
 import { dbHelper } from '@features/database'
 import type { StockSectorCamelCase } from '@sharedType/stock'
-import { nanoid } from 'nanoid' // 使用 uuid 生成唯一ID
 /**
  * StockSectorCamelCase 对象的创建类型。
  * 在创建时，所有字段都是必需的，因为 ID 是手动生成的。
@@ -115,6 +114,15 @@ export class StockSectorCamelCasesService {
   }
 
   /**
+   * 根据交易日期查询所有板块数据。
+   * @param tradeDate - 交易日期字符串，格式为 'YYYY-MM-DD'。
+   * @returns 该日期内所有板块数据的数组。
+   */
+  public findByTradeDate(tradeDate: string): StockSectorCamelCase[] {
+    return dbHelper.find<StockSectorCamelCase>(this.tableName, { tradeDate })
+  }
+
+  /**
    * 根据板块名称查询所有匹配的板块数据。
    * @param name - 要查询的板块名称。
    * @returns 包含所有同名板块数据的数组，如果没找到则返回空数组。
@@ -216,9 +224,7 @@ export function transformDataForDB(rawData: any[]): StockSectorCamelCase[] {
 
   for (let i = 0; i < numRows; i++) {
     // 创建一个临时的行对象，这里使用 any 类型以方便动态赋值
-    const rowObject: any = {
-      id: nanoid()
-    }
+    const rowObject: any = {}
 
     for (const key in columns) {
       const typedKey = key as keyof StockSectorCamelCase
