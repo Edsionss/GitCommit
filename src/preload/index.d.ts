@@ -126,7 +126,7 @@ interface ExposedAPI {
 
   // sectors
   scrapeStockSectors: () => Promise<StockSectorCamelCase[]>
-  getStockSectorsByTradeDate: (tradeDate: string) => Promise<StockSectorCamelCase[]>
+  getStockSectorsByTradeDate: (tradeDate?: string) => Promise<StockSectorCamelCase[]>
   cleanStockSectors: () => Promise<any>
 }
 

@@ -66,40 +66,50 @@
                 }}</span>
               </div>
             </div>
+            <div class="industry-details-row">
+              <div class="detail-item">
+                <span class="label">成交量</span>
+                <span class="value"
+                  >{{ sector.totalVolumeLots?.toLocaleString() || 'N/A' }}万手</span
+                >
+              </div>
+              <div class="detail-item">
+                <span class="label">成交额</span>
+                <span class="value"
+                  >{{ sector.totalTurnoverYuan?.toLocaleString() || 'N/A' }}亿元</span
+                >
+              </div>
+              <div class="detail-item">
+                <span class="label">上涨家数</span>
+                <span class="value" :class="{ 'is-up': sector.risingStocksCount }">{{
+                  sector.risingStocksCount || 'N/A'
+                }}</span>
+              </div>
+              <div class="detail-item">
+                <span class="label">下跌家数</span>
+                <span class="value" :class="{ 'is-down': sector.fallingStocksCount }">{{
+                  sector.fallingStocksCount || 'N/A'
+                }}</span>
+              </div>
+            </div>
           </div>
 
           <!-- Right Side: Leading Stock Data -->
           <div class="leading-stock-data">
-            <div class="stock-header">
-              <div>
-                <div class="stock-name-line">
-                  <span class="stock-name">{{ sector.leadingStock.name }}</span>
-                  <a-tag color="red">领涨</a-tag>
-                </div>
-                <div class="stock-market-code">
-                  <a-tag>{{ sector.leadingStock.market }}</a-tag>
-                  <span class="stock-code">{{ sector.leadingStock.code }}</span>
-                </div>
-              </div>
-              <a-button size="small" type="dashed">+自选</a-button>
-            </div>
-            <div class="stock-details">
-              <div class="price-item">
-                <span class="price-value" :class="getChangeClass(sector.leadingStock.change)">{{
-                  sector.leadingStock.price.toFixed(2)
-                }}</span>
-                <span class="price-label">现价</span>
-              </div>
-              <div class="price-item">
-                <span class="price-value" :class="getChangeClass(sector.leadingStock.change)"
-                  >{{ sector.leadingStock.change.toFixed(2) }}%</span
+            <div class="leading-stock-info">
+              <div class="stock-name">{{ sector.leadingStockName || 'N/A' }}</div>
+              <div class="stock-price">
+                <span class="price">{{ sector.leadingStockLatestPrice?.toFixed(2) || 'N/A' }}</span>
+                <span
+                  class="change"
+                  :class="getChangeClass(sector.leadingStockChangePercentage || 0)"
+                  >{{ sector.leadingStockChangePercentage?.toFixed(2) || 'N/A' }}%</span
                 >
-                <span class="price-label">涨幅</span>
               </div>
-              <div class="price-item">
-                <span class="price-value">{{ sector.leadingStock.openingPrice.toFixed(2) }}</span>
-                <span class="price-label">开盘</span>
-              </div>
+            </div>
+            <div class="leading-stock-actions">
+              <button class="action-btn">查看明细</button>
+              <button class="action-btn">+自选</button>
             </div>
           </div>
         </div>
@@ -109,153 +119,154 @@
 </template>
 
 <script setup lang="ts">
-import { reactive, computed } from 'vue'
+import { reactive, computed, onMounted } from 'vue'
 import { ArrowUpOutlined, ArrowDownOutlined } from '@ant-design/icons-vue'
 import { getCardBackgroundByChange } from '@/utils'
-interface LeadingStock {
-  name: string
-  market: string
-  code: string
-  price: number
-  openingPrice: number
-  change: number
-}
+import { stockApi } from '@/api/stock'
+import { message } from 'ant-design-vue'
+import type { StockSectorCamelCase } from '@shared/types/dtos/stock'
 
 interface Sector {
+  id: string
   name: string
   hotness: number
   change: number
   change_5d: number
   change_20d: number
-  leadingStock: LeadingStock
+  leadingStockName: string | null
+  leadingStockLatestPrice: number | null
+  leadingStockChangePercentage: number | null
   netInflow: number
+  totalVolumeLots: number | null
+  totalTurnoverYuan: number | null
+  risingStocksCount: number | null
+  fallingStocksCount: number | null
+  averagePrice: number | null
+  tradeDate: string
 }
 
 const sortOptions = [
   { key: 'netInflow', label: '净流入' },
   { key: 'hotness', label: '热度' },
-  { key: 'change', label: '涨幅' }
+  { key: 'changePercentage', label: '涨幅' },
+  { key: 'risingStocksCount', label: '上涨家数' }
 ]
 
 const sortState = reactive({
-  key: 'netInflow' as 'netInflow' | 'hotness' | 'change',
+  key: 'netInflow' as 'netInflow' | 'hotness' | 'changePercentage' | 'risingStocksCount',
   order: 'desc' as 'asc' | 'desc'
 })
 
-const sectors = reactive<Sector[]>([
-  {
-    name: '半导体',
-    hotness: 95,
-    change: 2.5,
-    change_5d: 5.8,
-    change_20d: -2.1,
-    leadingStock: {
-      name: '中芯国际',
-      market: 'SH',
-      code: '688981',
-      price: 45.88,
-      openingPrice: 45.0,
-      change: 3.1
-    },
-    netInflow: 7.1e8
-  },
-  {
-    name: '医疗器械',
-    hotness: 88,
-    change: -1.2,
-    change_5d: -3.4,
-    change_20d: 8.9,
-    leadingStock: {
-      name: '迈瑞医疗',
-      market: 'SZ',
-      code: '300760',
-      price: 310.5,
-      openingPrice: 315.0,
-      change: -1.5
-    },
-    netInflow: -2.8e8
-  },
-  {
-    name: '白酒',
-    hotness: 92,
-    change: 3.1,
-    change_5d: 2.5,
-    change_20d: 4.6,
-    leadingStock: {
-      name: '贵州茅台',
-      market: 'SH',
-      code: '600519',
-      price: 1750.0,
-      openingPrice: 1730.0,
-      change: 2.8
-    },
-    netInflow: 7.2e8
-  },
-  {
-    name: '新能源车',
-    hotness: 98,
-    change: 1.8,
-    change_5d: -0.5,
-    change_20d: 12.3,
-    leadingStock: {
-      name: '比亚迪',
-      market: 'SZ',
-      code: '002594',
-      price: 255.4,
-      openingPrice: 250.0,
-      change: 2.0
-    },
-    netInflow: 8.5e8
-  },
-  {
-    name: '光伏',
-    hotness: 85,
-    change: -0.5,
-    change_5d: -2.1,
-    change_20d: -5.0,
-    leadingStock: {
-      name: '隆基绿能',
-      market: 'SH',
-      code: '601012',
-      price: 25.8,
-      openingPrice: 26.1,
-      change: -0.8
-    },
-    netInflow: -3.1e8
-  },
-  {
-    name: '人工智能',
-    hotness: 99,
-    change: 4.2,
-    change_5d: 10.2,
-    change_20d: 15.7,
-    leadingStock: {
-      name: '科大讯飞',
-      market: 'SZ',
-      code: '002230',
-      price: 55.3,
-      openingPrice: 54.0,
-      change: 4.5
-    },
-    netInflow: 12.2e8
+const sectors = reactive<Sector[]>([])
+
+// 获取板块数据
+const fetchSectorData = async () => {
+  try {
+    const data = await stockApi.getStockSectorsByTradeDate()
+
+    // 将 API 数据转换为组件需要的格式
+    sectors.length = 0 // 清空现有数据
+    data.forEach((item: StockSectorCamelCase) => {
+      sectors.push({
+        id: item.id,
+        name: item.sectorName,
+        hotness: Math.floor(Math.random() * 100), // 模拟热度数据，实际项目中应该从 API 获取
+        change: item.changePercentage || 0,
+        change_5d: Math.random() * 10 - 5, // 模拟5日涨跌幅，实际项目中应该从 API 获取
+        change_20d: Math.random() * 20 - 10, // 模拟20日涨跌幅，实际项目中应该从 API 获取
+        leadingStockName: item.leadingStockName,
+        leadingStockLatestPrice: item.leadingStockLatestPrice,
+        leadingStockChangePercentage: item.leadingStockChangePercentage,
+        netInflow: (item.netInflowYuan || 0) * 1e8, // 转换为元
+        totalVolumeLots: item.totalVolumeLots,
+        totalTurnoverYuan: item.totalTurnoverYuan,
+        risingStocksCount: item.risingStocksCount,
+        fallingStocksCount: item.fallingStocksCount,
+        averagePrice: item.averagePrice,
+        tradeDate: item.tradeDate
+      })
+    })
+    message.success('行业板块数据加载成功')
+  } catch (error) {
+    message.error('行业板块数据加载失败')
+    console.error(error)
   }
-])
+}
+
+const clearIndustryData = async () => {
+  try {
+    await stockApi.cleanStockSectors()
+    sectors.length = 0 // 清空现有数据
+    message.success('行业数据已清空')
+  } catch (error) {
+    message.error('清空行业数据失败')
+    console.error(error)
+  }
+}
+
+const scrapeIndustryData = async () => {
+  try {
+    await stockApi.scrapeStockSectors()
+    message.success('开始爬取行业数据')
+    // 爬取完成后重新获取数据
+    setTimeout(() => {
+      fetchSectorData()
+    }, 2000) // 假设爬取需要2秒，实际项目中应该根据实际情况调整
+  } catch (error) {
+    message.error('爬取行业数据失败')
+    console.error(error)
+  }
+}
+
+// 组件挂载时获取数据
+onMounted(() => {
+  fetchSectorData()
+})
 
 const sortedSectors = computed(() => {
-  return [...sectors].sort((a, b) => {
-    const aValue = a[sortState.key]
-    const bValue = b[sortState.key]
-    if (sortState.order === 'asc') {
-      return aValue - bValue
+  // 创建数组的副本以避免修改原始数据
+  const sectorsCopy = [...sectors]
+
+  // 根据当前排序方式对行业数据进行排序
+  return sectorsCopy.sort((a, b) => {
+    let valueA, valueB
+
+    switch (sortState.key) {
+      case 'hotness':
+        valueA = a.hotness || 0
+        valueB = b.hotness || 0
+        break
+      case 'change':
+        valueA = a.change || 0
+        valueB = b.change || 0
+        break
+      case 'netInflow':
+        valueA = a.netInflow || 0
+        valueB = b.netInflow || 0
+        break
+      case 'risingStocksCount':
+        valueA = a.risingStocksCount || 0
+        valueB = b.risingStocksCount || 0
+        break
+      default:
+        valueA = a.hotness || 0
+        valueB = b.hotness || 0
     }
-    return bValue - aValue
+
+    // 根据排序顺序返回结果
+    if (sortState.order === 'asc') {
+      return valueA - valueB
+    }
+    return valueB - valueA
   })
 })
 
-const handleSort = (key: 'netInflow' | 'hotness' | 'change') => {
+const handleSort = (key: 'netInflow' | 'hotness' | 'changePercentage' | 'risingStocksCount') => {
   if (sortState.key === key) {
+    // 如果已经按这个键排序，则切换排序顺序
     sortState.order = sortState.order === 'asc' ? 'desc' : 'asc'
   } else {
+    // 如果按新的键排序，则默认降序
     sortState.key = key
     sortState.order = 'desc'
   }
@@ -269,16 +280,6 @@ const formatCurrency = (value: number): string => {
   if (Math.abs(value) >= 1e8) return `${(value / 1e8).toFixed(2)}亿`
   if (Math.abs(value) >= 1e4) return `${(value / 1e4).toFixed(2)}万`
   return value.toFixed(2)
-}
-
-const clearIndustryData = () => {
-  // 清除行业数据的逻辑
-  console.log('清除行业数据')
-}
-
-const scrapeIndustryData = () => {
-  // 爬取行业数据的逻辑
-  console.log('爬取行业数据')
 }
 </script>
 
@@ -407,51 +408,42 @@ const scrapeIndustryData = () => {
   gap: 8px;
 }
 
-.stock-header {
+.leading-stock-info {
   display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-}
-
-.stock-name-line {
-  display: flex;
-  align-items: center;
+  flex-direction: column;
   gap: 8px;
   .stock-name {
     font-size: 16px;
     font-weight: 500;
   }
-}
-
-.stock-market-code {
-  display: flex;
-  align-items: center;
-  margin-top: 4px;
-  .stock-code {
-    font-size: 12px;
-    color: var(--text-secondary);
+  .stock-price {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    .price {
+      font-size: 16px;
+      font-weight: bold;
+    }
+    .change {
+      font-size: 14px;
+      font-weight: 500;
+    }
   }
 }
 
-.stock-details {
+.leading-stock-actions {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-top: 8px;
-}
-
-.price-item {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  .price-value {
-    font-size: 16px;
-    font-weight: bold;
-  }
-  .price-label {
+  gap: 8px;
+  .action-btn {
+    padding: 4px 8px;
     font-size: 12px;
-    color: var(--text-secondary);
-    margin-top: 2px;
+    border: 1px solid var(--border-primary);
+    border-radius: 4px;
+    background-color: var(--bg-primary);
+    cursor: pointer;
+    &:hover {
+      background-color: var(--bg-secondary);
+    }
   }
 }
 

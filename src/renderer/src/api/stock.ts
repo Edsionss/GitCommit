@@ -13,7 +13,7 @@ export const stockApi = {
 
   //sector API
   scrapeStockSectors: () => window.api.scrapeStockSectors(),
-  getStockSectorsByTradeDate: (tradeDate: string) =>
+  getStockSectorsByTradeDate: (tradeDate?: string) =>
     window.api.getStockSectorsByTradeDate(tradeDate),
   cleanStockSectors: () => window.api.cleanStockSectors(),
 

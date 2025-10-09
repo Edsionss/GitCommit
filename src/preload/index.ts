@@ -175,7 +175,7 @@ const api = {
 
   // sectors
   scrapeStockSectors: () => ipcRenderer.invoke('stock:scrape_sectors'),
-  getStockSectorsByTradeDate: (tradeDate: string) =>
+  getStockSectorsByTradeDate: (tradeDate?: string) =>
     ipcRenderer.invoke('stock:get_sectors', tradeDate),
   cleanStockSectors: () => ipcRenderer.invoke('stock:clean_sectors')
 }
