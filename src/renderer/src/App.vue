@@ -10,18 +10,21 @@ import { theme as antTheme } from 'ant-design-vue'
 import { useTheme } from './composables/useTheme'
 import { useWebSocketStore } from '@/stores/webSocketStore'
 
-// 初始化 WebSocket store
+// --- WebSocket Initialization ---
+
+// --- WebSocket Initialization ---
 const wsStore = useWebSocketStore()
 
 onMounted(() => {
-  // 开启对直接广播的监听
+  // Listen for direct broadcasts from WebSocket
   wsStore.listenForDirectBroadcasts()
 })
 
+// --- Theme Management ---
 const { effectiveTheme } = useTheme()
 const { token } = antTheme.useToken()
 
-// 动态配置ConfigProvider的主题算法
+// Dynamically configure ConfigProvider's theme algorithm
 const themeConfig = computed(() => ({
   algorithm: effectiveTheme.value === 'dark' ? antTheme.darkAlgorithm : antTheme.defaultAlgorithm,
   token: {
@@ -30,7 +33,7 @@ const themeConfig = computed(() => ({
   }
 }))
 
-// 监听Ant Design的Token变化，并将其应用为CSS变量
+// Watch for Ant Design Token changes and apply them as CSS variables
 watchEffect(() => {
   if (!token.value) return // 增加一个健壮性检查
   const root = document.documentElement

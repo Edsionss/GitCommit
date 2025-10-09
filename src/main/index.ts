@@ -1,6 +1,7 @@
 import { app, shell, BrowserWindow, ipcMain, dialog, session } from 'electron'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
+import { applicationService } from '@services/application'
 import icon from '../../build/CognitoOcean1.png?asset' // Vite/TypeScript 可能会帮你处理这个导入，但路径更可靠
 import {
   beforeCreate,
@@ -72,6 +73,9 @@ function createWindow(): void {
   mainWindow.on('ready-to-show', () => {
     mainWindow?.show()
   })
+
+  // Start performance monitoring
+  applicationService.startPerformanceMonitoring(mainWindow)
 
   // 打开外部链接时使用默认浏览器，而不是在应用内打开新窗口
   mainWindow.webContents.setWindowOpenHandler((details) => {

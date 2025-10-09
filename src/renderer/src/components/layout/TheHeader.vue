@@ -14,6 +14,7 @@
       </h1>
       <span class="page-title">{{ currentPageTitle }}</span>
       <span class="code-container">{{ route.fullPath }}</span>
+      <AppMetricsDisplay />
     </div>
     <div class="header-actions">
       <div class="application-menu">
@@ -49,8 +50,14 @@
 <script setup lang="ts">
 // import CognitoOcean from '@/assets/img/logo/CognitoOcean.png'
 import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { useAppStore } from '@/stores/appStore'
+
+// Initialize performance metrics listener
+const appStore = useAppStore()
+appStore.listenForAppMetrics()
 import { useRouter, useRoute } from 'vue-router'
 import { useSettingsStore } from '@/stores/settingsStore'
+import AppMetricsDisplay from '@/components/Common/AppMetricsDisplay.vue'
 import { storeToRefs } from 'pinia'
 import { applicationApi } from '@api/application'
 import {

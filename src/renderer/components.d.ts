@@ -14,6 +14,7 @@ declare module 'vue' {
     AiConfig: typeof import('./src/components/SettingsView/AiConfig.vue')['default']
     AiDiagnosis: typeof import('./src/components/Stock/StockList/StockDetail/components/AiDiagnosis.vue')['default']
     Announcements: typeof import('./src/components/Stock/StockList/StockDetail/components/Announcements.vue')['default']
+    AppMetricsDisplay: typeof import('./src/components/Common/AppMetricsDisplay.vue')['default']
     BaseBarChart: typeof import('./src/components/charts/BaseBarChart.vue')['default']
     BasePieChart: typeof import('./src/components/charts/BasePieChart.vue')['default']
     BranchesList: typeof import('./src/components/BranchesView/BranchesList.vue')['default']

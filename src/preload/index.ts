@@ -97,6 +97,9 @@ const api = {
     ipcRenderer.on('direct-broadcast-received', listener)
     return () => ipcRenderer.removeListener('direct-broadcast-received', listener)
   },
+  onAppMetricsUpdate: (callback: (metrics: { cpu: number; memory: number }) => void) => {
+    ipcRenderer.on('app-metrics-update', (_, metrics) => callback(metrics))
+  },
   storeGet: (key: string) => ipcRenderer.invoke('store:get', key),
   storeSet: (key: string, value: any) => ipcRenderer.invoke('store:set', key, value),
   storeDelete: (key: string) => ipcRenderer.invoke('store:delete', key),
