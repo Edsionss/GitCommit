@@ -30,13 +30,16 @@
         <template #icon><UnorderedListOutlined /></template>
         <template #tooltip><div>重置路由</div></template>
       </a-float-button>
+      <a-float-button @click="resetDatabase">
+        <template #icon><DatabaseOutlined /></template>
+        <template #tooltip><div>重置数据库</div></template>
+      </a-float-button>
     </a-float-button-group>
   </div>
 </template>
 
 <script setup lang="ts">
 import { message, Modal } from 'ant-design-vue'
-import { storeToRefs } from 'pinia'
 import { useSettingsStore } from '@/stores/settingsStore'
 import DisplayConfig from '@renderer/components/SettingsView/DisplayConfig.vue'
 import Preferences from '@renderer/components/SettingsView/Preferences.vue'
@@ -44,8 +47,14 @@ import GitConfig from '@renderer/components/SettingsView/GitConfig.vue'
 import SystemConfig from '@/components/SettingsView/SystemConfig.vue'
 import AiConfig from '@renderer/components/SettingsView/AiConfig.vue'
 import MenuManagement from './MenuManagement.vue'
-import { SaveOutlined, RedoOutlined, UnorderedListOutlined } from '@ant-design/icons-vue'
+import {
+  SaveOutlined,
+  RedoOutlined,
+  UnorderedListOutlined,
+  DatabaseOutlined
+} from '@ant-design/icons-vue'
 import { useRoutesStore } from '@/stores/routesStore'
+import { applicationApi } from '@/api/application'
 
 const routesStore = useRoutesStore()
 
@@ -76,14 +85,38 @@ const resetSettings = () => {
 // 重置路由
 const resetRouterMenu = () => {
   Modal.confirm({
-    title: '重置设置',
-    content: '确定要重置所有设置到默认值吗？此操作不可撤销。',
+    title: '重置路由',
+    content: '确定要重置所有路由到默认值吗？此操作不可撤销。',
     okText: '确定',
     cancelText: '取消',
     onOk() {
       routesStore.restRoutes()
 
       setTimeout(() => location.reload(), 500)
+    }
+  })
+}
+
+// 重置数据库
+const resetDatabase = () => {
+  Modal.confirm({
+    title: '重置数据库',
+    content:
+      '确定要重置应用程序的数据库吗？所有本地存储的数据（如扫描历史、设置等）都将被永久删除。此操作不可撤销，应用程序将自动重启。',
+    okText: '确定重置',
+    cancelText: '取消',
+    async onOk() {
+      try {
+        const result = await applicationApi.resetDatabase()
+        if (result.success) {
+          message.success('数据库已开始重置，应用程序即将重启。')
+          // 后端会处理重启，前端不需要额外操作
+        } else {
+          message.error(`数据库重置失败: ${result.error}`)
+        }
+      } catch (error) {
+        message.error(`发生未知错误: ${error instanceof Error ? error.message : String(error)}`)
+      }
     }
   })
 }

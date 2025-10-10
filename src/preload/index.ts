@@ -192,7 +192,11 @@ const api = {
   scrapeStockSectors: () => ipcRenderer.invoke('stock:scrape_sectors'),
   getStockSectorsByTradeDate: (tradeDate?: string) =>
     ipcRenderer.invoke('stock:get_sectors', tradeDate),
-  cleanStockSectors: () => ipcRenderer.invoke('stock:clean_sectors')
+  cleanStockSectors: () => ipcRenderer.invoke('stock:clean_sectors'),
+
+  // Application API
+  resetDatabase: (): Promise<{ success: boolean; error?: string }> =>
+    ipcRenderer.invoke('application:reset-database')
 }
 
 // 暴露API

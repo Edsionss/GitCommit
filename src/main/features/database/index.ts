@@ -20,6 +20,6 @@ export function initializeDatabase() {
 
 // 3. 创建并导出通用的 DatabaseHelper 实例
 export const dbHelper: DatabaseHelper = new DatabaseHelper(db)
-export { db }
+export { db, dbPath }
 // 4. 在应用启动时调用初始化
 // initializeDatabase()

@@ -128,6 +128,9 @@ interface ExposedAPI {
   scrapeStockSectors: () => Promise<StockSectorCamelCase[]>
   getStockSectorsByTradeDate: (tradeDate?: string) => Promise<StockSectorCamelCase[]>
   cleanStockSectors: () => Promise<any>
+
+  // Application API
+  resetDatabase: () => Promise<{ success: boolean; error?: string }>
 }
 
 // AuditLog a new interface

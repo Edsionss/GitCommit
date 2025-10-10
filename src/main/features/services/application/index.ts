@@ -1,4 +1,6 @@
-import { BrowserWindow } from 'electron'
+import { BrowserWindow, app } from 'electron'
+import fs from 'fs'
+import { db, dbPath } from '@features/database'
 
 class ApplicationService {
   public minimize(browserWindow: BrowserWindow): void {
@@ -71,6 +73,29 @@ class ApplicationService {
         })
       }
     }, 1500)
+  }
+
+  /**
+   * Resets the application database.
+   * This function closes the database connection, deletes the database file,
+   * and then restarts the application to ensure a clean state.
+   */
+  public resetDatabase(): void {
+    try {
+      console.log('Closing database connection...')
+      db.close()
+      console.log(`Database connection closed. Deleting database file at: ${dbPath}`)
+      fs.unlinkSync(dbPath)
+      console.log('Database file deleted successfully.')
+
+      // Relaunch the application
+      console.log('Relaunching the application...')
+      app.relaunch()
+      app.exit()
+    } catch (error) {
+      console.error('Failed to reset database:', error)
+      throw new Error('Failed to reset database.')
+    }
   }
 }
 
