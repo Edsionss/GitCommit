@@ -20,7 +20,7 @@ export const useScanStore = defineStore('scan', () => {
   const getFirstRecord = computed(() => {
     return scanRecordList.value?.[scanRecordList.value.length - 1] || null
   })
-  
+
   // 从数据库加载扫描记录
   const loadScanRecords = async () => {
     try {
@@ -33,12 +33,12 @@ export const useScanStore = defineStore('scan', () => {
       isLoading.value = false
     }
   }
-  
+
   //获取扫描记录
   const getScanRecordById = (id: string) => {
     return scanRecordList.value.filter((item) => item.id === id)[0]
   }
-  
+
   //添加扫描记录
   const setScanRecordList = async (item) => {
     try {
@@ -49,7 +49,7 @@ export const useScanStore = defineStore('scan', () => {
       console.error('Failed to add scan record:', error)
     }
   }
-  
+
   //更新扫描记录
   const setScanRecordById = async (id: string, data: any) => {
     try {
@@ -93,7 +93,7 @@ export const useScanStore = defineStore('scan', () => {
       console.error('Failed to delete all scan records:', error)
     }
   }
-  
+
   // 从localStorage迁移扫描记录到数据库
   const migrateScanRecordsFromLocalStorage = async () => {
     try {
@@ -113,56 +113,12 @@ export const useScanStore = defineStore('scan', () => {
     try {
       await scanHistoryApi.updateScanHistory(id, { analysisResult })
       // 更新本地状态
-      const index = scanRecordList.value.findIndex(record => record.id === id)
+      const index = scanRecordList.value.findIndex((record) => record.id === id)
       if (index !== -1) {
         scanRecordList.value[index].analysisResult = analysisResult
       }
     } catch (error) {
       console.error('更新扫描记录分析结果失败:', error)
-      throw error
-    }
-  }
-
-  // 从 localStorage 迁移数据到数据库
-  const migrateFromLocalStorage = async () => {
-    try {
-      // 获取 localStorage 中的数据
-      const localRecords = JSON.parse(localStorage.getItem('scanRecord') || '[]')
-      
-      if (localRecords.length === 0) {
-        console.log('没有需要迁移的扫描记录')
-        return
-      }
-      
-      console.log(`开始迁移 ${localRecords.length} 条扫描记录到数据库`)
-      
-      // 将每条记录添加到数据库
-      for (const record of localRecords) {
-        // 转换为 ScanHistoryItem 格式
-        const scanHistoryItem: ScanHistoryItem = {
-          id: record.id,
-          repoPath: record.repoPath,
-          scanTime: record.scanTime,
-          status: record.status,
-          totalCommits: record.totalCommits,
-          scanOptions: record.scanOptions,
-          log: record.log,
-          results: record.results
-        }
-        
-        // 添加到数据库
-        await scanHistoryApi.addScanHistory(scanHistoryItem)
-      }
-      
-      // 迁移完成后，清空 localStorage
-      localStorage.removeItem('scanRecord')
-      
-      // 重新加载数据
-      await loadScanRecords()
-      
-      console.log('扫描记录迁移完成')
-    } catch (error) {
-      console.error('迁移扫描记录失败:', error)
       throw error
     }
   }
@@ -227,7 +183,6 @@ export const useScanStore = defineStore('scan', () => {
     delAllScanRecord,
     loadScanRecords,
     migrateScanRecordsFromLocalStorage,
-    migrateFromLocalStorage,
     updateScanRecordAnalysis,
     //仓库记录
     getGitRepos,

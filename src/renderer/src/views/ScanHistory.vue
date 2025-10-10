@@ -130,29 +130,6 @@ const filterScanHistory = () => {
   message.info('正在过滤扫描记录...')
 }
 
-// 方法：迁移扫描记录
-const migrateScanHistory = () => {
-  Modal.confirm({
-    title: '确认迁移',
-    content: '确定要将 localStorage 中的扫描记录迁移到数据库吗？',
-    okText: '迁移',
-    okType: 'primary',
-    cancelText: '取消',
-    onOk: async () => {
-      try {
-        loading.value = true
-        await scanStore.migrateFromLocalStorage()
-        message.success('扫描记录已成功迁移到数据库')
-      } catch (error) {
-        const errorMessage = error instanceof Error ? error.message : String(error)
-        message.error(`迁移失败: ${errorMessage}`)
-      } finally {
-        loading.value = false
-      }
-    }
-  })
-}
-
 // 方法：选择扫描记录
 const selectScanRecord = (record: ScanRecord) => {
   selectedRecord.value = record
