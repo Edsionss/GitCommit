@@ -1,8 +1,12 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import { nanoid } from 'nanoid'
-import { chatApi, type ChatSession as ApiChatSession, type ChatMessage as ApiChatMessage } from '@/api/chat'
-import type { ChatMessage, ChatSession } from '@/shared/types/dtos/ai'
+import {
+  chatApi,
+  type ChatSession as ApiChatSession,
+  type ChatMessage as ApiChatMessage
+} from '@/api/chat'
+import type { ChatMessage, ChatSession } from '@sharedType/ai'
 
 export const useChatStore = defineStore('chat', () => {
   // State
@@ -25,17 +29,17 @@ export const useChatStore = defineStore('chat', () => {
   // Actions
   async function _saveToDatabase() {
     if (!activeSession.value) return
-    
+
     try {
       // 更新会话信息
       await chatApi.updateChatSession(activeSession.value.id, {
         name: activeSession.value.name,
         startTime: activeSession.value.startTime
       })
-      
+
       // 删除该会话的所有消息，然后重新添加
       await chatApi.deleteMessagesBySessionId(activeSession.value.id)
-      
+
       // 添加所有消息
       for (const message of activeSession.value.messages) {
         await chatApi.addMessageToSession({
@@ -55,22 +59,22 @@ export const useChatStore = defineStore('chat', () => {
     try {
       // 从数据库获取所有会话
       const apiSessions = await chatApi.getAllChatSessions()
-      
+
       if (apiSessions.length > 0) {
         // 转换API会话格式为本地格式
         sessions.value = []
-        
+
         for (const apiSession of apiSessions) {
           // 获取会话的所有消息
           const apiMessages = await chatApi.getMessagesBySessionId(apiSession.id)
-          
+
           // 转换API消息格式为本地格式
-          const messages: ChatMessage[] = apiMessages.map(msg => ({
+          const messages: ChatMessage[] = apiMessages.map((msg) => ({
             sender: msg.sender,
             text: msg.text,
             isLoading: msg.isLoading
           }))
-          
+
           sessions.value.push({
             id: apiSession.id,
             name: apiSession.name,
@@ -78,7 +82,7 @@ export const useChatStore = defineStore('chat', () => {
             messages
           })
         }
-        
+
         // 设置最近的活动会话
         const sorted = [...sessions.value].sort(
           (a, b) => new Date(b.startTime).getTime() - new Date(a.startTime).getTime()
@@ -103,11 +107,11 @@ export const useChatStore = defineStore('chat', () => {
       name: '新会话',
       startTime: new Date().toISOString()
     }
-    
+
     try {
       // 在数据库中创建会话
       const apiSession = await chatApi.createChatSession(newSessionData)
-      
+
       // 创建本地会话对象
       const newSession: ChatSession = {
         id: apiSession.id,
@@ -115,10 +119,10 @@ export const useChatStore = defineStore('chat', () => {
         startTime: apiSession.startTime,
         messages: [{ sender: 'ai', text: '您好！有什么可以帮助您的吗？' }]
       }
-      
+
       sessions.value.unshift(newSession) // Add to the beginning
       activeSessionId.value = newSession.id
-      
+
       // 保存初始消息到数据库
       await chatApi.addMessageToSession({
         sessionId: newSession.id,
@@ -126,7 +130,7 @@ export const useChatStore = defineStore('chat', () => {
         text: '您好！有什么可以帮助您的吗？',
         isLoading: false
       })
-      
+
       return newSession.id
     } catch (error) {
       console.error('Failed to create new chat session:', error)
@@ -140,7 +144,10 @@ export const useChatStore = defineStore('chat', () => {
     }
   }
 
-  async function addMessageToActiveSession(message: Omit<ChatMessage, 'isLoading'>, isSave: boolean) {
+  async function addMessageToActiveSession(
+    message: Omit<ChatMessage, 'isLoading'>,
+    isSave: boolean
+  ) {
     if (!activeSession.value) return
 
     // If this is the first user message, update the session name
@@ -148,9 +155,9 @@ export const useChatStore = defineStore('chat', () => {
       activeSession.value.name = message.text.substring(0, 30) // Use first 30 chars as name
       await chatApi.updateSessionName(activeSession.value.id, activeSession.value.name)
     }
-    
+
     activeSession.value.messages.push(message)
-    
+
     if (isSave) {
       try {
         await chatApi.addMessageToSession({
@@ -163,7 +170,7 @@ export const useChatStore = defineStore('chat', () => {
         console.error('Failed to add message to database:', error)
       }
     }
-    
+
     return activeSession.value.messages[activeSession.value.messages.length - 1]
   }
 
@@ -171,10 +178,10 @@ export const useChatStore = defineStore('chat', () => {
     try {
       // 从数据库中删除会话
       await chatApi.deleteChatSession(sessionId)
-      
+
       // 从本地状态中删除会话
       sessions.value = sessions.value.filter((s) => s.id !== sessionId)
-      
+
       if (activeSessionId.value === sessionId) {
         if (sessions.value.length > 0) {
           setActiveSession(sessions.value[0].id)
