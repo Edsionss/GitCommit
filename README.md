@@ -117,7 +117,7 @@ CognitoOcean 是一个使用 Electron、Vue 3 和 TypeScript 构建的现代化�
 1. **定义需求**: 确定要开发的功能，并确定功能所需的 API、数据来源和 UI 设计。
 2. **设计 UI**: 根据需求，设计用户界面，并确定组件的布局和交互方式。
 3. **实现UI**: 开发前端UI代码，并确保与 UI 设计一致，使用 Ant Design Vue UI库构建。
-4. **设计和开发数据库**: 根据需求，设计数据库和编写建表语句，开发数据库流程为：1.确定数据库设置 2.在/src/main/features/database/schema/文件夹下新建一个一功能命名的ts文件并且默认导出字符串，字符串内容是建表语句 3.在/src/main/features/database/schema.ts文件中导入该文件，并且将导入的变量添加到schema 变量中，这样就可以在数据库初始化时自动创建表。 4.在开发与数据库交互的server层时，使用DatabaseHelper.ts封装好的方法进行数据库操作，在server层的文件中使用 import { dbHelper } from '@features/database' 导入dbHelper即可进行数据库操作。
+4. **设计和开发数据库**: 根据需求，设计数据库和编写建表语句，开发数据库流程为：1.确定数据库设置 2.在/src/main/features/database/schema/文件夹下新建一个一功能命名的ts文件并且默认导出字符串，字符串内容是建表语句 3.在/src/main/features/database/schema.ts文件中导入该文件，并且将导入的变量添加到schema 变量中，这样就可以在数据库初始化时自动创建表。 4.在开发与数据库交互的service层时，使用DatabaseHelper.ts封装好的方法进行数据库操作，在service层的文件中使用 import { dbHelper } from '@features/database' 导入dbHelper即可进行数据库操作。
 5. **设计后台功能逻辑**: 根据需求，设计后台功能逻辑，并确定与前端UI的交互方式。
 6. **开发功能的service层 在/src/main/features/services文件夹下**: 开发后台功能逻辑，并确保与前端UI的交互方式一致。开发规范：在services文件夹下新建一个以功能命名的文件夹，然后在该文件夹下创建index.ts文件进行开发，而不是直接在services文件夹下新建文件。
 7. **开发功能的handler层 在/src/main/features/handlers文件夹下**: 开发ipc注册方法和初始化方法。开发规范：在handlers文件夹下新建一个以功能命名的文件夹，然后在该文件夹下创建index.ts文件进行开发，而不是直接在handlers文件夹下新建文件。
