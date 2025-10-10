@@ -211,8 +211,9 @@ function autoAnalysisScanRecord(id: string, record: any[]) {
     sendMessage({
       input: resultInput,
       userContent: '[提交记录分析]()',
-      success: (result) => {
-        scanStore.setScanRecordById(id, { analysisResult: result })
+      success: async (result) => {
+        // 使用 scanHistoryApi 更新数据库中的扫描记录
+        await scanStore.updateScanRecordAnalysis(id, result)
         antMessage.success('分析完成，结果已保存到扫描记录中')
       }
     })

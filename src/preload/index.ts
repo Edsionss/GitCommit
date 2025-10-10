@@ -73,6 +73,15 @@ const api = {
   removeHistory: (repoPath: string) => ipcRenderer.invoke('history:remove', repoPath),
   clearHistory: () => ipcRenderer.invoke('history:clear'),
 
+  // Scan History API
+  getAllScanHistories: () => ipcRenderer.invoke('scan-history:get-all'),
+  getScanHistoryById: (id: string) => ipcRenderer.invoke('scan-history:get-by-id', id),
+  addScanHistory: (scanHistory) => ipcRenderer.invoke('scan-history:add', scanHistory),
+  updateScanHistory: (id: string, updates) => ipcRenderer.invoke('scan-history:update', id, updates),
+  deleteScanHistory: (id: string) => ipcRenderer.invoke('scan-history:delete', id),
+  deleteAllScanHistories: () => ipcRenderer.invoke('scan-history:delete-all'),
+  migrateScanHistoryFromLocalStorage: () => ipcRenderer.invoke('scan-history:migrate-from-local-storage'),
+
   // Export API
   exportCommits: (commits, format) => ipcRenderer.invoke('export:commits', commits, format),
 

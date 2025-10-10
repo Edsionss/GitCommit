@@ -122,13 +122,16 @@ const startScan = async () => {
     scanSubfolders: form.scanSubfolders,
     selectedRepos: [...form.selectedRepos],
     AutoAiAnalysis: !!form.AutoAiAnalysis,
-    analysisRules: form.analysisRules
+    analysisRules: form.analysisRules,
+    log: [...currentLogs.value]
   }
   scanOptionsRef.value = scanOptions
   addLog(`扫描选项: ${JSON.stringify(scanOptions, null, 2)}`, 'info')
 
   try {
     addLog(`已开始扫描${scanOptions.AutoAiAnalysis ? '和进行AI分析' : ''}`, 'info')
+    // 在开始扫描前，确保最新的日志已包含在 scanOptions 中
+    scanOptions.log = [...currentLogs.value]
     const { commits, analysisResult } = await window.api.scanGitRepo(
       form.repoPath,
       scanOptions,
@@ -146,7 +149,8 @@ const startScan = async () => {
       results: commits,
       analysisResult
     }
-    scanStore.setScanRecordList(newRecord)
+    // 扫描结果现在会自动保存到数据库，不再需要在这里处理
+    // scanStore.setScanRecordList(newRecord)
     // 跳转到扫描记录页面
     if (commits && commits.length) {
       router.push({ name: 'ScanHistory' })

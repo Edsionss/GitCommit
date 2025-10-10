@@ -38,6 +38,7 @@ export interface GitScanOptions {
   selectedRepos?: string[]
   AutoAiAnalysis?: boolean
   analysisRules?: string
+  log?: string[]
 }
 
 // 扫描进度回调接口

@@ -29,13 +29,18 @@
         <template #icon><SearchOutlined /></template>
         查询
       </a-button>
+      
+      <a-button type="default" @click="$emit('migrate')">
+        <template #icon><DatabaseOutlined /></template>
+        迁移数据
+      </a-button>
     </div>
   </a-card>
 </template>
 
 <script setup lang="ts">
 import { ref, PropType } from 'vue'
-import { SearchOutlined } from '@ant-design/icons-vue'
+import { SearchOutlined, DatabaseOutlined } from '@ant-design/icons-vue'
 import { Dayjs } from 'dayjs'
 
 interface Repository {
@@ -49,7 +54,7 @@ defineProps({
   dateRange: { type: Array as PropType<[Dayjs, Dayjs] | null>, default: null }
 })
 
-defineEmits(['update:selectedRepo', 'update:dateRange', 'filter'])
+defineEmits(['update:selectedRepo', 'update:dateRange', 'filter', 'migrate'])
 </script>
 
 <style scoped>

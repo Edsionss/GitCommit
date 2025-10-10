@@ -15,6 +15,7 @@ export function registerGitScanHandlers() {
       }
 
       try {
+        // 扫描结果现在会自动保存到数据库，不再需要在这里处理
         return await scanGitRepository(repoPath, options, aiConfig, progressCallback)
       } catch (error) {
         const errorMessage = error instanceof Error ? error.message : String(error)

@@ -16,6 +16,7 @@ import { registerAutoWriteWorkRepoHandlers } from '@handlers/autoWriteWorkRepo'
 import { registerApplicationHandlers } from '@handlers/application'
 import { registerAuditLogHandlers } from '@handlers/auditLog'
 import { registerChatHandlers } from '@handlers/chat/chat'
+import { registerScanHistoryHandlers } from './scanHistory'
 export function registerIpcHandlers() {
   // Register handlers from other modules
   registerGitInfoHandlers()
@@ -36,5 +37,6 @@ export function registerIpcHandlers() {
   registerApplicationHandlers()
   registerAuditLogHandlers()
   registerChatHandlers()
+  registerScanHistoryHandlers()
   // 注册 IPC 处理器
 }

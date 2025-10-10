@@ -1,5 +1,5 @@
 import { ElectronAPI } from '@electron-toolkit/preload'
-import type { GitCommit, RepoHistoryItem } from '@sharedType/git'
+import type { GitCommit, RepoHistoryItem, ScanHistoryItem } from '@sharedType/git'
 import type { AiConfig, ChatMessage, AiChatResponse } from '@sharedType/ai'
 import type {
   DirectBroadcastPayload,
@@ -74,6 +74,15 @@ interface ExposedAPI {
   addHistory: (repoPath: string) => Promise<RepoHistoryItem[]>
   removeHistory: (repoPath: string) => Promise<RepoHistoryItem[]>
   clearHistory: () => Promise<RepoHistoryItem[]>
+
+  // Scan History API
+  getAllScanHistories: () => Promise<ScanHistoryItem[]>
+  getScanHistoryById: (id: string) => Promise<ScanHistoryItem | null>
+  addScanHistory: (scanHistory: Omit<ScanHistoryItem, 'id'>) => Promise<ScanHistoryItem>
+  updateScanHistory: (id: string, updates: Partial<ScanHistoryItem>) => Promise<ScanHistoryItem | null>
+  deleteScanHistory: (id: string) => Promise<boolean>
+  deleteAllScanHistories: () => Promise<boolean>
+  migrateScanHistoryFromLocalStorage: () => Promise<{ success: boolean; message: string }>
 
   // Export API
   exportCommits: (commits: GitCommit[], format: 'json' | 'csv') => Promise<string | null>
