@@ -2,7 +2,7 @@ import { defineStore } from 'pinia'
 import { ref, computed, onMounted } from 'vue'
 import { nanoid } from 'nanoid'
 import type { RepoHistoryItem, GitCommit, ScanHistoryItem } from '@sharedType/git'
-import { scanHistoryApi } from '@/api/scanHistory'
+import { scanHistoryApi } from '@api/git'
 
 export const useScanStore = defineStore('scan', () => {
   //扫描记录

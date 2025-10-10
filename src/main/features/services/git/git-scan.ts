@@ -4,7 +4,7 @@ import * as path from 'path'
 import { isValidGitRepo, findGitRepos } from '@services/git/git-utils'
 // import { generateChatResponse } from '../ai/ai-service'
 import { generateChatResponse } from '@services/ai/ai'
-import { ScanHistoryService } from '@services/scanHistory'
+import { ScanHistoryService } from './index'
 import type {
   GitCommit,
   GitScanOptions,

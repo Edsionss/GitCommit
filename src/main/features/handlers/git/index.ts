@@ -1,5 +1,5 @@
 import { ipcMain } from 'electron'
-import { scanHistoryService } from '@services/scanHistory'
+import { scanHistoryService } from '@services/git'
 import type { ScanHistoryItem } from '@sharedType/git'
 
 export function registerScanHistoryHandlers() {
@@ -14,14 +14,20 @@ export function registerScanHistoryHandlers() {
   })
 
   // 添加扫描记录
-  ipcMain.handle('scan-history:add', (_, scanHistory: Omit<ScanHistoryItem, 'id'>): ScanHistoryItem => {
-    return scanHistoryService.addScanHistory(scanHistory)
-  })
+  ipcMain.handle(
+    'scan-history:add',
+    (_, scanHistory: Omit<ScanHistoryItem, 'id'>): ScanHistoryItem => {
+      return scanHistoryService.addScanHistory(scanHistory)
+    }
+  )
 
   // 更新扫描记录
-  ipcMain.handle('scan-history:update', (_, id: string, updates: Partial<ScanHistoryItem>): boolean => {
-    return scanHistoryService.updateScanHistory(id, updates)
-  })
+  ipcMain.handle(
+    'scan-history:update',
+    (_, id: string, updates: Partial<ScanHistoryItem>): boolean => {
+      return scanHistoryService.updateScanHistory(id, updates)
+    }
+  )
 
   // 删除扫描记录
   ipcMain.handle('scan-history:delete', (_, id: string): boolean => {
@@ -31,10 +37,5 @@ export function registerScanHistoryHandlers() {
   // 删除所有扫描记录
   ipcMain.handle('scan-history:delete-all', (): boolean => {
     return scanHistoryService.deleteAllScanHistories()
-  })
-
-  // 从 localStorage 迁移数据到数据库
-  ipcMain.handle('scan-history:migrate-from-local-storage', (): boolean => {
-    return scanHistoryService.migrateFromLocalStorage()
   })
 }

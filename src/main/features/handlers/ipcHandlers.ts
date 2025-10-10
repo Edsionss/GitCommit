@@ -16,7 +16,7 @@ import { registerAutoWriteWorkRepoHandlers } from '@handlers/autoWriteWorkRepo'
 import { registerApplicationHandlers } from '@handlers/application'
 import { registerAuditLogHandlers } from '@handlers/auditLog'
 import { registerChatHandlers } from '@handlers/chat/chat'
-import { registerScanHistoryHandlers } from './scanHistory'
+import { registerScanHistoryHandlers } from './git/index'
 export function registerIpcHandlers() {
   // Register handlers from other modules
   registerGitInfoHandlers()
