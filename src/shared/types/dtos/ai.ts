@@ -11,6 +11,7 @@ export interface AiConfig {
 export interface ChatMessage {
   sender: 'user' | 'ai'
   text: string
+  isLoading?: boolean
 }
 
 export interface GenerateCommitMessageParams {
@@ -59,4 +60,11 @@ export interface AiChatResponse {
   success: boolean
   message?: string
   error?: string
+}
+
+export interface ChatSession {
+  id: string
+  name: string
+  startTime: string
+  messages: ChatMessage[]
 }

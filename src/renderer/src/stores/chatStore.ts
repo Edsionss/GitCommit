@@ -2,19 +2,7 @@ import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import { nanoid } from 'nanoid'
 import { chatApi, type ChatSession as ApiChatSession, type ChatMessage as ApiChatMessage } from '@/api/chat'
-
-export interface Message {
-  sender: 'user' | 'ai'
-  text: string
-  isLoading?: boolean
-}
-
-export interface ChatSession {
-  id: string
-  name: string
-  startTime: string
-  messages: Message[]
-}
+import type { ChatMessage, ChatSession } from '@/shared/types/dtos/ai'
 
 export const useChatStore = defineStore('chat', () => {
   // State
@@ -77,7 +65,7 @@ export const useChatStore = defineStore('chat', () => {
           const apiMessages = await chatApi.getMessagesBySessionId(apiSession.id)
           
           // 转换API消息格式为本地格式
-          const messages: Message[] = apiMessages.map(msg => ({
+          const messages: ChatMessage[] = apiMessages.map(msg => ({
             sender: msg.sender,
             text: msg.text,
             isLoading: msg.isLoading
@@ -152,7 +140,7 @@ export const useChatStore = defineStore('chat', () => {
     }
   }
 
-  async function addMessageToActiveSession(message: Omit<Message, 'isLoading'>, isSave: boolean) {
+  async function addMessageToActiveSession(message: Omit<ChatMessage, 'isLoading'>, isSave: boolean) {
     if (!activeSession.value) return
 
     // If this is the first user message, update the session name
