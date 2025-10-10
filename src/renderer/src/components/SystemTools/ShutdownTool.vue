@@ -75,7 +75,7 @@
 import { ref, computed } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useSystemToolsStore } from '@/stores/systemToolsStore'
-import { systemToolsApi } from '@/api/systemToolsApi'
+import { systemToolsApi } from '@api/systemToolsApi'
 import { message } from 'ant-design-vue'
 import type { Dayjs } from 'dayjs'
 import dayjs from 'dayjs'

@@ -5,7 +5,7 @@ import {
   chatApi,
   type ChatSession as ApiChatSession,
   type ChatMessage as ApiChatMessage
-} from '@/api/chat'
+} from '@api/chat'
 import type { ChatMessage, ChatSession } from '@sharedType/ai'
 
 export const useChatStore = defineStore('chat', () => {

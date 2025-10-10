@@ -122,7 +122,7 @@
 import { reactive, computed, onMounted } from 'vue'
 import { ArrowUpOutlined, ArrowDownOutlined } from '@ant-design/icons-vue'
 import { getCardBackgroundByChange } from '@/utils'
-import { stockApi } from '@/api/stock'
+import { stockApi } from '@api/stock'
 import { message } from 'ant-design-vue'
 import type { StockSectorCamelCase } from '@shared/types/dtos/stock'
 

@@ -93,7 +93,7 @@
 import { ref, onMounted, computed } from 'vue'
 import { message, Modal } from 'ant-design-vue'
 import { DeleteOutlined, ReloadOutlined, ClearOutlined } from '@ant-design/icons-vue'
-import { getAuditLogsApi, deleteAuditLogsApi, clearAuditLogsApi } from '@/api/auditLog'
+import { getAuditLogsApi, deleteAuditLogsApi, clearAuditLogsApi } from '@api/auditLog'
 import { AuditLog } from '@sharedType/auditLog'
 import { copyNormalize } from '@utils/index'
 

@@ -54,7 +54,7 @@ import {
   DatabaseOutlined
 } from '@ant-design/icons-vue'
 import { useRoutesStore } from '@/stores/routesStore'
-import { applicationApi } from '@/api/application'
+import { applicationApi } from '@api/application'
 
 const routesStore = useRoutesStore()
 

@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import { MergeArray } from '@/utils'
-import { storeApi } from '@/api/store'
+import { storeApi } from '@api/store'
 import type { RouteRecord } from '@sharedType/MenuManagement'
 
 export const mockFlatRoutes: RouteRecord[] = [

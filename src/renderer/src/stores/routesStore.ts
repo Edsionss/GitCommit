@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import { MergeArray, buildTree } from '@/utils'
-import { routesMenuApi } from '@/api/routesMenu'
+import { routesMenuApi } from '@api/routesMenu'
 import {
   mockFlatRoutes,
   type RouteRecord,

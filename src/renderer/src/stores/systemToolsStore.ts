@@ -1,7 +1,6 @@
-
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
-import { systemToolsApi } from '@/api/systemToolsApi'
+import { systemToolsApi } from '@api/systemToolsApi'
 import { message } from 'ant-design-vue'
 
 export const useSystemToolsStore = defineStore('systemTools', () => {

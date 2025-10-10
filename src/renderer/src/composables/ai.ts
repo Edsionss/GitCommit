@@ -3,7 +3,7 @@ import { useSettingsStore } from '@/stores/settingsStore'
 import { storeToRefs } from 'pinia'
 import { message as antMessage } from 'ant-design-vue'
 import type { AiConfig, ChatMessage } from '@sharedType/ai'
-import { aiApi } from '@/api/ai'
+import { aiApi } from '@api/ai'
 
 interface SendAiMessageParams {
   prompt: string

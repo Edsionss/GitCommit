@@ -10,7 +10,7 @@ import type {
 } from '@type/setting'
 import _ from 'lodash' // 引入 lodash 用于深层合并
 import { storeApi } from '@api/store'
-import { settingsApi } from '@/api/settingsApi'
+import { settingsApi } from '@api/settingsApi'
 import { message } from 'ant-design-vue'
 import { copyNormalize } from '@utils/index'
 

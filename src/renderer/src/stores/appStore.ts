@@ -1,11 +1,11 @@
 import { defineStore } from 'pinia'
-import { onAppMetricsUpdate } from '@/api/windowApi'
+import { onAppMetricsUpdate } from '@api/windowApi'
 
 export const useAppStore = defineStore('app', {
   state: () => ({
     cpuUsage: 0,
     memoryUsage: 0,
-    isListenerInitialized: false,
+    isListenerInitialized: false
     // 可以在这里添加更多应用级别的状态
   }),
 
@@ -22,6 +22,6 @@ export const useAppStore = defineStore('app', {
         this.setAppMetrics(metrics)
       })
       this.isListenerInitialized = true
-    },
-  },
+    }
+  }
 })
