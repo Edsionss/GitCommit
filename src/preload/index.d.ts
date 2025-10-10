@@ -11,6 +11,24 @@ import type { StockNews, StockNewsQueryOptions } from '@sharedType/stockNews'
 import type { StockHotRank, CreateStockHotRankDto } from '@sharedType/stockHotRank'
 import type { StockSectorCamelCase } from '@sharedType/stock'
 
+// 聊天会话和消息的接口定义
+interface ChatSession {
+  id: string
+  name: string
+  startTime: string
+  createdAt: string
+  updatedAt: string
+}
+
+interface ChatMessageDB {
+  id?: number
+  sessionId: string
+  sender: 'user' | 'ai'
+  text: string
+  isLoading?: boolean
+  createdAt: string
+}
+
 // Define interfaces for the data structures used in the API
 interface GitScanOptions {
   authorFilter?: string
@@ -131,6 +149,19 @@ interface ExposedAPI {
 
   // Application API
   resetDatabase: () => Promise<{ success: boolean; error?: string }>
+
+  // Chat API
+  getAllChatSessions: () => Promise<ChatSession[]>
+  getChatSessionById: (id: string) => Promise<ChatSession | null>
+  createChatSession: (session: Omit<ChatSession, 'createdAt' | 'updatedAt'>) => Promise<ChatSession>
+  updateChatSession: (id: string, updates: Partial<ChatSession>) => Promise<void>
+  deleteChatSession: (id: string) => Promise<void>
+  updateSessionName: (sessionId: string, name: string) => Promise<void>
+  getMessagesBySessionId: (sessionId: string) => Promise<ChatMessageDB[]>
+  addMessageToSession: (message: Omit<ChatMessageDB, 'id' | 'createdAt'>) => Promise<ChatMessageDB>
+  updateMessage: (id: number, updates: Partial<ChatMessageDB>) => Promise<void>
+  deleteMessage: (id: number) => Promise<void>
+  deleteMessagesBySessionId: (sessionId: string) => Promise<void>
 }
 
 // AuditLog a new interface

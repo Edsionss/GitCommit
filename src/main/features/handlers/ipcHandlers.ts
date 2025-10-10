@@ -15,6 +15,7 @@ import { registerSystemToolsHandlers } from '@handlers/system_tools'
 import { registerAutoWriteWorkRepoHandlers } from '@handlers/autoWriteWorkRepo'
 import { registerApplicationHandlers } from '@handlers/application'
 import { registerAuditLogHandlers } from '@handlers/auditLog'
+import { registerChatHandlers } from '@handlers/chat/chat'
 export function registerIpcHandlers() {
   // Register handlers from other modules
   registerGitInfoHandlers()
@@ -34,5 +35,6 @@ export function registerIpcHandlers() {
   registerAutoWriteWorkRepoHandlers()
   registerApplicationHandlers()
   registerAuditLogHandlers()
+  registerChatHandlers()
   // 注册 IPC 处理器
 }

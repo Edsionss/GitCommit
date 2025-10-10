@@ -30,7 +30,7 @@ const chatStore = useChatStore()
 const isSidebarVisible = ref(true)
 
 const saveCurrentSession = () => {
-  chatStore._saveToLocalStorage()
+  chatStore._saveToDatabase()
   antMessage.success('会话保存成功！')
 }
 

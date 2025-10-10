@@ -196,7 +196,20 @@ const api = {
 
   // Application API
   resetDatabase: (): Promise<{ success: boolean; error?: string }> =>
-    ipcRenderer.invoke('application:reset-database')
+    ipcRenderer.invoke('application:reset-database'),
+
+  // Chat API
+  getAllChatSessions: () => ipcRenderer.invoke('chat:getAllSessions'),
+  getChatSessionById: (id: string) => ipcRenderer.invoke('chat:getSessionById', id),
+  createChatSession: (session) => ipcRenderer.invoke('chat:createSession', session),
+  updateChatSession: (id: string, updates) => ipcRenderer.invoke('chat:updateSession', id, updates),
+  deleteChatSession: (id: string) => ipcRenderer.invoke('chat:deleteSession', id),
+  updateSessionName: (sessionId: string, name: string) => ipcRenderer.invoke('chat:updateSessionName', sessionId, name),
+  getMessagesBySessionId: (sessionId: string) => ipcRenderer.invoke('chat:getMessagesBySessionId', sessionId),
+  addMessageToSession: (message) => ipcRenderer.invoke('chat:addMessageToSession', message),
+  updateMessage: (id: number, updates) => ipcRenderer.invoke('chat:updateMessage', id, updates),
+  deleteMessage: (id: number) => ipcRenderer.invoke('chat:deleteMessage', id),
+  deleteMessagesBySessionId: (sessionId: string) => ipcRenderer.invoke('chat:deleteMessagesBySessionId', sessionId)
 }
 
 // 暴露API
