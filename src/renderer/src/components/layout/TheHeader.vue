@@ -152,7 +152,6 @@ const close = () => {
   display: flex;
   align-items: center;
   gap: 12px;
-  -webkit-app-region: no-drag;
 }
 
 .app-title {
@@ -193,6 +192,8 @@ const close = () => {
     align-items: center;
     padding: 12px;
     border-radius: 50%;
+    -webkit-app-region: no-drag;
+    pointer-events: auto;
   }
   .menu-box:hover {
     background-color: var(--bg-hover);

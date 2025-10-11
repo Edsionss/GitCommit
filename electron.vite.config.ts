@@ -54,6 +54,10 @@ export default defineConfig({
       __APP_PRODUCT_NAME__: JSON.stringify(packageJson.project),
       __APP_DESC__: JSON.stringify(packageJson.description)
     },
+    server: {
+      port: 7582, // 使用端口3000而不是默认的5173
+      strictPort: true // 如果端口被占用，不要尝试其他端口
+    },
     resolve: {
       alias: {
         '@renderer': resolve('src/renderer/src'),
