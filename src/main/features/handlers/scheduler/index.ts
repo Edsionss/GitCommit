@@ -21,7 +21,7 @@ export function registerSchedulerHandlers() {
     }
   })
 
-  ipcMain.handle('scheduler:update-task', async (_, id: number, dto: UpdateScheduledTaskDto) => {
+  ipcMain.handle('scheduler:update-task', async (_, id: string, dto: UpdateScheduledTaskDto) => {
     try {
       return await schedulerService.updateTask(id, dto)
     } catch (error) {
@@ -30,7 +30,7 @@ export function registerSchedulerHandlers() {
     }
   })
 
-  ipcMain.handle('scheduler:delete-task', async (_, id: number) => {
+  ipcMain.handle('scheduler:delete-task', async (_, id: string) => {
     try {
       await schedulerService.deleteTask(id)
       return { success: true }
@@ -40,7 +40,7 @@ export function registerSchedulerHandlers() {
     }
   })
 
-  ipcMain.handle('scheduler:toggle-task', async (_, id: number, is_enabled: 0 | 1) => {
+  ipcMain.handle('scheduler:toggle-task', async (_, id: string, is_enabled: 0 | 1) => {
     try {
       return await schedulerService.toggleTask(id, is_enabled)
     } catch (error) {
