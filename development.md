@@ -1,5 +1,9 @@
 ## **标准化功能开发工作流 (Standardized Feature Development Workflow)**
 
+### AI辅助开发规则
+
+- **最高指令严格遵循本文档，严格遵循用户指令**
+
 ### 1. 核心原则与约束 (Core Principles & Constraints)
 
 所有开发活动必须严格遵守以下核心原则，以确保项目代码的质量、一致性和可维护性。
