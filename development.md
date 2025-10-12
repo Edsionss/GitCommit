@@ -11,6 +11,7 @@
   - 项目唯一的包管理器是 `pnpm`。
   - 在引入新的NPM包之前，必须进行尽职调查：确认其是否处于活跃维护状态、与项目技术栈（Vue 3, Electron等）兼容，并评估其必要性。
 - **文档先行**: 在编写任何代码之前，必须先完成开发设计文档和进度文档的创建。
+- **文档先行**: 所有的示例都是让你理解规则，和实际项目没有任何关系，请不要采用，只作为参考。
 
 ### 2. 开发前置任务：文档编制 (Pre-Development: Documentation)
 
@@ -41,7 +42,7 @@
   - 基于需求，使用 **Ant Design Vue** 组件库设计UI界面，并确保所有样式均使用 `App.vue` 中定义的全局CSS变量，以支持主题统一管理。
 
 - **步骤 1.2: 数据库模式设计与实现 (Schema)**:
-  1.  **设计表结构**: 设计数据表，并为需要追踪变更的表设计对应的审计日志触发器（`audit_logs` 表结构参考 `src/main/features/database/schema/audit_logs.ts`）。
+  1.  **设计表结构**: 设计数据表，并为需要追踪变更的表设计对应的审计日志触发器（`audit_logs` 表结构参考 `src/main/features/database/schema/audit_logs.ts`）；audit_logs表已经存在，无需重复设计。
   2.  **索引视图等**: 按需求适当的设计索引、视图等数据库对象，以优化查询性能和数据检索效率。
   3.  **编写建表语句**: 在 `/src/main/features/database/schema/` 目录下，创建一个以表名命名的 `.ts` 文件（例如 `scheduled_tasks.ts`），并默认导出一个包含SQL `CREATE` 语句的字符串。
   4.  **注册Schema**: 打开 `/src/main/features/database/schema.ts` 文件，导入刚刚创建的schema文件，并将其添加到导出的 `schema` 数组中，以确保应用初始化时能自动建表。
