@@ -83,7 +83,7 @@ class SchedulerService {
   }
 
   async updateTask(id: string, dto: UpdateScheduledTaskDto): Promise<ScheduledTask | null> {
-    dbHelper.update(this.tableName, dto, { id })
+    dbHelper.update<ScheduledTask>(this.tableName, dto, { id })
 
     const updatedTask = await dbHelper.findOne<ScheduledTask>(this.tableName, { id })
     if (updatedTask) {
