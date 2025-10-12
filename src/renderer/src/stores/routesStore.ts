@@ -15,6 +15,10 @@ export const useRoutesStore = defineStore('routes', () => {
   async function initRoutes() {
     try {
       const backendRoutes = await routesMenuApi.getAll()
+      // 如果 store 是空的，可以填充 mock 数据
+      if (backendRoutes.length === 0) {
+        await restRoutes()
+      }
       routes.value = buildTree(backendRoutes)
     } catch (error) {
       console.error('Failed to initialize routes:', error)

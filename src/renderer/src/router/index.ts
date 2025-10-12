@@ -49,9 +49,9 @@ async function addDynamicRoutes(routerInstance: Router) {
   await routesStore.initRoutes()
 
   // 如果 store 是空的，可以填充 mock 数据 (这个逻辑最好放在 store 内部)
-  if (!routesStore.routes.length) {
-    await routesStore.restRoutes()
-  }
+  // if (!routesStore.routes.length) {
+  //   await routesStore.restRoutes()
+  // }
 
   const mainLayoutRoute: RouteRecordRaw = {
     path: '/',
