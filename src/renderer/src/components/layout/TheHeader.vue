@@ -152,6 +152,7 @@ const close = () => {
   display: flex;
   align-items: center;
   gap: 12px;
+  -webkit-app-region: no-drag;
 }
 
 .app-title {
