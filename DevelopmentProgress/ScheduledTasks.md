@@ -17,24 +17,24 @@
 
 ## Phase 2: 后端实现
 
-- [ ] 2.1 类型定义
-  - [ ] 创建 ScheduledTasks.ts 类型定义文件
-  - [ ] 定义 ScheduledTaskDto 接口
-  - [ ] 定义 TaskExecutionLogDto 接口
-  - [ ] 定义其他相关类型
+- [x] 2.1 类型定义
+  - [x] 创建 ScheduledTasks.ts 类型定义文件
+  - [x] 定义 ScheduledTaskDto 接口
+  - [x] 定义 TaskExecutionLogDto 接口
+  - [x] 定义其他相关类型
 
-- [ ] 2.2 服务层开发
-  - [ ] 创建 ScheduledTasks 服务目录
-  - [ ] 实现任务管理核心业务逻辑
-  - [ ] 实现任务调度器
-  - [ ] 实现任务执行器
-  - [ ] 添加必要的错误处理和日志记录
+- [x] 2.2 服务层开发
+  - [x] 创建 ScheduledTasks 服务目录
+  - [x] 实现任务管理核心业务逻辑
+  - [x] 实现任务调度器
+  - [x] 实现任务执行器
+  - [x] 添加必要的错误处理和日志记录
 
-- [ ] 2.3 处理器层开发
-  - [ ] 创建 ScheduledTasks 处理器目录
-  - [ ] 实现任务管理相关IPC处理器
-  - [ ] 实现任务执行相关IPC处理器
-  - [ ] 实现系统相关IPC处理器
+- [x] 2.3 处理器层开发
+  - [x] 创建 ScheduledTasks 处理器目录
+  - [x] 实现任务管理相关IPC处理器
+  - [x] 实现任务执行相关IPC处理器
+  - [x] 实现系统相关IPC处理器
 
 ## Phase 3: 前后端集成
 
