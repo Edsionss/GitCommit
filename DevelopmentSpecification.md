@@ -1,10 +1,10 @@
 ## 📚 功能开发流程
 
 0. **开发前情提要**: 所有导入路径都必须使用项目中已有的别名，具体别名请查看`tsconfig.node.json`文件和`tsconfig.web.json`文件；包管理器使用pnpm;开发新功能 ；禁止任何已经完成的旧功能；禁止修改与本次开发无关的任何文件。
-1. **定义需求**: 确定要开发的功能，并确定功能所需的 API、数据来源和 UI 设计 确定功能所需的npm包。
+1. **定义需求**: 确定要开发的功能，并确定功能所需的 API、数据来源和 UI 设计 确定功能所需的npm包;npm包要确定这个包是否已经在项目中安装了。如果没有安装则需要先确定这个包是否被弃用；始终保证安装的npm包是正确可用的并且和该项目的框架所契合的 例如项目使用vue3 而包只支持vue2 那么就必须寻找别的替代方案。
 2. **设计 UI**: 根据需求，设计用户界面，并确定组件的布局和交互方式。
 3. **实现UI**: 开发前端UI代码，并确保与 UI 设计一致，使用 Ant Design Vue UI库构建；UI所有的样式使用App.vue中的变量进行开发 用于全局主题样式的管理；所有功能页面的文件都必须放在`src/renderer/src/views/`文件夹下,以功能名称大驼峰命名，例如：`TaskFormDialog.vue` 功能所需的组件都必须放在`src/renderer/src/components/`文件夹下,新建一个以组件名称大驼峰命名的文件夹，例如：`TaskFormDialog` 组件文件放入此次新建的目录中。例如`src/renderer/src/components/TaskFormDialog/`
-4. **设计和开发数据库**: 根据需求，设计数据库和编写建表语句，开发数据库流程为：1.确定数据库设计 除了数据的表、索引、视图create语句外 添加日志触发器 日志表为audit_logs 日志表结构可查看/src/main/features/database/schema/audit_logs.ts 文件 2.在/src/main/features/database/schema/文件夹下新建一个一功能命名的ts文件并且默认导出字符串，字符串内容是建表语句 3.在/src/main/features/database/schema.ts文件中导入该文件，并且将导入的变量添加到schema 变量中，这样就可以在数据库初始化时自动创建表。 4.在开发与数据库交互的service层时，使用DatabaseHelper.ts封装好的方法进行数据库操作，在service层的文件中使用 import { dbHelper } from '@features/database' 导入dbHelper即可进行数据库操作。
+4. **设计和开发数据库**: 根据需求，设计数据库和编写建表语句，开发数据库流程为：1.确定数据库设计 除了数据的表、索引、视图create语句外 添加日志触发器 日志表为audit_logs 日志表结构可查看/src/main/features/database/schema/audit_logs.ts 文件 2.在/src/main/features/database/schema/文件夹下新建一个一功能命名的ts文件并且默认导出字符串，命名规则为单词直接用下划线分隔 例如 audit_logs ，字符串内容是建表语句 3.在/src/main/features/database/schema.ts文件中导入该文件，并且将导入的变量添加到schema 变量中，这样就可以在数据库初始化时自动创建表。 4.在开发与数据库交互的service层时，使用DatabaseHelper.ts封装好的方法进行数据库操作，在service层的文件中使用 import { dbHelper } from '@features/database' 导入dbHelper即可进行数据库操作。
 5. **编写类型文件**: 为数据库操作和 API 请求定义 TypeScript 类型，确保类型安全和代码提示 存放的位置为`src/shared/types/dtos/` 文件夹下 每个功能对应一个ts文件，文件名就是功能的名称 使用类型文件时 使用别名：@sharedType/文件名 进行导入 前后端都可以使用这个别名 `。
 6. **设计后台功能逻辑**: 根据需求，设计后台功能逻辑，并确定与前端UI的交互方式。
 7. **开发功能的service层 在/src/main/features/services文件夹下**: 开发后台功能逻辑，并确保与前端UI的交互方式一致。开发规范：在services文件夹下新建一个以功能命名的文件夹，然后在该文件夹下创建index.ts文件进行开发，而不是直接在services文件夹下新建文件。
