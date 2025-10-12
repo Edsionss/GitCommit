@@ -13,7 +13,8 @@
 10. **完成`src/main/preload` 文件夹下的方法注册以及类型填写**: 绑定ipc方法到Window并填写类型。
 11. **封装前端API 文件路径为：`src/renderer/src/api`**: 封装前端可直接调用的api接口。
 12. **前端UI页面调用封装好的API接口**: 完成前后端的完整交互逻辑。
-13. **测试**: 确保功能在开发过程中没有错误，并确保功能在打包后的应用程序中正确运行。
+13. **添加前端页面路由** 在`src/shared/types/dtos/MenuManagement.ts`文件中的mockFlatRoutes 中添加路由信息；componentPath 为前端页面的路径，例如真实路径为：`src/renderer/src/views/TaskFormDialog.vue` 则填写`TaskFormDialog` 即可。
+14. **测试**: 确保功能在开发过程中没有错误，并确保功能在打包后的应用程序中正确运行。
 
 ## AI辅助编程规则
 
@@ -34,5 +35,8 @@
    6. 在xxx目录下开发api文件。
    7. 在xxx目录下开发前端页面文件。
    8. 等等xxxxxxxxxx
-
 5. 开发文档必须严格遵守当前项目的目录结构和命名规范；
+6. 开发文档保存到根目录下的 `DevelopmentDocument` 文件夹中；以对应的功能进行命名 ；例如：`TaskFormDialog.md`
+7. 开发进度文档保存到根目录下的 `DevelopmentProgress` 文件夹中；以对应的功能进行命名； 例如：`TaskFormDialog.md`
+8. 开发进度文档必须实时更新，与开发进度保持一致；
+9. 功能开发完成后，不需要启动项目，也不需要你进行测试；提示用户功能完成即可
