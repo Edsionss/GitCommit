@@ -6,6 +6,8 @@ import stock_news from './schema/stock/stock_news'
 import stock_funds from './schema/stock/stock_funds'
 import stock_hot_rank from './schema/stock/stock_hot_rank'
 import chat_sessions from './schema/chat_sessions'
+import scheduled_tasks from './schema/scheduled_tasks'
+import task_execution_logs from './schema/task_execution_logs'
 
 export const schema = mergeSchema([
   audit_logs,
@@ -15,7 +17,9 @@ export const schema = mergeSchema([
   stock_news,
   stock_funds,
   stock_hot_rank,
-  chat_sessions
+  chat_sessions,
+  scheduled_tasks,
+  task_execution_logs
 ])
 function mergeSchema(schemaArray) {
   let resultSchema = ``
