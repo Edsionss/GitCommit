@@ -3,6 +3,7 @@ import { dbHelper } from '@features/database'
 import * as cron from 'node-cron'
 import type { ScheduledTask, CreateScheduledTaskDto, UpdateScheduledTaskDto } from '@shared/types/dtos/Scheduler'
 import { BrowserWindow } from 'electron'
+import { getBuiltInTaskById } from './builtInTasks'
 
 import { nanoid } from 'nanoid'
 
@@ -23,7 +24,7 @@ class SchedulerService {
     console.log(`Initialized ${this.jobs.size} scheduled tasks.`)
   }
 
-  private executeAction(task: ScheduledTask) {
+  private async executeAction(task: ScheduledTask) {
     console.log(`Executing action for task: ${task.name} (ID: ${task.id})`)
     switch (task.actionType) {
       case 'notification':
@@ -38,6 +39,21 @@ class SchedulerService {
         break
       case 'run_script':
         console.log(`Running script for task ${task.name}. Payload: ${task.actionPayload}`)
+        // Placeholder for script execution logic
+        break
+      case 'built_in':
+        console.log(`Executing built-in task: ${task.actionPayload}`)
+        const builtInTask = getBuiltInTaskById(task.actionPayload || '')
+        if (builtInTask) {
+          try {
+            await builtInTask.execute()
+            console.log(`Built-in task "${builtInTask.name}" executed successfully.`)
+          } catch (error) {
+            console.error(`Error executing built-in task "${builtInTask.name}":`, error)
+          }
+        } else {
+          console.error(`Built-in task with ID "${task.actionPayload}" not found.`)
+        }
         break
       default:
         console.warn(`Unknown action type: ${task.actionType}`)

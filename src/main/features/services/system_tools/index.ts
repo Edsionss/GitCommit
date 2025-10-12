@@ -75,6 +75,24 @@ export class SystemToolsService {
   }
 
   /**
+   * 立即关机
+   */
+  public shutdownImmediately(): Promise<string> {
+    return new Promise((resolve, reject) => {
+      if (process.platform !== 'win32') {
+        return reject(new Error('此功能仅支持 Windows 系统。'))
+      }
+      const command = 'shutdown -s -t 0'
+      exec(command, (error, stdout, stderr) => {
+        if (error) {
+          return reject(new Error(stderr || error.message))
+        }
+        resolve(stdout || '系统将立即关机。')
+      })
+    })
+  }
+
+  /**
    * 获取一个环境变量的值。
    * @param key 环境变量的名称
    */

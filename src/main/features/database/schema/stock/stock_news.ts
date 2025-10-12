@@ -18,7 +18,7 @@ CREATE TRIGGER IF NOT EXISTS log_stock_news_insert
 AFTER INSERT ON stock_news
 FOR EACH ROW
 BEGIN
-    INSERT INTO audit_logs (action_type, table_name, record_id, user_id, old_data, new_data)
+    INSERT INTO audit_logs (action_type, table_name, record_id, user_id, old_date, new_date)
     VALUES (
         'INSERT',
         'stock_news',
@@ -44,7 +44,7 @@ CREATE TRIGGER IF NOT EXISTS log_stock_news_update
 AFTER UPDATE ON stock_news
 FOR EACH ROW
 BEGIN
-    INSERT INTO audit_logs (action_type, table_name, record_id, user_id, old_data, new_data)
+    INSERT INTO audit_logs (action_type, table_name, record_id, user_id, old_date, new_date)
     VALUES (
         'UPDATE',
         'stock_news',
@@ -80,7 +80,7 @@ CREATE TRIGGER IF NOT EXISTS log_stock_news_delete
 AFTER DELETE ON stock_news
 FOR EACH ROW
 BEGIN
-    INSERT INTO audit_logs (action_type, table_name, record_id, user_id, old_data, new_data)
+    INSERT INTO audit_logs (action_type, table_name, record_id, user_id, old_date, new_date)
     VALUES (
         'DELETE',
         'stock_news',

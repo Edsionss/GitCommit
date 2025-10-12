@@ -178,6 +178,7 @@ const api = {
               ipcRenderer.invoke('scheduler:delete-task', id),
             toggleScheduledTask: (id: string, is_enabled: 0 | 1): Promise<ScheduledTask | null> =>
               ipcRenderer.invoke('scheduler:toggle-task', id, is_enabled),
+  getBuiltInTasks: () => ipcRenderer.invoke('scheduler:get-built-in-tasks'),
   // Window Management API
   minimizeWindow: () => ipcRenderer.send('window:minimize'),
   maximizeWindow: () => ipcRenderer.send('window:maximize'),

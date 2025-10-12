@@ -3,7 +3,7 @@ export interface ScheduledTask {
   id: string
   name: string
   cronExpression: string
-  actionType: 'notification' | 'run_script' // Example action types
+  actionType: 'notification' | 'run_script' | 'built_in' // Example action types
   actionPayload?: string // JSON string
   isEnabled: 0 | 1
   createdAt?: string

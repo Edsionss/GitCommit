@@ -30,9 +30,26 @@
       >
         <a-select v-model:value="formState.actionType">
           <a-select-option value="notification">发送通知</a-select-option>
-          <a-select-option value="run_script" disabled>执行脚本 (暂未支持)</a-select-option>
+          <a-select-option value="built_in">内置任务</a-select-option>
+          <a-select-option value="run_script">执行脚本</a-select-option>
         </a-select>
       </a-form-item>
+
+      <!-- 内置任务选择 -->
+      <a-form-item
+        v-if="formState.actionType === 'built_in'"
+        label="选择任务"
+        :rules="[{ required: true, message: '请选择一个内置任务' }]"
+        name="actionPayload"
+      >
+        <a-select v-model:value="formState.actionPayload" placeholder="请选择内置任务">
+          <a-select-option v-for="task in builtInTasks" :key="task.id" :value="task.id">
+            {{ task.name }}
+          </a-select-option>
+        </a-select>
+      </a-form-item>
+
+      <!-- 通知内容 -->
       <a-form-item
         v-if="formState.actionType === 'notification'"
         label="通知内容"
@@ -40,6 +57,17 @@
       >
         <a-textarea v-model:value="formState.actionPayload" />
       </a-form-item>
+
+      <!-- 脚本路径 -->
+      <a-form-item
+        v-if="formState.actionType === 'run_script'"
+        label="脚本路径"
+        name="actionPayload"
+        :rules="[{ required: true, message: '请输入脚本路径' }]"
+      >
+        <a-input v-model:value="formState.actionPayload" placeholder="请输入可执行脚本的绝对路径" />
+      </a-form-item>
+
       <a-form-item label="是否启用">
         <a-switch v-model:checked="formState.isEnabled" />
       </a-form-item>
@@ -55,6 +83,8 @@ import type {
   CreateScheduledTaskDto,
   UpdateScheduledTaskDto
 } from '@shared/types/dtos/Scheduler'
+import { schedulerApi } from '@/api/scheduler'
+import { message } from 'ant-design-vue'
 
 const props = defineProps({
   open: {
@@ -74,10 +104,23 @@ const emit = defineEmits<{
 
 const isEditing = computed(() => !!props.task)
 
+// --- 新增: 内置任务列表 ---
+const builtInTasks = ref<{ id: string; name: string; description: string }[]>([])
+
+const fetchBuiltInTasks = async () => {
+  try {
+    builtInTasks.value = await schedulerApi.getBuiltInTasks()
+  } catch (error) {
+    message.error('加载内置任务列表失败')
+    console.error(error)
+  }
+}
+// --- 结束: 新增 ---
+
 interface TaskFormState {
   name: string
   cronExpression: string
-  actionType: 'notification' | 'run_script'
+  actionType: 'notification' | 'run_script' | 'built_in'
   actionPayload?: string
   isEnabled: boolean
 }
@@ -93,18 +136,34 @@ const createInitialFormState = (): TaskFormState => ({
 const formState = ref<TaskFormState>(createInitialFormState())
 
 watch(
-  () => props.task,
-  (newTask) => {
-    if (newTask) {
-      formState.value = {
-        name: newTask.name,
-        cronExpression: newTask.cronExpression,
-        actionType: newTask.actionType,
-        actionPayload: newTask.actionPayload || '',
-        isEnabled: newTask.isEnabled === 1
+  () => props.open,
+  (isOpen) => {
+    if (isOpen) {
+      fetchBuiltInTasks() // 打开模态框时加载内置任务
+      if (props.task) {
+        // 编辑模式
+        formState.value = {
+          name: props.task.name,
+          cronExpression: props.task.cronExpression,
+          actionType: props.task.actionType,
+          actionPayload: props.task.actionPayload || '',
+          isEnabled: props.task.isEnabled === 1
+        }
+      } else {
+        // 新建模式
+        formState.value = createInitialFormState()
       }
-    } else {
-      formState.value = createInitialFormState()
+    }
+  }
+)
+
+// 监视动作类型变化，清空载荷
+watch(
+  () => formState.value.actionType,
+  () => {
+    if (!isEditing.value) {
+      // 只有在新建模式下自动清空，编辑模式下不清空以便用户可以看到原始值
+      formState.value.actionPayload = ''
     }
   }
 )
