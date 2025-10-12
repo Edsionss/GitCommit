@@ -8,6 +8,7 @@ import stock_hot_rank from './schema/stock/stock_hot_rank'
 import chat_sessions from './schema/chat_sessions'
 import scheduled_tasks from './schema/scheduled_tasks'
 import scheduler_logs from './schema/scheduler_logs'
+import system_logs from './schema/system_logs'
 
 export const schema = mergeSchema([
   audit_logs,
@@ -19,7 +20,8 @@ export const schema = mergeSchema([
   stock_hot_rank,
   chat_sessions,
   scheduled_tasks,
-  scheduler_logs
+  scheduler_logs,
+  system_logs
 ])
 function mergeSchema(schemaArray) {
   let resultSchema = ``
