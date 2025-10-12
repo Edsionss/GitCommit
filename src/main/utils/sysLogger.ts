@@ -1,11 +1,11 @@
 import { AddSystemLogRequest } from '@sharedType/systemLog'
-
+import { systemLogService, type SystemLogService } from '@services/systemLog'
 /**
  * 系统日志工具类
  * 提供与 console 相同的方法接口，同时将日志存入数据库
  */
 class SysLogger {
-  private systemLogService: any = null
+  private systemLogService: SystemLogService = systemLogService
 
   constructor() {
     // 延迟加载服务，避免循环依赖
@@ -13,13 +13,12 @@ class SysLogger {
   }
 
   private initService() {
-    try {
-      // 动态导入服务，避免循环依赖
-      const { systemLogService } = require('@services/systemLog')
-      this.systemLogService = systemLogService
-    } catch (error) {
-      console.error('Failed to initialize systemLogService:', error)
-    }
+    // try {
+    //   // 动态导入服务，避免循环依赖
+    //   // this.systemLogService = systemLogService
+    // } catch (error) {
+    //   console.error('Failed to initialize systemLogService:', error)
+    // }
   }
 
   /**
@@ -29,7 +28,7 @@ class SysLogger {
   public log(...args: any[]): void {
     // 保留原有的控制台输出
     console.log(...args)
-    
+
     // 将日志存入数据库
     this.saveLogToDatabase('log', args)
   }
@@ -41,7 +40,7 @@ class SysLogger {
   public warn(...args: any[]): void {
     // 保留原有的控制台输出
     console.warn(...args)
-    
+
     // 将日志存入数据库
     this.saveLogToDatabase('warn', args)
   }
@@ -53,7 +52,7 @@ class SysLogger {
   public error(...args: any[]): void {
     // 保留原有的控制台输出
     console.error(...args)
-    
+
     // 将日志存入数据库
     this.saveLogToDatabase('error', args)
   }
@@ -65,7 +64,7 @@ class SysLogger {
   public info(...args: any[]): void {
     // 保留原有的控制台输出
     console.info(...args)
-    
+
     // 将日志存入数据库
     this.saveLogToDatabase('log', args)
   }
@@ -77,7 +76,7 @@ class SysLogger {
   public debug(...args: any[]): void {
     // 保留原有的控制台输出
     console.debug(...args)
-    
+
     // 将日志存入数据库
     this.saveLogToDatabase('log', args)
   }
@@ -100,16 +99,18 @@ class SysLogger {
       }
 
       // 将所有参数转换为字符串
-      const content = args.map(arg => {
-        if (typeof arg === 'object') {
-          try {
-            return JSON.stringify(arg)
-          } catch (e) {
-            return String(arg)
+      const content = args
+        .map((arg) => {
+          if (typeof arg === 'object') {
+            try {
+              return JSON.stringify(arg)
+            } catch (e) {
+              return String(arg)
+            }
           }
-        }
-        return String(arg)
-      }).join(' ')
+          return String(arg)
+        })
+        .join(' ')
 
       // 构建日志请求对象
       const logRequest: AddSystemLogRequest = {
@@ -118,7 +119,7 @@ class SysLogger {
       }
 
       // 异步保存日志，不阻塞主线程
-      this.systemLogService.addSystemLog(logRequest).catch(error => {
+      this.systemLogService.addSystemLog(logRequest).catch((error) => {
         console.error('Failed to save system log:', error)
       })
     } catch (error) {

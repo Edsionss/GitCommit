@@ -7,12 +7,12 @@ import {
   GetSystemLogsResponse
 } from '@sharedType/systemLog'
 
-import { sysLogger } from '@nodeUtils/sysLogger'
+// import { console } from '@nodeUtils/console'
 /**
  * 系统日志服务类
  * 负责处理与系统日志相关的业务逻辑
  */
-class SystemLogService {
+export class SystemLogService {
   private static readonly TABLE_NAME = 'system_logs'
 
   /**
@@ -38,7 +38,7 @@ class SystemLogService {
 
       return insertedRecord[0]
     } catch (error) {
-      sysLogger.error('Error adding system log:', error)
+      console.error('Error adding system log:', error)
       throw new Error(`添加系统日志失败: ${error instanceof Error ? error.message : String(error)}`)
     }
   }
@@ -67,7 +67,7 @@ class SystemLogService {
 
       return { records, total }
     } catch (error) {
-      sysLogger.error('Error fetching system logs:', error)
+      console.error('Error fetching system logs:', error)
       return { records: [], total: 0 }
     }
   }
@@ -91,7 +91,7 @@ class SystemLogService {
       const result = dbHelper.execute(sql, ids)
       return result
     } catch (error) {
-      sysLogger.error('Error deleting system logs:', error)
+      console.error('Error deleting system logs:', error)
       throw new Error(`删除系统日志失败: ${error instanceof Error ? error.message : String(error)}`)
     }
   }
@@ -105,7 +105,7 @@ class SystemLogService {
       const result = await dbHelper.clearTable(SystemLogService.TABLE_NAME)
       return result
     } catch (error) {
-      sysLogger.error('Error clearing system logs:', error)
+      console.error('Error clearing system logs:', error)
       return { changes: 0 }
     }
   }
