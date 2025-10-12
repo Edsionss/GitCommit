@@ -10,6 +10,11 @@ import { promises } from 'dns'
 import type { StockNews, StockNewsQueryOptions } from '@sharedType/stockNews'
 import type { StockHotRank, CreateStockHotRankDto } from '@sharedType/stockHotRank'
 import type { StockSectorCamelCase } from '@sharedType/stock'
+import type {
+  ScheduledTask,
+  CreateScheduledTaskDto,
+  UpdateScheduledTaskDto
+} from '@shared/types/dtos/Scheduler'
 
 // 聊天会话和消息的接口定义
 interface ChatSession {
@@ -129,6 +134,12 @@ interface ExposedAPI {
   // AutoWriteWorkRepo
   AutomaticallyFillWorkSheet: (data: any) => promises<string>
 
+  // Scheduler API
+  getScheduledTasks: () => Promise<ScheduledTask[]>
+  createScheduledTask: (dto: CreateScheduledTaskDto) => Promise<ScheduledTask>
+                updateScheduledTask: (id: string, dto: UpdateScheduledTaskDto) => Promise<ScheduledTask | null>
+                deleteScheduledTask: (id: string) => Promise<{ success: boolean }>
+                toggleScheduledTask: (id: string, is_enabled: 0 | 1) => Promise<ScheduledTask | null>
   // Window Management API
   minimizeWindow: () => Promise<void>
   maximizeWindow: () => Promise<void>

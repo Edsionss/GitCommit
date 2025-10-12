@@ -3,6 +3,11 @@ import { electronAPI } from '@electron-toolkit/preload'
 import type { AiConfig, ChatMessage } from '@sharedType/ai'
 import type { StockNews } from '@sharedType/stockNews'
 import type { StockHotRank } from '@sharedType/stockHotRank'
+import type {
+  ScheduledTask,
+  CreateScheduledTaskDto,
+  UpdateScheduledTaskDto
+} from '@shared/types/dtos/Scheduler'
 
 // Git扫描选项
 interface GitScanOptions {
@@ -162,6 +167,17 @@ const api = {
   // AutoWriteWorkRepo
   AutomaticallyFillWorkSheet: (data: any) => ipcRenderer.invoke('autoWrite-WorkRepo', data),
 
+  // Scheduler API
+  getScheduledTasks: (): Promise<ScheduledTask[]> =>
+    ipcRenderer.invoke('scheduler:get-tasks'),
+  createScheduledTask: (dto: CreateScheduledTaskDto): Promise<ScheduledTask> =>
+    ipcRenderer.invoke('scheduler:create-task', dto),
+            updateScheduledTask: (id: string, dto: UpdateScheduledTaskDto): Promise<ScheduledTask | null> =>
+              ipcRenderer.invoke('scheduler:update-task', id, dto),
+            deleteScheduledTask: (id: string): Promise<{ success: boolean }> =>
+              ipcRenderer.invoke('scheduler:delete-task', id),
+            toggleScheduledTask: (id: string, is_enabled: 0 | 1): Promise<ScheduledTask | null> =>
+              ipcRenderer.invoke('scheduler:toggle-task', id, is_enabled),
   // Window Management API
   minimizeWindow: () => ipcRenderer.send('window:minimize'),
   maximizeWindow: () => ipcRenderer.send('window:maximize'),

@@ -88,6 +88,7 @@ declare module 'vue' {
     SystemConfig: typeof import('./src/components/SettingsView/SystemConfig.vue')['default']
     SystemStartupManager: typeof import('./src/components/SystemTools/SystemStartupManager.vue')['default']
     Tabs: typeof import('./src/components/Common/Tabs.vue')['default']
+    TaskForm: typeof import('./src/components/Scheduler/TaskForm.vue')['default']
     Telegraph: typeof import('./src/components/Stock/MarketNewsflash/Telegraph.vue')['default']
     TheHeader: typeof import('./src/components/layout/TheHeader.vue')['default']
     TheSidebar: typeof import('./src/components/layout/TheSidebar/index.vue')['default']
