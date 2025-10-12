@@ -1,10 +1,9 @@
 import { ipcMain } from 'electron'
 import { stockNewsService } from '@services/stock/news'
-import { telegraphTest } from '@services/stock/scraping/news'
 export function initializeNewsHandlers() {
   ipcMain.handle('stock:scrape_news', async (_, dateStr?: string, timeStr?: string) => {
     try {
-      return await stockNewsService.insertMany(await telegraphTest(dateStr, timeStr))
+      return await stockNewsService.scrapeAndInsertNews(dateStr, timeStr)
     } catch (error) {
       console.error('Error scraping news:', error)
       return [] // Return empty array on error

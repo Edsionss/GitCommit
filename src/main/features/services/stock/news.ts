@@ -1,6 +1,7 @@
 // src/main/services/stock-news.service.ts
 import { dbHelper } from '@features/database'
 import { DatabaseHelper } from '@features/database/DatabaseHelper'
+import { telegraphTest } from '@services/stock/scraping/news'
 import type { StockNews, StockNewsQueryOptions } from '@sharedType/stockNews'
 import type { RunResult } from 'better-sqlite3'
 
@@ -122,6 +123,17 @@ export class StockNewsService {
    */
   public findByTradeDate(tradeDate: string): StockNews[] {
     return this.dbHelper.find<StockNews>(this.tableName, { tradeDate })
+  }
+
+  /**
+   * 抓取新闻并插入数据库
+   * @param dateStr - 日期字符串，可选
+   * @param timeStr - 时间字符串，可选
+   * @returns 插入结果
+   */
+  public async scrapeAndInsertNews(dateStr?: string, timeStr?: string): Promise<RunResult[]> {
+    const newsData = await telegraphTest(dateStr, timeStr)
+    return this.insertMany(newsData)
   }
 }
 export const stockNewsService = new StockNewsService()

@@ -1,5 +1,8 @@
 import { dbHelper } from '@features/database'
+import { scrapingThsIndustry } from '@services/stock/scraping/sectors'
+import { getLastTradingDay } from '@shared/utils'
 import type { StockSectorCamelCase } from '@sharedType/stock'
+import type { RunResult } from 'better-sqlite3'
 /**
  * StockSectorCamelCase 对象的创建类型。
  * 在创建时，所有字段都是必需的，因为 ID 是手动生成的。
@@ -54,6 +57,27 @@ export class StockSectorCamelCasesService {
   public clearAllSectors() {
     // 由于主键 `id` 不是自增的，重置自增序列的操作在这里没有意义。
     return dbHelper.clearTable(this.tableName, { resetAutoIncrement: false })
+  }
+
+  /**
+   * 抓取行业数据并插入数据库
+   * @returns 插入结果
+   */
+  public async scrapeAndInsertSectors(): Promise<RunResult[]> {
+    const sectorsData = await scrapingThsIndustry();
+    return this.insertMany(sectorsData);
+  }
+
+  /**
+   * 根据交易日期查询行业数据，如果没有提供交易日期则使用最近交易日
+   * @param tradeDate - 交易日期，可选
+   * @returns 符合条件的StockSectorCamelCase数组
+   */
+  public async findByTradeDateOrDefault(tradeDate?: string): Promise<StockSectorCamelCase[]> {
+    if (!tradeDate) {
+      tradeDate = await getLastTradingDay();
+    }
+    return this.findByTradeDate(tradeDate);
   }
 
   /**

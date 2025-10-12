@@ -1,5 +1,7 @@
 import { DatabaseHelper } from '@features/database/DatabaseHelper'
 import { dbHelper } from '@features/database'
+import { scrapingAllHotRank } from '@services/stock/scraping/hotRank'
+import { getLastTradingDay } from '@shared/utils'
 import type { StockHotRank, CreateStockHotRankDto } from '@sharedType/stockHotRank'
 import type { RunResult } from 'better-sqlite3'
 
@@ -119,6 +121,27 @@ export class StockHotRankService {
    */
   public update(id: string, data: Partial<CreateStockHotRankDto>): { changes: number } {
     return this.dbHelper.update(this.tableName, data, { id })
+  }
+
+  /**
+   * 抓取所有热榜数据并插入数据库
+   * @returns 插入结果
+   */
+  public async scrapeAndInsertAllHotRank(): Promise<RunResult[]> {
+    const hotRankData = await scrapingAllHotRank();
+    return this.insertMany(hotRankData);
+  }
+
+  /**
+   * 根据交易日期查询热榜数据，如果没有提供交易日期则使用最近交易日
+   * @param tradeDate - 交易日期，可选
+   * @returns 符合条件的StockHotRank数组
+   */
+  public async findByTradeDateOrDefault(tradeDate?: string): Promise<StockHotRank[]> {
+    if (!tradeDate) {
+      tradeDate = await getLastTradingDay();
+    }
+    return this.findByTradeDate(tradeDate);
   }
 }
 

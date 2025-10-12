@@ -1,12 +1,9 @@
 import { ipcMain } from 'electron'
 import { stockHotRankService } from '@features/services/stock/hotRank'
-import * as scrapHotRank from '@services/stock/scraping/hotRank'
-import { getLastTradingDay } from '@shared/utils'
-
 export function initializeHotRankHandlers() {
   ipcMain.handle('stock:scrape_all_hotRank', async (_) => {
     try {
-      return await stockHotRankService.insertMany(await scrapHotRank.scrapingAllHotRank())
+      return await stockHotRankService.scrapeAndInsertAllHotRank()
     } catch (error) {
       console.error('Error scraping hotRank:', error)
       return [] // Return empty array on error
@@ -14,10 +11,7 @@ export function initializeHotRankHandlers() {
   })
   ipcMain.handle('stock:get_all_hotRank', async (_, tradeDate?: string) => {
     try {
-      if (!tradeDate) {
-        tradeDate = await getLastTradingDay()
-      }
-      return await stockHotRankService.findByTradeDate(tradeDate)
+      return await stockHotRankService.findByTradeDateOrDefault(tradeDate)
     } catch (error) {
       console.error('Error get hotRank:', error)
       return [] // Return empty array on error

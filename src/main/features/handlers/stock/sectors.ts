@@ -1,12 +1,9 @@
 import { ipcMain } from 'electron'
-import { stockSectorService } from '@services/stock/sectors'
-import { scrapingThsIndustry } from '@services/stock/scraping/sectors'
-import { getLastTradingDay } from '@shared/utils'
-
+import { stockSectorService } from '@features/services/stock/sectors'
 export function initializeSectorHandlers() {
   ipcMain.handle('stock:scrape_sectors', async (_) => {
     try {
-      return await stockSectorService.insertMany(await scrapingThsIndustry())
+      return await stockSectorService.scrapeAndInsertSectors()
     } catch (error) {
       console.error('Error scraping sectors:', error)
       return [] // Return empty array on error
@@ -14,10 +11,7 @@ export function initializeSectorHandlers() {
   })
   ipcMain.handle('stock:get_sectors', async (_, tradeDate?: string) => {
     try {
-      if (!tradeDate) {
-        tradeDate = await getLastTradingDay()
-      }
-      return await stockSectorService.findByTradeDate(tradeDate)
+      return await stockSectorService.findByTradeDateOrDefault(tradeDate)
     } catch (error) {
       console.error('Error get sectors:', error)
       return [] // Return empty array on error
