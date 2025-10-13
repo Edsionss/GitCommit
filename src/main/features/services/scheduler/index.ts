@@ -6,8 +6,7 @@ import type {
   ScheduledTask,
   CreateScheduledTaskDto,
   UpdateScheduledTaskDto
-} from '@shared/types/dtos/Scheduler'
-import { BrowserWindow } from 'electron'
+} from '@sharedType/Scheduler'
 import { getBuiltInTaskById } from './builtInTasks'
 
 import { nanoid } from 'nanoid'
@@ -32,16 +31,6 @@ class SchedulerService {
   private async executeAction(task: ScheduledTask) {
     sysLogger.log(`Executing action for task: ${task.name} (ID: ${task.id})`)
     switch (task.actionType) {
-      case 'notification':
-        const mainWindow = BrowserWindow.getAllWindows()[0]
-        if (mainWindow) {
-          sysLogger.log(`Notification Payload: ${task.actionPayload}`)
-          mainWindow.webContents.send('show-notification', {
-            title: 'Scheduled Task',
-            body: task.actionPayload || `Task "${task.name}" has run.`
-          })
-        }
-        break
       case 'run_script':
         sysLogger.log(`Running script for task ${task.name}. Payload: ${task.actionPayload}`)
         // Placeholder for script execution logic

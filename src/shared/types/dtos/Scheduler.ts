@@ -1,9 +1,8 @@
-
 export interface ScheduledTask {
   id: string
   name: string
   cronExpression: string
-  actionType: 'notification' | 'run_script' | 'built_in' // Example action types
+  actionType: 'run_script' | 'built_in' // Example action types
   actionPayload?: string // JSON string
   isEnabled: 0 | 1
   createdAt?: string
@@ -11,5 +10,8 @@ export interface ScheduledTask {
 }
 
 export type CreateScheduledTaskDto = Omit<ScheduledTask, 'id' | 'createdAt' | 'updatedAt'>
+export type TaskFormState = Omit<CreateScheduledTaskDto, 'isEnabled'> & {
+  isEnabled: boolean
+}
 
 export type UpdateScheduledTaskDto = Partial<Omit<ScheduledTask, 'id'>>

@@ -1,6 +1,7 @@
 import { sysLogger } from '@nodeUtils/sysLogger'
 import { stockNewsService } from '@services/stock/news'
 import { systemToolsService } from '@services/system_tools'
+import { loadSystemNotify } from '@main/utils/index'
 
 export interface BuiltInTask {
   id: string
@@ -10,6 +11,23 @@ export interface BuiltInTask {
 }
 
 export const builtInTasks: BuiltInTask[] = [
+  {
+    id: 'send-notification',
+    name: '发送通知',
+    description: '发送系统通知，使用默认标题和内容。',
+    execute: async () => {
+      sysLogger.info('Executing built-in task: send-notification')
+      try {
+        // 使用默认通知内容
+        loadSystemNotify('定时任务已执行', '定时任务通知')
+        sysLogger.info('Built-in task "send-notification" completed successfully.')
+        return { success: true, message: '通知已发送' }
+      } catch (error) {
+        sysLogger.error('Error executing built-in task "send-notification":', error)
+        throw error
+      }
+    }
+  },
   {
     id: 'fetch-stock-news',
     name: '获取股票资讯',

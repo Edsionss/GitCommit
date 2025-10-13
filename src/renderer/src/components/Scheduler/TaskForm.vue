@@ -29,7 +29,6 @@
         name="actionType"
       >
         <a-select v-model:value="formState.actionType">
-          <a-select-option value="notification">发送通知</a-select-option>
           <a-select-option value="built_in">内置任务</a-select-option>
           <a-select-option value="run_script">执行脚本</a-select-option>
         </a-select>
@@ -47,15 +46,6 @@
             {{ task.name }}
           </a-select-option>
         </a-select>
-      </a-form-item>
-
-      <!-- 通知内容 -->
-      <a-form-item
-        v-if="formState.actionType === 'notification'"
-        label="通知内容"
-        name="actionPayload"
-      >
-        <a-textarea v-model:value="formState.actionPayload" />
       </a-form-item>
 
       <!-- 脚本路径 -->
@@ -81,7 +71,8 @@ import type { PropType } from 'vue'
 import type {
   ScheduledTask,
   CreateScheduledTaskDto,
-  UpdateScheduledTaskDto
+  UpdateScheduledTaskDto,
+  TaskFormState
 } from '@shared/types/dtos/Scheduler'
 import { schedulerApi } from '@/api/scheduler'
 import { message } from 'ant-design-vue'
@@ -115,20 +106,11 @@ const fetchBuiltInTasks = async () => {
     console.error(error)
   }
 }
-// --- 结束: 新增 ---
-
-interface TaskFormState {
-  name: string
-  cronExpression: string
-  actionType: 'notification' | 'run_script' | 'built_in'
-  actionPayload?: string
-  isEnabled: boolean
-}
 
 const createInitialFormState = (): TaskFormState => ({
   name: '',
   cronExpression: '',
-  actionType: 'notification',
+  actionType: 'built_in',
   actionPayload: '',
   isEnabled: true
 })
