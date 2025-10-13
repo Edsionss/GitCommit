@@ -1,6 +1,7 @@
 import { sysLogger } from '@nodeUtils/sysLogger'
 import { BrowserWindow, app } from 'electron'
 import fs from 'fs'
+import path from 'path'
 import { db, dbPath } from '@features/database'
 
 class ApplicationService {
@@ -96,6 +97,25 @@ class ApplicationService {
     } catch (error) {
       sysLogger.error('Failed to reset database:', error)
       throw new Error('Failed to reset database.')
+    }
+  }
+
+  /**
+   * Reads package.json and returns the dependencies.
+   * @returns An object containing dependencies and devDependencies.
+   */
+  public getDependencies(): { dependencies: Record<string, string>; devDependencies: Record<string, string> } {
+    try {
+      const packageJsonPath = path.join(app.getAppPath(), 'package.json');
+      const packageJsonContent = fs.readFileSync(packageJsonPath, 'utf-8');
+      const packageJson = JSON.parse(packageJsonContent);
+      return {
+        dependencies: packageJson.dependencies || {},
+        devDependencies: packageJson.devDependencies || {},
+      };
+    } catch (error) {
+      sysLogger.error('Failed to read or parse package.json:', error);
+      throw new Error('Failed to get project dependencies.');
     }
   }
 }

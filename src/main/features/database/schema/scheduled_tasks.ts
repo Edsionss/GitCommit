@@ -5,11 +5,13 @@ CREATE TABLE IF NOT EXISTS scheduled_tasks (
     name TEXT NOT NULL,
     cron_expression TEXT NOT NULL,
     action_type TEXT NOT NULL, -- e.g., 'notification', 'run_script'
+    script_id TEXT, -- Foreign key to scripts.id, nullable
     action_payload TEXT, -- JSON string with action details
     action_params TEXT, -- JSON string with task parameters
     is_enabled INTEGER NOT NULL DEFAULT 1, -- 1 for true, 0 for false
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (script_id) REFERENCES scripts(id) ON DELETE SET NULL
 );
 
 -- Trigger to update 'updated_at' timestamp
@@ -25,7 +27,7 @@ AFTER INSERT ON scheduled_tasks
 BEGIN
     INSERT INTO audit_logs (action_type, table_name, record_id, new_data)
     VALUES ('INSERT', 'scheduled_tasks', NEW.id, json_object(
-        'id', NEW.id, 'name', NEW.name, 'cron_expression', NEW.cron_expression, 'action_type', NEW.action_type, 'action_payload', NEW.action_payload, 'action_params', NEW.action_params, 'is_enabled', NEW.is_enabled
+        'id', NEW.id, 'name', NEW.name, 'cron_expression', NEW.cron_expression, 'action_type', NEW.action_type, 'script_id', NEW.script_id, 'action_payload', NEW.action_payload, 'action_params', NEW.action_params, 'is_enabled', NEW.is_enabled
     ));
 END;
 
@@ -35,9 +37,9 @@ AFTER UPDATE ON scheduled_tasks FOR EACH ROW
 BEGIN
     INSERT INTO audit_logs (action_type, table_name, record_id, old_data, new_data)
     VALUES ('UPDATE', 'scheduled_tasks', OLD.id, json_object(
-        'name', OLD.name, 'cron_expression', OLD.cron_expression, 'action_type', OLD.action_type, 'action_payload', OLD.action_payload, 'action_params', OLD.action_params, 'is_enabled', OLD.is_enabled
+        'name', OLD.name, 'cron_expression', OLD.cron_expression, 'action_type', OLD.action_type, 'script_id', OLD.script_id, 'action_payload', OLD.action_payload, 'action_params', OLD.action_params, 'is_enabled', OLD.is_enabled
     ), json_object(
-        'name', NEW.name, 'cron_expression', NEW.cron_expression, 'action_type', NEW.action_type, 'action_payload', NEW.action_payload, 'action_params', NEW.action_params, 'is_enabled', NEW.is_enabled
+        'name', NEW.name, 'cron_expression', NEW.cron_expression, 'action_type', NEW.action_type, 'script_id', NEW.script_id, 'action_payload', NEW.action_payload, 'action_params', NEW.action_params, 'is_enabled', NEW.is_enabled
     ));
 END;
 
@@ -47,7 +49,7 @@ AFTER DELETE ON scheduled_tasks FOR EACH ROW
 BEGIN
     INSERT INTO audit_logs (action_type, table_name, record_id, old_data)
     VALUES ('DELETE', 'scheduled_tasks', OLD.id, json_object(
-        'id', OLD.id, 'name', OLD.name, 'cron_expression', OLD.cron_expression, 'action_type', OLD.action_type, 'action_payload', OLD.action_payload, 'action_params', OLD.action_params, 'is_enabled', OLD.is_enabled
+        'id', OLD.id, 'name', OLD.name, 'cron_expression', OLD.cron_expression, 'action_type', OLD.action_type, 'script_id', OLD.script_id, 'action_payload', OLD.action_payload, 'action_params', OLD.action_params, 'is_enabled', OLD.is_enabled
     ));
 END;
 `;

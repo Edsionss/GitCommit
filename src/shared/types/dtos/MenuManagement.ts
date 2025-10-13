@@ -344,6 +344,20 @@ export const mockFlatRoutes: RouteRecordWithOptionalId[] = [
   {
     id: '',
     parentId: null,
+    path: 'scriptManagement',
+    name: 'ScriptManagement',
+    componentPath: 'ScriptManagement',
+    meta: {
+      title: '脚本管理',
+      keepAlive: '1'
+    },
+    menuOrder: 95,
+    menuIcon: 'CodeSandboxOutlined',
+    hide: '0'
+  },
+  {
+    id: '',
+    parentId: null,
     path: 'scheduler',
     name: 'Scheduler',
     componentPath: 'Scheduler',
@@ -402,5 +416,6 @@ export const menuIconArray = [
   'ContainerOutlined',
   'CodeOutlined',
   'AccountBookOutlined',
-  'LineChartOutlined'
+  'LineChartOutlined',
+  'CodeSandboxOutlined'
 ]

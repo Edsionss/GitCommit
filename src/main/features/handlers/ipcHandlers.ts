@@ -20,6 +20,7 @@ import { registerScanHistoryHandlers } from './git/index'
 import { registerSchedulerHandlers } from '@handlers/scheduler'
 import { registerSystemLogHandlers } from '@handlers/systemLog'
 import { registerNtfyNotificationHandlers } from './NtfyNotification'
+import { registerScriptManagementHandlers } from '@handlers/ScriptManagement'
 export function registerIpcHandlers() {
   // Register handlers from other modules
   registerGitInfoHandlers()
@@ -44,5 +45,6 @@ export function registerIpcHandlers() {
   registerSchedulerHandlers()
   registerSystemLogHandlers()
   registerNtfyNotificationHandlers()
+  registerScriptManagementHandlers()
   // 注册 IPC 处理器
 }

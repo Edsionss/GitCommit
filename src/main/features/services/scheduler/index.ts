@@ -8,6 +8,7 @@ import type {
   UpdateScheduledTaskDto
 } from '@shared/types/dtos/Scheduler'
 import { getBuiltInTaskById } from './builtInTasks'
+import { scriptManagementService } from '@services/ScriptManagement'
 
 import { nanoid } from 'nanoid'
 
@@ -32,8 +33,23 @@ class SchedulerService {
     sysLogger.log(`Executing action for task: ${task.name} (ID: ${task.id})`)
     switch (task.actionType) {
       case 'run_script':
-        sysLogger.log(`Running script for task ${task.name}. Payload: ${task.actionPayload}`)
-        // Placeholder for script execution logic
+        if (task.script_id) {
+          sysLogger.log(`Running script with ID: ${task.script_id} for task ${task.name}.`)
+          try {
+            const result = await scriptManagementService.executeScript(task.script_id)
+            sysLogger.log(`Script execution for task ${task.name} completed.`)
+            if (result.stdout) {
+              sysLogger.log(`Stdout:\n${result.stdout}`)
+            }
+            if (result.stderr) {
+              sysLogger.error(`Stderr:\n${result.stderr}`)
+            }
+          } catch (error) {
+            sysLogger.error(`Error executing script for task ${task.name}:`, error)
+          }
+        } else {
+          sysLogger.warn(`Task ${task.name} is of type 'run_script' but has no script_id.`)
+        }
         break
       case 'built_in':
         sysLogger.log(`Executing built-in task: ${task.actionPayload}`)
@@ -50,7 +66,7 @@ class SchedulerService {
                 params = {}
               }
             }
-            
+
             await builtInTask.execute(params)
             sysLogger.log(`Built-in task "${builtInTask.name}" executed successfully.`)
           } catch (error) {
@@ -91,9 +107,9 @@ class SchedulerService {
 
   async getTasks(filters: Partial<ScheduledTask> = {}): Promise<ScheduledTask[]> {
     const tasks = dbHelper.find<ScheduledTask>(this.tableName, filters)
-    
+
     // 解析 actionParams JSON 字符串为对象
-    return tasks.map(task => ({
+    return tasks.map((task) => ({
       ...task,
       actionParams: task.actionParams ? JSON.parse(task.actionParams) : undefined
     }))
@@ -101,20 +117,23 @@ class SchedulerService {
 
   async createTask(dto: CreateScheduledTaskDto): Promise<ScheduledTask> {
     // 确保 actionParams 被序列化为 JSON 字符串
-    const taskToInsert = { 
-      id: nanoid(), 
+    const taskToInsert = {
+      id: nanoid(),
       ...dto,
+      script_id: dto.script_id || null,
       actionParams: dto.actionParams ? JSON.stringify(dto.actionParams) : undefined
     }
     dbHelper.insert(this.tableName, taskToInsert)
     const newTask = await dbHelper.findOne<ScheduledTask>(this.tableName, { id: taskToInsert.id })
-    
+
     // 解析 actionParams JSON 字符串为对象
-    const parsedTask = newTask ? {
-      ...newTask,
-      actionParams: newTask.actionParams ? JSON.parse(newTask.actionParams) : undefined
-    } : null
-    
+    const parsedTask = newTask
+      ? {
+          ...newTask,
+          actionParams: newTask.actionParams ? JSON.parse(newTask.actionParams) : undefined
+        }
+      : null
+
     if (parsedTask && parsedTask.isEnabled) {
       this.startJob(parsedTask)
     }
@@ -127,17 +146,19 @@ class SchedulerService {
       ...dto,
       actionParams: dto.actionParams ? JSON.stringify(dto.actionParams) : undefined
     }
-    
+
     dbHelper.update<ScheduledTask>(this.tableName, updateData, { id })
 
     const updatedTask = await dbHelper.findOne<ScheduledTask>(this.tableName, { id })
-    
+
     // 解析 actionParams JSON 字符串为对象
-    const parsedTask = updatedTask ? {
-      ...updatedTask,
-      actionParams: updatedTask.actionParams ? JSON.parse(updatedTask.actionParams) : undefined
-    } : null
-    
+    const parsedTask = updatedTask
+      ? {
+          ...updatedTask,
+          actionParams: updatedTask.actionParams ? JSON.parse(updatedTask.actionParams) : undefined
+        }
+      : null
+
     if (parsedTask) {
       this.startJob(parsedTask)
     }

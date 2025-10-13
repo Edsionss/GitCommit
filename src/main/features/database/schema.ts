@@ -10,6 +10,7 @@ import scheduled_tasks from './schema/scheduled_tasks'
 import scheduler_logs from './schema/scheduler_logs'
 import system_logs from './schema/system_logs'
 import notification_logs from './schema/notification_logs'
+import scripts from './schema/scripts'
 
 export const schema = mergeSchema([
   audit_logs,
@@ -23,7 +24,8 @@ export const schema = mergeSchema([
   scheduled_tasks,
   scheduler_logs,
   system_logs,
-  notification_logs
+  notification_logs,
+  scripts
 ])
 function mergeSchema(schemaArray) {
   let resultSchema = ``

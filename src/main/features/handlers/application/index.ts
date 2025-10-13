@@ -42,4 +42,16 @@ export function registerApplicationHandlers(): void {
   applicationService.onUnmaximized(browserWindow, () => {
     browserWindow.webContents.send('window:unmaximized')
   })
+
+  // Handler to get project dependencies
+  ipcMain.handle('application:get-dependencies', () => {
+    try {
+      return applicationService.getDependencies();
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      sysLogger.error('Error in application:get-dependencies handler:', errorMessage);
+      // In case of an error, re-throw it to be caught by the caller
+      throw error;
+    }
+  });
 }

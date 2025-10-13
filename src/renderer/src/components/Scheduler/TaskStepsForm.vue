@@ -13,36 +13,20 @@
 
     <!-- 第一步：基本信息 -->
     <div v-show="currentStep === 0">
-      <a-form
-        ref="basicFormRef"
-        :model="formState"
-        layout="vertical"
-        :rules="basicFormRules"
-      >
-        <a-form-item
-          label="任务名称"
-          name="name"
-        >
+      <a-form ref="basicFormRef" :model="formState" layout="vertical" :rules="basicFormRules">
+        <a-form-item label="任务名称" name="name">
           <a-input v-model:value="formState.name" placeholder="请输入任务名称" />
         </a-form-item>
-        
-        <a-form-item
-          label="Cron 表达式"
-          name="cronExpression"
-        >
+
+        <a-form-item label="Cron 表达式" name="cronExpression">
           <a-input
             v-model:value="formState.cronExpression"
             placeholder="例如: 0 8 * * * (每天早上8点)"
           />
-          <div class="text-xs text-secondary mt-1">
-            支持标准Cron表达式，格式：分 时 日 月 周
-          </div>
+          <div class="text-xs text-secondary mt-1">支持标准Cron表达式，格式：分 时 日 月 周</div>
         </a-form-item>
-        
-        <a-form-item
-          label="动作类型"
-          name="actionType"
-        >
+
+        <a-form-item label="动作类型" name="actionType">
           <a-select v-model:value="formState.actionType" placeholder="请选择动作类型">
             <a-select-option value="built_in">内置任务</a-select-option>
             <a-select-option value="run_script">执行脚本</a-select-option>
@@ -69,13 +53,25 @@
           </div>
         </a-form-item>
 
-        <!-- 脚本路径 -->
-        <a-form-item
-          v-if="formState.actionType === 'run_script'"
-          label="脚本路径"
-          name="actionPayload"
-        >
-          <a-input v-model:value="formState.actionPayload" placeholder="请输入可执行脚本的绝对路径" />
+        <!-- 脚本选择 -->
+        <a-form-item v-if="formState.actionType === 'run_script'" label="选择脚本" name="script_id">
+          <a-select
+            v-model:value="formState.script_id"
+            placeholder="请选择要执行的脚本"
+            show-search
+            :filter-option="
+              (input, option) => option.label.toLowerCase().includes(input.toLowerCase())
+            "
+          >
+            <a-select-option
+              v-for="script in scripts"
+              :key="script.id"
+              :value="script.id"
+              :label="script.name"
+            >
+              {{ script.name }}
+            </a-select-option>
+          </a-select>
         </a-form-item>
 
         <a-form-item label="是否启用">
@@ -86,13 +82,15 @@
 
     <!-- 第二步：任务参数 -->
     <div v-show="currentStep === 1">
-      <div v-if="formState.actionType === 'built_in' && selectedBuiltInTask && selectedBuiltInTask.params && selectedBuiltInTask.params.length > 0">
-        <a-form
-          ref="paramsFormRef"
-          :model="formState"
-          layout="vertical"
-          :rules="paramsFormRules"
-        >
+      <div
+        v-if="
+          formState.actionType === 'built_in' &&
+          selectedBuiltInTask &&
+          selectedBuiltInTask.params &&
+          selectedBuiltInTask.params.length > 0
+        "
+      >
+        <a-form ref="paramsFormRef" :model="formState" layout="vertical" :rules="paramsFormRules">
           <a-divider orientation="left">任务参数配置</a-divider>
           <a-form-item
             v-for="param in selectedBuiltInTask.params"
@@ -163,7 +161,7 @@
           </a-form-item>
         </a-form>
       </div>
-      
+
       <div v-else class="text-center py-8">
         <a-empty description="当前任务类型无需配置参数" />
       </div>
@@ -171,16 +169,12 @@
 
     <!-- 步骤导航按钮 -->
     <div class="flex justify-between mt-6">
-      <a-button v-if="currentStep > 0" @click="prevStep">
-        上一步
-      </a-button>
+      <a-button v-if="currentStep > 0" @click="prevStep"> 上一步 </a-button>
       <div v-else></div>
-      
+
       <a-space>
         <a-button @click="close">取消</a-button>
-        <a-button v-if="currentStep < 1" type="primary" @click="nextStep">
-          下一步
-        </a-button>
+        <a-button v-if="currentStep < 1" type="primary" @click="nextStep"> 下一步 </a-button>
         <a-button v-else type="primary" @click="submit" :loading="submitting">
           {{ isEditing ? '更新任务' : '创建任务' }}
         </a-button>
@@ -190,18 +184,19 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch, computed, reactive } from 'vue'
-import type { PropType } from 'vue'
+import { schedulerApi } from '@/api/scheduler'
+import { scriptManagementApi } from '@/api/scriptManagement'
+import { message } from 'ant-design-vue'
+import type { FormInstance } from 'ant-design-vue'
+import type { Script } from '@shared/types/dtos/ScriptManagement'
+import { ref, watch, computed, reactive, type PropType } from 'vue'
+import type { BuiltInTask, ParameterDefinition } from '@sharedType/parameterTypes'
 import type {
   ScheduledTask,
   CreateScheduledTaskDto,
   UpdateScheduledTaskDto,
   TaskFormState
-} from '@shared/types/dtos/Scheduler'
-import type { BuiltInTask, ParameterDefinition } from '@sharedType/parameterTypes'
-import { schedulerApi } from '@/api/scheduler'
-import { message } from 'ant-design-vue'
-import type { FormInstance } from 'ant-design-vue'
+} from '@sharedType/Scheduler'
 
 const props = defineProps({
   open: {
@@ -227,8 +222,9 @@ const submitting = ref(false)
 const basicFormRef = ref<FormInstance>()
 const paramsFormRef = ref<FormInstance>()
 
-// 内置任务列表
+// 内置任务和脚本列表
 const builtInTasks = ref<BuiltInTask[]>([])
+const scripts = ref<Script[]>([])
 const selectedBuiltInTask = ref<BuiltInTask | null>(null)
 
 // 表单验证规则
@@ -237,14 +233,20 @@ const basicFormRules = reactive({
   cronExpression: [{ required: true, message: '请输入 Cron 表达式' }],
   actionType: [{ required: true, message: '请选择动作类型' }],
   actionPayload: [
-    { 
+    {
       validator: (_rule: any, value: string) => {
-        if (!formState.value.actionType) return Promise.resolve()
         if (formState.value.actionType === 'built_in' && !value) {
           return Promise.reject('请选择内置任务')
         }
+        return Promise.resolve()
+      }
+    }
+  ],
+  script_id: [
+    {
+      validator: (_rule: any, value: string) => {
         if (formState.value.actionType === 'run_script' && !value) {
-          return Promise.reject('请输入脚本路径')
+          return Promise.reject('请选择脚本')
         }
         return Promise.resolve()
       }
@@ -256,11 +258,9 @@ const basicFormRules = reactive({
 const paramsFormRules = computed(() => {
   const rules: any = {}
   if (selectedBuiltInTask.value && selectedBuiltInTask.value.params) {
-    selectedBuiltInTask.value.params.forEach(param => {
+    selectedBuiltInTask.value.params.forEach((param) => {
       if (param.required) {
-        rules[`actionParams.${param.name}`] = [
-          { required: true, message: `请输入${param.label}` }
-        ]
+        rules[`actionParams.${param.name}`] = [{ required: true, message: `请输入${param.label}` }]
       }
     })
   }
@@ -272,6 +272,15 @@ const fetchBuiltInTasks = async () => {
     builtInTasks.value = await schedulerApi.getBuiltInTasks()
   } catch (error) {
     message.error('加载内置任务列表失败')
+    console.error(error)
+  }
+}
+
+const fetchScripts = async () => {
+  try {
+    scripts.value = await scriptManagementApi.getAllScripts()
+  } catch (error) {
+    message.error('加载脚本列表失败')
     console.error(error)
   }
 }
@@ -296,6 +305,7 @@ const createInitialFormState = (): TaskFormState => ({
   cronExpression: '',
   actionType: 'built_in',
   actionPayload: '',
+  script_id: undefined,
   actionParams: {},
   isEnabled: true
 })
@@ -321,6 +331,7 @@ watch(
   (isOpen) => {
     if (isOpen) {
       fetchBuiltInTasks()
+      fetchScripts()
       currentStep.value = 0 // 重置步骤
       if (props.task) {
         // 编辑模式
@@ -329,6 +340,7 @@ watch(
           cronExpression: props.task.cronExpression,
           actionType: props.task.actionType,
           actionPayload: props.task.actionPayload || '',
+          script_id: props.task.script_id || undefined,
           actionParams: props.task.actionParams ? JSON.parse(props.task.actionParams) : {},
           isEnabled: props.task.isEnabled === 1
         }
@@ -353,6 +365,7 @@ watch(
     if (!isEditing.value) {
       // 只有在新建模式下自动清空，编辑模式下不清空以便用户可以看到原始值
       formState.value.actionPayload = ''
+      formState.value.script_id = undefined
       formState.value.actionParams = {}
       selectedBuiltInTask.value = null
     }

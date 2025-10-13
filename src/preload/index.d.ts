@@ -16,6 +16,7 @@ import type {
   UpdateScheduledTaskDto
 } from '@shared/types/dtos/Scheduler'
 import type { BuiltInTask } from '@sharedTypes/parameterTypes'
+import type { Script, CreateScriptDto, UpdateScriptDto } from '@shared/types/dtos/ScriptManagement'
 
 // 聊天会话和消息的接口定义
 interface ChatSession {
@@ -176,7 +177,8 @@ interface ExposedAPI {
   cleanStockSectors: () => Promise<any>
 
   // Application API
-  resetDatabase: () => Promise<{ success: boolean; error?: string }>
+  resetDatabase: () => Promise<{ success: boolean; error?: string }>,
+  getDependencies: () => Promise<{ dependencies: Record<string, string>; devDependencies: Record<string, string> }>
 
   // Chat API
   getAllChatSessions: () => Promise<ChatSession[]>
@@ -207,7 +209,17 @@ interface ExposedAPI {
     logs?: NotificationLog[]; 
     total?: number; 
     error?: string 
-  }>
+  }>,
+
+  // Script Management API
+  scriptManagement: {
+    create: (data: CreateScriptDto) => Promise<Script>;
+    getAll: () => Promise<Script[]>;
+    getById: (id: string) => Promise<Script | null>;
+    update: (id: string, data: UpdateScriptDto) => Promise<Script | null>;
+    delete: (id: string) => Promise<void>;
+    execute: (id: string) => Promise<{ stdout: string; stderr: string }>;
+  }
 }
 
 // AuditLog a new interface

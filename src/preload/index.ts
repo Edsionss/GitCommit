@@ -231,6 +231,7 @@ const api = {
   // Application API
   resetDatabase: (): Promise<{ success: boolean; error?: string }> =>
     ipcRenderer.invoke('application:reset-database'),
+  getDependencies: () => ipcRenderer.invoke('application:get-dependencies'),
 
   // Chat API
   getAllChatSessions: () => ipcRenderer.invoke('chat:getAllSessions'),
@@ -253,7 +254,17 @@ const api = {
     offset?: number; 
     topic?: string; 
     status?: 'success' | 'failed' 
-  }) => ipcRenderer.invoke('ntfy:getLogs', request)
+  }) => ipcRenderer.invoke('ntfy:getLogs', request),
+
+  // Script Management API
+  scriptManagement: {
+    create: (data) => ipcRenderer.invoke('script:create', data),
+    getAll: () => ipcRenderer.invoke('script:getAll'),
+    getById: (id) => ipcRenderer.invoke('script:getById', id),
+    update: (id, data) => ipcRenderer.invoke('script:update', id, data),
+    delete: (id) => ipcRenderer.invoke('script:delete', id),
+    execute: (id) => ipcRenderer.invoke('script:execute', id)
+  }
 }
 
 // 暴露API
