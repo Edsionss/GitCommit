@@ -81,6 +81,7 @@ declare module 'vue' {
     ScanLogTab: typeof import('./src/components/ScanHistoryView/ScanLogTab.vue')['default']
     ScanParametersTab: typeof import('./src/components/ScanHistoryView/ScanParametersTab.vue')['default']
     ScanResultsTable: typeof import('./src/components/ScanHistoryView/ScanResultsTable.vue')['default']
+    ScriptForm: typeof import('./src/components/ScriptManagement/ScriptForm.vue')['default']
     SettingsForm: typeof import('./src/components/BasicSettings/SettingsForm.vue')['default']
     ShutdownTool: typeof import('./src/components/SystemTools/ShutdownTool.vue')['default']
     StatsCards: typeof import('./src/components/Dashboard/StatsCards.vue')['default']
