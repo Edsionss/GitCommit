@@ -1,25 +1,51 @@
 <template>
-  <div class="p-4">
-    <a-button type="primary" @click="showCreateModal" class="mb-4">新建任务</a-button>
-    <a-table :columns="columns" :data-source="tasks" row-key="id" :loading="loading">
-      <template #bodyCell="{ column, record }">
-        <template v-if="column.key === 'isEnabled'">
-          <a-tag :color="record.isEnabled === 1 ? 'success' : 'error'">
-            {{ record.isEnabled === 1 ? '开启' : '关闭' }}
-          </a-tag>
+  <div class="scheduler-container">
+    <div class="page-header">
+      <a-button type="primary" @click="showCreateModal">
+        <template #icon>
+          <PlusOutlined />
         </template>
-        <template v-if="column.key === 'action'">
-          <a-space>
-            <a-button type="link" @click="showEditModal(record)">编辑</a-button>
-            <a-popconfirm title="确定删除此任务吗?" @confirm="onDelete(record.id)">
-              <a-button type="link" danger>删除</a-button>
-            </a-popconfirm>
-          </a-space>
-        </template>
-      </template>
-    </a-table>
+        新建任务
+      </a-button>
+    </div>
 
-    <TaskForm
+    <div class="table-container">
+      <a-table
+        :columns="columns"
+        :data-source="tasks"
+        row-key="id"
+        :loading="loading"
+        :pagination="{ pageSize: 10, showSizeChanger: true, showQuickJumper: true }"
+      >
+        <template #bodyCell="{ column, record }">
+          <template v-if="column.key === 'isEnabled'">
+            <a-tag :color="record.isEnabled === 1 ? 'success' : 'error'">
+              {{ record.isEnabled === 1 ? '开启' : '关闭' }}
+            </a-tag>
+          </template>
+          <template v-if="column.key === 'action'">
+            <a-space>
+              <a-button type="link" size="small" @click="showEditModal(record)">
+                <template #icon>
+                  <EditOutlined />
+                </template>
+                编辑
+              </a-button>
+              <a-popconfirm title="确定删除此任务吗?" @confirm="onDelete(record.id)">
+                <a-button type="link" size="small" danger>
+                  <template #icon>
+                    <DeleteOutlined />
+                  </template>
+                  删除
+                </a-button>
+              </a-popconfirm>
+            </a-space>
+          </template>
+        </template>
+      </a-table>
+    </div>
+
+    <TaskStepsForm
       :open="isModalVisible"
       :task="currentTask"
       @close="handleModalClose"
@@ -30,13 +56,14 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
+import { PlusOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons-vue'
 import { schedulerApi } from '@/api/scheduler'
 import type {
   ScheduledTask,
   CreateScheduledTaskDto,
   UpdateScheduledTaskDto
 } from '@shared/types/dtos/Scheduler'
-import TaskForm from '@/components/Scheduler/TaskForm.vue'
+import TaskStepsForm from '@/components/Scheduler/TaskStepsForm.vue'
 import { message } from 'ant-design-vue'
 
 const tasks = ref<ScheduledTask[]>([])
@@ -123,3 +150,72 @@ const onDelete = async (id: string) => {
   }
 }
 </script>
+
+<style scoped>
+.scheduler-container {
+  padding: 14px;
+  background-color: var(--bg-container);
+  height: 100%;
+}
+
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--border-secondary);
+}
+
+.page-title {
+  margin: 0;
+  color: var(--text-primary);
+  font-size: 24px;
+  font-weight: 600;
+}
+
+.table-container {
+  background-color: var(--bg-container);
+  border-radius: 8px;
+  padding: 16px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+/* 表格样式优化 */
+:deep(.ant-table) {
+  background-color: transparent;
+}
+
+:deep(.ant-table-thead > tr > th) {
+  background-color: var(--bg-container);
+  border-bottom: 1px solid var(--border-secondary);
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+:deep(.ant-table-tbody > tr > td) {
+  border-bottom: 1px solid var(--border-secondary);
+  color: var(--text-primary);
+}
+
+:deep(.ant-table-tbody > tr:hover > td) {
+  background-color: var(--bg-hover);
+}
+
+/* 按钮样式优化 */
+:deep(.ant-btn-primary) {
+  background-color: var(--brand-primary);
+  border-color: var(--brand-primary);
+}
+
+:deep(.ant-btn-primary:hover) {
+  background-color: var(--brand-primary-hover);
+  border-color: var(--brand-primary-hover);
+}
+
+/* 标签样式优化 */
+:deep(.ant-tag) {
+  border-radius: 4px;
+  font-weight: 500;
+}
+</style>
