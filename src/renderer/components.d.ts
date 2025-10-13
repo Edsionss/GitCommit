@@ -60,6 +60,8 @@ declare module 'vue' {
     MenuList: typeof import('./src/components/MenuManagement/MenuList.vue')['default']
     MenuModal: typeof import('./src/components/MenuManagement/MenuModal.vue')['default']
     MergeBranchDialog: typeof import('./src/components/BranchesView/MergeBranchDialog.vue')['default']
+    MessageForm: typeof import('./src/components/NtfyNotification/MessageForm.vue')['default']
+    MessageHistory: typeof import('./src/components/NtfyNotification/MessageHistory.vue')['default']
     MonthlyK: typeof import('./src/components/Stock/StockList/StockDetail/components/MonthlyK.vue')['default']
     NetWorkTool: typeof import('./src/components/RealTimeCommunication/NetWorkTool.vue')['default']
     News: typeof import('./src/components/Stock/StockList/StockDetail/components/News.vue')['default']
