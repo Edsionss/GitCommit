@@ -1,3 +1,4 @@
+import { sysLogger } from '@nodeUtils/sysLogger'
 import { BrowserWindow, ipcMain } from 'electron'
 import { applicationService } from '@services/application'
 import { getMainWindow } from '@main/index'
@@ -10,7 +11,7 @@ export function registerApplicationHandlers(): void {
       return { success: true }
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : String(error)
-      console.error('Error in application:reset-database handler:', errorMessage)
+      sysLogger.error('Error in application:reset-database handler:', errorMessage)
       return { success: false, error: errorMessage }
     }
   })
@@ -18,7 +19,7 @@ export function registerApplicationHandlers(): void {
   // Window management handlers
   const browserWindow: BrowserWindow | null = getMainWindow()
   if (!browserWindow) {
-    console.warn('Main window not available for application handlers.')
+    sysLogger.warn('Main window not available for application handlers.')
     return
   }
 

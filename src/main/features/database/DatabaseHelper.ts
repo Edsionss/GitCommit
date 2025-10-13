@@ -1,3 +1,4 @@
+import { sysLogger } from '@nodeUtils/sysLogger'
 // src/main/database/db-helper.ts
 
 import type { Database, RunResult } from 'better-sqlite3'
@@ -46,7 +47,15 @@ export class DatabaseHelper {
     const sql = `INSERT INTO "${tableName}" (${columns}) VALUES (${placeholders})`
     const stmt = this.db.prepare(sql)
     const info = stmt.run(values)
-    console.log(`[DB insert from table  ${tableName}] `)
+    
+    // 避免在插入系统日志表时使用 sysLogger，防止循环引用
+    if (tableName !== 'system_logs') {
+      sysLogger.log(`[DB insert from table  ${tableName}] `)
+    } else {
+      // 对于系统日志表，使用原生 console
+      console.log(`[DB insert from table  ${tableName}] `)
+    }
+    
     return info
   }
 
@@ -66,7 +75,13 @@ export class DatabaseHelper {
     const sql = `INSERT INTO "${tableName}" (${columns}) VALUES (${placeholders})`
     const stmt = this.db.prepare(sql)
 
-    console.log(`[DB insertMany from table  ${tableName}] `)
+    // 避免在批量插入系统日志表时使用 sysLogger，防止循环引用
+    if (tableName !== 'system_logs') {
+      sysLogger.log(`[DB insertMany from table  ${tableName}] `)
+    } else {
+      // 对于系统日志表，使用原生 console
+      console.log(`[DB insertMany from table  ${tableName}] `)
+    }
 
     return this.transaction(() => {
       // 直接将整个对象传递给 run()，驱动会自动匹配命名占位符和对象属性
@@ -84,7 +99,7 @@ export class DatabaseHelper {
     const stmt = this.db.prepare(sql)
     const results = stmt.all(params)
 
-    console.log(`[DB find from table  ${tableName}] `)
+    sysLogger.log(`[DB find from table  ${tableName}] `)
 
     // --> 转换: 将从数据库返回的下划线式结果转换为应用层使用的驼峰式
     return autoTransformKeys(results, 'camel') as T[]
@@ -99,7 +114,7 @@ export class DatabaseHelper {
     const sql = `SELECT ${columns} FROM "${tableName}" ${text} LIMIT 1`
     const stmt = this.db.prepare(sql)
     const result = stmt.get(params)
-    console.log(`[DB findOne from table  ${tableName}] `)
+    sysLogger.log(`[DB findOne from table  ${tableName}] `)
 
     if (!result) {
       return null
@@ -134,7 +149,7 @@ export class DatabaseHelper {
     const stmt = this.db.prepare(sql)
     const info = stmt.run([...dataValues, ...whereValues])
 
-    console.log(`[DB update from table  ${tableName}] `)
+    sysLogger.log(`[DB update from table  ${tableName}] `)
     return { changes: info.changes }
   }
 
@@ -151,7 +166,7 @@ export class DatabaseHelper {
     const stmt = this.db.prepare(sql)
     const info = stmt.run(params)
 
-    console.log(`[DB delete from table  ${tableName}] `)
+    sysLogger.log(`[DB delete from table  ${tableName}] `)
     return { changes: info.changes }
   }
 
@@ -171,7 +186,7 @@ export class DatabaseHelper {
         this.db.prepare(resetSql).run(tableName)
       }
 
-      console.log(`[DB clearTable from table  ${tableName}] `)
+      sysLogger.log(`[DB clearTable from table  ${tableName}] `)
       return { changes: info.changes }
     })
   }
@@ -180,7 +195,7 @@ export class DatabaseHelper {
    * 直接执行 SQL 查询（用于复杂查询）
    */
   public query<T>(sql: string, params: any[] = []): T[] {
-    console.log(`[DB query] `)
+    sysLogger.log(`[DB query] `)
     const results = this.db.prepare(sql).all(params)
 
     // --> 转换: 将原生查询返回的结果也转换为驼峰式
@@ -192,7 +207,7 @@ export class DatabaseHelper {
    */
   public execute(sql: string, params: any[] = []): { changes: number } {
     const info = this.db.prepare(sql).run(params)
-    console.log(`[DB execute] `)
+    sysLogger.log(`[DB execute] `)
     return { changes: info.changes }
   }
 
@@ -201,7 +216,7 @@ export class DatabaseHelper {
    */
   public transaction<T>(callback: () => T): T {
     const runTransaction = this.db.transaction(callback)
-    console.log(`[DB transaction] `)
+    sysLogger.log(`[DB transaction] `)
     return runTransaction()
   }
 }

@@ -1,3 +1,4 @@
+import { sysLogger } from '@nodeUtils/sysLogger'
 /**
  * @file AI IPC Handlers
  * @description Registers IPC handlers for AI-related functionalities.
@@ -12,14 +13,14 @@ import type { AiConfig, ChatMessage } from '@sharedType/ai'
 export function registerAiHandlers() {
   ipcMain.handle(
     'ai:generate-commit-message',
-    async (_, params: { prompt: string, aiConfig: AiConfig, isStream: boolean }) => {
+    async (_, params: { prompt: string; aiConfig: AiConfig; isStream: boolean }) => {
       try {
         const { prompt, aiConfig, isStream } = params
         const message = await generateCommitMessage({ _, prompt, aiConfig, isStream })
         return { success: true, message }
       } catch (error) {
         const errorMessage = error instanceof Error ? error.message : String(error)
-        console.error('AI commit message generation failed:', errorMessage)
+        sysLogger.error('AI commit message generation failed:', errorMessage)
         return { success: false, error: errorMessage }
       }
     }
@@ -27,14 +28,17 @@ export function registerAiHandlers() {
 
   ipcMain.handle(
     'ai:chat',
-    async (_, params: { prompt: string, aiConfig: AiConfig, history?: ChatMessage[], isStream?: boolean }) => {
+    async (
+      _,
+      params: { prompt: string; aiConfig: AiConfig; history?: ChatMessage[]; isStream?: boolean }
+    ) => {
       try {
         const { prompt, aiConfig, history, isStream } = params
         const message = await generateChatResponse({ _, prompt, aiConfig, history, isStream })
         return { success: true, message }
       } catch (error) {
         const errorMessage = error instanceof Error ? error.message : String(error)
-        console.error('AI chat failed:', errorMessage)
+        sysLogger.error('AI chat failed:', errorMessage)
         return { success: false, error: errorMessage }
       }
     }

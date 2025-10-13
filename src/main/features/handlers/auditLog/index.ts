@@ -1,3 +1,4 @@
+import { sysLogger } from '@nodeUtils/sysLogger'
 import { ipcMain } from 'electron'
 import { auditLogService } from '@services/auditLog'
 
@@ -10,7 +11,7 @@ export function registerAuditLogHandlers(): void {
     try {
       return await auditLogService.getAuditLogs(page, pageSize)
     } catch (error) {
-      console.error('Failed to get audit logs:', error)
+      sysLogger.error('Failed to get audit logs:', error)
       // 确保错误信息是可序列化的字符串
       if (error instanceof Error) {
         return Promise.reject(error.message)
@@ -24,7 +25,7 @@ export function registerAuditLogHandlers(): void {
     try {
       return await auditLogService.deleteAuditLogs(ids)
     } catch (error) {
-      console.error('Failed to delete audit logs:', error)
+      sysLogger.error('Failed to delete audit logs:', error)
       // 确保错误信息是可序列化的字符串
       if (error instanceof Error) {
         return Promise.reject(error.message)
@@ -38,7 +39,7 @@ export function registerAuditLogHandlers(): void {
     try {
       return await auditLogService.clearAllAuditLogs()
     } catch (error) {
-      console.error('Failed to clear audit logs:', error)
+      sysLogger.error('Failed to clear audit logs:', error)
       // 确保错误信息是可序列化的字符串
       if (error instanceof Error) {
         return Promise.reject(error.message)

@@ -1,3 +1,4 @@
+import { sysLogger } from '@nodeUtils/sysLogger'
 import { ipcMain } from 'electron'
 import { stockNewsService } from '@services/stock/news'
 export function initializeNewsHandlers() {
@@ -5,7 +6,7 @@ export function initializeNewsHandlers() {
     try {
       return await stockNewsService.scrapeAndInsertNews(dateStr, timeStr)
     } catch (error) {
-      console.error('Error scraping news:', error)
+      sysLogger.error('Error scraping news:', error)
       return [] // Return empty array on error
     }
   })
@@ -13,7 +14,7 @@ export function initializeNewsHandlers() {
     try {
       return await stockNewsService.findByTradeDate(tradeDate)
     } catch (error) {
-      console.error('Error get news:', error)
+      sysLogger.error('Error get news:', error)
       return [] // Return empty array on error
     }
   })
@@ -21,7 +22,7 @@ export function initializeNewsHandlers() {
     try {
       return await stockNewsService.clearAllNews()
     } catch (error) {
-      console.error('Errorclean news:', error)
+      sysLogger.error('Errorclean news:', error)
       return [] // Return empty array on error
     }
   })

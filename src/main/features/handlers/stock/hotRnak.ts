@@ -1,3 +1,4 @@
+import { sysLogger } from '@nodeUtils/sysLogger'
 import { ipcMain } from 'electron'
 import { stockHotRankService } from '@features/services/stock/hotRank'
 export function initializeHotRankHandlers() {
@@ -5,7 +6,7 @@ export function initializeHotRankHandlers() {
     try {
       return await stockHotRankService.scrapeAndInsertAllHotRank()
     } catch (error) {
-      console.error('Error scraping hotRank:', error)
+      sysLogger.error('Error scraping hotRank:', error)
       return [] // Return empty array on error
     }
   })
@@ -13,7 +14,7 @@ export function initializeHotRankHandlers() {
     try {
       return await stockHotRankService.findByTradeDateOrDefault(tradeDate)
     } catch (error) {
-      console.error('Error get hotRank:', error)
+      sysLogger.error('Error get hotRank:', error)
       return [] // Return empty array on error
     }
   })
@@ -21,7 +22,7 @@ export function initializeHotRankHandlers() {
     try {
       return await stockHotRankService.clearAll()
     } catch (error) {
-      console.error('Errorclean news:', error)
+      sysLogger.error('Errorclean news:', error)
       return [] // Return empty array on error
     }
   })

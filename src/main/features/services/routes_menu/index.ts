@@ -1,3 +1,4 @@
+import { sysLogger } from '@nodeUtils/sysLogger'
 import { dbHelper } from '@features/database'
 import type { RouteRecord, RouteRecordWithOptionalId } from '@sharedType/MenuManagement'
 import { nanoid } from 'nanoid'
@@ -38,7 +39,7 @@ export class RoutesMenuService {
       // 不再需要手动转换
       return formattedMenus
     } catch (error) {
-      console.error('Error fetching all menus:', error)
+      sysLogger.error('Error fetching all menus:', error)
       return []
     }
   }
@@ -53,7 +54,7 @@ export class RoutesMenuService {
       // 直接将驼峰式对象传递给 dbHelper，它会自动转换
       return await dbHelper.insert(RoutesMenuService.TABLE_NAME, dbRecord)
     } catch (error) {
-      console.error('Error adding menu:', error)
+      sysLogger.error('Error adding menu:', error)
       throw error
     }
   }
@@ -70,7 +71,7 @@ export class RoutesMenuService {
       // 直接将驼峰式对象数组传递给 dbHelper
       return await Promise.resolve(dbHelper.insertMany(RoutesMenuService.TABLE_NAME, dbRecords))
     } catch (error) {
-      console.error('Error adding menus:', error)
+      sysLogger.error('Error adding menus:', error)
       throw error
     }
   }
@@ -89,7 +90,7 @@ export class RoutesMenuService {
       // 直接将驼峰式对象传递给 dbHelper
       return await dbHelper.update(RoutesMenuService.TABLE_NAME, dbRecord, { id })
     } catch (error) {
-      console.error('Error updating menu:', error)
+      sysLogger.error('Error updating menu:', error)
       throw error
     }
   }
@@ -102,7 +103,7 @@ export class RoutesMenuService {
     try {
       return await dbHelper.delete(RoutesMenuService.TABLE_NAME, { id })
     } catch (error) {
-      console.error('Error deleting menu:', error)
+      sysLogger.error('Error deleting menu:', error)
       throw error
     }
   }
@@ -114,7 +115,7 @@ export class RoutesMenuService {
     try {
       return await dbHelper.clearTable(RoutesMenuService.TABLE_NAME)
     } catch (error) {
-      console.error('Error clean menu:', error)
+      sysLogger.error('Error clean menu:', error)
       throw error
     }
   }

@@ -1,3 +1,4 @@
+import { sysLogger } from '@nodeUtils/sysLogger'
 import { ipcMain } from 'electron'
 // import { StockAnalysisService } from '@services/stock/stock'
 import { StockFetchConfig } from '@sharedType/stock'
@@ -9,7 +10,7 @@ export function initializeStockHandlers() {
     try {
       return await searchStock(query)
     } catch (error) {
-      console.error('Error searching stocks:', error)
+      sysLogger.error('Error searching stocks:', error)
       return [] // Return empty array on error
     }
   })
@@ -18,7 +19,7 @@ export function initializeStockHandlers() {
     try {
       return await getStockInfoByCode(code, name)
     } catch (error) {
-      console.error(`Error fetching advanced stock data for ${code}:`, error)
+      sysLogger.error(`Error fetching advanced stock data for ${code}:`, error)
       return null // Return null on error
     }
   })
@@ -27,7 +28,7 @@ export function initializeStockHandlers() {
   //   try {
   //     return await stockService.analyzeStock(stockName)
   //   } catch (error) {
-  //     console.error(`Error analyzing stock ${stockName}:`, error)
+  //     sysLogger.error(`Error analyzing stock ${stockName}:`, error)
   //     return null
   //   }
   // })

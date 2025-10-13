@@ -1,3 +1,4 @@
+import { sysLogger } from '@nodeUtils/sysLogger'
 import { BrowserWindow, app } from 'electron'
 import fs from 'fs'
 import { db, dbPath } from '@features/database'
@@ -63,7 +64,7 @@ class ApplicationService {
       const memoryUsage = process.memoryUsage().heapUsed
 
       // Log the metrics before sending
-      // console.log(`Sending metrics: CPU: ${cpuPercent.toFixed(1)}%, Memory: ${(memoryUsage / 1024 / 1024).toFixed(0)}MB`)
+      // sysLogger.log(`Sending metrics: CPU: ${cpuPercent.toFixed(1)}%, Memory: ${(memoryUsage / 1024 / 1024).toFixed(0)}MB`)
 
       // Send metrics to renderer process
       if (browserWindow && !browserWindow.isDestroyed()) {
@@ -82,18 +83,18 @@ class ApplicationService {
    */
   public resetDatabase(): void {
     try {
-      console.log('Closing database connection...')
+      sysLogger.log('Closing database connection...')
       db.close()
-      console.log(`Database connection closed. Deleting database file at: ${dbPath}`)
+      sysLogger.log(`Database connection closed. Deleting database file at: ${dbPath}`)
       fs.unlinkSync(dbPath)
-      console.log('Database file deleted successfully.')
+      sysLogger.log('Database file deleted successfully.')
 
       // Relaunch the application
-      console.log('Relaunching the application...')
+      sysLogger.log('Relaunching the application...')
       app.relaunch()
       app.exit()
     } catch (error) {
-      console.error('Failed to reset database:', error)
+      sysLogger.error('Failed to reset database:', error)
       throw new Error('Failed to reset database.')
     }
   }

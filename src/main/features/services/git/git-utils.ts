@@ -1,3 +1,4 @@
+import { sysLogger } from '@nodeUtils/sysLogger'
 import simpleGit, { SimpleGit } from 'simple-git'
 import { promises as fs } from 'fs'
 import * as path from 'path'
@@ -10,7 +11,7 @@ export async function isValidGitRepo(repoPath: string): Promise<boolean> {
     const isRepo = await git.checkIsRepo()
     return isRepo
   } catch (error) {
-    console.error('验证Git仓库失败:', error)
+    sysLogger.error('验证Git仓库失败:', error)
     return false
   }
 }
@@ -37,7 +38,7 @@ export async function findGitRepos(dir: string): Promise<{ name: string; path: s
           repos = repos.concat(await findGitRepos(fullPath))
         } catch (error) {
           // Ignore errors from directories we can't access
-          console.error(`Could not access ${fullPath}, skipping.`)
+          sysLogger.error(`Could not access ${fullPath}, skipping.`)
         }
       }
     }

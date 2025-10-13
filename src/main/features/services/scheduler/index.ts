@@ -1,7 +1,12 @@
+import { sysLogger } from '@nodeUtils/sysLogger'
 
 import { dbHelper } from '@features/database'
 import * as cron from 'node-cron'
-import type { ScheduledTask, CreateScheduledTaskDto, UpdateScheduledTaskDto } from '@shared/types/dtos/Scheduler'
+import type {
+  ScheduledTask,
+  CreateScheduledTaskDto,
+  UpdateScheduledTaskDto
+} from '@shared/types/dtos/Scheduler'
 import { BrowserWindow } from 'electron'
 import { getBuiltInTaskById } from './builtInTasks'
 
@@ -16,21 +21,21 @@ class SchedulerService {
   }
 
   private async initializeSchedulers() {
-    console.log('Initializing schedulers...')
+    sysLogger.log('Initializing schedulers...')
     const tasks = await this.getTasks({ isEnabled: 1 })
     for (const task of tasks) {
       this.startJob(task)
     }
-    console.log(`Initialized ${this.jobs.size} scheduled tasks.`)
+    sysLogger.log(`Initialized ${this.jobs.size} scheduled tasks.`)
   }
 
   private async executeAction(task: ScheduledTask) {
-    console.log(`Executing action for task: ${task.name} (ID: ${task.id})`)
+    sysLogger.log(`Executing action for task: ${task.name} (ID: ${task.id})`)
     switch (task.actionType) {
       case 'notification':
         const mainWindow = BrowserWindow.getAllWindows()[0]
         if (mainWindow) {
-          console.log(`Notification Payload: ${task.actionPayload}`)
+          sysLogger.log(`Notification Payload: ${task.actionPayload}`)
           mainWindow.webContents.send('show-notification', {
             title: 'Scheduled Task',
             body: task.actionPayload || `Task "${task.name}" has run.`
@@ -38,25 +43,25 @@ class SchedulerService {
         }
         break
       case 'run_script':
-        console.log(`Running script for task ${task.name}. Payload: ${task.actionPayload}`)
+        sysLogger.log(`Running script for task ${task.name}. Payload: ${task.actionPayload}`)
         // Placeholder for script execution logic
         break
       case 'built_in':
-        console.log(`Executing built-in task: ${task.actionPayload}`)
+        sysLogger.log(`Executing built-in task: ${task.actionPayload}`)
         const builtInTask = getBuiltInTaskById(task.actionPayload || '')
         if (builtInTask) {
           try {
             await builtInTask.execute()
-            console.log(`Built-in task "${builtInTask.name}" executed successfully.`)
+            sysLogger.log(`Built-in task "${builtInTask.name}" executed successfully.`)
           } catch (error) {
-            console.error(`Error executing built-in task "${builtInTask.name}":`, error)
+            sysLogger.error(`Error executing built-in task "${builtInTask.name}":`, error)
           }
         } else {
-          console.error(`Built-in task with ID "${task.actionPayload}" not found.`)
+          sysLogger.error(`Built-in task with ID "${task.actionPayload}" not found.`)
         }
         break
       default:
-        console.warn(`Unknown action type: ${task.actionType}`)
+        sysLogger.warn(`Unknown action type: ${task.actionType}`)
     }
   }
 
@@ -72,7 +77,7 @@ class SchedulerService {
         this.executeAction(task)
       })
       this.jobs.set(task.id, job)
-      console.log(`Scheduled task "${task.name}" (ID: ${task.id})`)
+      sysLogger.log(`Scheduled task "${task.name}" (ID: ${task.id})`)
     }
   }
 
@@ -80,7 +85,7 @@ class SchedulerService {
     if (this.jobs.has(taskId)) {
       this.jobs.get(taskId)!.stop()
       this.jobs.delete(taskId)
-      console.log(`Stopped scheduled task (ID: ${taskId})`)
+      sysLogger.log(`Stopped scheduled task (ID: ${taskId})`)
     }
   }
 

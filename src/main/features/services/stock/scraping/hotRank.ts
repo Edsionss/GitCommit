@@ -1,3 +1,4 @@
+import { sysLogger } from '@nodeUtils/sysLogger'
 //爬取同花顺热榜
 
 import { executeScrapingTask } from '@services/puppeteer'
@@ -86,7 +87,7 @@ export const scrapingHotStock = async () => {
           })
         }
       }
-      console.log(`${result[0].rankType} 爬取到${result.length}`)
+      sysLogger.log(`${result[0].rankType} 爬取到${result.length}`)
 
       return result
     })
@@ -134,7 +135,7 @@ export const scrapingHotETF = async () => {
           })
         }
       }
-      console.log(`${result[0].rankType} 爬取到${result.length}`)
+      sysLogger.log(`${result[0].rankType} 爬取到${result.length}`)
 
       return result
     })
@@ -180,7 +181,7 @@ export const scrapingHotTopic = async () => {
           })
         }
       }
-      console.log(`${result[0].rankType} 爬取到${result.length}`)
+      sysLogger.log(`${result[0].rankType} 爬取到${result.length}`)
 
       return result
     })
@@ -244,7 +245,7 @@ export const scrapingHotConcept = async (
             })
           }
         }
-        console.log(`${result[0].rankType} 爬取到${result.length}`)
+        sysLogger.log(`${result[0].rankType} 爬取到${result.length}`)
 
         return result
       },
@@ -280,7 +281,7 @@ export const scrapingAllHotRank = async () => {
         successfulResults.push(...result.value)
       } else {
         // 如果失败，记录错误
-        console.error(`爬取任务 ${index} 失败:`, result.reason)
+        sysLogger.error(`爬取任务 ${index} 失败:`, result.reason)
       }
     })
 
@@ -292,12 +293,12 @@ export const scrapingAllHotRank = async () => {
     const tradeDate = await getLastTradingDay()
     // 为每个成功的结果添加 ID
     const resultsWithIds = addIdsFast(successfulResults, 'hotRank', { tradeDate })
-    console.log(`成功爬取热榜到 ${resultsWithIds.length} 条数据`)
+    sysLogger.log(`成功爬取热榜到 ${resultsWithIds.length} 条数据`)
     return resultsWithIds
   } catch (error) {
     // 这里的 catch 现在主要捕获 allSettled 本身的错误（很少见）
     // 或者我们自己抛出的 '所有任务失败' 的错误
-    console.error('处理热榜数据时发生严重错误:', error)
+    sysLogger.error('处理热榜数据时发生严重错误:', error)
     throw error
   }
 }

@@ -1,3 +1,4 @@
+import { sysLogger } from '@nodeUtils/sysLogger'
 import { dbHelper } from '@features/database'
 import type { ScanHistoryItem, GitCommit } from '@sharedType/git'
 
@@ -18,7 +19,7 @@ export class ScanHistoryService {
         }
       })
     } catch (error) {
-      console.error('Error getting scan histories:', error)
+      sysLogger.error('Error getting scan histories:', error)
       return []
     }
   }
@@ -37,7 +38,7 @@ export class ScanHistoryService {
         results: commits
       }
     } catch (error) {
-      console.error(`Error getting scan history by id ${id}:`, error)
+      sysLogger.error(`Error getting scan history by id ${id}:`, error)
       return null
     }
   }
@@ -87,7 +88,7 @@ export class ScanHistoryService {
 
       return this.getScanHistoryById(id)!
     } catch (error) {
-      console.error('Error adding scan history:', error)
+      sysLogger.error('Error adding scan history:', error)
       throw error
     }
   }
@@ -138,7 +139,7 @@ export class ScanHistoryService {
 
       return true
     } catch (error) {
-      console.error(`Error updating scan history ${id}:`, error)
+      sysLogger.error(`Error updating scan history ${id}:`, error)
       return false
     }
   }
@@ -150,7 +151,7 @@ export class ScanHistoryService {
       const result = dbHelper.delete('scan_histories', { id })
       return result.changes > 0
     } catch (error) {
-      console.error(`Error deleting scan history ${id}:`, error)
+      sysLogger.error(`Error deleting scan history ${id}:`, error)
       return false
     }
   }
@@ -163,7 +164,7 @@ export class ScanHistoryService {
       dbHelper.clearTable('scan_histories')
       return true
     } catch (error) {
-      console.error('Error deleting all scan histories:', error)
+      sysLogger.error('Error deleting all scan histories:', error)
       return false
     }
   }

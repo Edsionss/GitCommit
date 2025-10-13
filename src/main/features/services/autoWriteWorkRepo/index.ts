@@ -1,3 +1,4 @@
+import { sysLogger } from '@nodeUtils/sysLogger'
 import { executeScrapingTask } from '@services/puppeteer'
 export const AutomaticallyFillWorkSheet = async (data: any) => {
   await executeScrapingTask({
@@ -15,17 +16,17 @@ export const AutomaticallyFillWorkSheet = async (data: any) => {
       } = repoData
       // 1. 导航到登录页面 (请替换为你的实际网址)
       await page.goto('http://www.bpsip.com/BPGL/userlogin.jsp', { waitUntil: 'networkidle0' })
-      console.log('navigated to login page.')
+      sysLogger.log('navigated to login page.')
 
       // 2. 填写用户名和密码
       await page.type('#username', username, { delay: 100 }) // delay 模拟真实输入
       await page.type('#password', password, { delay: 100 })
-      console.log('credentials filled.')
+      sysLogger.log('credentials filled.')
 
       // 3. 点击登录按钮并等待导航完成
       await page.click('.login')
       await page.waitForSelector('.panel-tool-expand', { visible: true })
-      console.log('logged in successfully.')
+      sysLogger.log('logged in successfully.')
 
       // 4. 导航到日志填写页面
       // 点开折叠栏
@@ -41,14 +42,14 @@ export const AutomaticallyFillWorkSheet = async (data: any) => {
       page.click('text/开发需求人天补充表')
       const iframeSelector = 'iframe[name="inner-frame"]'
       await page.waitForSelector(iframeSelector, { visible: true })
-      console.log('iframe loading success')
+      sysLogger.log('iframe loading success')
       const iframeElementHandle = await page.$(iframeSelector)
       if (iframeElementHandle) {
-        console.log('iframe get success')
+        sysLogger.log('iframe get success')
         const frame = await iframeElementHandle.contentFrame()
 
         if (frame) {
-          console.log('iframe contentFrame success')
+          sysLogger.log('iframe contentFrame success')
           await frame.waitForSelector('#defaultTablediv')
           await frame.type('[name="C_fxmmc"]', projectName, { delay: 100 }) // delay 模拟真实输入
           await frame.type('[name="C_fbz"]', taskDescription, { delay: 100 }) // delay 模拟真实输入
@@ -59,7 +60,7 @@ export const AutomaticallyFillWorkSheet = async (data: any) => {
             // @ts-ignore
             document.querySelector('[name="C_frq"]').value = date
           }, completionDate)
-          console.log('write success')
+          sysLogger.log('write success')
 
           await frame.click('#save')
         }

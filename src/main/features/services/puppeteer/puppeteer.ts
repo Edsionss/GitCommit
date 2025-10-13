@@ -1,3 +1,4 @@
+import { sysLogger } from '@nodeUtils/sysLogger'
 // puppeteer.ts
 import puppeteer, { Browser, Page, Target } from 'puppeteer-core'
 
@@ -18,18 +19,18 @@ class PuppeteerService {
    */
   public async connect(): Promise<void> {
     if (this.isConnected()) {
-      console.log('[PuppeteerService] Already connected.')
+      sysLogger.log('[PuppeteerService] Already connected.')
       return
     }
     try {
       this.browser = await puppeteer.connect({ browserURL: this.options.browserURL })
       this.browser.on('disconnected', () => {
-        console.log('[PuppeteerService] Browser disconnected.')
+        sysLogger.log('[PuppeteerService] Browser disconnected.')
         this.browser = null
       })
-      console.log('[PuppeteerService] Successfully connected to browser.')
+      sysLogger.log('[PuppeteerService] Successfully connected to browser.')
     } catch (error) {
-      console.error('[PuppeteerService] Failed to connect to browser:', error)
+      sysLogger.error('[PuppeteerService] Failed to connect to browser:', error)
       this.browser = null // 确保状态正确
       throw error
     }
@@ -44,7 +45,7 @@ class PuppeteerService {
     }
     await this.browser?.disconnect()
     this.browser = null
-    console.log('[PuppeteerService] Disconnected from browser.')
+    sysLogger.log('[PuppeteerService] Disconnected from browser.')
   }
 
   /**
@@ -76,7 +77,7 @@ class PuppeteerService {
       if (foundTarget) {
         const page = await foundTarget.page()
         if (page) {
-          console.log(`[PuppeteerService] Found page: ${url}`)
+          sysLogger.log(`[PuppeteerService] Found page: ${url}`)
           return page
         }
       }

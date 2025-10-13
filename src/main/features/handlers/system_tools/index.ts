@@ -1,3 +1,4 @@
+import { sysLogger } from '@nodeUtils/sysLogger'
 
 import { ipcMain } from 'electron'
 import { getMainWindow } from '@main/index'
@@ -63,7 +64,7 @@ export function registerSystemToolsHandlers() {
       getMainWindow()?.webContents.send('startup-apps-updated', apps)
     } catch (error) {
       // 可以在这里向前端发送一个错误通知
-      console.error(`Failed to remove startup app ${name}:`, error)
+      sysLogger.error(`Failed to remove startup app ${name}:`, error)
       getMainWindow()?.webContents.send('error-notification', {
         title: '删除失败',
         body: `删除启动项 ${name} 时出错。`

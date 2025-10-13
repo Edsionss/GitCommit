@@ -1,13 +1,14 @@
+import { sysLogger } from '@nodeUtils/sysLogger'
 import axios from 'axios'
 import { SMA, MACD, RSI, BollingerBands, Stochastic } from 'technicalindicators'
 import { executeScrapingTask } from '@services/puppeteer'
 
 export const searchStock = async (keyword) => {
   if (!keyword) {
-    console.error('请输入搜索关键字')
+    sysLogger.error('请输入搜索关键字')
     return []
   }
-  console.log(await getStockBasicInfo('600519'))
+  sysLogger.log(await getStockBasicInfo('600519'))
 
   // 东方财富的搜索建议接口 URL
   const url = `http://searchapi.eastmoney.com/api/suggest/get`
@@ -63,7 +64,7 @@ export const searchStock = async (keyword) => {
       return []
     }
   } catch (error) {
-    console.error('查询股票时出错:', error?.message)
+    sysLogger.error('查询股票时出错:', error?.message)
     return []
   }
 }
@@ -114,7 +115,7 @@ export const fetchKLineData = async (code: string, days: number): Promise<any[]>
 
     const data = response.data.data
     if (!data || !data.klines) {
-      console.error('未能获取到K线数据，请检查股票代码是否正确。')
+      sysLogger.error('未能获取到K线数据，请检查股票代码是否正确。')
       return []
     }
 
@@ -134,7 +135,7 @@ export const fetchKLineData = async (code: string, days: number): Promise<any[]>
 
     return parsedData
   } catch (error) {
-    console.error('获取K线数据时出错:', error?.message)
+    sysLogger.error('获取K线数据时出错:', error?.message)
     return []
   }
 }
@@ -197,7 +198,7 @@ export function calculateIndicators(klineData: any[]) {
  */
 export async function fetchNews(code: string, name: string) {
   const dom = executeScrapingTask(`https://www.cls.cn/telegraph`, (): any => {
-    console.log(window.document)
+    sysLogger.log(window.document)
     return window.document.body.innerText
   })
 
@@ -262,7 +263,7 @@ export async function fetchNews(code: string, name: string) {
     }
     return []
   } catch (error) {
-    console.error('获取新闻资讯时出错:', error?.message)
+    sysLogger.error('获取新闻资讯时出错:', error?.message)
     return []
   }
 }
@@ -304,7 +305,7 @@ async function getStockBasicInfo(stockCode) {
     secid = `0.${stockCode}`
     marketName = 'BJ' // 北京
   } else {
-    console.error(`未知的股票代码前缀: ${stockCode}`)
+    sysLogger.error(`未知的股票代码前缀: ${stockCode}`)
     return null
   }
 
@@ -328,11 +329,11 @@ async function getStockBasicInfo(stockCode) {
   try {
     // 3. 发送GET请求
     const response = await axios.get(url, { params, headers })
-    console.log(response)
+    sysLogger.log(response)
 
     const data = response.data
     if (!data || !data.data) {
-      console.error(`未能获取到股票 ${stockCode} 的有效数据。`)
+      sysLogger.error(`未能获取到股票 ${stockCode} 的有效数据。`)
       return null
     }
 
@@ -357,7 +358,7 @@ async function getStockBasicInfo(stockCode) {
 
     return result
   } catch (error) {
-    console.error(`请求股票 ${stockCode} 数据时发生错误:`, error.message)
+    sysLogger.error(`请求股票 ${stockCode} 数据时发生错误:`, error.message)
     return null
   }
 }

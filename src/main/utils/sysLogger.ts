@@ -6,20 +6,21 @@ import { systemLogService, type SystemLogService } from '@services/systemLog'
  */
 class SysLogger {
   private systemLogService: SystemLogService = systemLogService
+  private isSavingToDatabase = false // 防止循环引用的标志
 
   constructor() {
     // 延迟加载服务，避免循环依赖
-    this.initService()
+    // this.initService()
   }
 
-  private initService() {
-    // try {
-    //   // 动态导入服务，避免循环依赖
-    //   // this.systemLogService = systemLogService
-    // } catch (error) {
-    //   console.error('Failed to initialize systemLogService:', error)
-    // }
-  }
+  // private initService() {
+  //   // try {
+  //   //   // 动态导入服务，避免循环依赖
+  //   //   // this.systemLogService = systemLogService
+  //   // } catch (error) {
+  //   //   console.error('Failed to initialize systemLogService:', error)
+  //   // }
+  // }
 
   /**
    * 记录普通日志
@@ -87,10 +88,15 @@ class SysLogger {
    * @param args - 日志内容数组
    */
   private saveLogToDatabase(level: 'log' | 'warn' | 'error', args: any[]): void {
+    // 如果正在保存日志到数据库，则跳过以防止循环引用
+    if (this.isSavingToDatabase) {
+      return
+    }
+
     try {
       // 如果服务未初始化，尝试重新初始化
       if (!this.systemLogService) {
-        this.initService()
+        // this.initService()
       }
 
       // 如果服务仍然不可用，跳过数据库存储
@@ -118,12 +124,22 @@ class SysLogger {
         level
       }
 
+      // 设置标志，防止循环引用
+      this.isSavingToDatabase = true
+      
       // 异步保存日志，不阻塞主线程
       this.systemLogService.addSystemLog(logRequest).catch((error) => {
+        // 使用原生 console.error 而不是 sysLogger.error，防止循环引用
         console.error('Failed to save system log:', error)
+      }).finally(() => {
+        // 无论成功或失败，都要重置标志
+        this.isSavingToDatabase = false
       })
     } catch (error) {
+      // 使用原生 console.error 而不是 sysLogger.error，防止循环引用
       console.error('Error in saveLogToDatabase:', error)
+      // 确保在出错时也重置标志
+      this.isSavingToDatabase = false
     }
   }
 }

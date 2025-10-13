@@ -1,3 +1,4 @@
+import { sysLogger } from '@nodeUtils/sysLogger'
 // puppeteer-service.ts
 
 import { puppeteerService } from './puppeteer'
@@ -59,7 +60,7 @@ export async function executeScrapingTask<T>(
 
     // 让窗口加载这个唯一的 URL
     await scrapeWindow.loadURL(targetUrl)
-    console.log(`[Generic Service] Created off-screen window, unique URL: ${targetUrl}`)
+    sysLogger.log(`[Generic Service] Created off-screen window, unique URL: ${targetUrl}`)
 
     // 获取你想要操作的 Page 对象
     page = await puppeteerService.findPageByUrl(targetUrl)
@@ -72,14 +73,14 @@ export async function executeScrapingTask<T>(
         let beforeData = await beforeExecution(page, beforeExecutionData, scrapeWindow)
         resultData = smartMerge(resultData, beforeData)
       } catch (error) {
-        console.error('[PuppeteerService] Error occurred during beforeExecution:', error)
+        sysLogger.error('[PuppeteerService] Error occurred during beforeExecution:', error)
         throw error
       }
     }
 
     // 执行核心的抓取逻辑
     if (url) {
-      console.log(`[Generic Service] Navigating to target URL: ${url}`)
+      sysLogger.log(`[Generic Service] Navigating to target URL: ${url}`)
       // 使用更长的超时和更合适的等待条件
       await page.goto(url, { waitUntil: 'networkidle0' })
     }
@@ -100,7 +101,7 @@ export async function executeScrapingTask<T>(
 
     return resultData
   } catch (error) {
-    console.error('[PuppeteerService] Error occurred while executing scraping task:', error)
+    sysLogger.error('[PuppeteerService] Error occurred while executing scraping task:', error)
     if (page && captureError) {
       const errorLogDir = path.join(process.cwd(), 'puppeteer', 'puppeteerError')
 
@@ -108,7 +109,7 @@ export async function executeScrapingTask<T>(
       const errorTimestamp = now.format('YYYYMMDD-HHmmss')
       const specificErrorDir = path.join(errorLogDir, errorTimestamp)
 
-      console.log(`[PuppeteerService] Saving debug info to: ${specificErrorDir}`)
+      sysLogger.log(`[PuppeteerService] Saving debug info to: ${specificErrorDir}`)
 
       // 日志内容初始化
       let logContent = `[${now.format('YYYY-MM-DD HH:mm:ss')}] - Primary Scraping Error\n`
@@ -122,14 +123,14 @@ export async function executeScrapingTask<T>(
       try {
         const htmlContent = await page.content()
         writeResultFile(specificErrorDir, htmlContent, 'page', 'html')
-        console.log(`[PuppeteerService] Successfully saved HTML.`)
+        sysLogger.log(`[PuppeteerService] Successfully saved HTML.`)
       } catch (htmlError) {
         const errMsg =
           `\n[${dayjs().format('YYYY-MM-DD HH:mm:ss')}] - FAILED TO SAVE HTML\n` +
           '======================================================\n' +
           (htmlError instanceof Error ? htmlError.stack : JSON.stringify(htmlError)) +
           '\n'
-        console.error(errMsg)
+        sysLogger.error(errMsg)
         logContent += errMsg
       }
 
@@ -137,7 +138,7 @@ export async function executeScrapingTask<T>(
       try {
         const screenshotBuffer = await page.screenshot({ fullPage: true })
         writeResultFile(specificErrorDir, screenshotBuffer, 'screenshot', 'png')
-        console.log(`[PuppeteerService] Successfully saved screenshot.`)
+        sysLogger.log(`[PuppeteerService] Successfully saved screenshot.`)
       } catch (screenshotError) {
         const errMsg =
           `\n[${dayjs().format('YYYY-MM-DD HH:mm:ss')}] - FAILED TO SAVE SCREENSHOT\n` +
@@ -146,16 +147,19 @@ export async function executeScrapingTask<T>(
             ? screenshotError.stack
             : JSON.stringify(screenshotError)) +
           '\n'
-        console.error(errMsg)
+        sysLogger.error(errMsg)
         logContent += errMsg
       }
 
       // 3️⃣ 写入日志
       try {
         writeResultFile(specificErrorDir, logContent, 'error', 'log')
-        console.log(`[PuppeteerService] Successfully saved error log.`)
+        sysLogger.log(`[PuppeteerService] Successfully saved error log.`)
       } catch (logWriteError) {
-        console.error(`[PuppeteerService] CRITICAL: Failed to write error log file:`, logWriteError)
+        sysLogger.error(
+          `[PuppeteerService] CRITICAL: Failed to write error log file:`,
+          logWriteError
+        )
       }
     }
     throw error

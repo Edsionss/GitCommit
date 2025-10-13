@@ -1,3 +1,4 @@
+import { sysLogger } from '@nodeUtils/sysLogger'
 import { session, app } from 'electron'
 import { execSync } from 'child_process'
 import { settingsService } from '@features/services/settings'
@@ -37,7 +38,7 @@ export const beforeCreate = () => {
     try {
       execSync('chcp 65001')
     } catch (e) {
-      console.warn('Failed to set console code page:', e)
+      sysLogger.warn('Failed to set sysLogger code page:', e)
     }
   }
   // 确保 stdout/stderr 默认用 utf-8
@@ -97,17 +98,17 @@ export const whenReady = () => {
 
   // thsTest()
   // AutomaticallyFillWorkSheet({})
-  // console.log(scrapingStockInfo('亚太药业')
+  // sysLogger.log(scrapingStockInfo('亚太药业')
   // stockSectorService.clearAllSectors()
   // scrapingThsIndustry().then((data: any) => {
   //   // stockSectorService.addSectors(transformDataForDB(data || []))
-  //   // console.log(transformDataForDB(data || []))
+  //   // sysLogger.log(transformDataForDB(data || []))
   // })
 
   // scrapingThsStockFunds().then((data: any) => {
   //   // stockSectorService.addSectors(transformDataForDB(data || []))
-  //   // console.log(transformDataForDB(data || []))
-  //   console.log(data)
+  //   // sysLogger.log(transformDataForDB(data || []))
+  //   sysLogger.log(data)
   // })
 
   // scrapingHotStock()
@@ -124,9 +125,9 @@ export const willQuit = () => {
   // 在这里关闭数据库连接
   if (db) {
     // 您的 db 实例
-    console.log('Closing database connection...')
+    sysLogger.log('Closing database connection...')
     db.close()
-    console.log('Database connection closed.')
+    sysLogger.log('Database connection closed.')
   }
 }
 // 激活应用时的周期函数

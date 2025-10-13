@@ -1,3 +1,4 @@
+import { sysLogger } from '@nodeUtils/sysLogger'
 import { dbHelper } from '@features/database'
 
 import { AuditLog } from '@sharedType/auditLog'
@@ -38,7 +39,7 @@ class AuditLogService {
 
       return { records, total }
     } catch (error) {
-      console.error('Error fetching audit logs:', error)
+      sysLogger.error('Error fetching audit logs:', error)
       // 在实际应用中, 可能需要更复杂的错误处理
       return { records: [], total: 0 }
     }
@@ -63,7 +64,7 @@ class AuditLogService {
       const result = dbHelper.execute(sql, ids)
       return result
     } catch (error) {
-      console.error('Error deleting audit logs:', error)
+      sysLogger.error('Error deleting audit logs:', error)
       // 抛出错误，让调用者能够捕获并处理
       throw new Error(`删除审计日志失败: ${error instanceof Error ? error.message : String(error)}`)
     }
@@ -78,7 +79,7 @@ class AuditLogService {
       const result = await dbHelper.clearTable(AuditLogService.TABLE_NAME)
       return result
     } catch (error) {
-      console.error('Error clearing audit logs:', error)
+      sysLogger.error('Error clearing audit logs:', error)
       return { changes: 0 }
     }
   }

@@ -1,3 +1,4 @@
+import { sysLogger } from '@nodeUtils/sysLogger'
 import { executeScrapingTask } from '@services/puppeteer'
 import { getYesterdayCN, isTimeAfter, addIdsFast } from '@nodeUtils/index'
 import type { StockNews } from '@sharedType/stockNews'
@@ -16,7 +17,7 @@ export const telegraphTest = async (dateStr?: string, timeStr?: string) => {
           (response) => response.url().includes('telegraphList') && response.status() === 200
         )
       ])
-      console.log('✅ 加载更多完成')
+      sysLogger.log('✅ 加载更多完成')
       const getStopScroll = () => {
         return page.evaluate(
           (dateStr: string, timeStr: string, isTimeAfterStr: string) => {
@@ -107,11 +108,11 @@ export const telegraphTest = async (dateStr?: string, timeStr?: string) => {
       while (stopScroll) {
         // 滚动到页面底部以触发“加载更多”
         await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight))
-        console.log('✅ 滚动完成')
+        sysLogger.log('✅ 滚动完成')
         page.waitForResponse(
           (response) => response.url().includes('telegraphList') && response.status() === 200
         )
-        console.log('✅ 等待加载完成')
+        sysLogger.log('✅ 等待加载完成')
 
         // 判断是否需要停止（解构返回值）
         const { stopScroll: newStopScroll, result: newResult } = await getStopScroll()

@@ -1,3 +1,4 @@
+import { sysLogger } from '@nodeUtils/sysLogger'
 import { ipcMain } from 'electron'
 import { routesMenuService } from '@features/services/routes_menu'
 import type { RouteRecord } from '@sharedType/MenuManagement'
@@ -8,7 +9,7 @@ export function registerRoutesMenuHandlers() {
     try {
       return await routesMenuService.getAllMenus()
     } catch (error) {
-      console.error('IPC Error: Failed to get all menus', error)
+      sysLogger.error('IPC Error: Failed to get all menus', error)
       return []
     }
   })
@@ -18,7 +19,7 @@ export function registerRoutesMenuHandlers() {
     try {
       return await routesMenuService.addMenu(menu)
     } catch (error) {
-      console.error('IPC Error: Failed to add menu', error)
+      sysLogger.error('IPC Error: Failed to add menu', error)
       throw error // 将错误传递给渲染器进程
     }
   })
@@ -28,7 +29,7 @@ export function registerRoutesMenuHandlers() {
     try {
       return await routesMenuService.addMenus(menus)
     } catch (error) {
-      console.error('IPC Error: Failed to add menus', error)
+      sysLogger.error('IPC Error: Failed to add menus', error)
       throw error // 将错误传递给渲染器进程
     }
   })
@@ -38,7 +39,7 @@ export function registerRoutesMenuHandlers() {
     try {
       return await routesMenuService.updateMenu(menu)
     } catch (error) {
-      console.error('IPC Error: Failed to update menu', error)
+      sysLogger.error('IPC Error: Failed to update menu', error)
       throw error
     }
   })
@@ -48,7 +49,7 @@ export function registerRoutesMenuHandlers() {
     try {
       return await routesMenuService.deleteMenu(id)
     } catch (error) {
-      console.error('IPC Error: Failed to delete menu', error)
+      sysLogger.error('IPC Error: Failed to delete menu', error)
       throw error
     }
   })
@@ -58,7 +59,7 @@ export function registerRoutesMenuHandlers() {
     try {
       return await routesMenuService.cleanMenu()
     } catch (error) {
-      console.error('IPC Error: Failed to cleanMenu menu', error)
+      sysLogger.error('IPC Error: Failed to cleanMenu menu', error)
       throw error
     }
   })

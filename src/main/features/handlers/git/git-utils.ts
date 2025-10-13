@@ -1,3 +1,4 @@
+import { sysLogger } from '@nodeUtils/sysLogger'
 import { ipcMain } from 'electron'
 import { isValidGitRepo, findGitRepos } from '@services/git/git-utils'
 
@@ -15,7 +16,7 @@ export function registerGitUtilsHandlers() {
       return { success: true, repos }
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : String(error)
-      console.error('查找子仓库失败:', errorMessage)
+      sysLogger.error('查找子仓库失败:', errorMessage)
       return { success: false, error: errorMessage }
     }
   })

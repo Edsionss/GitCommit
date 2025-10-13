@@ -1,3 +1,4 @@
+import { sysLogger } from '@nodeUtils/sysLogger'
 import { dbHelper } from '@features/database'
 import { scrapingThsIndustry } from '@services/stock/scraping/sectors'
 import { getLastTradingDay } from '@shared/utils'
@@ -64,8 +65,8 @@ export class StockSectorCamelCasesService {
    * @returns 插入结果
    */
   public async scrapeAndInsertSectors(): Promise<RunResult[]> {
-    const sectorsData = await scrapingThsIndustry();
-    return this.insertMany(sectorsData);
+    const sectorsData = await scrapingThsIndustry()
+    return this.insertMany(sectorsData)
   }
 
   /**
@@ -75,9 +76,9 @@ export class StockSectorCamelCasesService {
    */
   public async findByTradeDateOrDefault(tradeDate?: string): Promise<StockSectorCamelCase[]> {
     if (!tradeDate) {
-      tradeDate = await getLastTradingDay();
+      tradeDate = await getLastTradingDay()
     }
-    return this.findByTradeDate(tradeDate);
+    return this.findByTradeDate(tradeDate)
   }
 
   /**
@@ -232,7 +233,7 @@ export function transformDataForDB(rawData: any[]): StockSectorCamelCase[] {
       try {
         columns[key] = JSON.parse(item.value)
       } catch (e) {
-        console.error(`Error parsing JSON for title "${item.title}":`, e)
+        sysLogger.error(`Error parsing JSON for title "${item.title}":`, e)
         return [] // 解析失败则返回空数组
       }
     }

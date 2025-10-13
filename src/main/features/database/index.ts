@@ -1,3 +1,4 @@
+import { sysLogger } from '@nodeUtils/sysLogger'
 import Database from 'better-sqlite3'
 import { Database as SqliteDatabase } from 'better-sqlite3'
 import path from 'path'
@@ -12,9 +13,9 @@ db.pragma('journal_mode = WAL') // 开启 WAL 模式 “读”和“写”可以
 export function initializeDatabase() {
   try {
     db.exec(schema)
-    console.log(`Database tables created or already exist at: ${dbPath}.`)
+    sysLogger.log(`Database tables created or already exist at: ${dbPath}.`)
   } catch (error) {
-    console.error('Error initializing database:', error)
+    sysLogger.error('Error initializing database:', error)
   }
 }
 

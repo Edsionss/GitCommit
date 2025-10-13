@@ -1,3 +1,4 @@
+import { sysLogger } from '@nodeUtils/sysLogger'
 import { executeScrapingTask } from '@services/puppeteer'
 import { mergeColumnArrayList, scrapePaginatedTable, addIdsFast } from '@nodeUtils/index'
 import { getLastTradingDay } from '@shared/utils/'
@@ -10,7 +11,7 @@ export const scrapingThsIndustry = async () => {
       const homeUrl = 'https://q.10jqka.com.cn/thshy/'
       // 设置一个较长的超时时间，并等待网络空闲
       await page.goto(homeUrl, { waitUntil: 'networkidle2', timeout: 60000 })
-      console.log(`📄 正在访问首页: ${homeUrl}`)
+      sysLogger.log(`📄 正在访问首页: ${homeUrl}`)
       const allData: any[] = await scrapePaginatedTable({
         page,
         processPageDataCallback: (pageData: any[]) => {
@@ -23,9 +24,9 @@ export const scrapingThsIndustry = async () => {
         }
       })
 
-      console.log(`🎉 抓取完成！共获得 ${allData.length} 条数据。`)
+      sysLogger.log(`🎉 抓取完成！共获得 ${allData.length} 条数据。`)
       const tradeDate = await getLastTradingDay()
-      console.log(`📅 最近交易日: ${tradeDate}`)
+      sysLogger.log(`📅 最近交易日: ${tradeDate}`)
       // return transformDataForDB(
       //   addIdsFast(mergeColumnArrayList(allData), 'thsIndustryId', { tradeDate })
       // )

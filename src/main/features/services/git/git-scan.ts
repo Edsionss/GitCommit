@@ -1,3 +1,4 @@
+import { sysLogger } from '@nodeUtils/sysLogger'
 import simpleGit, { SimpleGit, LogOptions } from 'simple-git'
 import * as path from 'path'
 // import { isValidGitRepo, findGitRepos } from './git-utils-service'
@@ -59,18 +60,18 @@ export async function scanGitRepository(
 
   // 收集扫描日志
   const scanLogs: string[] = options?.log || []
-  
+
   const addScanLog = (msg: string) => {
     const timestamp = new Date().toLocaleTimeString()
     const formattedLog = `[${timestamp}] ${msg}`
     scanLogs.push(formattedLog)
-    console.log(formattedLog)
+    sysLogger.log(formattedLog)
   }
 
   try {
     // 重置取消标志
     cancelScanFlag = false
-    
+
     addScanLog(`开始扫描仓库: ${repoPath}`)
 
     let reposToScan: string[] = []
@@ -128,7 +129,7 @@ export async function scanGitRepository(
         if (!latestLog) {
           const warnMsg = `跳过空仓库 (无提交): ${currentRepoPath}`
           addScanLog(`警告: ${warnMsg}`)
-          console.warn(warnMsg)
+          sysLogger.warn(warnMsg)
           continue
         }
 
@@ -154,7 +155,9 @@ export async function scanGitRepository(
         if (options?.dateRange && options.dateRange[0] && options.dateRange[1]) {
           logOptions['--after'] = `"${options.dateRange[0]}"`
           logOptions['--before'] = `"${options.dateRange[1]}"`
-          addScanLog(`${progressPrefix} - 日期范围: ${options.dateRange[0]} 至 ${options.dateRange[1]}`)
+          addScanLog(
+            `${progressPrefix} - 日期范围: ${options.dateRange[0]} 至 ${options.dateRange[1]}`
+          )
         }
 
         if (options?.authorFilter && options.authorFilter.length > 0) {
@@ -205,22 +208,22 @@ export async function scanGitRepository(
             branch: options?.branches?.join(', ') || currentBranch
           })
         }
-        
+
         addScanLog(`${progressPrefix} - 完成，找到 ${logResult.all.length} 条提交记录`)
       } catch (repoError) {
         const errorMsg = repoError instanceof Error ? repoError.message : String(repoError)
         addScanLog(`扫描仓库 ${currentRepoPath} 失败: ${errorMsg}`)
-        console.error(`扫描仓库 ${currentRepoPath} 失败: ${errorMsg}`)
+        sysLogger.error(`扫描仓库 ${currentRepoPath} 失败: ${errorMsg}`)
         // Continue to the next repo
       }
     }
 
-    console.log(
+    sysLogger.log(
       `Returning ${allCommits.length} commits. Sample:`,
       JSON.stringify(allCommits.slice(0, 2), null, 2)
     )
     addScanLog(`总共找到 ${allCommits.length} 条提交记录`)
-    
+
     let analysisResult: any = ''
     if (options?.AutoAiAnalysis && options?.analysisRules && aiConfig) {
       if (allCommits.length) {
@@ -252,11 +255,11 @@ export async function scanGitRepository(
       }
       await scanHistoryService.addScanHistory(scanHistory)
       addScanLog('扫描历史已保存到数据库')
-      console.log('Scan history saved to database successfully')
+      sysLogger.log('Scan history saved to database successfully')
     } catch (error) {
       const errorMsg = error instanceof Error ? error.message : String(error)
       addScanLog(`保存扫描历史失败: ${errorMsg}`)
-      console.error('Failed to save scan history to database:', error)
+      sysLogger.error('Failed to save scan history to database:', error)
     }
 
     return { commits: allCommits, analysisResult }

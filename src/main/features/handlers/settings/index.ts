@@ -1,3 +1,4 @@
+import { sysLogger } from '@nodeUtils/sysLogger'
 import { ipcMain } from 'electron'
 import { settingsService } from '@services/settings'
 
@@ -7,7 +8,7 @@ export function registerSettingsHandlers() {
     try {
       return settingsService.getAutoStartStatus()
     } catch (error) {
-      console.error('IPC Error: Failed to get auto-start status', error)
+      sysLogger.error('IPC Error: Failed to get auto-start status', error)
       return false
     }
   })
@@ -18,7 +19,7 @@ export function registerSettingsHandlers() {
       settingsService.setAutoStart(isEnabled)
       return { success: true }
     } catch (error) {
-      console.error('IPC Error: Failed to set auto-start status', error)
+      sysLogger.error('IPC Error: Failed to set auto-start status', error)
       return { success: false, error: (error as Error).message }
     }
   })

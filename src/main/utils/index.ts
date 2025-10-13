@@ -1,3 +1,4 @@
+import { sysLogger } from '@nodeUtils/sysLogger'
 import { networkInterfaces } from 'os'
 import { Notification } from 'electron'
 import { flashMainWindow, getMainWindow } from '@main/index'
@@ -331,7 +332,7 @@ export function writeResultFile(
     fs.writeFileSync(filePath, content)
   }
 
-  console.log(`✅ 文件已写入: ${filePath}`)
+  sysLogger.log(`✅ 文件已写入: ${filePath}`)
   return filePath
 }
 
@@ -384,16 +385,16 @@ export async function scrapePaginatedTable({
     return parseInt(pageText.split('/')[1], 10) || 1
   }, totalPagesSelector)
 
-  console.log(`📄 共 ${totalPages} 页`)
+  sysLogger.log(`📄 共 ${totalPages} 页`)
 
   // --- 2. 循环所有分页 ---
   for (let currentPage = 1; currentPage <= (maxPages || totalPages); currentPage++) {
-    console.log(`🔎 正在处理第 ${currentPage} 页...`)
+    sysLogger.log(`🔎 正在处理第 ${currentPage} 页...`)
 
     try {
       // 对于第一页之后的所有页，执行点击和等待操作
       if (currentPage > 1) {
-        console.log(`🖱️ 点击下一页 (选择器: ${nextPageSelector})...`)
+        sysLogger.log(`🖱️ 点击下一页 (选择器: ${nextPageSelector})...`)
         await page.click(nextPageSelector)
 
         // 等待 Ajax 请求完成，这是比固定等待时间更可靠的方法
@@ -428,10 +429,10 @@ export async function scrapePaginatedTable({
 
       allData.push(processedData as any[]) // 将处理后的数据合并到总数组中
 
-      console.log(`✅ 第 ${currentPage} 页处理完毕，获得 ${processedData.length} 条数据。`)
+      sysLogger.log(`✅ 第 ${currentPage} 页处理完毕，获得 ${processedData.length} 条数据。`)
     } catch (error) {
-      console.error(`❌ 处理第 ${currentPage} 页时发生错误:`)
-      console.log('跳过此页，继续处理下一页...')
+      sysLogger.error(`❌ 处理第 ${currentPage} 页时发生错误:`)
+      sysLogger.log('跳过此页，继续处理下一页...')
       throw error
       // continue // 如果某一页出错，可以选择跳过
     }

@@ -1,9 +1,10 @@
+import { sysLogger } from '@nodeUtils/sysLogger'
 // modify-windows-env.js
 
 import { execSync } from 'child_process'
 // 检查是否在 Windows 系统上运行
 if (process.platform !== 'win32') {
-  console.error('此脚本只能在 Windows 系统上运行。')
+  sysLogger.error('此脚本只能在 Windows 系统上运行。')
   process.exit(1)
 }
 
@@ -14,22 +15,22 @@ if (process.platform !== 'win32') {
  * @param {boolean} isSystemVar 是否设置为系统变量 (需要管理员权限)
  */
 function setPermanentEnvVar(key, value, isSystemVar = false) {
-  console.log(`正在设置环境变量: ${key} = ${value}`)
+  sysLogger.log(`正在设置环境变量: ${key} = ${value}`)
   try {
     // setx 命令需要将值放在最后
     // /M 开关表示设置系统变量 (Machine level)
     const command = `setx ${key} "${value}" ${isSystemVar ? '/M' : ''}`
-    console.log(`执行命令: ${command}`)
+    sysLogger.log(`执行命令: ${command}`)
 
     // 使用 execSync 同步执行命令
     const output = execSync(command)
-    console.log(`命令输出: ${output.toString()}`)
-    console.log(`✅ 成功设置环境变量 "${key}"。请重新打开一个新的终端以使其生效。`)
+    sysLogger.log(`命令输出: ${output.toString()}`)
+    sysLogger.log(`✅ 成功设置环境变量 "${key}"。请重新打开一个新的终端以使其生效。`)
   } catch (error) {
     error as Error
-    console.error(`❌ 设置环境变量 "${key}" 时出错:`, error.message)
+    sysLogger.error(`❌ 设置环境变量 "${key}" 时出错:`, error.message)
     if (isSystemVar && error.message.includes('access denied')) {
-      console.error('提示: 设置系统变量需要以管理员权限运行此脚本。')
+      sysLogger.error('提示: 设置系统变量需要以管理员权限运行此脚本。')
     }
   }
 }
@@ -41,17 +42,17 @@ function setPermanentEnvVar(key, value, isSystemVar = false) {
  * @param {boolean} isSystemVar 是否为系统变量 (需要管理员权限)
  */
 function deletePermanentEnvVar(key, isSystemVar = false) {
-  console.log(`正在删除环境变量: ${key}`)
+  sysLogger.log(`正在删除环境变量: ${key}`)
   try {
     // setx 没有直接的删除命令，最佳实践是将其值设置为空
     const command = `setx ${key} "" ${isSystemVar ? '/M' : ''}`
-    console.log(`执行命令: ${command}`)
+    sysLogger.log(`执行命令: ${command}`)
     execSync(command)
-    console.log(`✅ 成功将环境变量 "${key}" 的值清空。请重新打开一个新的终端以使其生效。`)
+    sysLogger.log(`✅ 成功将环境变量 "${key}" 的值清空。请重新打开一个新的终端以使其生效。`)
   } catch (error) {
     error as Error
 
-    console.error(`❌ 删除环境变量 "${key}" 时出错:`, error.message)
+    sysLogger.error(`❌ 删除环境变量 "${key}" 时出错:`, error.message)
   }
 }
 

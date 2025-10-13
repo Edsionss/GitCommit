@@ -1,3 +1,4 @@
+import { sysLogger } from '@nodeUtils/sysLogger'
 import { ipcMain } from 'electron'
 import simpleGit, { SimpleGit } from 'simple-git'
 
@@ -14,7 +15,7 @@ export function registerGitInfoHandlers() {
         // 检查仓库是否至少有一个提交，否则 shortlog 会失败
         const log = await git.log(['-1']).catch(() => null)
         if (!log) {
-          console.warn(`Skipping empty repository (no commits): ${repoPath}`)
+          sysLogger.warn(`Skipping empty repository (no commits): ${repoPath}`)
           continue
         }
 
@@ -28,7 +29,7 @@ export function registerGitInfoHandlers() {
           }
         }
       } catch (error) {
-        console.error(`获取Git作者列表失败 for repo ${repoPath}:`, error)
+        sysLogger.error(`获取Git作者列表失败 for repo ${repoPath}:`, error)
         // 不要抛出错误，只记录并继续下一个
       }
     }
@@ -43,7 +44,7 @@ export function registerGitInfoHandlers() {
       const branches = await git.branchLocal()
       return branches.all
     } catch (error) {
-      console.error(`获取Git分支列表失败 for repo ${repoPath}:`, error)
+      sysLogger.error(`获取Git分支列表失败 for repo ${repoPath}:`, error)
       const errorMessage = error instanceof Error ? error.message : String(error)
       throw new Error(errorMessage)
     }

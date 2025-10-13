@@ -1,3 +1,4 @@
+import { sysLogger } from '@nodeUtils/sysLogger'
 import { ipcMain } from 'electron'
 import { stockSectorService } from '@features/services/stock/sectors'
 export function initializeSectorHandlers() {
@@ -5,7 +6,7 @@ export function initializeSectorHandlers() {
     try {
       return await stockSectorService.scrapeAndInsertSectors()
     } catch (error) {
-      console.error('Error scraping sectors:', error)
+      sysLogger.error('Error scraping sectors:', error)
       return [] // Return empty array on error
     }
   })
@@ -13,7 +14,7 @@ export function initializeSectorHandlers() {
     try {
       return await stockSectorService.findByTradeDateOrDefault(tradeDate)
     } catch (error) {
-      console.error('Error get sectors:', error)
+      sysLogger.error('Error get sectors:', error)
       return [] // Return empty array on error
     }
   })
@@ -21,7 +22,7 @@ export function initializeSectorHandlers() {
     try {
       return await stockSectorService.clearAllSectors()
     } catch (error) {
-      console.error('Error clean sectors:', error)
+      sysLogger.error('Error clean sectors:', error)
       return [] // Return empty array on error
     }
   })

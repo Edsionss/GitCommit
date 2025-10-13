@@ -1,3 +1,4 @@
+import { sysLogger } from '@nodeUtils/sysLogger'
 import { WebSocketServer, WebSocket } from 'ws'
 import http from 'http'
 import type { ChatMessage, RoomMember } from '@sharedType/WebSocket'
@@ -21,7 +22,7 @@ const processedBroadcasts = new Set<string>()
 const localCreatedRooms = new Map<string, Map<string, RoomMember>>()
 export function startWebSocketServer() {
   if (wss) {
-    console.log('WebSocket server is already running.')
+    sysLogger.log('WebSocket server is already running.')
     return
   }
 
@@ -40,7 +41,7 @@ export function startWebSocketServer() {
   wss.on('connection', (ws: WebSocket) => {
     const clientId = nanoid()
     clients.set(ws, clientId)
-    console.log(`A new client connected with ID: ${clientId} `)
+    sysLogger.log(`A new client connected with ID: ${clientId} `)
     ws.on('message', (message: string) => {
       try {
         const incomingData = JSON.parse(message.toString())
@@ -54,18 +55,18 @@ export function startWebSocketServer() {
         // 检查是否是广播消息
         if (broadcastType) {
           if (originIp === myIp) {
-            console.log(`[Broadcast] 忽略来自我自己的消息 ${id}.`)
+            sysLogger.log(`[Broadcast] 忽略来自我自己的消息 ${id}.`)
             return
           }
 
           if (broadcastType === 'global') {
             // **防止重复处理同一个广播消息**
             if (processedBroadcasts.has(id)) {
-              console.log(`[Global Broadcast] Ignoring duplicate broadcast ${id}`)
+              sysLogger.log(`[Global Broadcast] Ignoring duplicate broadcast ${id}`)
               return
             }
             loadSystemNotify()
-            console.log(`[Global Broadcast] Received broadcast ${id} from ${originIp}`)
+            sysLogger.log(`[Global Broadcast] Received broadcast ${id} from ${originIp}`)
             // 记录已处理
             processedBroadcasts.add(id)
             // 可选：定时清理这个 Set，防止内存无限增长
@@ -88,7 +89,7 @@ export function startWebSocketServer() {
             return // 处理完毕
           } else if (broadcastType === 'direct') {
             // 检查是否是直接广播消息
-            console.log('Received direct broadcast:', incomingData)
+            sysLogger.log('Received direct broadcast:', incomingData)
             loadSystemNotify()
             getMainWindow()?.webContents.send('direct-broadcast-received', incomingData)
             return // 不再继续处理
@@ -99,19 +100,19 @@ export function startWebSocketServer() {
         const processedMessage = handleMessage(message.toString(), clientId)
         broadcast(processedMessage)
       } catch (error) {
-        console.error('Failed to process message:', error)
+        sysLogger.error('Failed to process message:', error)
       }
     })
 
     ws.on('close', () => {
-      console.log(`Client ${clients.get(ws)} disconnected.`)
+      sysLogger.log(`Client ${clients.get(ws)} disconnected.`)
 
       // 遍历所有本机创建的房间
       localCreatedRooms.forEach((members) => {
         if (members.has(clientId)) {
           const member = members.get(clientId)
           members.delete(clientId)
-          console.log(`Member ${member?.nickname} removed from a room.`)
+          sysLogger.log(`Member ${member?.nickname} removed from a room.`)
           // 向该房间广播成员离开的消息
           broadcastToRoom(
             {
@@ -132,12 +133,12 @@ export function startWebSocketServer() {
     })
 
     ws.on('error', (error) => {
-      console.error('WebSocket error:', error)
+      sysLogger.error('WebSocket error:', error)
     })
   })
 
   httpServer.listen(PORT, HOST, () => {
-    console.log(`Server (HTTP + WebSocket) started on ws://localhost:${PORT}`)
+    sysLogger.log(`Server (HTTP + WebSocket) started on ws://localhost:${PORT}`)
   })
 }
 
@@ -145,13 +146,13 @@ export function startWebSocketServer() {
 export function stopWebSocketServer() {
   if (wss) {
     wss.close(() => {
-      console.log('WebSocket server stopped.')
+      sysLogger.log('WebSocket server stopped.')
       wss = null
     })
   }
   if (httpServer) {
     httpServer.close(() => {
-      console.log('HTTP server stopped.')
+      sysLogger.log('HTTP server stopped.')
       httpServer = null
     })
   }
@@ -181,7 +182,7 @@ export function handleSendRoomBroadcast(
     }
     broadcast(broadcastMessage)
   } catch (error) {
-    console.error('Failed to send room broadcast:', error)
+    sysLogger.error('Failed to send room broadcast:', error)
   }
 }
 
@@ -207,7 +208,7 @@ export function handleMessage(message: string, clientId: string): ChatMessage {
     token: incomingData.token // 将 token 传递下去
   }
 
-  console.log('Processed message:', processedMessage)
+  sysLogger.log('Processed message:', processedMessage)
   return processedMessage
 }
 
@@ -232,7 +233,7 @@ export function handleSendDirectBroadcast(
     })
 
     ws.on('error', (err) => {
-      console.error(`Failed to send direct broadcast to ${ip}:`, err.message)
+      sysLogger.error(`Failed to send direct broadcast to ${ip}:`, err.message)
       // Optional: Notify the renderer process about the failure
       getMainWindow()?.webContents.send('direct-broadcast-failed', { ip, error: err.message })
     })
@@ -262,7 +263,7 @@ export async function handleSendGlobalBroadcast(
       id: nanoid() // **为每次广播创建一个唯一ID，防止重复处理**
     }
 
-    console.log(`[Global Broadcast] Initiating broadcast ${payload.id} to hosts:`, allHosts)
+    sysLogger.log(`[Global Broadcast] Initiating broadcast ${payload.id} to hosts:`, allHosts)
 
     // 4. 向所有【其他】节点发送这个全局广播消息
     allHosts.forEach((ip) => {
@@ -279,7 +280,7 @@ export async function handleSendGlobalBroadcast(
       })
 
       ws.on('error', (err) => {
-        console.error(`[Global Broadcast] Failed to send to ${ip}:`, err.message)
+        sysLogger.error(`[Global Broadcast] Failed to send to ${ip}:`, err.message)
       })
     })
 
@@ -296,7 +297,7 @@ export async function handleSendGlobalBroadcast(
     }
     broadcast(localMessage) // 使用你现有的 broadcast 函数
   } catch (error) {
-    console.error('Failed to initiate global broadcast:', error)
+    sysLogger.error('Failed to initiate global broadcast:', error)
   }
 }
 
@@ -321,7 +322,7 @@ function handleRoomCommand(ws: WebSocket, clientId: string, incomingData: any) {
       const newMember: RoomMember = { id: clientId, ws, nickname }
       roomMembers.set(clientId, newMember)
 
-      console.log(`[Room ${roomId}] Member ${nickname} joined.`)
+      sysLogger.log(`[Room ${roomId}] Member ${nickname} joined.`)
 
       // 向房间内所有成员广播“加入”消息
       const joinMessage: ChatMessage = {

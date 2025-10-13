@@ -1,3 +1,4 @@
+import { sysLogger } from '@nodeUtils/sysLogger'
 import { ipcMain } from 'electron'
 import { nanoid } from 'nanoid'
 import {
@@ -19,7 +20,7 @@ export function initializeWebSocket() {
       const ips = await findAppHosts(port)
       return { success: true, ips }
     } catch (error) {
-      console.error('Failed to scan network:', error)
+      sysLogger.error('Failed to scan network:', error)
       return { success: false, error: (error as Error).message }
     }
   })
@@ -34,10 +35,10 @@ export function initializeWebSocket() {
     const roomId = nanoid(8) // 生成8位随机ID
     try {
       createNewRoom(roomId)
-      console.log(`Private room created with ID: ${roomId}`)
+      sysLogger.log(`Private room created with ID: ${roomId}`)
       return { success: true, roomId }
     } catch (error) {
-      console.error('Failed to create private room:', error)
+      sysLogger.error('Failed to create private room:', error)
       return { success: false, error: (error as Error).message }
     }
   })

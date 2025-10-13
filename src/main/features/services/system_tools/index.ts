@@ -1,3 +1,4 @@
+import { sysLogger } from '@nodeUtils/sysLogger'
 import { exec } from 'child_process'
 
 /**
@@ -13,10 +14,10 @@ function setPermanentEnvVar(key: string, value: string): Promise<void> {
     const command = `setx ${key} "${value}"`
     exec(command, (error) => {
       if (error) {
-        console.error(`设置环境变量 "${key}" 时出错:`, error)
+        sysLogger.error(`设置环境变量 "${key}" 时出错:`, error)
         return reject(error)
       }
-      console.log(`成功设置环境变量 "${key}"。请重启应用或终端以使其生效。`)
+      sysLogger.log(`成功设置环境变量 "${key}"。请重启应用或终端以使其生效。`)
       resolve()
     })
   })
@@ -38,14 +39,15 @@ export class SystemToolsService {
       exec(command, (error, stdout, stderr) => {
         // shutdown -a 在没有任务时可能会在 stderr 中输出信息，但不应视为致命错误
         // 主要判断 shutdown -s 是否成功
-        if (error && !stderr.includes('1116')) { // 1116 是“没有正在进行的关机”的错误代码
-           // 检查是否包含真正的错误信息
-           const errStr = stderr.toString()
-           if(errStr.includes('A system shutdown has not been scheduled')){
-             // 这是 `shutdown -a` 的正常“失败”，可以忽略
-           } else {
-             return reject(new Error(errStr || error.message));
-           }
+        if (error && !stderr.includes('1116')) {
+          // 1116 是“没有正在进行的关机”的错误代码
+          // 检查是否包含真正的错误信息
+          const errStr = stderr.toString()
+          if (errStr.includes('A system shutdown has not been scheduled')) {
+            // 这是 `shutdown -a` 的正常“失败”，可以忽略
+          } else {
+            return reject(new Error(errStr || error.message))
+          }
         }
         resolve(stdout || `新任务已设定，将在 ${Math.round(seconds / 60)} 分钟后关机。`)
       })
@@ -144,10 +146,10 @@ export class SystemToolsService {
 
       paths.forEach((path) => {
         exec(`reg query "${path}"`, (error, stdout, stderr) => {
-          console.log(`Querying registry path: ${path}\nRaw stdout:\n${stdout}`)
+          sysLogger.log(`Querying registry path: ${path}\nRaw stdout:\n${stdout}`)
           if (error) {
             // 打印警告而不是让整个Promise失败，这样可以返回部分成功的结果
-            console.warn(`无法查询启动项路径 ${path}: ${stderr}`)
+            sysLogger.warn(`无法查询启动项路径 ${path}: ${stderr}`)
           }
           if (stdout) {
             parseOutput(stdout, path)
@@ -174,7 +176,7 @@ export class SystemToolsService {
       const command = `reg delete "${path}" /v "${name}" /f`
       exec(command, (error, stdout, stderr) => {
         if (error) {
-          console.error(`删除启动项 "${name}" 时出错:`, error, stderr)
+          sysLogger.error(`删除启动项 "${name}" 时出错:`, error, stderr)
           return reject(error)
         }
         resolve()
