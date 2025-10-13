@@ -330,6 +330,20 @@ export const mockFlatRoutes: RouteRecordWithOptionalId[] = [
   {
     id: '',
     parentId: null,
+    path: 'systemLog',
+    name: 'SystemLog',
+    componentPath: 'SystemLog',
+    meta: {
+      title: '系统日志',
+      keepAlive: '1'
+    },
+    menuOrder: 10001,
+    menuIcon: 'FileTextOutlined',
+    hide: '0'
+  },
+  {
+    id: '',
+    parentId: null,
     path: 'scheduler',
     name: 'Scheduler',
     componentPath: 'Scheduler',

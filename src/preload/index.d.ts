@@ -151,6 +151,12 @@ interface ExposedAPI {
   auditLogDelete: (ids: number[]) => Promise<{ changes: number }>
   auditLogClear: () => Promise<{ changes: number }>
 
+  // System Log API
+  systemLogGet: (page: number, pageSize: number) => Promise<{ records: SystemLog[]; total: number }>
+  systemLogAdd: (logRequest: { content: string; level: 'log' | 'warn' | 'error' }) => Promise<SystemLog>
+  systemLogDelete: (ids: number[]) => Promise<{ changes: number }>
+  systemLogClear: () => Promise<{ changes: number }>
+
   // Stock API---------------------------------
   // News
   scrapeStockNews: (dateStr?: string, timeStr?: string) => Promise<any>
@@ -195,6 +201,14 @@ interface AuditLog {
   oldData?: string
   newData?: string
   remarks?: string
+}
+
+// SystemLog interface
+interface SystemLog {
+  id: number
+  content: string
+  timestamp: string
+  level: 'log' | 'warn' | 'error'
 }
 
 declare global {

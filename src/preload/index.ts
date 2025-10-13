@@ -200,6 +200,14 @@ const api = {
   auditLogDelete: (ids: number[]) => ipcRenderer.invoke('auditLog:delete', ids),
   auditLogClear: () => ipcRenderer.invoke('auditLog:clear'),
 
+  // System Log API
+  systemLogGet: (page: number, pageSize: number) =>
+    ipcRenderer.invoke('systemLog:get', { page, pageSize }),
+  systemLogAdd: (logRequest: { content: string; level: 'log' | 'warn' | 'error' }) =>
+    ipcRenderer.invoke('systemLog:add', logRequest),
+  systemLogDelete: (ids: number[]) => ipcRenderer.invoke('systemLog:delete', ids),
+  systemLogClear: () => ipcRenderer.invoke('systemLog:clear'),
+
   // Stock API---------------------------------
   // News
   scrapeStockNews: (dateStr?: string, timeStr?: string) =>
