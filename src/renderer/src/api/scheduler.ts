@@ -1,9 +1,9 @@
-
 import type {
   ScheduledTask,
   CreateScheduledTaskDto,
   UpdateScheduledTaskDto
 } from '@shared/types/dtos/Scheduler'
+import type { BuiltInTask } from '@sharedType/parameterTypes'
 
 const api = window.api
 
@@ -20,6 +20,5 @@ export const schedulerApi = {
   toggleTask: (id: string, is_enabled: 0 | 1): Promise<ScheduledTask | null> =>
     api.toggleScheduledTask(id, is_enabled),
 
-  getBuiltInTasks: (): Promise<{ id: string; name: string; description: string }[]> =>
-    api.getBuiltInTasks()
+  getBuiltInTasks: (): Promise<BuiltInTask[]> => api.getBuiltInTasks()
 }

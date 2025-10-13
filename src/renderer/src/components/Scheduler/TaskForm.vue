@@ -41,12 +41,95 @@
         :rules="[{ required: true, message: '请选择一个内置任务' }]"
         name="actionPayload"
       >
-        <a-select v-model:value="formState.actionPayload" placeholder="请选择内置任务">
+        <a-select
+          v-model:value="formState.actionPayload"
+          placeholder="请选择内置任务"
+          @change="handleBuiltInTaskChange"
+        >
           <a-select-option v-for="task in builtInTasks" :key="task.id" :value="task.id">
             {{ task.name }}
           </a-select-option>
         </a-select>
       </a-form-item>
+
+      <!-- 内置任务参数 -->
+      <template
+        v-if="
+          formState.actionType === 'built_in' &&
+          selectedBuiltInTask &&
+          selectedBuiltInTask.params &&
+          selectedBuiltInTask.params.length > 0
+        "
+      >
+        <a-divider orientation="left">任务参数</a-divider>
+        <a-form-item
+          v-for="param in selectedBuiltInTask.params"
+          :key="param.name"
+          :label="param.label"
+          :name="['actionParams', param.name]"
+          :rules="param.required ? [{ required: true, message: `请输入${param.label}` }] : []"
+        >
+          <!-- 字符串输入框 -->
+          <a-input
+            v-if="param.type === 'string'"
+            v-model:value="formState.actionParams[param.name]"
+            :placeholder="param.placeholder"
+          />
+
+          <!-- 数字输入框 -->
+          <a-input-number
+            v-else-if="param.type === 'number'"
+            v-model:value="formState.actionParams[param.name]"
+            :placeholder="param.placeholder"
+            :min="param.validation?.min"
+            :max="param.validation?.max"
+            style="width: 100%"
+          />
+
+          <!-- 布尔值开关 -->
+          <a-switch
+            v-else-if="param.type === 'boolean'"
+            v-model:checked="formState.actionParams[param.name]"
+          />
+
+          <!-- 文本域 -->
+          <a-textarea
+            v-else-if="param.type === 'textarea'"
+            v-model:value="formState.actionParams[param.name]"
+            :placeholder="param.placeholder"
+            :rows="4"
+          />
+
+          <!-- 日期选择器 -->
+          <a-date-picker
+            v-else-if="param.type === 'date'"
+            v-model:value="formState.actionParams[param.name]"
+            style="width: 100%"
+          />
+
+          <!-- 时间选择器 -->
+          <a-time-picker
+            v-else-if="param.type === 'time'"
+            v-model:value="formState.actionParams[param.name]"
+            style="width: 100%"
+          />
+
+          <!-- 下拉选择框 -->
+          <a-select
+            v-else-if="param.type === 'select'"
+            v-model:value="formState.actionParams[param.name]"
+            :placeholder="param.placeholder"
+          >
+            <a-select-option
+              v-for="option in param.options"
+              :key="option.value"
+              :value="option.value"
+            >
+              {{ option.label }}
+            </a-select-option>
+          </a-select>
+        </a-form-item>
+      </template>
 
       <!-- 脚本路径 -->
       <a-form-item
@@ -74,6 +157,7 @@ import type {
   UpdateScheduledTaskDto,
   TaskFormState
 } from '@shared/types/dtos/Scheduler'
+import type { BuiltInTask, ParameterDefinition } from '@sharedType/parameterTypes'
 import { schedulerApi } from '@/api/scheduler'
 import { message } from 'ant-design-vue'
 
@@ -96,7 +180,8 @@ const emit = defineEmits<{
 const isEditing = computed(() => !!props.task)
 
 // --- 新增: 内置任务列表 ---
-const builtInTasks = ref<{ id: string; name: string; description: string }[]>([])
+const builtInTasks = ref<BuiltInTask[]>([])
+const selectedBuiltInTask = ref<BuiltInTask | null>(null)
 
 const fetchBuiltInTasks = async () => {
   try {
@@ -107,11 +192,28 @@ const fetchBuiltInTasks = async () => {
   }
 }
 
+// 处理内置任务选择变化
+const handleBuiltInTaskChange = (taskId: string) => {
+  selectedBuiltInTask.value = builtInTasks.value.find((task) => task.id === taskId) || null
+
+  // 初始化参数值
+  if (selectedBuiltInTask.value && selectedBuiltInTask.value.params) {
+    const params: Record<string, any> = {}
+    selectedBuiltInTask.value.params.forEach((param) => {
+      params[param.name] = param.defaultValue || (param.type === 'boolean' ? false : '')
+    })
+    formState.value.actionParams = params
+  } else {
+    formState.value.actionParams = {}
+  }
+}
+
 const createInitialFormState = (): TaskFormState => ({
   name: '',
   cronExpression: '',
   actionType: 'built_in',
   actionPayload: '',
+  actionParams: {},
   isEnabled: true
 })
 
@@ -129,23 +231,32 @@ watch(
           cronExpression: props.task.cronExpression,
           actionType: props.task.actionType,
           actionPayload: props.task.actionPayload || '',
+          actionParams: props.task.actionParams ? JSON.parse(props.task.actionParams) : {},
           isEnabled: props.task.isEnabled === 1
+        }
+
+        // 如果是内置任务，设置选中的任务并初始化参数
+        if (props.task.actionType === 'built_in' && props.task.actionPayload) {
+          handleBuiltInTaskChange(props.task.actionPayload)
         }
       } else {
         // 新建模式
         formState.value = createInitialFormState()
+        selectedBuiltInTask.value = null
       }
     }
   }
 )
 
-// 监视动作类型变化，清空载荷
+// 监视动作类型变化，清空载荷和参数
 watch(
   () => formState.value.actionType,
   () => {
     if (!isEditing.value) {
       // 只有在新建模式下自动清空，编辑模式下不清空以便用户可以看到原始值
       formState.value.actionPayload = ''
+      formState.value.actionParams = {}
+      selectedBuiltInTask.value = null
     }
   }
 )
@@ -157,7 +268,9 @@ const close = () => {
 const submit = () => {
   const payload: CreateScheduledTaskDto | UpdateScheduledTaskDto = {
     ...formState.value,
-    isEnabled: formState.value.isEnabled ? 1 : 0
+    isEnabled: formState.value.isEnabled ? 1 : 0,
+    // 将参数对象转换为JSON字符串
+    actionParams: JSON.stringify(formState.value.actionParams || {})
   }
   emit('submit', payload)
 }

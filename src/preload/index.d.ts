@@ -15,6 +15,7 @@ import type {
   CreateScheduledTaskDto,
   UpdateScheduledTaskDto
 } from '@shared/types/dtos/Scheduler'
+import type { BuiltInTask } from '@sharedTypes/parameterTypes'
 
 // 聊天会话和消息的接口定义
 interface ChatSession {
@@ -137,9 +138,10 @@ interface ExposedAPI {
   // Scheduler API
   getScheduledTasks: () => Promise<ScheduledTask[]>
   createScheduledTask: (dto: CreateScheduledTaskDto) => Promise<ScheduledTask>
-                updateScheduledTask: (id: string, dto: UpdateScheduledTaskDto) => Promise<ScheduledTask | null>
-                deleteScheduledTask: (id: string) => Promise<{ success: boolean }>
-                toggleScheduledTask: (id: string, is_enabled: 0 | 1) => Promise<ScheduledTask | null>
+  updateScheduledTask: (id: string, dto: UpdateScheduledTaskDto) => Promise<ScheduledTask | null>
+  deleteScheduledTask: (id: string) => Promise<{ success: boolean }>
+  toggleScheduledTask: (id: string, is_enabled: 0 | 1) => Promise<ScheduledTask | null>
+  getBuiltInTasks: () => Promise<BuiltInTask[]>
   // Window Management API
   minimizeWindow: () => Promise<void>
   maximizeWindow: () => Promise<void>

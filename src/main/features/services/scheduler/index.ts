@@ -6,7 +6,7 @@ import type {
   ScheduledTask,
   CreateScheduledTaskDto,
   UpdateScheduledTaskDto
-} from '@sharedType/Scheduler'
+} from '@shared/types/dtos/Scheduler'
 import { getBuiltInTaskById } from './builtInTasks'
 
 import { nanoid } from 'nanoid'
@@ -40,7 +40,18 @@ class SchedulerService {
         const builtInTask = getBuiltInTaskById(task.actionPayload || '')
         if (builtInTask) {
           try {
-            await builtInTask.execute()
+            // 解析参数
+            let params = {}
+            if (task.actionParams) {
+              try {
+                params = JSON.parse(task.actionParams)
+              } catch (e) {
+                sysLogger.error(`Failed to parse action params: ${task.actionParams}`, e)
+                params = {}
+              }
+            }
+            
+            await builtInTask.execute(params)
             sysLogger.log(`Built-in task "${builtInTask.name}" executed successfully.`)
           } catch (error) {
             sysLogger.error(`Error executing built-in task "${builtInTask.name}":`, error)
@@ -79,27 +90,58 @@ class SchedulerService {
   }
 
   async getTasks(filters: Partial<ScheduledTask> = {}): Promise<ScheduledTask[]> {
-    return dbHelper.find<ScheduledTask>(this.tableName, filters)
+    const tasks = dbHelper.find<ScheduledTask>(this.tableName, filters)
+    
+    // 解析 actionParams JSON 字符串为对象
+    return tasks.map(task => ({
+      ...task,
+      actionParams: task.actionParams ? JSON.parse(task.actionParams) : undefined
+    }))
   }
 
   async createTask(dto: CreateScheduledTaskDto): Promise<ScheduledTask> {
-    const taskToInsert = { id: nanoid(), ...dto }
+    // 确保 actionParams 被序列化为 JSON 字符串
+    const taskToInsert = { 
+      id: nanoid(), 
+      ...dto,
+      actionParams: dto.actionParams ? JSON.stringify(dto.actionParams) : undefined
+    }
     dbHelper.insert(this.tableName, taskToInsert)
     const newTask = await dbHelper.findOne<ScheduledTask>(this.tableName, { id: taskToInsert.id })
-    if (newTask && newTask.isEnabled) {
-      this.startJob(newTask)
+    
+    // 解析 actionParams JSON 字符串为对象
+    const parsedTask = newTask ? {
+      ...newTask,
+      actionParams: newTask.actionParams ? JSON.parse(newTask.actionParams) : undefined
+    } : null
+    
+    if (parsedTask && parsedTask.isEnabled) {
+      this.startJob(parsedTask)
     }
-    return newTask!
+    return parsedTask!
   }
 
   async updateTask(id: string, dto: UpdateScheduledTaskDto): Promise<ScheduledTask | null> {
-    dbHelper.update<ScheduledTask>(this.tableName, dto, { id })
+    // 确保 actionParams 被序列化为 JSON 字符串
+    const updateData = {
+      ...dto,
+      actionParams: dto.actionParams ? JSON.stringify(dto.actionParams) : undefined
+    }
+    
+    dbHelper.update<ScheduledTask>(this.tableName, updateData, { id })
 
     const updatedTask = await dbHelper.findOne<ScheduledTask>(this.tableName, { id })
-    if (updatedTask) {
-      this.startJob(updatedTask)
+    
+    // 解析 actionParams JSON 字符串为对象
+    const parsedTask = updatedTask ? {
+      ...updatedTask,
+      actionParams: updatedTask.actionParams ? JSON.parse(updatedTask.actionParams) : undefined
+    } : null
+    
+    if (parsedTask) {
+      this.startJob(parsedTask)
     }
-    return updatedTask
+    return parsedTask
   }
 
   async deleteTask(id: string): Promise<void> {

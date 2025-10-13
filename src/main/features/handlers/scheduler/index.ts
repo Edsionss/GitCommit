@@ -3,11 +3,17 @@ import { ipcMain } from 'electron'
 import { schedulerService } from '@services/scheduler'
 import type { CreateScheduledTaskDto, UpdateScheduledTaskDto } from '@shared/types/dtos/Scheduler'
 import { builtInTasks } from '@services/scheduler/builtInTasks'
+import type { BuiltInTask } from '@sharedType/parameterTypes'
 
 export function registerSchedulerHandlers() {
   ipcMain.handle('scheduler:get-built-in-tasks', async () => {
-    // 只返回可序列化的数据，不包括 execute 函数
-    return builtInTasks.map(({ id, name, description }) => ({ id, name, description }))
+    // 返回完整的BuiltInTask对象，但不包括execute函数
+    return builtInTasks.map(({ id, name, description, params }) => ({
+      id,
+      name,
+      description,
+      params
+    })) as BuiltInTask[]
   })
 
   ipcMain.handle('scheduler:get-tasks', async () => {

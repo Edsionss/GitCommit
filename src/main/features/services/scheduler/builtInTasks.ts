@@ -2,24 +2,39 @@ import { sysLogger } from '@nodeUtils/sysLogger'
 import { stockNewsService } from '@services/stock/news'
 import { systemToolsService } from '@services/system_tools'
 import { loadSystemNotify } from '@main/utils/index'
-
-export interface BuiltInTask {
-  id: string
-  name: string
-  description: string
-  execute: () => Promise<any>
-}
+import type { BuiltInTask, ParameterDefinition } from '@sharedType/parameterTypes'
+import { ParameterType } from '@sharedType/parameterTypes'
 
 export const builtInTasks: BuiltInTask[] = [
   {
     id: 'send-notification',
     name: '发送通知',
-    description: '发送系统通知，使用默认标题和内容。',
-    execute: async () => {
+    description: '发送系统通知，可自定义标题和内容。',
+    params: [
+      {
+        name: 'title',
+        label: '通知标题',
+        type: ParameterType.STRING,
+        required: true,
+        defaultValue: '定时任务通知',
+        placeholder: '请输入通知标题'
+      },
+      {
+        name: 'message',
+        label: '通知内容',
+        type: ParameterType.TEXTAREA,
+        required: true,
+        defaultValue: '定时任务已执行',
+        placeholder: '请输入通知内容'
+      }
+    ],
+    execute: async (params) => {
       sysLogger.info('Executing built-in task: send-notification')
       try {
-        // 使用默认通知内容
-        loadSystemNotify('定时任务已执行', '定时任务通知')
+        // 使用传入的参数或默认值
+        const title = params?.title || '定时任务通知'
+        const message = params?.message || '定时任务已执行'
+        loadSystemNotify(message, title)
         sysLogger.info('Built-in task "send-notification" completed successfully.')
         return { success: true, message: '通知已发送' }
       } catch (error) {
@@ -32,10 +47,29 @@ export const builtInTasks: BuiltInTask[] = [
     id: 'fetch-stock-news',
     name: '获取股票资讯',
     description: '抓取最新的股票相关新闻并存储到数据库。',
-    execute: async () => {
+    params: [
+      {
+        name: 'dateStr',
+        label: '获取开始日期',
+        type: ParameterType.STRING,
+        required: false,
+        defaultValue: '',
+        placeholder: '请输入要获取的新闻的开始日期 例如：xxxx年 xx月 xx日 星期X'
+      },
+      {
+        name: 'timeStr',
+        label: '获取开始时间',
+        type: ParameterType.STRING,
+        required: false,
+        defaultValue: '',
+        placeholder: '请输入要获取的新闻的开始时间 例如 ： 15:00:00'
+      }
+    ],
+    execute: async (params) => {
       sysLogger.info('Executing built-in task: fetch-stock-news')
       try {
-        const result = await stockNewsService.scrapeAndInsertNews()
+        const { dateStr, timeStr } = params
+        const result = await stockNewsService.scrapeAndInsertNews(dateStr, timeStr)
         sysLogger.info('Built-in task "fetch-stock-news" completed successfully.')
         return result
       } catch (error) {
@@ -48,6 +82,7 @@ export const builtInTasks: BuiltInTask[] = [
     id: 'scheduled-shutdown',
     name: '定时关机',
     description: '立即关闭计算机。此功能目前仅支持 Windows 系统。',
+    params: [],
     execute: async () => {
       sysLogger.info('Executing built-in task: scheduled-shutdown')
       try {
