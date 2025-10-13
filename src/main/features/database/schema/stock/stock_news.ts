@@ -53,12 +53,12 @@ BEGIN
         json_object(
             'id', OLD.id,
             'news_time', OLD.news_time,
-            'news_date', NEW.news_date,
+            'news_date', OLD.news_date,
             'is_important', OLD.is_important,
             'title', OLD.title,
             'content', OLD.content,
             'source', OLD.source,
-            'trade_date', NEW.trade_date,
+            'trade_date', OLD.trade_date,
             'created_at', OLD.created_at
         ),
         json_object(
@@ -89,12 +89,12 @@ BEGIN
         json_object(
             'id', OLD.id,
             'news_time', OLD.news_time,
-            'news_date', NEW.news_date,
+            'news_date', OLD.news_date,
             'is_important', OLD.is_important,
             'title', OLD.title,
             'content', OLD.content,
             'source', OLD.source,
-            'trade_date', NEW.trade_date,
+            'trade_date', OLD.trade_date,
             'created_at', OLD.created_at
         ),
         NULL
