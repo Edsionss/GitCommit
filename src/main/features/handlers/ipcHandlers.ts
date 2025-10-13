@@ -19,6 +19,7 @@ import { registerChatHandlers } from '@handlers/chat/chat'
 import { registerScanHistoryHandlers } from './git/index'
 import { registerSchedulerHandlers } from '@handlers/scheduler'
 import { registerSystemLogHandlers } from '@handlers/systemLog'
+import { registerNtfyNotificationHandlers } from './NtfyNotification'
 export function registerIpcHandlers() {
   // Register handlers from other modules
   registerGitInfoHandlers()
@@ -42,5 +43,6 @@ export function registerIpcHandlers() {
   registerScanHistoryHandlers()
   registerSchedulerHandlers()
   registerSystemLogHandlers()
+  registerNtfyNotificationHandlers()
   // 注册 IPC 处理器
 }

@@ -354,6 +354,20 @@ export const mockFlatRoutes: RouteRecordWithOptionalId[] = [
     menuOrder: 90,
     menuIcon: 'ControlOutlined',
     hide: '0'
+  },
+  {
+    id: '',
+    parentId: null,
+    path: 'ntfyNotification',
+    name: 'NtfyNotification',
+    componentPath: 'NtfyNotification',
+    meta: {
+      title: '消息推送',
+      keepAlive: '1'
+    },
+    menuOrder: 85,
+    menuIcon: 'NotificationOutlined',
+    hide: '0'
   }
 ]
 

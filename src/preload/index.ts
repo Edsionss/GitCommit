@@ -243,7 +243,17 @@ const api = {
   addMessageToSession: (message) => ipcRenderer.invoke('chat:addMessageToSession', message),
   updateMessage: (id: number, updates) => ipcRenderer.invoke('chat:updateMessage', id, updates),
   deleteMessage: (id: number) => ipcRenderer.invoke('chat:deleteMessage', id),
-  deleteMessagesBySessionId: (sessionId: string) => ipcRenderer.invoke('chat:deleteMessagesBySessionId', sessionId)
+  deleteMessagesBySessionId: (sessionId: string) => ipcRenderer.invoke('chat:deleteMessagesBySessionId', sessionId),
+
+  // Ntfy Notification API
+  sendNtfyMessage: (request: { topic: string; message: string }) =>
+    ipcRenderer.invoke('ntfy:sendMessage', request),
+  getNotificationLogs: (request?: { 
+    limit?: number; 
+    offset?: number; 
+    topic?: string; 
+    status?: 'success' | 'failed' 
+  }) => ipcRenderer.invoke('ntfy:getLogs', request)
 }
 
 // 暴露API

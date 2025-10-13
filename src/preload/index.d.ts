@@ -190,6 +190,24 @@ interface ExposedAPI {
   updateMessage: (id: number, updates: Partial<ChatMessageDB>) => Promise<void>
   deleteMessage: (id: number) => Promise<void>
   deleteMessagesBySessionId: (sessionId: string) => Promise<void>
+
+  // Ntfy Notification API
+  sendNtfyMessage: (request: { topic: string; message: string }) => Promise<{ 
+    success: boolean; 
+    message?: string; 
+    error?: string 
+  }>
+  getNotificationLogs: (request?: { 
+    limit?: number; 
+    offset?: number; 
+    topic?: string; 
+    status?: 'success' | 'failed' 
+  }) => Promise<{ 
+    success: boolean; 
+    logs?: NotificationLog[]; 
+    total?: number; 
+    error?: string 
+  }>
 }
 
 // AuditLog a new interface
@@ -211,6 +229,16 @@ interface SystemLog {
   content: string
   timestamp: string
   level: 'log' | 'warn' | 'error'
+}
+
+// NotificationLog interface
+interface NotificationLog {
+  id: number
+  topic: string
+  message: string
+  status: 'success' | 'failed'
+  error_message?: string
+  created_at: string
 }
 
 declare global {

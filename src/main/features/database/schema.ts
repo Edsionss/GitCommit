@@ -9,6 +9,7 @@ import chat_sessions from './schema/chat_sessions'
 import scheduled_tasks from './schema/scheduled_tasks'
 import scheduler_logs from './schema/scheduler_logs'
 import system_logs from './schema/system_logs'
+import notification_logs from './schema/notification_logs'
 
 export const schema = mergeSchema([
   audit_logs,
@@ -21,7 +22,8 @@ export const schema = mergeSchema([
   chat_sessions,
   scheduled_tasks,
   scheduler_logs,
-  system_logs
+  system_logs,
+  notification_logs
 ])
 function mergeSchema(schemaArray) {
   let resultSchema = ``
