@@ -14,6 +14,8 @@ import { computed } from 'vue'
 import { Bubble } from 'ant-design-x-vue'
 import type { BubbleListProps } from 'ant-design-x-vue'
 import PlaceholderComponent from './PlaceholderComponent.vue'
+import aiAvatar from '@/assets/img/fmt.png'
+import userAvatar from '@/assets/img/logo/CognitoOcean.png'
 
 interface Props {
   messages: Array<{ id: string; message: string; status: string }>
@@ -33,6 +35,7 @@ const roles: BubbleListProps['roles'] = {
   ai: {
     placement: 'start',
     typing: { step: 5, interval: 20 },
+    avatar: { src: aiAvatar, shape: 'circle' },
     styles: {
       content: {
         borderRadius: '16px'
@@ -41,7 +44,8 @@ const roles: BubbleListProps['roles'] = {
   },
   local: {
     placement: 'end',
-    variant: 'shadow'
+    variant: 'shadow',
+    avatar: { src: userAvatar, shape: 'circle' }
   }
 }
 
