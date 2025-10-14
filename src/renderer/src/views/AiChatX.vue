@@ -1,10 +1,9 @@
 <script setup lang="ts">
-import type { BubbleListProps, ConversationsProps } from 'ant-design-x-vue'
+import type { ConversationsProps } from 'ant-design-x-vue'
 import { useXAgent, useXChat } from 'ant-design-x-vue'
 import { computed, ref, watch } from 'vue'
 import { theme } from 'ant-design-vue'
 import {
-  LogoComponent,
   ConversationListComponent,
   MessageListComponent,
   SenderComponent,
@@ -71,6 +70,15 @@ const { onRequest, messages, setMessages } = useXChat({
   agent: agent.value
 })
 
+// 格式化消息以匹配 MessageListComponent 期望的类型
+const formattedMessages = computed(() => {
+  return messages.value.map((msg) => ({
+    id: typeof msg.id === 'string' ? msg.id : String(msg.id), // 确保id是字符串类型
+    message: msg.message, // 使用 message 属性而不是 content
+    status: msg.status || 'success' // 默认状态为 success
+  }))
+})
+
 watch(
   activeKey,
   () => {
@@ -107,8 +115,8 @@ const onConversationClick: ConversationsProps['onActiveChange'] = (key) => {
   activeKey.value = key
 }
 
-function handleFileChange(fileList: any[]) {
-  attachedFiles.value = fileList
+function handleFileChange(fileList: any[] | undefined) {
+  attachedFiles.value = fileList || []
 }
 
 // ==================== Runtime ====================
@@ -126,7 +134,7 @@ function handleFileChange(fileList: any[]) {
     <!-- 右侧聊天区域 -->
     <div :style="styles.chat">
       <!-- 消息列表 -->
-      <MessageListComponent :messages="messages" />
+      <MessageListComponent :messages="formattedMessages" />
 
       <!-- 提示词 -->
       <PromptsComponent @prompts-item-click="onPromptsItemClick" />

@@ -353,7 +353,7 @@ export const mockFlatRoutes: RouteRecordWithOptionalId[] = [
     parentId: null,
     path: 'workbench',
     name: 'Workbench',
-    componentPath: 'AutoWriteWorkRepo',
+    componentPath: '',
     meta: {
       title: 'Workbench',
       keepAlive: '1'
