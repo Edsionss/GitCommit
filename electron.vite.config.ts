@@ -3,7 +3,7 @@ import { defineConfig, externalizeDepsPlugin } from 'electron-vite'
 import { visualizer } from 'rollup-plugin-visualizer'
 import vue from '@vitejs/plugin-vue'
 import packageJson from './package.json'
-
+import tailwindcss from '@tailwindcss/vite'
 // 1. 引入插件
 import Icons from 'unplugin-icons/vite'
 import IconsResolver from 'unplugin-icons/resolver'
@@ -78,6 +78,8 @@ export default defineConfig({
     plugins: [
       vue(),
       htmlPlugin(),
+      // 1. 配置 tailwindcss
+      tailwindcss(),
       // 2. 配置 unplugin-vue-components
       Components({
         // resolvers 用来自动解析图标，将其视为组件
