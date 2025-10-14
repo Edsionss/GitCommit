@@ -53,6 +53,9 @@ const headerOpen = ref(false)
 const content = ref('')
 const conversationsItems = ref(defaultConversationsItems)
 const activeKey = ref(defaultConversationsItems[0].key)
+
+// 当前使用的模型
+const currentModel = ref('GPT-4')
 const agentRequestLoading = ref(false)
 const attachedFiles = ref<any[]>([])
 
@@ -127,6 +130,7 @@ function handleFileChange(fileList: any[] | undefined) {
     <ConversationListComponent
       :conversations-items="conversationsItems"
       :active-key="activeKey"
+      :model="currentModel"
       @add-conversation="onAddConversation"
       @conversation-click="onConversationClick"
     />

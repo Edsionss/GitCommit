@@ -1,7 +1,7 @@
 <template>
   <div :style="styles.menu">
     <!-- Logo -->
-    <LogoComponent :title="logoTitle" />
+    <LogoComponent :title="logoTitle" :model="model" />
 
     <!-- 添加会话按钮 -->
     <Button type="link" :style="styles.addBtn" @click="handleAddConversation">
@@ -31,11 +31,13 @@ interface Props {
   activeKey: string
   logoTitle?: string
   addButtonText?: string
+  model?: string
 }
 
 const props = withDefaults(defineProps<Props>(), {
-  logoTitle: 'Cognito Ocean X AI',
-  addButtonText: 'New Conversation'
+  logoTitle: 'Cognito Ocean AI',
+  addButtonText: 'New Conversation',
+  model: 'GPT-4'
 })
 
 const emit = defineEmits<{
