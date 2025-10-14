@@ -51,7 +51,7 @@ const props = withDefaults(defineProps<Props>(), {
   promptsTitle: 'Do you want?',
   welcomeIcon:
     'https://mdn.alipayobjects.com/huamei_iwk9zp/afts/img/A*s5sNRo5LjfQAAAAAAAAAAAAADgCCAQ/fmt.webp',
-  welcomeTitle: "Hello, I'm Ant Design X",
+  welcomeTitle: 'Cognito Ocean X AI',
   welcomeDescription:
     'Base on Ant Design, AGI product interface solution, create a better intelligent vision~'
 })

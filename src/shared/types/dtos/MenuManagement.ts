@@ -19,6 +19,7 @@ export interface RouteRecord {
 export type RouteRecordWithOptionalId = Omit<RouteRecord, 'id'> & Partial<Pick<RouteRecord, 'id'>>
 
 export const mockFlatRoutes: RouteRecordWithOptionalId[] = [
+  // 首页
   {
     id: 'IG1bzaXsigzD8gt1DwDNj',
     parentId: null,
@@ -33,11 +34,12 @@ export const mockFlatRoutes: RouteRecordWithOptionalId[] = [
     menuIcon: 'DashboardOutlined',
     hide: '0'
   },
+  //  股票功能
   {
     id: 'AnusIQBdiS5ZbLx4E8ata',
     parentId: null,
     path: 'stock',
-    name: '',
+    name: 'Stock',
     componentPath: '',
     meta: {
       title: 'Stock',
@@ -160,8 +162,37 @@ export const mockFlatRoutes: RouteRecordWithOptionalId[] = [
     hide: '0'
   },
   {
-    id: 'bbsyp1V2agdfeTKGK8KoX',
+    id: 'auPRcV_br3gMhu2tzRDPS',
     parentId: null,
+    path: 'stockAll',
+    name: 'stockAll',
+    componentPath: 'Stock',
+    meta: {
+      title: '股票分析',
+      keepAlive: '1'
+    },
+    menuOrder: 80,
+    menuIcon: 'StockOutlined',
+    hide: '1'
+  },
+  //  GitLab 功能
+  {
+    id: '9iMNgIHCV2gTG8D3_97-bi0z',
+    parentId: null,
+    path: 'git',
+    name: 'Git',
+    componentPath: '',
+    meta: {
+      title: 'GitLab',
+      keepAlive: '0'
+    },
+    menuOrder: 10,
+    menuIcon: 'ScanOutlined',
+    hide: '0'
+  },
+  {
+    id: 'bbsyp1V2agdfeTKGK8KoX',
+    parentId: '9iMNgIHCV2gTG8D3_97-bi0z',
     path: 'scan',
     name: 'Scan',
     componentPath: 'BasicSettings',
@@ -175,7 +206,7 @@ export const mockFlatRoutes: RouteRecordWithOptionalId[] = [
   },
   {
     id: '3jzQig2z8gK6uJox576M5',
-    parentId: null,
+    parentId: '9iMNgIHCV2gTG8D3_97-bi0z',
     path: 'scanHistory',
     name: 'ScanHistory',
     componentPath: 'ScanHistory',
@@ -189,7 +220,7 @@ export const mockFlatRoutes: RouteRecordWithOptionalId[] = [
   },
   {
     id: 'BBQYE5BPVVjr_7afMEDlg',
-    parentId: null,
+    parentId: '9iMNgIHCV2gTG8D3_97-bi0z',
     path: 'branches',
     name: 'Branches',
     componentPath: 'BranchesView',
@@ -203,7 +234,7 @@ export const mockFlatRoutes: RouteRecordWithOptionalId[] = [
   },
   {
     id: 'qoNsEEMsNGIijpYlb-LMP',
-    parentId: null,
+    parentId: '9iMNgIHCV2gTG8D3_97-bi0z',
     path: 'analysis',
     name: 'Analysis',
     componentPath: 'CodeAnalysis',
@@ -217,7 +248,7 @@ export const mockFlatRoutes: RouteRecordWithOptionalId[] = [
   },
   {
     id: 'IIxcVfeNUGtEjYbIX_cdh',
-    parentId: null,
+    parentId: '9iMNgIHCV2gTG8D3_97-bi0z',
     path: 'reports',
     name: 'Reports',
     componentPath: 'Reports',
@@ -229,6 +260,7 @@ export const mockFlatRoutes: RouteRecordWithOptionalId[] = [
     menuIcon: 'FileTextOutlined',
     hide: '0'
   },
+  // AI功能
   {
     id: 'YWxboacI121N0X8aqTBOg',
     parentId: null,
@@ -257,20 +289,49 @@ export const mockFlatRoutes: RouteRecordWithOptionalId[] = [
     menuIcon: 'RobotOutlined',
     hide: '0'
   },
+
+  // 应用系统功能
   {
-    id: 'auPRcV_br3gMhu2tzRDPS',
+    id: 'application_system',
     parentId: null,
-    path: 'stock',
-    name: 'Stock',
-    componentPath: 'Stock',
+    path: 'system',
+    name: 'System',
+    componentPath: '',
+    meta: { title: 'ApplicationSystem', keepAlive: '0' },
+    menuOrder: 2,
+    menuIcon: 'SettingOutlined',
+    hide: '0'
+  },
+  {
+    id: '',
+    parentId: 'application_system',
+    path: 'auditLog',
+    name: 'AuditLog',
+    componentPath: 'AuditLog',
     meta: {
-      title: '股票分析',
+      title: '日志管理',
       keepAlive: '1'
     },
-    menuOrder: 80,
-    menuIcon: 'StockOutlined',
-    hide: '1'
+    menuOrder: 10000,
+    menuIcon: 'CommentOutlined',
+    hide: '0'
   },
+  {
+    id: '',
+    parentId: 'application_system',
+    path: 'systemLog',
+    name: 'SystemLog',
+    componentPath: 'SystemLog',
+    meta: {
+      title: '控制台日志',
+      keepAlive: '1'
+    },
+    menuOrder: 10001,
+    menuIcon: 'FileTextOutlined',
+    hide: '0'
+  },
+
+  // 设置
   {
     id: 'QJJ0Crd8FRbsY-Q_fDT6p',
     parentId: null,
@@ -285,28 +346,16 @@ export const mockFlatRoutes: RouteRecordWithOptionalId[] = [
     menuIcon: 'SettingOutlined',
     hide: '1'
   },
+
+  // 工作台功能
   {
-    id: '3xPTToKm4_uwjHAHGX1C7',
+    id: 'Workbench_task',
     parentId: null,
-    path: 'systemTools',
-    name: 'SystemTools',
-    componentPath: 'SystemTools',
+    path: 'workbench',
+    name: 'Workbench',
+    componentPath: 'AutoWriteWorkRepo',
     meta: {
-      title: 'SystemTool',
-      keepAlive: '1'
-    },
-    menuOrder: 1001,
-    menuIcon: 'CommentOutlined',
-    hide: '0'
-  },
-  {
-    id: 'HJ-8kf2i6Zz-_jJArgq_Q',
-    parentId: null,
-    path: 'chat',
-    name: 'Chat',
-    componentPath: 'RealTimeCommunication',
-    meta: {
-      title: 'WebSocket',
+      title: 'Workbench',
       keepAlive: '1'
     },
     menuOrder: 10000,
@@ -315,12 +364,12 @@ export const mockFlatRoutes: RouteRecordWithOptionalId[] = [
   },
   {
     id: '',
-    parentId: null,
+    parentId: 'Workbench_task',
     path: 'autoWriteWorkRepo',
     name: 'AutoWriteWorkRepo',
     componentPath: 'AutoWriteWorkRepo',
     meta: {
-      title: '自动化工作日志',
+      title: '自动化工作',
       keepAlive: '1'
     },
     menuOrder: 10000,
@@ -329,35 +378,7 @@ export const mockFlatRoutes: RouteRecordWithOptionalId[] = [
   },
   {
     id: '',
-    parentId: null,
-    path: 'auditLog',
-    name: 'AuditLog',
-    componentPath: 'AuditLog',
-    meta: {
-      title: '日志管理',
-      keepAlive: '1'
-    },
-    menuOrder: 10000,
-    menuIcon: 'CommentOutlined',
-    hide: '0'
-  },
-  {
-    id: '',
-    parentId: null,
-    path: 'systemLog',
-    name: 'SystemLog',
-    componentPath: 'SystemLog',
-    meta: {
-      title: '系统日志',
-      keepAlive: '1'
-    },
-    menuOrder: 10001,
-    menuIcon: 'FileTextOutlined',
-    hide: '0'
-  },
-  {
-    id: '',
-    parentId: null,
+    parentId: 'Workbench_task',
     path: 'scriptManagement',
     name: 'ScriptManagement',
     componentPath: 'ScriptManagement',
@@ -371,7 +392,7 @@ export const mockFlatRoutes: RouteRecordWithOptionalId[] = [
   },
   {
     id: '',
-    parentId: null,
+    parentId: 'Workbench_task',
     path: 'scheduler',
     name: 'Scheduler',
     componentPath: 'Scheduler',
@@ -384,8 +405,37 @@ export const mockFlatRoutes: RouteRecordWithOptionalId[] = [
     hide: '0'
   },
   {
-    id: '',
+    id: '3xPTToKm4_uwjHAHGX1C7',
+    parentId: 'Workbench_task',
+    path: 'systemTools',
+    name: 'SystemTools',
+    componentPath: 'SystemTools',
+    meta: {
+      title: 'SystemTool',
+      keepAlive: '1'
+    },
+    menuOrder: 1001,
+    menuIcon: 'CommentOutlined',
+    hide: '0'
+  },
+  // 通信 功能
+  {
+    id: 'Communication_chat',
     parentId: null,
+    path: 'communication',
+    name: 'Communication',
+    componentPath: '',
+    meta: {
+      title: '通信',
+      keepAlive: '1'
+    },
+    menuOrder: 85,
+    menuIcon: 'NotificationOutlined',
+    hide: '0'
+  },
+  {
+    id: '',
+    parentId: 'Communication_chat',
     path: 'ntfyNotification',
     name: 'NtfyNotification',
     componentPath: 'NtfyNotification',
@@ -395,6 +445,20 @@ export const mockFlatRoutes: RouteRecordWithOptionalId[] = [
     },
     menuOrder: 85,
     menuIcon: 'NotificationOutlined',
+    hide: '0'
+  },
+  {
+    id: 'HJ-8kf2i6Zz-_jJArgq_Q',
+    parentId: 'Communication_chat',
+    path: 'chat',
+    name: 'Chat',
+    componentPath: 'RealTimeCommunication',
+    meta: {
+      title: 'WebSocket',
+      keepAlive: '1'
+    },
+    menuOrder: 10000,
+    menuIcon: 'CommentOutlined',
     hide: '0'
   }
 ]

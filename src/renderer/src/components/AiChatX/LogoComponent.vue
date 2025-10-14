@@ -19,7 +19,7 @@ interface Props {
 }
 
 const props = withDefaults(defineProps<Props>(), {
-  title: 'Ant Design X Vue'
+  title: 'Cognito Ocean X AI'
 })
 
 const { token } = theme.useToken()

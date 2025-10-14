@@ -2,7 +2,7 @@
   <div :style="styles.menu">
     <!-- Logo -->
     <LogoComponent :title="logoTitle" />
-    
+
     <!-- 添加会话按钮 -->
     <Button type="link" :style="styles.addBtn" @click="handleAddConversation">
       <PlusOutlined />
@@ -34,7 +34,7 @@ interface Props {
 }
 
 const props = withDefaults(defineProps<Props>(), {
-  logoTitle: 'Ant Design X Vue',
+  logoTitle: 'Cognito Ocean X AI',
   addButtonText: 'New Conversation'
 })
 
