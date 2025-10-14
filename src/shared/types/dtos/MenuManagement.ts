@@ -244,6 +244,20 @@ export const mockFlatRoutes: RouteRecordWithOptionalId[] = [
     hide: '0'
   },
   {
+    id: 'XyZboacI121N0X8aqTBOg',
+    parentId: null,
+    path: 'aiChatX',
+    name: 'AiChatX',
+    componentPath: 'AiChatX',
+    meta: {
+      title: 'AI Chat X',
+      keepAlive: '0'
+    },
+    menuOrder: 71,
+    menuIcon: 'RobotOutlined',
+    hide: '0'
+  },
+  {
     id: 'auPRcV_br3gMhu2tzRDPS',
     parentId: null,
     path: 'stock',
