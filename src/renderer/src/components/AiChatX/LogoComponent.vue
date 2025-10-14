@@ -17,7 +17,7 @@ interface Props {
 }
 
 const props = withDefaults(defineProps<Props>(), {
-  title: 'Cognito Ocean X AI',
+  title: 'Cognito Ocean AI',
   model: 'GPT-4'
 })
 

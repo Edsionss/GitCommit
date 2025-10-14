@@ -34,23 +34,23 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, h } from 'vue'
 import { ShareAltOutlined, EllipsisOutlined } from '@ant-design/icons-vue'
 import { Button, Space } from 'ant-design-vue'
 import { Prompts, Welcome } from 'ant-design-x-vue'
 import type { PromptsProps } from 'ant-design-x-vue'
+import aiIcon from '@/assets/img/fmt.png'
 
 interface Props {
   promptsTitle?: string
-  welcomeIcon?: string
+  welcomeIcon?: any
   welcomeTitle?: string
   welcomeDescription?: string
 }
 
 const props = withDefaults(defineProps<Props>(), {
   promptsTitle: 'Do you want?',
-  welcomeIcon:
-    'https://mdn.alipayobjects.com/huamei_iwk9zp/afts/img/A*s5sNRo5LjfQAAAAAAAAAAAAADgCCAQ/fmt.webp',
+  welcomeIcon: () => h('img', { src: aiIcon, alt: 'AI Icon', style: { width: '48px', height: '48px' } }),
   welcomeTitle: 'Cognito Ocean X AI',
   welcomeDescription:
     'Base on Ant Design, AGI product interface solution, create a better intelligent vision~'
