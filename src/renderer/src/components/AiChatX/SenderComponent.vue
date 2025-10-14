@@ -23,11 +23,7 @@
         :styles="{ content: { padding: 0 } }"
         @open-change="handleHeaderChange"
       >
-        <Attachments
-          :before-upload="() => false"
-          :items="attachedFiles"
-          @change="handleFileChange"
-        >
+        <Attachments :before-upload="() => false" :items="attachedFiles" @change="handleFileChange">
           <template #placeholder="type">
             <Flex
               v-if="type && type.type === 'inline'"
@@ -46,9 +42,7 @@
                 Click or drag files to this area to upload
               </Typography.Text>
             </Flex>
-            <Typography.Text v-if="type && type.type === 'drop'">
-              Drop file here
-            </Typography.Text>
+            <Typography.Text v-if="type && type.type === 'drop'"> Drop file here </Typography.Text>
           </template>
         </Attachments>
       </Sender.Header>
@@ -76,8 +70,8 @@ const props = withDefaults(defineProps<Props>(), {
 })
 
 const emit = defineEmits<{
-  'submit': [content: string]
-  'change': [value: string]
+  submit: [content: string]
+  change: [value: string]
   'file-change': [fileList: AttachmentsProps['items']]
   'header-change': [open: boolean]
 }>()
@@ -95,18 +89,25 @@ const styles = computed(() => {
 })
 
 // 监听 props.attachedFiles 的变化
-watch(() => props.attachedFiles, (newFiles) => {
-  if (newFiles) {
-    attachedFiles.value = newFiles
-  }
-}, { deep: true })
+watch(
+  () => props.attachedFiles,
+  (newFiles) => {
+    if (newFiles) {
+      attachedFiles.value = newFiles
+    }
+  },
+  { deep: true }
+)
 
 // 监听 props.headerOpen 的变化
-watch(() => props.headerOpen, (newOpen) => {
-  if (newOpen !== undefined) {
-    headerOpen.value = newOpen
+watch(
+  () => props.headerOpen,
+  (newOpen) => {
+    if (newOpen !== undefined) {
+      headerOpen.value = newOpen
+    }
   }
-})
+)
 
 const handleSubmit = (nextContent: string) => {
   if (!nextContent) return

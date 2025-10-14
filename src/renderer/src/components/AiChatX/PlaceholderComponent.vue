@@ -36,7 +36,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { ShareAltOutlined, EllipsisOutlined } from '@ant-design/icons-vue'
-import { Button, Space, theme } from 'ant-design-vue'
+import { Button, Space } from 'ant-design-vue'
 import { Prompts, Welcome } from 'ant-design-x-vue'
 import type { PromptsProps } from 'ant-design-x-vue'
 
@@ -59,8 +59,6 @@ const props = withDefaults(defineProps<Props>(), {
 const emit = defineEmits<{
   'prompts-item-click': [description: string]
 }>()
-
-const { token } = theme.useToken()
 
 const styles = computed(() => {
   return {

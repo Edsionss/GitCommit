@@ -5,7 +5,6 @@
 <script setup lang="ts">
 import { h } from 'vue'
 import { FireOutlined, ReadOutlined } from '@ant-design/icons-vue'
-import { Space } from 'ant-design-vue'
 import { Prompts } from 'ant-design-x-vue'
 import type { PromptsProps } from 'ant-design-x-vue'
 
