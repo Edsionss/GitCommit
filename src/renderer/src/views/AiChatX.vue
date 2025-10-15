@@ -7,7 +7,8 @@ import {
   ConversationListComponent,
   MessageListComponent,
   SenderComponent,
-  PromptsComponent
+  PromptsComponent,
+  ToolbarComponent
 } from '@components/AiChatX'
 
 const { token } = theme.useToken()
@@ -33,6 +34,15 @@ const styles = computed(() => {
       'flex-direction': 'column',
       padding: `${token.value.paddingLG}px`,
       gap: '16px'
+    },
+    chatContainer: {
+      display: 'flex',
+      height: '100%',
+      width: '100%'
+    },
+    chatContent: {
+      flex: 1,
+      height: '100%'
     }
   } as const
 })
@@ -58,6 +68,10 @@ const activeKey = ref(defaultConversationsItems[0].key)
 const currentModel = ref('GPT-4')
 const agentRequestLoading = ref(false)
 const attachedFiles = ref<any[]>([])
+
+// 工具栏状态
+const conversationListCollapsed = ref(false)
+const streamingEnabled = ref(false)
 
 // ==================== Runtime ====================
 const [agent] = useXAgent<string, { message: string }, string>({
@@ -122,12 +136,27 @@ function handleFileChange(fileList: any[] | undefined) {
   attachedFiles.value = fileList || []
 }
 
+// 工具栏功能
+function toggleConversationList() {
+  conversationListCollapsed.value = !conversationListCollapsed.value
+}
+
+function toggleStreaming() {
+  streamingEnabled.value = !streamingEnabled.value
+}
+
+function saveCurrentConversation() {
+  // 保存当前会话的逻辑
+  console.log('保存当前会话')
+}
+
 // ==================== Runtime ====================
 </script>
 <template>
   <div :style="styles.layout">
     <!-- 左侧会话列表 -->
     <ConversationListComponent
+      v-if="!conversationListCollapsed"
       :conversations-items="conversationsItems"
       :active-key="activeKey"
       :model="currentModel"
@@ -135,25 +164,39 @@ function handleFileChange(fileList: any[] | undefined) {
       @conversation-click="onConversationClick"
     />
 
-    <!-- 右侧聊天区域 -->
-    <div :style="styles.chat">
-      <!-- 消息列表 -->
-      <MessageListComponent :messages="formattedMessages" />
-
-      <!-- 提示词 -->
-      <PromptsComponent @prompts-item-click="onPromptsItemClick" />
-
-      <!-- 输入框 -->
-      <SenderComponent
-        :content="content"
-        :loading="agentRequestLoading"
-        :header-open="headerOpen"
-        :attached-files="attachedFiles"
-        @submit="onSubmit"
-        @change="(value) => (content = value)"
-        @file-change="handleFileChange"
-        @header-change="(open) => (headerOpen = open)"
+    <!-- 右侧聊天区域容器 -->
+    <div :style="styles.chatContainer">
+      <!-- 左侧工具栏 -->
+      <ToolbarComponent
+        :conversation-list-collapsed="conversationListCollapsed"
+        :streaming-enabled="streamingEnabled"
+        @toggle-conversation-list="toggleConversationList"
+        @toggle-streaming="toggleStreaming"
+        @save-current-conversation="saveCurrentConversation"
       />
+
+      <!-- 右侧聊天内容区域 -->
+      <div :style="styles.chatContent">
+        <div :style="styles.chat">
+          <!-- 消息列表 -->
+          <MessageListComponent :messages="formattedMessages" />
+
+          <!-- 提示词 -->
+          <PromptsComponent @prompts-item-click="onPromptsItemClick" />
+
+          <!-- 输入框 -->
+          <SenderComponent
+            :content="content"
+            :loading="agentRequestLoading"
+            :header-open="headerOpen"
+            :attached-files="attachedFiles"
+            @submit="onSubmit"
+            @change="(value) => (content = value)"
+            @file-change="handleFileChange"
+            @header-change="(open) => (headerOpen = open)"
+          />
+        </div>
+      </div>
     </div>
   </div>
 </template>
