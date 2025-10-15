@@ -8,6 +8,7 @@ import { db } from '@features/database'
 import { is } from '@electron-toolkit/utils'
 import dayjs from 'dayjs'
 import 'dayjs/locale/zh-cn'
+import { startServer, stopServer } from './server' // 引入服务器控制函数
 
 import { extractTableDataByColumn } from '@nodeUtils/index'
 
@@ -89,6 +90,9 @@ export const whenReady = () => {
   // WebSocket 服务器启动
   startWebSocketServer()
 
+  // 启动 API 服务器
+  startServer()
+
   // 同步开机自启设置
   const storedAutoStart = settingsService.getStoredAutoStartSetting()
   const actualAutoStart = settingsService.getAutoStartStatus()
@@ -122,6 +126,9 @@ export const whenReady = () => {
 export const willQuit = () => {
   // 停止 WebSocket 服务器
   stopWebSocketServer()
+
+  // 停止 API 服务器
+  stopServer()
   // 在这里关闭数据库连接
   if (db) {
     // 您的 db 实例

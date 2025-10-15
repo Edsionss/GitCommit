@@ -1,3 +1,5 @@
+import { ipcMain } from 'electron'
+import { apiRegistry } from './apiRegistry' // 导入新的 API 注册表
 import { registerStoreHandlers } from '@handlers/store_conf'
 import { registerGitInfoHandlers } from './git/git-info'
 import { registerGitScanHandlers } from './git/git-scan'
@@ -21,8 +23,9 @@ import { registerSchedulerHandlers } from '@handlers/scheduler'
 import { registerSystemLogHandlers } from '@handlers/systemLog'
 import { registerNtfyNotificationHandlers } from './NtfyNotification'
 import { registerScriptManagementHandlers } from '@handlers/ScriptManagement'
+
 export function registerIpcHandlers() {
-  // Register handlers from other modules
+  // 1. 保留所有原有的注册函数调用，确保现有功能不受影响
   registerGitInfoHandlers()
   registerGitScanHandlers()
   registerGitUtilsHandlers()
@@ -46,5 +49,11 @@ export function registerIpcHandlers() {
   registerSystemLogHandlers()
   registerNtfyNotificationHandlers()
   registerScriptManagementHandlers()
-  // 注册 IPC 处理器
+
+  // 2. 从 apiRegistry 动态注册新的 IPC 处理器
+  console.log('[IPC] Registering dynamic IPC handlers...')
+  apiRegistry.forEach(({ channel, handler }) => {
+    ipcMain.handle(channel, handler)
+  })
+  console.log(`[IPC] ✅ Registered ${apiRegistry.length} dynamic IPC handlers.`)
 }
