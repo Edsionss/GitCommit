@@ -45,7 +45,9 @@
       "@shared/*": ["./src/shared/*"],
       "@sharedType/*": ["./src/shared/types/dtos/*"],
       "@type/*": ["./src/renderer/src/types/*"],
-      "@utils/*": ["./src/renderer/src/utils/*"]
+      "@utils/*": ["./src/renderer/src/utils/*"],
+      "@config/*": ["./src/renderer/src/config/*"]
+
     },
 
     // ----------------------------------------------------------

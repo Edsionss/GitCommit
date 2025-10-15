@@ -2,12 +2,9 @@ import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import { MergeArray, buildTree } from '@/utils'
 import { routesMenuApi } from '@api/routesMenu'
-import {
-  mockFlatRoutes,
-  type RouteRecord,
-  RouteRecordWithOptionalId
-} from '@sharedType/MenuManagement'
+import { type RouteRecord, RouteRecordWithOptionalId } from '@sharedType/MenuManagement'
 import { message as AntMessage } from 'ant-design-vue'
+import { DEFAULT_MENU_MAP } from '@config/index'
 
 export const useRoutesStore = defineStore('routes', () => {
   const routes = ref<RouteRecord[]>([])
@@ -29,8 +26,10 @@ export const useRoutesStore = defineStore('routes', () => {
   async function restRoutes() {
     try {
       await routesMenuApi.clean()
-      await routesMenuApi.addMany(mockFlatRoutes)
+      await routesMenuApi.addMany(DEFAULT_MENU_MAP)
       await initRoutes()
+      // 刷新路由
+      location.reload()
       AntMessage.success('重置成功')
     } catch (error) {
       console.error('Failed to clean and add routes:', error)

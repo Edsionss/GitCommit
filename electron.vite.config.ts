@@ -72,7 +72,8 @@ export default defineConfig({
         '@shared': resolve('src/shared'),
         '@sharedType': resolve('src/shared/types/dtos'),
         '@type': resolve('src/renderer/src/types'),
-        '@utils': resolve('src/renderer/src/utils')
+        '@utils': resolve('src/renderer/src/utils'),
+        '@config': resolve('src/renderer/src/config')
       }
     },
     plugins: [
