@@ -120,6 +120,8 @@ interface ExposedAPI {
   updateMenu: (menu: Partial<RouteRecord>) => Promise<any>
   deleteMenu: (id: string) => Promise<any>
   cleanMenu: () => Promise<any>
+  getAllFlatMenus: () => Promise<RouteRecord[]>
+  setAsDefaultMenu: () => Promise<{ success: boolean; error?: string }>
 
   // Settings API
   getAutoStartStatus: () => Promise<boolean>

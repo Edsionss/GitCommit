@@ -1,7 +1,8 @@
 import { sysLogger } from '@nodeUtils/sysLogger'
 import { ipcMain } from 'electron'
 import { routesMenuService } from '@features/services/routes_menu'
-import type { RouteRecord } from '@sharedType/MenuManagement'
+import { configService } from '@features/services/config'
+import type { RouteRecord, RouteRecordWithOptionalId } from '@sharedType/MenuManagement'
 
 export function registerRoutesMenuHandlers() {
   // 获取所有菜单
@@ -61,6 +62,38 @@ export function registerRoutesMenuHandlers() {
     } catch (error) {
       sysLogger.error('IPC Error: Failed to cleanMenu menu', error)
       throw error
+    }
+  })
+
+  // 获取所有扁平化菜单（用于设置为默认菜单）
+  ipcMain.handle('routes-menu:get-all-flat', async () => {
+    try {
+      return await routesMenuService.getAllFlatMenus()
+    } catch (error) {
+      sysLogger.error('IPC Error: Failed to get all flat menus', error)
+      return []
+    }
+  })
+
+  // 设置当前菜单为默认菜单
+  ipcMain.handle('routes-menu:set-as-default', async () => {
+    try {
+      // 获取所有扁平化菜单数据
+      const flatMenus = await routesMenuService.getAllFlatMenus()
+
+      // 转换为RouteRecordWithOptionalId格式
+      const menusWithOptionalId: RouteRecordWithOptionalId[] = flatMenus.map((menu) => {
+        const { id, ...rest } = menu
+        return rest as RouteRecordWithOptionalId
+      })
+
+      // 更新默认菜单配置
+      const success = await configService.updateDefaultMenu(menusWithOptionalId)
+
+      return { success }
+    } catch (error) {
+      sysLogger.error('IPC Error: Failed to set as default menu', error)
+      return { success: false, error: error }
     }
   })
 }

@@ -13,5 +13,9 @@ export const routesMenuApi = {
 
   delete: (id: string): Promise<any> => api.deleteMenu(id),
 
-  clean: (): Promise<any> => api.cleanMenu()
+  clean: (): Promise<any> => api.cleanMenu(),
+
+  getAllFlat: (): Promise<RouteRecord[]> => api.getAllFlatMenus(),
+
+  setAsDefault: (): Promise<{ success: boolean; error?: string }> => api.setAsDefaultMenu()
 }

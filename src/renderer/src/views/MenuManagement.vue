@@ -4,6 +4,10 @@
       <template #icon><PlusOutlined /></template>
       新增菜单目录
     </a-button>
+    <a-button type="default" @click="handleSetAsDefault" size="small" style="margin-bottom: 16px; margin-left: 8px">
+      <template #icon><SettingOutlined /></template>
+      设置当前为默认菜单
+    </a-button>
 
     <MenuList
       :data="menuTreeData"
@@ -28,7 +32,8 @@
 <script setup lang="ts">
 import { ref, reactive } from 'vue'
 import { storeToRefs } from 'pinia'
-import { PlusOutlined } from '@ant-design/icons-vue'
+import { PlusOutlined, SettingOutlined } from '@ant-design/icons-vue'
+import { message as AntMessage } from 'ant-design-vue'
 import MenuList from '@components/MenuManagement/MenuList.vue'
 import MenuModal from '@components/MenuManagement/MenuModal.vue'
 import type { RouteRecord } from '@sharedType/MenuManagement'
@@ -37,6 +42,7 @@ const routesStore = useRoutesStore()
 const { routes } = storeToRefs(routesStore)
 const { addRoute, deleteRoute, updateRoute } = routesStore
 import { copyNormalize } from '@utils/index'
+import { routesMenuApi } from '@api/routesMenu'
 // --- 状态管理 ---
 const loading = ref(false)
 const menuTreeData = ref<RouteRecord[]>([])
@@ -109,6 +115,21 @@ const handleModalOk = async (formData: Omit<RouteRecord, 'id' | 'children'>) => 
 // 弹窗取消
 const handleModalCancel = () => {
   resetModalState()
+}
+
+// 设置当前菜单为默认菜单
+const handleSetAsDefault = async () => {
+  try {
+    const { success, error } = await routesMenuApi.setAsDefault()
+    if (success) {
+      AntMessage.success('设置默认菜单成功')
+    } else {
+      AntMessage.error(`设置默认菜单失败: ${error || '未知错误'}`)
+    }
+  } catch (error) {
+    console.error('Failed to set as default menu:', error)
+    AntMessage.error('设置默认菜单失败')
+  }
 }
 </script>
 

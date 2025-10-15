@@ -139,6 +139,8 @@ const api = {
   updateMenu: (menu) => ipcRenderer.invoke('routes-menu:update', menu),
   deleteMenu: (id) => ipcRenderer.invoke('routes-menu:delete', id),
   cleanMenu: () => ipcRenderer.invoke('routes-menu:clean'),
+  getAllFlatMenus: () => ipcRenderer.invoke('routes-menu:get-all-flat'),
+  setAsDefaultMenu: () => ipcRenderer.invoke('routes-menu:set-as-default'),
 
   // Settings API
   getAutoStartStatus: () => ipcRenderer.invoke('settings:get-auto-start'),

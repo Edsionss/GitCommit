@@ -5,8 +5,9 @@ import { nanoid } from 'nanoid'
 
 // 将从数据库取出的记录（meta是字符串）转换为前端需要的格式（meta是对象）
 function formatMenuRecord(record: any): RouteRecord {
+  const { createdAt, updatedAt, ...menuRecord } = record
   return {
-    ...record,
+    ...menuRecord,
     meta: JSON.parse(record.meta || '{}')
   }
 }
@@ -117,6 +118,21 @@ export class RoutesMenuService {
     } catch (error) {
       sysLogger.error('Error clean menu:', error)
       throw error
+    }
+  }
+
+  /**
+   * 获取所有菜单的扁平化数据（用于设置为默认菜单）
+   */
+  public async getAllFlatMenus(): Promise<RouteRecord[]> {
+    try {
+      const flatMenus = await dbHelper.find<any>(RoutesMenuService.TABLE_NAME, {}, '*')
+      const formattedMenus = flatMenus.map(formatMenuRecord)
+      formattedMenus.sort((a, b) => a.menuOrder - b.menuOrder)
+      return formattedMenus
+    } catch (error) {
+      sysLogger.error('Error fetching all flat menus:', error)
+      return []
     }
   }
 }
