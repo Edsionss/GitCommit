@@ -14,6 +14,7 @@
       <!-- <RouterSetting /> -->
       <MenuManagement />
     </a-card>
+
     <a-float-button-group trigger="hover" type="primary" :right="'24px'">
       <template #tooltip>
         <div>操作</div>
@@ -55,6 +56,7 @@ import {
 } from '@ant-design/icons-vue'
 import { useRoutesStore } from '@/stores/routesStore'
 import { applicationApi } from '@api/application'
+import SegmentedControl from '@renderer/components/LH/LHTabs/Tabs.vue'
 
 const routesStore = useRoutesStore()
 

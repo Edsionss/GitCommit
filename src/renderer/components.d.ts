@@ -88,6 +88,7 @@ declare module 'vue' {
     ScanParametersTab: typeof import('./src/components/ScanHistoryView/ScanParametersTab.vue')['default']
     ScanResultsTable: typeof import('./src/components/ScanHistoryView/ScanResultsTable.vue')['default']
     ScriptForm: typeof import('./src/components/ScriptManagement/ScriptForm.vue')['default']
+    SegmentedControl: typeof import('./src/components/LH-components/SegmentedControl.vue')['default']
     SenderComponent: typeof import('./src/components/AiChatX/SenderComponent.vue')['default']
     SettingsForm: typeof import('./src/components/BasicSettings/SettingsForm.vue')['default']
     ShutdownTool: typeof import('./src/components/SystemTools/ShutdownTool.vue')['default']
