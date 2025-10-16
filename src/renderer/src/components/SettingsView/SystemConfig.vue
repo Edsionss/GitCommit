@@ -49,7 +49,7 @@
 
       <div class="setting-item">
         <div class="setting-label">
-          <CodeOutlined />
+          <i-heroicons-solid-chip />
           <span>启动方式</span>
         </div>
         <div class="setting-control">
