@@ -5,9 +5,9 @@ import type {
   DisplayConfig,
   Preferences,
   GitConfig,
-  SystemConfig,
-  AiConfig
+  SystemConfig
 } from '@type/setting'
+import type { AiConfig } from '@sharedType/ai'
 import _ from 'lodash' // 引入 lodash 用于深层合并
 import { storeApi } from '@api/store'
 import { settingsApi } from '@api/settingsApi'
@@ -26,7 +26,13 @@ const DefaultSetting: AppSettings = {
     refreshInterval: '300000',
     clearScanConfigOnFinish: true
   },
-  SystemConfig: { startWithSystem: false, notifications: true, autoUpdate: true, telemetry: true },
+  SystemConfig: {
+    startWithSystem: false,
+    notifications: true,
+    autoUpdate: true,
+    telemetry: true,
+    launch: 'ELETRON'
+  },
   AiConfig: {
     provider: null,
     apiKey: '',

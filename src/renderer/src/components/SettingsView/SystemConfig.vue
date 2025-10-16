@@ -46,11 +46,22 @@
           <a-switch v-model:checked="SystemConfig.telemetry" />
         </div>
       </div>
+
+      <div class="setting-item">
+        <div class="setting-label">
+          <CodeOutlined />
+          <span>启动方式</span>
+        </div>
+        <div class="setting-control">
+          <a-segmented v-model:value="SystemConfig.launch" :options="launchData" />
+        </div>
+      </div>
     </div>
   </a-card>
 </template>
 
 <script setup lang="ts">
+import { reactive } from 'vue'
 import {
   SettingOutlined,
   RocketOutlined,
@@ -62,6 +73,7 @@ import { storeToRefs } from 'pinia'
 import { useSettingsStore } from '@/stores/settingsStore'
 const settingStore = useSettingsStore()
 const { SystemConfig } = storeToRefs(settingStore)
+const launchData = reactive(['ELETRON', 'SERVER'])
 </script>
 
 <style scoped>

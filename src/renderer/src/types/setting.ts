@@ -26,14 +26,15 @@ export interface SystemConfig {
   notifications: boolean
   autoUpdate: boolean
   telemetry: boolean
+  launch: string
 }
 
 import type { AiConfig } from '@sharedType/ai'
 
 export interface AppSettings {
-  ai: AiConfig
-  git: GitConfig
-  theme: DisplayConfig
-  preferences: Preferences
-  system: SystemConfig
+  AiConfig: AiConfig
+  GitConfig: GitConfig
+  DisplayConfig: DisplayConfig
+  Preferences: Preferences
+  SystemConfig: SystemConfig
 }
