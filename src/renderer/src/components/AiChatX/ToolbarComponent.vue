@@ -1,31 +1,25 @@
 <template>
   <div :style="styles.toolbar">
-    <Tooltip title="收起/展开会话列表">
-      <Button
-        type="text"
-        :icon="conversationListCollapsed ? h(MenuUnfoldOutlined) : h(MenuFoldOutlined)"
-        @click="toggleConversationList"
-      />
-    </Tooltip>
+    <Button
+      type="text"
+      :icon="conversationListCollapsed ? h(MenuUnfoldOutlined) : h(MenuFoldOutlined)"
+      @click="toggleConversationList"
+    />
 
-    <Tooltip title="开启/关闭流式输出">
-      <Button
-        type="text"
-        :icon="h(PlayCircleOutlined)"
-        :class="{ 'text-primary': streamingEnabled }"
-        @click="toggleStreaming"
-      />
-    </Tooltip>
+    <Button
+      type="text"
+      :icon="h(PlayCircleOutlined)"
+      :class="{ 'text-primary': streamingEnabled }"
+      @click="toggleStreaming"
+    />
 
-    <Tooltip title="保存当前会话">
-      <Button type="text" :icon="h(SaveOutlined)" @click="saveCurrentConversation" />
-    </Tooltip>
+    <Button type="text" :icon="h(SaveOutlined)" @click="saveCurrentConversation" />
   </div>
 </template>
 
 <script setup lang="ts">
 import { computed } from 'vue'
-import { Button, Tooltip, theme } from 'ant-design-vue'
+import { Button, theme } from 'ant-design-vue'
 import {
   MenuFoldOutlined,
   MenuUnfoldOutlined,
