@@ -6,30 +6,31 @@
     row-key="id"
     :pagination="false"
     :scroll="{ x: 'max-content' }"
+    :row-class-name="getRowClassName"
   >
     <template #bodyCell="{ column, record }">
       <!-- 渲染图标 -->
       <template v-if="column.key === 'menuIcon'">
-        <component :is="Icons[record.menuIcon]" v-if="record.menuIcon" />
+        <component :is="getIconComponent(record.menuIcon)" v-if="record.menuIcon" />
       </template>
       <!-- 菜单名称 -->
-      <template v-if="column.key === 'title'">
+      <template v-else-if="column.key === 'title'">
         {{ record.meta.title }}
       </template>
       <!-- 菜单隐藏 -->
-      <template v-if="column.key === 'hide'">
+      <template v-else-if="column.key === 'hide'">
         <a-tag :color="record.hide == 0 ? 'green' : ''">{{
           record.hide == '0' ? '否' : '是'
         }}</a-tag>
       </template>
       <!-- 菜单缓存 -->
-      <template v-if="column.key === 'keepAlive'">
+      <template v-else-if="column.key === 'keepAlive'">
         <a-tag :color="record.meta.keepAlive == 0 ? '' : 'green'">{{
           record.meta.keepAlive == '0' ? '否' : '是'
         }}</a-tag>
       </template>
       <!-- 操作列 -->
-      <template v-if="column.key === 'action'">
+      <template v-else-if="column.key === 'action'">
         <a-space>
           <a-button
             @click="$emit('edit', record)"
@@ -60,6 +61,7 @@
 </template>
 
 <script setup lang="ts">
+import { computed } from 'vue'
 import type { PropType } from 'vue'
 import type { RouteRecord } from '@sharedType/MenuManagement'
 import * as Icons from '@ant-design/icons-vue' // 引入所有图标
@@ -83,7 +85,31 @@ defineProps({
 
 defineEmits<Emits>()
 
-const columns = [
+// 缓存图标组件，避免重复创建
+const iconCache = new Map<string, any>()
+
+// 获取图标组件，使用缓存提高性能
+const getIconComponent = (iconName: string) => {
+  if (iconCache.has(iconName)) {
+    return iconCache.get(iconName)
+  }
+  
+  const iconComponent = Icons[iconName as keyof typeof Icons]
+  if (iconComponent) {
+    iconCache.set(iconName, iconComponent)
+    return iconComponent
+  }
+  
+  return null
+}
+
+// 为行添加类名，便于样式优化
+const getRowClassName = (record: RouteRecord, index: number) => {
+  return record.children && record.children.length > 0 ? 'parent-row' : 'child-row'
+}
+
+// 使用计算属性缓存列定义，避免重复创建
+const columns = computed(() => [
   { title: '菜单名称', dataIndex: ['meta', 'title'], key: 'title' },
   {
     title: '图标',
@@ -115,5 +141,15 @@ const columns = [
     ellipsis: true
   },
   { title: '操作', key: 'action', width: '150px', align: 'center' }
-]
+])
 </script>
+
+<style scoped>
+.parent-row {
+  font-weight: 500;
+}
+
+.child-row {
+  padding-left: 20px;
+}
+</style>
