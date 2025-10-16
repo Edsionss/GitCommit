@@ -107,5 +107,6 @@ declare module 'vue' {
     TimeSharing: typeof import('./src/components/Stock/StockList/StockDetail/components/TimeSharing.vue')['default']
     ToolbarComponent: typeof import('./src/components/AiChatX/ToolbarComponent.vue')['default']
     WeeklyK: typeof import('./src/components/Stock/StockList/StockDetail/components/WeeklyK.vue')['default']
+    WindowControls: typeof import('./src/components/layout/WindowControls.vue')['default']
   }
 }

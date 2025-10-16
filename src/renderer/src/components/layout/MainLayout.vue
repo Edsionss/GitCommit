@@ -22,23 +22,31 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, ref } from 'vue'
+import { computed, ref, onErrorCaptured } from 'vue'
+import { useRouter } from 'vue-router'
 import { storeToRefs } from 'pinia'
 import { useSettingsStore } from '@/stores/settingsStore'
-// import TheSidebar from './TheSidebar.vue'
 import TheSidebar from './TheSidebar/index.vue'
 import TheHeader from './TheHeader.vue'
 
+// --- Layout State ---
 const isExpanded = ref(true)
-
 const settingsStore = useSettingsStore()
 const { DisplayConfig } = storeToRefs(settingsStore)
-
 const sidebarPosition = computed(() => DisplayConfig?.value?.sidebarPosition || 'left')
-
 const layoutClasses = computed(() => ({
   'sidebar-right': sidebarPosition.value === 'right'
 }))
+
+// --- Error Handling ---
+const router = useRouter()
+onErrorCaptured((err, instance, info) => {
+  console.error('An error was captured in a child component:', err, instance, info)
+  // Navigate to the dedicated error route
+  router.push({ name: 'Error' })
+  // Prevent the error from propagating further
+  return false
+})
 </script>
 
 <style scoped>
@@ -57,7 +65,6 @@ const layoutClasses = computed(() => ({
 .sidebar {
   height: 100%;
   z-index: 20;
-  /* border-right: 1px solid var(--border-primary); */
 }
 
 .layout-container.sidebar-right .sidebar {

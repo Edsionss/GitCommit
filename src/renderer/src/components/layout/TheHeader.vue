@@ -28,50 +28,34 @@
         <div class="menu-box">
           <ReloadOutlined @click="refreshApp" />
         </div>
-        <!-- <div class="menu-box"></div> -->
       </div>
       <a-divider style="border-color: #87868673; height: 20px" type="vertical" />
-      <div class="window-menu">
-        <div class="menu-box">
-          <LineOutlined @click="minimize" />
-        </div>
-        <div class="menu-box" @click="maximize">
-          <ExpandOutlined v-if="!isMaximized" />
-          <CompressOutlined v-else />
-        </div>
-        <div class="menu-box danger">
-          <CloseOutlined @click="close" />
-        </div>
-      </div>
+      <WindowControls />
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-// import CognitoOcean from '@/assets/img/logo/CognitoOcean.png'
-import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { computed } from 'vue'
 import { useAppStore } from '@/stores/appStore'
+import { useRouter, useRoute } from 'vue-router'
+import { useSettingsStore } from '@/stores/settingsStore'
+import AppMetricsDisplay from '@/components/Common/AppMetricsDisplay.vue'
+import WindowControls from './WindowControls.vue'
+import { storeToRefs } from 'pinia'
+import {
+  SettingOutlined,
+  ReloadOutlined,
+  MenuUnfoldOutlined,
+  MenuFoldOutlined
+} from '@ant-design/icons-vue'
+
+const PROJECT_NAME = import.meta.env.NAME
+const PROJECT_VERSION = import.meta.env.VERSION
 
 // Initialize performance metrics listener
 const appStore = useAppStore()
 appStore.listenForAppMetrics()
-import { useRouter, useRoute } from 'vue-router'
-import { useSettingsStore } from '@/stores/settingsStore'
-import AppMetricsDisplay from '@/components/Common/AppMetricsDisplay.vue'
-import { storeToRefs } from 'pinia'
-import { applicationApi } from '@api/application'
-import {
-  SettingOutlined,
-  ReloadOutlined,
-  LineOutlined,
-  CloseOutlined,
-  CompressOutlined,
-  ExpandOutlined,
-  MenuUnfoldOutlined,
-  MenuFoldOutlined
-} from '@ant-design/icons-vue'
-const PROJECT_NAME = import.meta.env.NAME
-const PROJECT_VERSION = import.meta.env.VERSION
 
 const isExpanded = defineModel<boolean>()
 
@@ -88,7 +72,7 @@ const currentPageTitle = computed(() => {
 // 切换主题
 const toggleTheme = () => {
   DisplayConfig.value.theme = DisplayConfig.value.theme === 'light' ? 'dark' : 'light'
-  settingsStore.saveTheme() // 调用新的 action
+  settingsStore.saveTheme()
 }
 
 // 跳转到设置页面
@@ -99,34 +83,6 @@ const goToSettings = () => {
 // 刷新应用
 const refreshApp = () => {
   window.location.reload()
-}
-
-const isMaximized = ref(false)
-
-let unlisten: () => void
-
-onMounted(() => {
-  unlisten = applicationApi.onWindowStateChange((state) => {
-    isMaximized.value = state === 'maximized'
-  })
-})
-
-onUnmounted(() => {
-  if (unlisten) {
-    unlisten()
-  }
-})
-
-const minimize = () => {
-  applicationApi.minimizeWindow()
-}
-
-const maximize = () => {
-  applicationApi.maximizeWindow()
-}
-
-const close = () => {
-  applicationApi.closeWindow()
 }
 </script>
 
@@ -144,7 +100,6 @@ const close = () => {
   box-sizing: border-box;
   overflow: hidden;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-
   -webkit-app-region: drag;
 }
 
@@ -181,8 +136,7 @@ const close = () => {
   -webkit-app-region: no-drag;
 }
 
-.application-menu,
-.window-menu {
+.application-menu {
   display: flex;
   align-items: center;
   cursor: pointer;
@@ -198,11 +152,6 @@ const close = () => {
   }
   .menu-box:hover {
     background-color: var(--bg-hover);
-  }
-
-  .danger:hover {
-    background-color: var(--color-danger);
-    color: #fff;
   }
 }
 
