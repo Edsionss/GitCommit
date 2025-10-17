@@ -61,7 +61,7 @@ export function useAi() {
   }
   
   const onChatStreamChunk = (callback: (chunk: string) => void) => {
-    aiApi.onChatStreamChunk(callback)
+    return aiApi.onChatStreamChunk(callback)
   }
 
   // 删除会话

@@ -5,7 +5,8 @@ import { computed, ref, watch, onMounted } from 'vue'
 import { theme } from 'ant-design-vue'
 import { message as antMessage } from 'ant-design-vue'
 import { useChatStore } from '@/stores/chatStore'
-import { chatApi } from '@api/chat'
+// import { chatApi } from '@api/chat'
+import { useAi } from '@/composables/ai'
 import {
   ConversationListComponent,
   MessageListComponent,
@@ -13,6 +14,7 @@ import {
   PromptsComponent,
   TopToolbarComponent
 } from '@components/AiChatX'
+import { storeToRefs } from 'pinia'
 
 const { token } = theme.useToken()
 
@@ -41,7 +43,10 @@ defineOptions({ name: 'PlaygroundIndependentSetup' })
 // 使用 chatStore 管理会话历史
 const chatStore = useChatStore()
 
-const sleep = () => new Promise((resolve) => setTimeout(resolve, 500))
+// 使用 useAi composable
+const { sendAiMessage, onChatStreamChunk, deleteConversation, renameConversation } = useAi()
+
+// const sleep = () => new Promise((resolve) => setTimeout(resolve, 500))
 
 // ==================== State ====================
 const headerOpen = ref(false)
@@ -69,32 +74,30 @@ const activeKey = computed(() => chatStore.activeSessionId || '')
 
 // 修改 XChat 的 request 函数，以便在接收到AI响应时保存到 chatStore
 const [agent] = useXAgent<string, { message: string }, string>({
-  request: async ({ message }, { onSuccess }) => {
+  request: async ({ message }, { onSuccess, onUpdate }) => {
     agentRequestLoading.value = true
+    let history: Array<{ sender: 'user' | 'ai'; text: string }> = []
 
     try {
-      // 模拟API调用延迟
-      await sleep()
-
-      // 生成模拟响应
-      const response = `Mock success return. You said: ${message}`
-
-      // 移除思考中的状态
-      chatStore.ThinkIngLoading(false)
-
-      // 添加AI响应到 chatStore
-      if (chatStore.activeSession) {
-        await chatStore.addMessageToActiveSession(
-          {
-            sender: 'ai',
-            text: response
-          },
-          true
-        )
+      if (chatStore.AiConfig?.enableStreaming) {
+        onChatStreamChunk((chunk) => {
+          onUpdate(chunk)
+        })
       }
-
-      // 调用 onSuccess 回调
-      onSuccess([response])
+      sendAiMessage({
+        prompt: message,
+        history: history,
+        successFn: (response) => {
+          chatStore.addMessageToActiveSession({ sender: 'ai', text: response })
+          onSuccess([response])
+        },
+        errorFn: (errorMessage) => {
+          chatStore.addMessageToActiveSession({ sender: 'ai', text: `错误: ${errorMessage}` })
+        },
+        finallyFn: () => {
+          chatStore.ThinkIngLoading(false)
+        }
+      })
     } catch (error) {
       console.error('Error in agent request:', error)
       chatStore.ThinkIngLoading(false)
@@ -105,11 +108,11 @@ const [agent] = useXAgent<string, { message: string }, string>({
   }
 })
 
-// 初始化时加载会话历史
-onMounted(() => {
-  // chatStore 的 init 方法已经在 store 中自动调用
-  // 这里可以添加额外的初始化逻辑
-})
+// // 初始化时加载会话历史
+// onMounted(() => {
+//   // chatStore 的 init 方法已经在 store 中自动调用
+//   // 这里可以添加额外的初始化逻辑
+// })
 
 const { onRequest, messages, setMessages } = useXChat({
   agent: agent.value
@@ -142,15 +145,8 @@ watch(
           message: msg.text,
           status: msg.isLoading ? 'loading' : msg.sender === 'user' ? 'local' : 'ai'
         }))
-
         // 将 chatStore 的消息转换为 XChat 格式
-        setMessages(
-          xchatMessages.map((msg) => ({
-            id: msg.id,
-            message: msg.message,
-            status: msg.status
-          }))
-        )
+        setMessages(xchatMessages)
       } else {
         setMessages([])
       }
@@ -165,13 +161,10 @@ function onSubmit(nextContent: string) {
 
   // 添加用户消息到 chatStore
   if (chatStore.activeSession) {
-    chatStore.addMessageToActiveSession(
-      {
-        sender: 'user',
-        text: nextContent
-      },
-      true
-    )
+    chatStore.addMessageToActiveSession({
+      sender: 'user',
+      text: nextContent
+    })
 
     // 添加AI思考中的状态
     chatStore.ThinkIngLoading(true)
@@ -185,13 +178,10 @@ function onSubmit(nextContent: string) {
 function onPromptsItemClick(description: string) {
   // 添加提示词作为用户消息
   if (chatStore.activeSession) {
-    chatStore.addMessageToActiveSession(
-      {
-        sender: 'user',
-        text: description
-      },
-      true
-    )
+    chatStore.addMessageToActiveSession({
+      sender: 'user',
+      text: description
+    })
 
     // 添加AI思考中的状态
     chatStore.ThinkIngLoading(true)
@@ -208,35 +198,6 @@ async function onAddConversation() {
   } catch (error) {
     console.error('Failed to create new conversation:', error)
     antMessage.error('创建新会话失败')
-  }
-}
-
-// 删除会话
-async function deleteConversation(sessionId: string) {
-  try {
-    await chatStore.deleteSession(sessionId)
-    antMessage.success('会话删除成功')
-  } catch (error) {
-    console.error('Failed to delete conversation:', error)
-    antMessage.error('删除会话失败')
-  }
-}
-
-// 重命名会话
-async function renameConversation(sessionId: string, newName: string) {
-  try {
-    // 更新本地状态
-    const session = chatStore.sessions.find(s => s.id === sessionId)
-    if (session) {
-      session.name = newName
-    }
-    
-    // 调用API更新数据库
-    await chatApi.updateSessionName(sessionId, newName)
-    antMessage.success('会话名称修改成功')
-  } catch (error) {
-    console.error('Failed to rename conversation:', error)
-    antMessage.error('修改会话名称失败')
   }
 }
 
