@@ -16,25 +16,33 @@
 
     <!-- Tab 内容 -->
     <div class="tab-content">
-      <!-- 基础设置 Tab -->
-      <div v-if="activeTab === 'basic'" class="tab-panel">
+      <!-- DisplayConfig Tab -->
+      <div v-if="activeTab === 'display'" class="tab-panel">
         <DisplayConfig />
+      </div>
+
+      <!-- Preferences Tab -->
+      <div v-if="activeTab === 'preferences'" class="tab-panel">
         <Preferences />
       </div>
 
-      <!-- 系统设置 Tab -->
+      <!-- SystemConfig Tab -->
       <div v-if="activeTab === 'system'" class="tab-panel">
         <SystemConfig />
+      </div>
+
+      <!-- GitConfig Tab -->
+      <div v-if="activeTab === 'git'" class="tab-panel">
         <GitConfig />
       </div>
 
-      <!-- AI设置 Tab -->
+      <!-- AiConfig Tab -->
       <div v-if="activeTab === 'ai'" class="tab-panel">
         <AiConfig />
       </div>
 
-      <!-- 高级设置 Tab -->
-      <div v-if="activeTab === 'advanced'" class="tab-panel">
+      <!-- MenuManagement Tab -->
+      <div v-if="activeTab === 'menu'" class="tab-panel">
         <a-card title="菜单与路由管理">
           <MenuManagement />
         </a-card>
@@ -90,14 +98,16 @@ const routesStore = useRoutesStore()
 const settingsStore = useSettingsStore()
 
 // 当前激活的 tab
-const activeTab = ref('basic')
+const activeTab = ref('display')
 
-// Tab 选项
+// Tab 选项 - 按组件分类
 const tabOptions = reactive([
-  { value: 'basic', label: '基础设置' },
-  { value: 'system', label: '系统设置' },
-  { value: 'ai', label: 'AI设置' },
-  { value: 'advanced', label: '高级设置' }
+  { value: 'display', label: '显示配置' },
+  { value: 'preferences', label: '偏好设置' },
+  { value: 'system', label: '系统配置' },
+  { value: 'git', label: 'Git配置' },
+  { value: 'ai', label: 'AI配置' },
+  { value: 'menu', label: '菜单管理' }
 ])
 
 // 保存设置到 Store
