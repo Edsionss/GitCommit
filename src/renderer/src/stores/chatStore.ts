@@ -1,14 +1,14 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import { nanoid } from 'nanoid'
-import {
-  chatApi,
-  type ChatSession as ApiChatSession,
-  type ChatMessage as ApiChatMessage
-} from '@api/chat'
+import { chatApi } from '@api/chat'
 import type { ChatMessage, ChatSession } from '@sharedType/ai'
+import { useSettingsStore } from '@/stores/settingsStore'
+import { storeToRefs } from 'pinia'
 
 export const useChatStore = defineStore('chat', () => {
+  const settingsStore = useSettingsStore()
+  const { AiConfig } = storeToRefs(settingsStore)
   // State
   const sessions = ref<ChatSession[]>([])
   const activeSessionId = ref<string | null>(null)
@@ -130,9 +130,10 @@ export const useChatStore = defineStore('chat', () => {
   }
 
   async function addMessageToActiveSession(
-    message: Omit<ChatMessage, 'isLoading'>,
-    isSave: boolean
+    message: Omit<ChatMessage, 'isLoading'>
+    // isSave: boolean
   ) {
+    const isSave = AiConfig.value?.enableAutoSave || false
     if (!activeSession.value) return
 
     // 检查是否是第一条消息，如果是，先将会话保存到数据库
@@ -148,12 +149,12 @@ export const useChatStore = defineStore('chat', () => {
           startTime: activeSession.value.startTime
         })
         sessionId = apiSession.id
-        
+
         // 更新本地会话ID（如果数据库返回的ID不同）
         if (apiSession.id !== activeSession.value.id) {
           activeSession.value.id = apiSession.id
           // 更新sessions数组中的ID
-          const sessionIndex = sessions.value.findIndex(s => s.id === activeSession.value?.id)
+          const sessionIndex = sessions.value.findIndex((s) => s.id === activeSession.value?.id)
           if (sessionIndex !== -1) {
             sessions.value[sessionIndex].id = apiSession.id
           }

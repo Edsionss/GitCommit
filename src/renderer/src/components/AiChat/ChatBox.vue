@@ -155,7 +155,7 @@ const sendMessage = async ({ input, userContent, success }: any) => {
   const aiConfig = AiConfig.value
   if (!text || isLoading.value) return
   const userMessage = { sender: 'user' as const, text: userContent || text }
-  chatStore.addMessageToActiveSession(userMessage, aiConfig.enableAutoSave)
+  chatStore.addMessageToActiveSession(userMessage)
   // chatStore.ThinkIngLoading(true)
   isLoading.value = true
   const { sendAiMessage, onChatStreamChunk } = useAi()
@@ -176,17 +176,14 @@ const sendMessage = async ({ input, userContent, success }: any) => {
     prompt: text,
     history: history,
     successFn: (message) => {
-      chatStore.addMessageToActiveSession({ sender: 'ai', text: message }, aiConfig.enableAutoSave)
+      chatStore.addMessageToActiveSession({ sender: 'ai', text: message })
       success && success(message)
       startSend.value = false
       streamingMessage.value = ''
       scrollToBottom()
     },
     errorFn: (errorMessage) => {
-      chatStore.addMessageToActiveSession(
-        { sender: 'ai', text: `错误: ${errorMessage}` },
-        aiConfig.enableAutoSave
-      )
+      chatStore.addMessageToActiveSession({ sender: 'ai', text: `错误: ${errorMessage}` })
     },
     finallyFn: () => {
       isLoading.value = false
