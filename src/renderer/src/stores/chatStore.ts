@@ -102,40 +102,25 @@ export const useChatStore = defineStore('chat', () => {
   }
 
   async function createNewSession() {
+    const newSessionId = nanoid()
     const newSessionData = {
-      id: nanoid(),
+      id: newSessionId,
       name: '新会话',
       startTime: new Date().toISOString()
     }
 
-    try {
-      // 在数据库中创建会话
-      const apiSession = await chatApi.createChatSession(newSessionData)
-
-      // 创建本地会话对象 - 不添加默认消息
-      const newSession: ChatSession = {
-        id: apiSession.id,
-        name: apiSession.name,
-        startTime: apiSession.startTime,
-        messages: [] // 空消息数组，不添加默认消息
-      }
-
-      sessions.value.unshift(newSession) // Add to the beginning
-      activeSessionId.value = newSession.id
-
-      // 注释掉保存初始消息到数据库的代码
-      // await chatApi.addMessageToSession({
-      //   sessionId: newSession.id,
-      //   sender: 'ai',
-      //   text: '您好！有什么可以帮助您的吗？',
-      //   isLoading: false
-      // })
-
-      return newSession.id
-    } catch (error) {
-      console.error('Failed to create new chat session:', error)
-      throw error
+    // 只在前端创建会话，不保存到数据库
+    const newSession: ChatSession = {
+      id: newSessionId,
+      name: newSessionData.name,
+      startTime: newSessionData.startTime,
+      messages: [] // 空消息数组
     }
+
+    sessions.value.unshift(newSession) // Add to the beginning
+    activeSessionId.value = newSession.id
+
+    return newSession.id
   }
 
   function setActiveSession(sessionId: string) {
@@ -150,10 +135,42 @@ export const useChatStore = defineStore('chat', () => {
   ) {
     if (!activeSession.value) return
 
+    // 检查是否是第一条消息，如果是，先将会话保存到数据库
+    const isFirstMessage = activeSession.value.messages.length === 0
+    let sessionId = activeSession.value.id
+
+    if (isFirstMessage) {
+      try {
+        // 在数据库中创建会话
+        const apiSession = await chatApi.createChatSession({
+          id: activeSession.value.id,
+          name: activeSession.value.name,
+          startTime: activeSession.value.startTime
+        })
+        sessionId = apiSession.id
+        
+        // 更新本地会话ID（如果数据库返回的ID不同）
+        if (apiSession.id !== activeSession.value.id) {
+          activeSession.value.id = apiSession.id
+          // 更新sessions数组中的ID
+          const sessionIndex = sessions.value.findIndex(s => s.id === activeSession.value?.id)
+          if (sessionIndex !== -1) {
+            sessions.value[sessionIndex].id = apiSession.id
+          }
+          activeSessionId.value = apiSession.id
+        }
+      } catch (error) {
+        console.error('Failed to create new chat session in database:', error)
+        throw error
+      }
+    }
+
     // If this is the first user message, update the session name
     if (activeSession.value.name === '新会话' && message.sender === 'user') {
       activeSession.value.name = message.text.substring(0, 30) // Use first 30 chars as name
-      await chatApi.updateSessionName(activeSession.value.id, activeSession.value.name)
+      if (!isFirstMessage) {
+        await chatApi.updateSessionName(sessionId, activeSession.value.name)
+      }
     }
 
     activeSession.value.messages.push(message)
@@ -161,7 +178,7 @@ export const useChatStore = defineStore('chat', () => {
     if (isSave) {
       try {
         await chatApi.addMessageToSession({
-          sessionId: activeSession.value.id,
+          sessionId: sessionId,
           sender: message.sender,
           text: message.text,
           isLoading: false
@@ -176,8 +193,17 @@ export const useChatStore = defineStore('chat', () => {
 
   async function deleteSession(sessionId: string) {
     try {
-      // 从数据库中删除会话
-      await chatApi.deleteChatSession(sessionId)
+      // 检查会话是否存在于数据库中
+      const session = sessions.value.find((s) => s.id === sessionId)
+      if (session) {
+        // 尝试从数据库中删除会话（如果存在）
+        try {
+          await chatApi.deleteChatSession(sessionId)
+        } catch (error) {
+          // 如果会话不在数据库中，忽略错误
+          console.log('Session not found in database, might be a local-only session:', error)
+        }
+      }
 
       // 从本地状态中删除会话
       sessions.value = sessions.value.filter((s) => s.id !== sessionId)
