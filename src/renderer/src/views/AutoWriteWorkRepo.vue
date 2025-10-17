@@ -75,7 +75,7 @@ import { automaticallyFillApi } from '@api/automaticallyFill'
 // 使用 TypeScript 定义表单数据的接口，提供类型安全
 interface FormState {
   projectName: string
-  completionDate: Dayjs | null
+  completionDate: Dayjs | string
   taskDescription: string
   evaluationManDays: string
   manDays: string
@@ -84,7 +84,7 @@ interface FormState {
 // 初始化表单状态，使用 reactive
 const formState = reactive<FormState>({
   projectName: '人天汇总',
-  completionDate: dayjs('2025-09-27'), // 匹配图片
+  completionDate: dayjs(), // 匹配图片
   taskDescription: '',
   evaluationManDays: '',
   manDays: '5'
@@ -102,11 +102,11 @@ const rules: Record<string, Rule[]> = {
 const onFinish = async (values: FormState) => {
   const data = { ...values, completionDate: dayjs(values.completionDate).format('YYYY-MM-DD') }
   console.log('Success:', data)
-  const state = await automaticallyFillApi.writeWorkRepo(data)
-  if (state == 'success') {
-    message.success('自动填写报告成功!')
+  const res = await automaticallyFillApi.writeWorkRepo(data)
+  if (res.success) {
+    message.success(res.message)
   } else {
-    message.success('自动填写报告失败!')
+    message.error(res.message)
   }
 }
 

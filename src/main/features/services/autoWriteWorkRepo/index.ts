@@ -2,22 +2,20 @@ import { sysLogger } from '@nodeUtils/sysLogger'
 import { executeScrapingTask } from '@services/puppeteer'
 export const AutomaticallyFillWorkSheet = async (data: any) => {
   await executeScrapingTask({
-    // windowOptions: { show: true },
     beforeExecutionData: data,
     beforeExecution: async (page, repoData) => {
       const {
         username = 'longhai_shen',
         password = 'Biaopu@20241031',
-        projectName = '人天汇总',
-        taskDescription = '任务描述',
-        manDay = '5',
-        completionDate = '2025-9-26',
+        projectName = '',
+        taskDescription = '',
+        manDays = '',
+        completionDate = '',
         evaluationManDays = ''
       } = repoData
       // 1. 导航到登录页面 (请替换为你的实际网址)
       await page.goto('http://www.bpsip.com/BPGL/userlogin.jsp', { waitUntil: 'networkidle0' })
       sysLogger.log('navigated to login page.')
-
       // 2. 填写用户名和密码
       await page.type('#username', username, { delay: 100 }) // delay 模拟真实输入
       await page.type('#password', password, { delay: 100 })
@@ -53,7 +51,7 @@ export const AutomaticallyFillWorkSheet = async (data: any) => {
           await frame.waitForSelector('#defaultTablediv')
           await frame.type('[name="C_fxmmc"]', projectName, { delay: 100 }) // delay 模拟真实输入
           await frame.type('[name="C_fbz"]', taskDescription, { delay: 100 }) // delay 模拟真实输入
-          await frame.type('[name="C_frt"]', manDay, { delay: 100 }) // delay 模拟真实输入
+          await frame.type('[name="C_frt"]', manDays, { delay: 100 }) // delay 模拟真实输入
           await frame.type('[name="C_fpdrt"]', evaluationManDays, { delay: 100 }) // delay 模拟真实输入
 
           await frame.evaluate((date) => {
@@ -61,8 +59,12 @@ export const AutomaticallyFillWorkSheet = async (data: any) => {
             document.querySelector('[name="C_frq"]').value = date
           }, completionDate)
           sysLogger.log('write success')
-
           await frame.click('#save')
+          await new Promise((r) => setTimeout(r, 5000))
+          return {
+            success: true,
+            message: '日志填写成功'
+          }
         }
       }
     }
