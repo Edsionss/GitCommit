@@ -1,20 +1,47 @@
 <template>
   <div class="settings-container">
-    <DisplayConfig />
+    <div class="settings-header">
+      <div class="tab-container">
+        <SegmentedControl
+          backgroundColor="var(--bg-container)"
+          v-model="activeTab"
+          :options="tabOptions"
+          :border-radius="20"
+          :padding="5"
+          borderColor="var(--border-primary)"
+          activeBackgroundColor="var(--bg-hover)"
+        />
+      </div>
+    </div>
 
-    <Preferences />
+    <!-- Tab 内容 -->
+    <div class="tab-content">
+      <!-- 基础设置 Tab -->
+      <div v-if="activeTab === 'basic'" class="tab-panel">
+        <DisplayConfig />
+        <Preferences />
+      </div>
 
-    <GitConfig />
+      <!-- 系统设置 Tab -->
+      <div v-if="activeTab === 'system'" class="tab-panel">
+        <SystemConfig />
+        <GitConfig />
+      </div>
 
-    <SystemConfig />
+      <!-- AI设置 Tab -->
+      <div v-if="activeTab === 'ai'" class="tab-panel">
+        <AiConfig />
+      </div>
 
-    <AiConfig />
+      <!-- 高级设置 Tab -->
+      <div v-if="activeTab === 'advanced'" class="tab-panel">
+        <a-card title="菜单与路由管理">
+          <MenuManagement />
+        </a-card>
+      </div>
+    </div>
 
-    <a-card title="菜单与路由管理">
-      <!-- <RouterSetting /> -->
-      <MenuManagement />
-    </a-card>
-
+    <!-- 浮动操作按钮 -->
     <a-float-button-group trigger="hover" type="primary" :right="'24px'">
       <template #tooltip>
         <div>操作</div>
@@ -40,6 +67,7 @@
 </template>
 
 <script setup lang="ts">
+import { reactive, ref } from 'vue'
 import { message, Modal } from 'ant-design-vue'
 import { useSettingsStore } from '@/stores/settingsStore'
 import DisplayConfig from '@renderer/components/SettingsView/DisplayConfig.vue'
@@ -56,12 +84,21 @@ import {
 } from '@ant-design/icons-vue'
 import { useRoutesStore } from '@/stores/routesStore'
 import { applicationApi } from '@api/application'
-import SegmentedControl from '@renderer/components/LH/LHTabs/Tabs.vue'
+import SegmentedControl from '@/components/LH-components/SegmentedControl.vue'
 
 const routesStore = useRoutesStore()
-
-// 使用 Pinia Store
 const settingsStore = useSettingsStore()
+
+// 当前激活的 tab
+const activeTab = ref('basic')
+
+// Tab 选项
+const tabOptions = reactive([
+  { value: 'basic', label: '基础设置' },
+  { value: 'system', label: '系统设置' },
+  { value: 'ai', label: 'AI设置' },
+  { value: 'advanced', label: '高级设置' }
+])
 
 // 保存设置到 Store
 const saveSettings = async () => {
@@ -124,69 +161,56 @@ const resetDatabase = () => {
 }
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .settings-container {
   width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  overflow: hidden;
+  height: 100%;
+  .settings-header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 24px;
+    height: 40px;
+    .tab-container {
+      position: fixed;
+      display: flex;
+      justify-content: center;
+    }
+  }
+  .tab-content {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    overflow-y: auto;
+    height: 100%;
+  }
 }
 
 .page-title {
-  margin: 0 0 20px 0;
+  margin: 0;
   font-size: var(--font-size-xl);
-  color: var(--text-primary); /* 修改为正确的CSS变量 */
+  color: var(--text-primary);
   font-weight: var(--font-weight-semibold);
 }
 
-.settings-card {
-  margin-bottom: 20px;
-}
-
-.card-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  font-weight: var(--font-weight-medium);
-  font-size: var(--font-size-md);
-}
-
-.settings-section {
+.tab-panel {
   display: flex;
   flex-direction: column;
   gap: 20px;
 }
 
-.setting-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.setting-label {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  color: var(--text-primary); /* 修改为正确的CSS变量 */
-  font-weight: var(--font-weight-medium);
-}
-
-.setting-control {
-  min-width: 200px;
-}
-
-.settings-actions {
-  display: flex;
-  gap: 12px;
-  margin-top: 30px;
-}
-
 @media (max-width: 768px) {
-  .setting-item {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 10px;
+  .settings-header {
+    gap: 16px;
   }
 
-  .setting-control {
-    width: 100%;
+  .tab-container {
+    overflow-x: auto;
+    justify-content: flex-start;
   }
 }
 </style>

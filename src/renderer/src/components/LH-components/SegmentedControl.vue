@@ -74,13 +74,19 @@ interface SegmentedControlProps {
    * 组件容器的边框圆角
    */
   borderRadius?: string | number
+  // 选项项的内边距
+  padding?: string | number
+  // 选项项的边框颜色
+  borderColor?: string
 }
 
 const props = withDefaults(defineProps<SegmentedControlProps>(), {
   disabled: false,
   variant: 'outlined',
   inactiveColor: '#6b7280',
-  borderRadius: '8px'
+  borderRadius: '8px',
+  padding: '5px',
+  borderColor: '#d9d9d9'
 })
 
 const emit = defineEmits<{
@@ -132,7 +138,9 @@ const styleVars = computed<StyleValue>(() => {
     '--background-color': props.backgroundColor ?? currentDefaults.bg,
     '--active-background-color': props.activeBackgroundColor ?? currentDefaults.activeBg,
     '--active-color': props.activeColor ?? currentDefaults.activeColor,
-    '--inactive-color': props.inactiveColor
+    '--inactive-color': props.inactiveColor,
+    '--padding': typeof props.padding === 'number' ? `${props.padding}px` : props.padding,
+    '--border-color': props.borderColor
   }
 })
 </script>
@@ -143,17 +151,18 @@ const styleVars = computed<StyleValue>(() => {
 .segmented-control {
   display: inline-flex;
   align-items: center;
-  padding: 3px;
+  padding: var(--padding);
   border-radius: var(--border-radius);
   background-color: var(--background-color);
   transition: background-color 0.3s ease;
   user-select: none;
   -webkit-user-select: none; /* for Safari */
+  border: 1px solid var(--border-color);
 }
 
 /* 针对不同 variant 的细微调整 */
 .segmented-control.outlined {
-  border: 1px solid #d9d9d9;
+  /* border: 1px solid #d9d9d9; */
 }
 
 .segmented-control.ghost {
