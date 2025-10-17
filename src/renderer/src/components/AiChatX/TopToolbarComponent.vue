@@ -1,19 +1,27 @@
 <template>
-  <div :style="styles.toolbar">
-    <Button
-      type="text"
-      :icon="conversationListCollapsed ? h(MenuUnfoldOutlined) : h(MenuFoldOutlined)"
-      @click="toggleConversationList"
-    />
+  <div
+    class="flex justify-between items-center px-4 h-12 border-b flex-shrink-0"
+    :style="{ borderBottomColor: token.colorBorder }"
+  >
+    <!-- 左侧按钮：收起展开按钮 -->
+    <div class="flex gap-2">
+      <Button
+        type="text"
+        :icon="conversationListCollapsed ? h(MenuUnfoldOutlined) : h(MenuFoldOutlined)"
+        @click="toggleConversationList"
+      />
+    </div>
 
-    <Button
-      type="text"
-      :icon="h(PlayCircleOutlined)"
-      :class="{ 'text-primary': streamingEnabled }"
-      @click="toggleStreaming"
-    />
-
-    <Button type="text" :icon="h(SaveOutlined)" @click="saveCurrentConversation" />
+    <!-- 右侧按钮：其他功能按钮 -->
+    <div class="flex gap-2">
+      <Button
+        type="text"
+        :icon="h(PlayCircleOutlined)"
+        :class="{ 'text-primary': streamingEnabled }"
+        @click="toggleStreaming"
+      />
+      <Button type="text" :icon="h(SaveOutlined)" @click="saveCurrentConversation" />
+    </div>
   </div>
 </template>
 
@@ -45,20 +53,6 @@ const emit = defineEmits<{
 }>()
 
 const { token } = theme.useToken()
-
-const styles = computed(() => {
-  return {
-    toolbar: {
-      display: 'flex',
-      'flex-direction': 'column',
-      gap: '8px',
-      padding: '16px', // 增加上下padding
-      'align-items': 'center'
-      // background: `${token.value.colorBgLayout}80`, // 与ConversationListComponent相同的背景色
-      // 'border-right': `1px solid ${token.value.colorBorder}`
-    }
-  } as const
-})
 
 const toggleConversationList = () => {
   emit('toggle-conversation-list')

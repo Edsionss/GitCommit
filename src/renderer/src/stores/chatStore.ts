@@ -112,24 +112,24 @@ export const useChatStore = defineStore('chat', () => {
       // 在数据库中创建会话
       const apiSession = await chatApi.createChatSession(newSessionData)
 
-      // 创建本地会话对象
+      // 创建本地会话对象 - 不添加默认消息
       const newSession: ChatSession = {
         id: apiSession.id,
         name: apiSession.name,
         startTime: apiSession.startTime,
-        messages: [{ sender: 'ai', text: '您好！有什么可以帮助您的吗？' }]
+        messages: [] // 空消息数组，不添加默认消息
       }
 
       sessions.value.unshift(newSession) // Add to the beginning
       activeSessionId.value = newSession.id
 
-      // 保存初始消息到数据库
-      await chatApi.addMessageToSession({
-        sessionId: newSession.id,
-        sender: 'ai',
-        text: '您好！有什么可以帮助您的吗？',
-        isLoading: false
-      })
+      // 注释掉保存初始消息到数据库的代码
+      // await chatApi.addMessageToSession({
+      //   sessionId: newSession.id,
+      //   sender: 'ai',
+      //   text: '您好！有什么可以帮助您的吗？',
+      //   isLoading: false
+      // })
 
       return newSession.id
     } catch (error) {

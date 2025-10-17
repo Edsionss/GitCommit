@@ -1,71 +1,50 @@
 <script setup lang="ts">
 import type { ConversationsProps } from 'ant-design-x-vue'
 import { useXAgent, useXChat } from 'ant-design-x-vue'
-import { computed, ref, watch } from 'vue'
+import { computed, ref, watch, onMounted } from 'vue'
 import { theme } from 'ant-design-vue'
+import { message as antMessage } from 'ant-design-vue'
+import { useChatStore } from '@/stores/chatStore'
 import {
   ConversationListComponent,
   MessageListComponent,
   SenderComponent,
   PromptsComponent,
-  ToolbarComponent
+  TopToolbarComponent
 } from '@components/AiChatX'
 
 const { token } = theme.useToken()
 
-const styles = computed(() => {
+// 只保留需要动态计算的样式
+const dynamicStyles = computed(() => {
   return {
     layout: {
-      width: '100%',
-      'min-width': '970px',
-      height: '100%',
-      'border-radius': `${token.value.borderRadius}px`,
-      display: 'flex',
+      borderRadius: `${token.value.borderRadius}px`,
       background: `${token.value.colorBgContainer}`,
-      'font-family': `AlibabaPuHuiTi, ${token.value.fontFamily}, sans-serif`
+      fontFamily: `AlibabaPuHuiTi, ${token.value.fontFamily}, sans-serif`
     },
     chat: {
-      height: '100%',
-      width: '100%',
-      'max-width': '700px',
-      margin: '0 auto',
-      'box-sizing': 'border-box',
-      display: 'flex',
-      'flex-direction': 'column',
-      padding: `${token.value.paddingLG}px`,
-      gap: '16px'
+      padding: `${token.value.paddingLG}px`
     },
-    chatContainer: {
-      display: 'flex',
-      height: '100%',
-      width: '100%'
-    },
-    chatContent: {
-      flex: 1,
-      height: '100%'
+    messagesContainer: {
+      '&::-webkit-scrollbar-thumb': {
+        'background-color': 'rgba(0, 0, 0, 0.2)',
+        'border-radius': '3px'
+      }
     }
   } as const
 })
 
 defineOptions({ name: 'PlaygroundIndependentSetup' })
 
-const sleep = () => new Promise((resolve) => setTimeout(resolve, 500))
+// 使用 chatStore 管理会话历史
+const chatStore = useChatStore()
 
-const defaultConversationsItems = [
-  {
-    key: '0',
-    label: 'What is Ant Design X?'
-  }
-]
+const sleep = () => new Promise((resolve) => setTimeout(resolve, 500))
 
 // ==================== State ====================
 const headerOpen = ref(false)
 const content = ref('')
-const conversationsItems = ref(defaultConversationsItems)
-const activeKey = ref(defaultConversationsItems[0].key)
-
-// 当前使用的模型
-const currentModel = ref('GPT-4')
 const agentRequestLoading = ref(false)
 const attachedFiles = ref<any[]>([])
 
@@ -73,14 +52,62 @@ const attachedFiles = ref<any[]>([])
 const conversationListCollapsed = ref(false)
 const streamingEnabled = ref(false)
 
-// ==================== Runtime ====================
+// 当前使用的模型
+const currentModel = ref('GPT-4')
+
+// 计算属性：从 chatStore 获取会话列表并转换为 Conversations 组件需要的格式
+const conversationsItems = computed(() => {
+  return chatStore.sessionHistory.map((session) => ({
+    key: session.id,
+    label: session.name
+  }))
+})
+
+// 当前活动会话ID
+const activeKey = computed(() => chatStore.activeSessionId || '')
+
+// 修改 XChat 的 request 函数，以便在接收到AI响应时保存到 chatStore
 const [agent] = useXAgent<string, { message: string }, string>({
   request: async ({ message }, { onSuccess }) => {
     agentRequestLoading.value = true
-    await sleep()
-    agentRequestLoading.value = false
-    onSuccess([`Mock success return. You said: ${message}`])
+
+    try {
+      // 模拟API调用延迟
+      await sleep()
+
+      // 生成模拟响应
+      const response = `Mock success return. You said: ${message}`
+
+      // 移除思考中的状态
+      chatStore.ThinkIngLoading(false)
+
+      // 添加AI响应到 chatStore
+      if (chatStore.activeSession) {
+        await chatStore.addMessageToActiveSession(
+          {
+            sender: 'ai',
+            text: response
+          },
+          true
+        )
+      }
+
+      // 调用 onSuccess 回调
+      onSuccess([response])
+    } catch (error) {
+      console.error('Error in agent request:', error)
+      chatStore.ThinkIngLoading(false)
+      antMessage.error('发送消息失败')
+    } finally {
+      agentRequestLoading.value = false
+    }
   }
+})
+
+// 初始化时加载会话历史
+onMounted(() => {
+  // chatStore 的 init 方法已经在 store 中自动调用
+  // 这里可以添加额外的初始化逻辑
 })
 
 const { onRequest, messages, setMessages } = useXChat({
@@ -89,18 +116,43 @@ const { onRequest, messages, setMessages } = useXChat({
 
 // 格式化消息以匹配 MessageListComponent 期望的类型
 const formattedMessages = computed(() => {
-  return messages.value.map((msg) => ({
-    id: typeof msg.id === 'string' ? msg.id : String(msg.id), // 确保id是字符串类型
-    message: msg.message, // 使用 message 属性而不是 content
-    status: msg.status || 'success' // 默认状态为 success
+  // 从 chatStore 获取当前活动会话的消息
+  const activeSession = chatStore.activeSession
+  if (!activeSession || !activeSession.messages) return []
+
+  return activeSession.messages.map((msg, index) => ({
+    id: `${activeSession.id}-${index}`, // 使用会话ID和消息索引作为唯一ID
+    message: msg.text,
+    status: msg.isLoading ? 'loading' : msg.sender === 'user' ? 'local' : 'ai'
   }))
 })
 
+// 监听活动会话变化，更新 XChat 的消息
 watch(
-  activeKey,
-  () => {
-    if (activeKey.value !== undefined) {
-      setMessages([])
+  () => chatStore.activeSessionId,
+  (newSessionId, oldSessionId) => {
+    if (newSessionId && newSessionId !== oldSessionId) {
+      // 当会话切换时，清空 XChat 的消息
+      // 然后从 chatStore 加载新会话的消息
+      const activeSession = chatStore.activeSession
+      if (activeSession && activeSession.messages) {
+        const xchatMessages = activeSession.messages.map((msg) => ({
+          id: `temp-${Date.now()}-${Math.random()}`,
+          message: msg.text,
+          status: msg.isLoading ? 'loading' : msg.sender === 'user' ? 'local' : 'ai'
+        }))
+
+        // 将 chatStore 的消息转换为 XChat 格式
+        setMessages(
+          xchatMessages.map((msg) => ({
+            id: msg.id,
+            message: msg.message,
+            status: msg.status
+          }))
+        )
+      } else {
+        setMessages([])
+      }
     }
   },
   { immediate: true }
@@ -109,27 +161,69 @@ watch(
 // ==================== Event ====================
 function onSubmit(nextContent: string) {
   if (!nextContent) return
+
+  // 添加用户消息到 chatStore
+  if (chatStore.activeSession) {
+    chatStore.addMessageToActiveSession(
+      {
+        sender: 'user',
+        text: nextContent
+      },
+      true
+    )
+
+    // 添加AI思考中的状态
+    chatStore.ThinkIngLoading(true)
+  }
+
+  // 发送消息到 XChat
   onRequest(nextContent)
   content.value = ''
 }
 
 function onPromptsItemClick(description: string) {
+  // 添加提示词作为用户消息
+  if (chatStore.activeSession) {
+    chatStore.addMessageToActiveSession(
+      {
+        sender: 'user',
+        text: description
+      },
+      true
+    )
+
+    // 添加AI思考中的状态
+    chatStore.ThinkIngLoading(true)
+  }
+
+  // 发送消息到 XChat
   onRequest(description)
 }
 
-function onAddConversation() {
-  conversationsItems.value = [
-    ...conversationsItems.value,
-    {
-      key: `${conversationsItems.value.length}`,
-      label: `New Conversation ${conversationsItems.value.length}`
-    }
-  ]
-  activeKey.value = `${conversationsItems.value.length}`
+async function onAddConversation() {
+  try {
+    // 使用 chatStore 创建新会话
+    await chatStore.createNewSession()
+  } catch (error) {
+    console.error('Failed to create new conversation:', error)
+    antMessage.error('创建新会话失败')
+  }
+}
+
+// 删除会话
+async function deleteConversation(sessionId: string) {
+  try {
+    await chatStore.deleteSession(sessionId)
+    antMessage.success('会话删除成功')
+  } catch (error) {
+    console.error('Failed to delete conversation:', error)
+    antMessage.error('删除会话失败')
+  }
 }
 
 const onConversationClick: ConversationsProps['onActiveChange'] = (key) => {
-  activeKey.value = key
+  // 使用 chatStore 设置活动会话
+  chatStore.setActiveSession(key)
 }
 
 function handleFileChange(fileList: any[] | undefined) {
@@ -146,14 +240,15 @@ function toggleStreaming() {
 }
 
 function saveCurrentConversation() {
-  // 保存当前会话的逻辑
-  console.log('保存当前会话')
+  // 使用 chatStore 保存当前会话
+  chatStore._saveToDatabase()
+  antMessage.success('会话保存成功！')
 }
 
 // ==================== Runtime ====================
 </script>
 <template>
-  <div :style="styles.layout">
+  <div class="w-full min-w-[970px] h-full flex" :style="dynamicStyles.layout">
     <!-- 左侧会话列表 -->
     <ConversationListComponent
       v-if="!conversationListCollapsed"
@@ -162,12 +257,13 @@ function saveCurrentConversation() {
       :model="currentModel"
       @add-conversation="onAddConversation"
       @conversation-click="onConversationClick"
+      @delete-conversation="deleteConversation"
     />
 
-    <!-- 右侧聊天区域容器 -->
-    <div :style="styles.chatContainer">
-      <!-- 左侧工具栏 -->
-      <ToolbarComponent
+    <!-- 右侧聊天内容区域 -->
+    <div class="flex-1 h-full w-full flex flex-col">
+      <!-- 顶部工具栏 -->
+      <TopToolbarComponent
         :conversation-list-collapsed="conversationListCollapsed"
         :streaming-enabled="streamingEnabled"
         @toggle-conversation-list="toggleConversationList"
@@ -175,27 +271,30 @@ function saveCurrentConversation() {
         @save-current-conversation="saveCurrentConversation"
       />
 
-      <!-- 右侧聊天内容区域 -->
-      <div :style="styles.chatContent">
-        <div :style="styles.chat">
-          <!-- 消息列表 -->
+      <!-- 聊天区域 -->
+      <div
+        class="flex-1 w-full max-w-[100%] box-border flex flex-col gap-4 h-[calc(100%-48px)] !mx-auto"
+        :style="dynamicStyles.chat"
+      >
+        <!-- 消息列表容器，添加滚动功能 -->
+        <div class="flex-1 overflow-auto scrollbar-thin" :style="dynamicStyles.messagesContainer">
           <MessageListComponent :messages="formattedMessages" />
-
-          <!-- 提示词 -->
-          <PromptsComponent @prompts-item-click="onPromptsItemClick" />
-
-          <!-- 输入框 -->
-          <SenderComponent
-            :content="content"
-            :loading="agentRequestLoading"
-            :header-open="headerOpen"
-            :attached-files="attachedFiles"
-            @submit="onSubmit"
-            @change="(value) => (content = value)"
-            @file-change="handleFileChange"
-            @header-change="(open) => (headerOpen = open)"
-          />
         </div>
+
+        <!-- 提示词 -->
+        <PromptsComponent @prompts-item-click="onPromptsItemClick" />
+
+        <!-- 输入框 -->
+        <SenderComponent
+          :content="content"
+          :loading="agentRequestLoading"
+          :header-open="headerOpen"
+          :attached-files="attachedFiles"
+          @submit="onSubmit"
+          @change="(value) => (content = value)"
+          @file-change="handleFileChange"
+          @header-change="(open) => (headerOpen = open)"
+        />
       </div>
     </div>
   </div>

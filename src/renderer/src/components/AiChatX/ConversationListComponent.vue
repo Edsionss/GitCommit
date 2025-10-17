@@ -1,10 +1,17 @@
 <template>
-  <div :style="styles.menu">
+  <div
+    class="bg-opacity-50 w-[20%] h-full flex flex-col mx-[30px]"
+    :style="{ background: `${token.colorBgLayout}80` }"
+  >
     <!-- Logo -->
     <LogoComponent :title="logoTitle" :model="model" />
 
     <!-- 添加会话按钮 -->
-    <Button type="link" :style="styles.addBtn" @click="handleAddConversation">
+    <Button
+      type="link"
+      class="!bg-[#1677ff0f] !border-[#1677ff34] w-[calc(100%-24px)] !mx-auto mb-6"
+      @click="handleAddConversation"
+    >
       <PlusOutlined />
       {{ addButtonText }}
     </Button>
@@ -12,17 +19,19 @@
     <!-- 会话列表 -->
     <Conversations
       :items="conversationsItems"
-      :style="styles.conversations"
+      class="px-3 flex-1 overflow-y-auto"
       :active-key="activeKey"
+      :actions="conversationActions"
       @active-change="handleConversationClick"
+      @actions-click="handleActionsClick"
     />
   </div>
 </template>
 
 <script setup lang="ts">
 import { computed } from 'vue'
-import { PlusOutlined } from '@ant-design/icons-vue'
-import { Button, theme } from 'ant-design-vue'
+import { PlusOutlined, DeleteOutlined } from '@ant-design/icons-vue'
+import { Button, theme, Dropdown } from 'ant-design-vue'
 import { Conversations } from 'ant-design-x-vue'
 import LogoComponent from './LogoComponent.vue'
 
@@ -43,32 +52,19 @@ const props = withDefaults(defineProps<Props>(), {
 const emit = defineEmits<{
   'add-conversation': []
   'conversation-click': [key: string]
+  'delete-conversation': [key: string]
 }>()
 
 const { token } = theme.useToken()
 
-const styles = computed(() => {
-  return {
-    menu: {
-      background: `${token.value.colorBgLayout}80`,
-      width: '280px',
-      height: '100%',
-      display: 'flex',
-      'flex-direction': 'column'
-    },
-    conversations: {
-      padding: '0 12px',
-      flex: 1,
-      'overflow-y': 'auto'
-    },
-    addBtn: {
-      background: '#1677ff0f',
-      border: '1px solid #1677ff34',
-      width: 'calc(100% - 24px)',
-      margin: '0 12px 24px 12px'
-    }
-  } as const
-})
+// 定义会话操作项
+const conversationActions = computed(() => [
+  {
+    key: 'delete',
+    icon: DeleteOutlined,
+    danger: true
+  }
+])
 
 const handleAddConversation = () => {
   emit('add-conversation')
@@ -76,5 +72,11 @@ const handleAddConversation = () => {
 
 const handleConversationClick = (key: string) => {
   emit('conversation-click', key)
+}
+
+const handleActionsClick = ({ key, itemKey }: { key: string; itemKey: string }) => {
+  if (itemKey === 'delete') {
+    emit('delete-conversation', key)
+  }
 }
 </script>

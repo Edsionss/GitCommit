@@ -1,5 +1,5 @@
 <template>
-  <Prompts :items="promptsItems" @item-click="handlePromptsItemClick" />
+  <Prompts :items="promptsItems" class="flex" @item-click="handlePromptsItemClick" />
 </template>
 
 <script setup lang="ts">

@@ -1,7 +1,7 @@
 <template>
   <div :style="styles.messages">
     <template v-if="props.messages.length === 0">
-      <PlaceholderComponent />
+      <PlaceholderComponent class="!mx-auto w-[70%]" />
     </template>
     <template v-else>
       <Bubble.List :items="items" :roles="roles" />
@@ -26,7 +26,10 @@ const props = defineProps<Props>()
 const styles = computed(() => {
   return {
     messages: {
-      flex: 1
+      flex: 1,
+      height: '100%',
+      display: 'flex',
+      'flex-direction': 'column'
     }
   } as const
 })

@@ -7,7 +7,7 @@
       :title="welcomeTitle"
       :description="welcomeDescription"
     >
-      <template #extra>
+      <!-- <template #extra>
         <Space>
           <Button>
             <template #icon>
@@ -20,7 +20,7 @@
             </template>
           </Button>
         </Space>
-      </template>
+      </template> -->
     </Welcome>
 
     <!-- 提示词组件 -->
@@ -50,10 +50,10 @@ interface Props {
 
 const props = withDefaults(defineProps<Props>(), {
   promptsTitle: 'Do you want?',
-  welcomeIcon: () => h('img', { src: aiIcon, alt: 'AI Icon', style: { width: '48px', height: '48px' } }),
+  welcomeIcon: () =>
+    h('img', { src: aiIcon, alt: 'AI Icon', style: { width: '48px', height: '48px' } }),
   welcomeTitle: 'Cognito Ocean X AI',
-  welcomeDescription:
-    'Base on Ant Design, AGI product interface solution, create a better intelligent vision~'
+  welcomeDescription: 'Hello , I am Cognito Ocean X AI, your intelligent assistant.\n'
 })
 
 const emit = defineEmits<{

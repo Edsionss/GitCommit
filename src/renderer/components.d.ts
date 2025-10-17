@@ -43,7 +43,6 @@ declare module 'vue' {
     GitConfig: typeof import('./src/components/SettingsView/GitConfig.vue')['default']
     GlobalMarkets: typeof import('./src/components/Stock/MarketQuotation/GlobalMarkets.vue')['default']
     HotspotTrendChart: typeof import('./src/components/Stock/MarketQuotation/HotspotTrendChart.vue')['default']
-    IHeroiconsSolidChip: typeof import('~icons/heroicons-solid/chip')['default']
     IHeroiconsSolidMoon: typeof import('~icons/heroicons-solid/moon')['default']
     IHeroiconsSolidSun: typeof import('~icons/heroicons-solid/sun')['default']
     'Index copy': typeof import('./src/components/Stock/MarketNewsflash/index copy.vue')['default']
@@ -107,6 +106,7 @@ declare module 'vue' {
     Timeline: typeof import('./src/components/Common/Timeline.vue')['default']
     TimeSharing: typeof import('./src/components/Stock/StockList/StockDetail/components/TimeSharing.vue')['default']
     ToolbarComponent: typeof import('./src/components/AiChatX/ToolbarComponent.vue')['default']
+    TopToolbarComponent: typeof import('./src/components/AiChatX/TopToolbarComponent.vue')['default']
     WeeklyK: typeof import('./src/components/Stock/StockList/StockDetail/components/WeeklyK.vue')['default']
     WindowControls: typeof import('./src/components/layout/WindowControls.vue')['default']
   }

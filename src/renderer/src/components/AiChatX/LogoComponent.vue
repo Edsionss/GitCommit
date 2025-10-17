@@ -1,13 +1,16 @@
 <template>
-  <div :style="styles.logo">
-    <img :src="logoSrc" draggable="false" alt="logo" :style="styles['logo-img']" />
-    <span :style="styles['logo-span']">{{ title }}</span>
-    <a-tag :style="styles['model-tag']">{{ model }}</a-tag>
+  <div class="flex h-14 items-center justify-start !px-[13px] box-border gap-2">
+    <img :src="logoSrc" draggable="false" alt="logo" class="w-6 h-6 inline-block" />
+    <span
+      class="inline-block mx-2 !font-bold justify-center"
+      :style="{ color: token.colorText, fontSize: '16px' }"
+      >{{ title }}</span
+    >
+    <a-tag class="model-tag">{{ model }}</a-tag>
   </div>
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
 import { theme } from 'ant-design-vue'
 import logoSrc from '@/assets/img/logo/CognitoOcean.png'
 
@@ -22,37 +25,15 @@ const props = withDefaults(defineProps<Props>(), {
 })
 
 const { token } = theme.useToken()
-
-const styles = computed(() => {
-  return {
-    logo: {
-      display: 'flex',
-      height: '72px',
-      'align-items': 'center',
-      'justify-content': 'start',
-      padding: '0 17px',
-      'box-sizing': 'border-box'
-    },
-    'logo-img': {
-      width: '24px',
-      height: '24px',
-      display: 'inline-block'
-    },
-    'logo-span': {
-      display: 'inline-block',
-      margin: '0 8px',
-      'font-weight': 'bold',
-      color: token.value.colorText,
-      'font-size': '16px'
-    },
-    'model-tag': {
-      'margin-left': '8px',
-      'font-size': '12px',
-      'border-radius': '10px',
-      background: '#f0f0f0',
-      'border-color': '#d9d9d9',
-      color: '#595959'
-    }
-  } as const
-})
 </script>
+<style scoped lang="scss">
+.model-tag {
+  font-size: 12px;
+  border-radius: 10px;
+  background: #f0f0f0;
+  border-color: #d9d9d9;
+  color: #595959;
+  justify-content: center;
+  margin: 0;
+}
+</style>
