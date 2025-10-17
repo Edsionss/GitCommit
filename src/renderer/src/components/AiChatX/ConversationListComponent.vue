@@ -21,17 +21,30 @@
       :items="conversationsItems"
       class="px-3 flex-1 overflow-y-auto"
       :active-key="activeKey"
-      :actions="conversationActions"
+      :menu="conversationMenu"
       @active-change="handleConversationClick"
-      @actions-click="handleActionsClick"
     />
+
+    <!-- 编辑会话名称的模态框 -->
+    <Modal
+      v-model:open="isModalVisible"
+      title="修改会话名称"
+      @ok="handleRenameConfirm"
+      @cancel="handleRenameCancel"
+    >
+      <Input
+        v-model:value="editingName"
+        placeholder="请输入会话名称"
+        @keyup.enter="handleRenameConfirm"
+      />
+    </Modal>
   </div>
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
-import { PlusOutlined, DeleteOutlined } from '@ant-design/icons-vue'
-import { Button, theme, Dropdown } from 'ant-design-vue'
+import { computed, ref, h } from 'vue'
+import { PlusOutlined, DeleteOutlined, EditOutlined } from '@ant-design/icons-vue'
+import { Button, theme, Dropdown, Input, Modal, Menu } from 'ant-design-vue'
 import { Conversations } from 'ant-design-x-vue'
 import LogoComponent from './LogoComponent.vue'
 
@@ -53,18 +66,41 @@ const emit = defineEmits<{
   'add-conversation': []
   'conversation-click': [key: string]
   'delete-conversation': [key: string]
+  'rename-conversation': [key: string, newName: string]
 }>()
 
 const { token } = theme.useToken()
 
-// 定义会话操作项
-const conversationActions = computed(() => [
-  {
-    key: 'delete',
-    icon: DeleteOutlined,
-    danger: true
+// 编辑会话名称的状态
+const editingKey = ref<string | null>(null)
+const editingName = ref('')
+const isModalVisible = ref(false)
+
+// 定义会话操作菜单
+const conversationMenu = (conversation: { key: string; label: string }) => ({
+  items: [
+    {
+      key: 'rename',
+      label: '重命名',
+      icon: () => h(EditOutlined)
+    },
+    {
+      key: 'delete',
+      label: '删除',
+      danger: true,
+      icon: () => h(DeleteOutlined)
+    }
+  ],
+  onClick: ({ key }: { key: string }) => {
+    if (key === 'rename') {
+      editingKey.value = conversation.key
+      editingName.value = conversation.label
+      isModalVisible.value = true
+    } else if (key === 'delete') {
+      emit('delete-conversation', conversation.key)
+    }
   }
-])
+})
 
 const handleAddConversation = () => {
   emit('add-conversation')
@@ -74,9 +110,20 @@ const handleConversationClick = (key: string) => {
   emit('conversation-click', key)
 }
 
-const handleActionsClick = ({ key, itemKey }: { key: string; itemKey: string }) => {
-  if (itemKey === 'delete') {
-    emit('delete-conversation', key)
+// 确认重命名
+const handleRenameConfirm = () => {
+  if (editingKey.value && editingName.value.trim()) {
+    emit('rename-conversation', editingKey.value, editingName.value.trim())
+    isModalVisible.value = false
+    editingKey.value = null
+    editingName.value = ''
   }
+}
+
+// 取消重命名
+const handleRenameCancel = () => {
+  isModalVisible.value = false
+  editingKey.value = null
+  editingName.value = ''
 }
 </script>

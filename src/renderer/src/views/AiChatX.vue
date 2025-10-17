@@ -5,6 +5,7 @@ import { computed, ref, watch, onMounted } from 'vue'
 import { theme } from 'ant-design-vue'
 import { message as antMessage } from 'ant-design-vue'
 import { useChatStore } from '@/stores/chatStore'
+import { chatApi } from '@api/chat'
 import {
   ConversationListComponent,
   MessageListComponent,
@@ -221,6 +222,24 @@ async function deleteConversation(sessionId: string) {
   }
 }
 
+// 重命名会话
+async function renameConversation(sessionId: string, newName: string) {
+  try {
+    // 更新本地状态
+    const session = chatStore.sessions.find(s => s.id === sessionId)
+    if (session) {
+      session.name = newName
+    }
+    
+    // 调用API更新数据库
+    await chatApi.updateSessionName(sessionId, newName)
+    antMessage.success('会话名称修改成功')
+  } catch (error) {
+    console.error('Failed to rename conversation:', error)
+    antMessage.error('修改会话名称失败')
+  }
+}
+
 const onConversationClick: ConversationsProps['onActiveChange'] = (key) => {
   // 使用 chatStore 设置活动会话
   chatStore.setActiveSession(key)
@@ -258,6 +277,7 @@ function saveCurrentConversation() {
       @add-conversation="onAddConversation"
       @conversation-click="onConversationClick"
       @delete-conversation="deleteConversation"
+      @rename-conversation="renameConversation"
     />
 
     <!-- 右侧聊天内容区域 -->
