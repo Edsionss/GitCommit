@@ -51,6 +51,7 @@
     "electron-updater": "^6.3.9",
     "express": "^5.1.0",
     "lodash": "^4.17.21",
+    "markdown-it": "^14.1.0",
     "marked": "^15.0.8",
     "monaco-editor": "^0.54.0",
     "monaco-editor-vue3": "^1.0.4",
