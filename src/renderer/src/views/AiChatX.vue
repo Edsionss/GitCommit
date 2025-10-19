@@ -1,11 +1,10 @@
 <script setup lang="ts">
 import type { ConversationsProps } from 'ant-design-x-vue'
 import { useXAgent, useXChat } from 'ant-design-x-vue'
-import { computed, ref, watch, onMounted } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { theme } from 'ant-design-vue'
 import { message as antMessage } from 'ant-design-vue'
 import { useChatStore } from '@/stores/chatStore'
-// import { chatApi } from '@api/chat'
 import { useAi } from '@/composables/ai'
 import {
   ConversationListComponent,
@@ -14,7 +13,6 @@ import {
   PromptsComponent,
   TopToolbarComponent
 } from '@components/AiChatX'
-import { storeToRefs } from 'pinia'
 
 const { token } = theme.useToken()
 
@@ -46,7 +44,7 @@ const chatStore = useChatStore()
 // 使用 useAi composable
 const { sendAiMessage, onChatStreamChunk, deleteConversation, renameConversation } = useAi()
 
-// const sleep = () => new Promise((resolve) => setTimeout(resolve, 500))
+const defaultMessages = ref<any>([])
 
 // ==================== State ====================
 const headerOpen = ref(false)
@@ -76,31 +74,22 @@ const activeKey = computed(() => chatStore.activeSessionId || '')
 const [agent] = useXAgent<string, { message: string }, string>({
   request: async ({ message }, { onSuccess, onUpdate }) => {
     agentRequestLoading.value = true
-    let history: Array<{ sender: 'user' | 'ai'; text: string }> = []
-
     try {
       if (chatStore.AiConfig?.enableStreaming) {
-        onChatStreamChunk((chunk) => {
-          onUpdate(chunk)
+        onChatStreamChunk({
+          callAfter: (chunk) => {
+            onUpdate(chunk)
+          }
         })
       }
-      sendAiMessage({
+      await sendAiMessage({
         prompt: message,
-        history: history,
-        successFn: (response) => {
-          chatStore.addMessageToActiveSession({ sender: 'ai', text: response })
+        successAfter: (response) => {
           onSuccess([response])
-        },
-        errorFn: (errorMessage) => {
-          chatStore.addMessageToActiveSession({ sender: 'ai', text: `错误: ${errorMessage}` })
-        },
-        finallyFn: () => {
-          chatStore.ThinkIngLoading(false)
         }
       })
     } catch (error) {
       console.error('Error in agent request:', error)
-      chatStore.ThinkIngLoading(false)
       antMessage.error('发送消息失败')
     } finally {
       agentRequestLoading.value = false
@@ -108,22 +97,14 @@ const [agent] = useXAgent<string, { message: string }, string>({
   }
 })
 
-// // 初始化时加载会话历史
-// onMounted(() => {
-//   // chatStore 的 init 方法已经在 store 中自动调用
-//   // 这里可以添加额外的初始化逻辑
-// })
-
-const { onRequest, messages, setMessages } = useXChat({
+const { onRequest, setMessages } = useXChat({
   agent: agent.value
 })
 
-// 格式化消息以匹配 MessageListComponent 期望的类型
 const formattedMessages = computed(() => {
   // 从 chatStore 获取当前活动会话的消息
   const activeSession = chatStore.activeSession
   if (!activeSession || !activeSession.messages) return []
-
   return activeSession.messages.map((msg, index) => ({
     id: `${activeSession.id}-${index}`, // 使用会话ID和消息索引作为唯一ID
     message: msg.text,
@@ -137,18 +118,16 @@ watch(
   (newSessionId, oldSessionId) => {
     if (newSessionId && newSessionId !== oldSessionId) {
       // 当会话切换时，清空 XChat 的消息
+      setMessages([])
       // 然后从 chatStore 加载新会话的消息
       const activeSession = chatStore.activeSession
       if (activeSession && activeSession.messages) {
-        const xchatMessages = activeSession.messages.map((msg) => ({
+        defaultMessages.value = activeSession.messages.map((msg) => ({
           id: `temp-${Date.now()}-${Math.random()}`,
           message: msg.text,
           status: msg.isLoading ? 'loading' : msg.sender === 'user' ? 'local' : 'ai'
         }))
-        // 将 chatStore 的消息转换为 XChat 格式
-        setMessages(xchatMessages)
-      } else {
-        setMessages([])
+        setMessages(defaultMessages.value)
       }
     }
   },
@@ -156,39 +135,26 @@ watch(
 )
 
 // ==================== Event ====================
-function onSubmit(nextContent: string) {
+async function onSubmit(nextContent: string) {
   if (!nextContent) return
 
   // 添加用户消息到 chatStore
   if (chatStore.activeSession) {
-    chatStore.addMessageToActiveSession({
+    await chatStore.addMessageToActiveSession({
       sender: 'user',
       text: nextContent
     })
-
+    onRequest(nextContent)
+    content.value = ''
     // 添加AI思考中的状态
-    chatStore.ThinkIngLoading(true)
   }
 
   // 发送消息到 XChat
-  onRequest(nextContent)
-  content.value = ''
 }
 
 function onPromptsItemClick(description: string) {
   // 添加提示词作为用户消息
-  if (chatStore.activeSession) {
-    chatStore.addMessageToActiveSession({
-      sender: 'user',
-      text: description
-    })
-
-    // 添加AI思考中的状态
-    chatStore.ThinkIngLoading(true)
-  }
-
-  // 发送消息到 XChat
-  onRequest(description)
+  console.log('onPromptsItemClick', description)
 }
 
 async function onAddConversation() {

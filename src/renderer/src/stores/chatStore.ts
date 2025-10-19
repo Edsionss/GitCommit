@@ -188,8 +188,11 @@ export const useChatStore = defineStore('chat', () => {
     }
   }
 
-  //
-  async function addMessageToActiveSession(message: Omit<ChatMessage, 'isLoading'>) {
+  //  向当前活动会话添加一条消息并且保存到数据库
+  async function addMessageToActiveSession(
+    message: Omit<ChatMessage, 'isLoading'>,
+    updateLocal = true
+  ) {
     const session = activeSession.value
     // 1. 卫语句：提前检查，让代码结构更扁平
     if (!session) {
@@ -197,11 +200,11 @@ export const useChatStore = defineStore('chat', () => {
       return
     }
 
-    // 4. 更新本地状态：这是核心目的，应尽快执行以响应UI
-    session.messages.push(message)
+    // 4. 更新本地状态：这是核心目的，应尽快执行以响应UI （仅当updateLocal为true时）
+    updateLocal && session.messages.push(message)
 
     const isSaveEnabled = AiConfig.value?.enableAutoSave || false
-    const isFirstMessage = session.messages.length === 0
+    const isFirstMessage = session.messages.length === 1
 
     // 2. 职责分离：将会话命名、创建、消息保存的逻辑委托给辅助函数
     await handleSessionNaming(session, message, isFirstMessage)
@@ -234,69 +237,7 @@ export const useChatStore = defineStore('chat', () => {
     return session.messages[session.messages.length - 1]
   }
 
-  // async function addMessageToActiveSession(
-  //   message: Omit<ChatMessage, 'isLoading'>
-  //   // isSave: boolean
-  // ) {
-  //   const isSave = AiConfig.value?.enableAutoSave || false
-  //   if (!activeSession.value) return
-
-  //   let sessionId = activeSession.value.id
-
-  //   // 检查是否是第一条消息，如果是，先将会话保存到数据库
-  //   const isFirstMessage = activeSession.value.messages.length === 0
-  //   // If this is the first user message, update the session name
-  //   if (activeSession.value.name === '新会话' && message.sender === 'user' && isFirstMessage) {
-  //     activeSession.value.name = message.text.substring(0, 30) // Use first 30 chars as name
-  //     if (!isFirstMessage) {
-  //       await chatApi.updateSessionName(sessionId, activeSession.value.name)
-  //     }
-  //   }
-
-  //   if (isFirstMessage && isSave) {
-  //     try {
-  //       // 在数据库中创建会话
-  //       const apiSession = await chatApi.createChatSession({
-  //         id: activeSession.value.id,
-  //         name: activeSession.value.name,
-  //         startTime: activeSession.value.startTime
-  //       })
-  //       sessionId = apiSession.id
-
-  //       // 更新本地会话ID（如果数据库返回的ID不同）
-  //       if (apiSession.id !== activeSession.value.id) {
-  //         activeSession.value.id = apiSession.id
-  //         // 更新sessions数组中的ID
-  //         const sessionIndex = sessions.value.findIndex((s) => s.id === activeSession.value?.id)
-  //         if (sessionIndex !== -1) {
-  //           sessions.value[sessionIndex].id = apiSession.id
-  //         }
-  //         activeSessionId.value = apiSession.id
-  //       }
-  //     } catch (error) {
-  //       console.error('Failed to create new chat session in database:', error)
-  //       throw error
-  //     }
-  //   }
-
-  //   activeSession.value.messages.push(message)
-
-  //   if (isSave) {
-  //     try {
-  //       await chatApi.addMessageToSession({
-  //         sessionId: sessionId,
-  //         sender: message.sender,
-  //         text: message.text,
-  //         isLoading: false
-  //       })
-  //     } catch (error) {
-  //       console.error('Failed to add message to database:', error)
-  //     }
-  //   }
-
-  //   return activeSession.value.messages[activeSession.value.messages.length - 1]
-  // }
-
+  // 从数据库中删除会话
   async function deleteSession(sessionId: string) {
     try {
       // 检查会话是否存在于数据库中
@@ -327,6 +268,10 @@ export const useChatStore = defineStore('chat', () => {
     }
   }
 
+  // 设置当前会话的思考状态
+  /**
+   * 1. 开始AI思考，向消息列表添加一个加载占位符
+   */
   function ThinkIngLoading(isLoading: boolean) {
     if (!activeSession.value) return
     if (isLoading) {
@@ -335,6 +280,56 @@ export const useChatStore = defineStore('chat', () => {
       activeSession.value.messages = activeSession.value.messages.filter(
         (item) => item.isLoading !== true
       )
+    }
+  }
+  function getLastMessage() {
+    if (!activeSession.value) return
+    return activeSession.value.messages.at(-1)
+  }
+  /**
+   * 2. (核心) 接收流式数据块，并追加到加载中的消息上
+   */
+  function appendStreamChunk(chunk: string) {
+    if (!activeSession.value) return
+    const lastMessage = getLastMessage()
+    ThinkIngLoading(false)
+    if (lastMessage && !lastMessage.streaming) {
+      activeSession.value.messages.push({
+        sender: 'ai',
+        text: chunk,
+        streaming: true
+      })
+    } else if (lastMessage && lastMessage.streaming) {
+      lastMessage.text += chunk
+    }
+  }
+
+  /**
+   * 3. 流式传输结束，将最后一条消息标记为完成
+   * @param finalResponse 可选，如果API在最后会返回完整消息，可用它来覆盖，保证数据一致性
+   */
+  function finalizeStream(finalResponse?: string) {
+    const lastMessage = getLastMessage()
+    if (lastMessage && lastMessage.streaming) {
+      if (finalResponse) {
+        lastMessage.text = finalResponse // 用最终完整数据覆盖，防止丢块
+      }
+      lastMessage.streaming = false
+      addMessageToActiveSession(lastMessage, false)
+    }
+  }
+
+  /**
+   * 处理错误情况
+   */
+  function handleStreamError(errorMessage: string) {
+    const lastMessage = getLastMessage()
+    if (lastMessage && lastMessage.streaming) {
+      lastMessage.text = errorMessage // 在占位符上显示错误
+      addMessageToActiveSession({ sender: 'ai', text: errorMessage }, false)
+    } else {
+      // 如果没有加载占位符，就新增一条错误消息
+      addMessageToActiveSession({ sender: 'ai', text: errorMessage })
     }
   }
 
@@ -353,6 +348,9 @@ export const useChatStore = defineStore('chat', () => {
     addMessageToActiveSession,
     deleteSession,
     ThinkIngLoading,
+    handleStreamError,
+    appendStreamChunk,
+    finalizeStream,
     _saveToDatabase,
     AiConfig
   }

@@ -4,7 +4,7 @@
       <PlaceholderComponent class="!mx-auto w-[70%]" />
     </template>
     <template v-else>
-      <Bubble.List :items="items" :roles="roles" />
+      <Bubble.List :autoScroll="true" :items="items" :roles="roles" />
     </template>
   </div>
 </template>

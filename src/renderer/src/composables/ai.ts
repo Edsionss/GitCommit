@@ -13,29 +13,48 @@ interface SendAiMessageParams {
   aiConfig?: AiConfig
   Stream?: boolean
   successFn?: (message: string) => void
+  successAfter?: (message: string) => void
   errorFn?: (message: string) => void
   finallyFn?: () => void
+}
+
+interface OnChatStreamChunkParams {
+  callback?: (chunk: string) => void
+  callAfter?: (chunk: string) => void
 }
 
 export function useAi() {
   const settingsStore = useSettingsStore()
   const { AiConfig } = storeToRefs(settingsStore)
   const chatStore = useChatStore()
-  
+  const { activeSession } = storeToRefs(chatStore)
+
   const sendAiMessage = async ({
     prompt,
-    history,
     aiConfig,
     Stream = AiConfig.value?.enableStreaming,
     successFn,
     errorFn,
-    finallyFn
+    finallyFn,
+    successAfter
   }: SendAiMessageParams) => {
     try {
       if (!AiConfig.value.provider || !AiConfig.value.apiKey) {
         antMessage.error('请设置AI源和API密钥')
         return
       }
+      if (!activeSession.value) {
+        antMessage.error('请先创建一个会话')
+        return
+      }
+      let history: Array<{ sender: 'user' | 'ai'; text: string }> = []
+      if (AiConfig.value.enableAiHistory) {
+        history = activeSession.value.messages
+          .filter((msg) => !msg.isLoading) // 过滤掉加载中的消息
+          .slice(0, -1) // 排除当前用户输入
+          .map((msg) => ({ sender: msg.sender, text: msg.text }))
+      }
+      chatStore.ThinkIngLoading(true)
       const result = await aiApi.aiChat({
         prompt,
         aiConfig: _.cloneDeep(aiConfig || AiConfig.value),
@@ -44,24 +63,37 @@ export function useAi() {
       })
       if (result.success) {
         successFn && successFn(result.message)
+        successFn || chatStore.finalizeStream(result.message)
+        successAfter && successAfter(result.message)
         return result.message
       } else {
-        antMessage.error(result.error)
         throw new Error(result.error)
       }
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred.'
       antMessage.error(errorMessage)
       errorFn && errorFn(errorMessage)
+      errorFn || chatStore.handleStreamError(errorMessage)
       throw new Error(errorMessage)
     } finally {
+      chatStore.ThinkIngLoading(false)
       finallyFn && finallyFn()
       return 'end'
     }
   }
-  
-  const onChatStreamChunk = (callback: (chunk: string) => void) => {
-    return aiApi.onChatStreamChunk(callback)
+
+  const onChatStreamChunk = ({ callback, callAfter }: OnChatStreamChunkParams) => {
+    chatStore.ThinkIngLoading(false)
+    if (callback) {
+      aiApi.onChatStreamChunk(callback)
+    } else {
+      aiApi.onChatStreamChunk((chunk) => {
+        chatStore.appendStreamChunk(chunk)
+      })
+    }
+    if (callAfter) {
+      aiApi.onChatStreamChunk(callAfter)
+    }
   }
 
   // 删除会话
