@@ -220,8 +220,7 @@ function saveCurrentConversation() {
 
       <!-- 聊天区域 -->
       <div
-        class="flex-1 w-full max-w-[100%] box-border flex flex-col gap-4 h-[calc(100%-48px)] !mx-auto"
-        :style="dynamicStyles.chat"
+        class="flex-1 w-full max-w-[100%] box-border flex flex-col gap-2 h-[calc(100%-48px)] !mx-auto ![padding:0_10px_15px_10px]"
       >
         <!-- 消息列表容器，添加滚动功能 -->
         <div class="flex-1 overflow-auto scrollbar-thin" :style="dynamicStyles.messagesContainer">
