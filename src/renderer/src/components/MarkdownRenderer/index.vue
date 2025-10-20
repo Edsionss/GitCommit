@@ -23,9 +23,6 @@ const htmlContent = computed(() => markdownIt.render(props.content))
   使用 :deep() 伪类来让样式穿透到 v-html 或 innerHTML 生成的子组件中。
   我们将所有针对动态内容的样式规则都包裹在 :deep() 中。
 */
-:deep(.ant-bubble .ant-bubble-content-filled) {
-  flex: 1;
-}
 
 .markdown-content :deep(pre) {
   padding: 0px;

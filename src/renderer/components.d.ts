@@ -66,7 +66,6 @@ declare module 'vue' {
     MessageForm: typeof import('./src/components/NtfyNotification/MessageForm.vue')['default']
     MessageHistory: typeof import('./src/components/NtfyNotification/MessageHistory.vue')['default']
     MessageListComponent: typeof import('./src/components/AiChatX/MessageListComponent.vue')['default']
-    'MessageListComponent copy': typeof import('./src/components/AiChatX/MessageListComponent copy.vue')['default']
     MonthlyK: typeof import('./src/components/Stock/StockList/StockDetail/components/MonthlyK.vue')['default']
     NetWorkTool: typeof import('./src/components/RealTimeCommunication/NetWorkTool.vue')['default']
     News: typeof import('./src/components/Stock/StockList/StockDetail/components/News.vue')['default']
