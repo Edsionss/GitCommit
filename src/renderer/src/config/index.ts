@@ -254,7 +254,7 @@ export const DEFAULT_MENU_MAP: RouteRecordWithOptionalId[] = [
     },
     menuOrder: 70,
     menuIcon: 'RobotOutlined',
-    hide: '0'
+    hide: '1'
   },
   {
     id: 'XyZboacI121N0X8aqTBOg',
