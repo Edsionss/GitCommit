@@ -17,11 +17,11 @@
       <a-collapse v-model:activeKey="activeKey" :bordered="false" expand-icon-position="right">
         <a-collapse-panel key="1">
           <template #header>
-            <a-typography-text type="secondary">点击此处查看/隐藏房间信息</a-typography-text>
+            <a-typography-text type="secondary" content="点击此处查看/隐藏房间信息" />
           </template>
-          <a-typography-text strong>IP: {{ hostIpForDisplay }}</a-typography-text>
+          <a-typography-text strong :content="`IP: ${hostIpForDisplay}`" />
           <br />
-          <a-typography-text strong>令牌: {{ roomToken }}</a-typography-text>
+          <a-typography-text strong :content="`令牌: ${roomToken}`" />
         </a-collapse-panel>
       </a-collapse>
     </div>
