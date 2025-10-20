@@ -67,6 +67,7 @@ const roles: BubbleListProps['roles'] = {
     placement: 'start',
     typing: { step: 5, interval: 20 },
     avatar: { src: aiAvatar, shape: 'circle' },
+    messageRender: renderMarkdown,
     styles: {
       content: {
         borderRadius: '16px'
