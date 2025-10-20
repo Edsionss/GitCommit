@@ -75,15 +75,9 @@
 </template>
 
 <script setup lang="ts">
-import { reactive, ref } from 'vue'
+import { reactive, ref, defineAsyncComponent } from 'vue'
 import { message, Modal } from 'ant-design-vue'
 import { useSettingsStore } from '@/stores/settingsStore'
-import DisplayConfig from '@renderer/components/SettingsView/DisplayConfig.vue'
-import Preferences from '@renderer/components/SettingsView/Preferences.vue'
-import GitConfig from '@renderer/components/SettingsView/GitConfig.vue'
-import SystemConfig from '@/components/SettingsView/SystemConfig.vue'
-import AiConfig from '@renderer/components/SettingsView/AiConfig.vue'
-import MenuManagement from './MenuManagement.vue'
 import {
   SaveOutlined,
   RedoOutlined,
@@ -93,6 +87,55 @@ import {
 import { useRoutesStore } from '@/stores/routesStore'
 import { applicationApi } from '@api/application'
 import SegmentedControl from '@/components/LH-components/SegmentedControl.vue'
+
+// 异步加载组件
+const DisplayConfig = defineAsyncComponent({
+  loader: () => import('@renderer/components/SettingsView/DisplayConfig.vue'),
+  loadingComponent: { template: '<div class="loading-container"><a-spin size="large" tip="加载显示配置中..." /></div>' },
+  errorComponent: { template: '<div class="error-container">加载显示配置失败，请刷新页面重试</div>' },
+  delay: 200,
+  timeout: 3000
+})
+
+const Preferences = defineAsyncComponent({
+  loader: () => import('@renderer/components/SettingsView/Preferences.vue'),
+  loadingComponent: { template: '<div class="loading-container"><a-spin size="large" tip="加载偏好设置中..." /></div>' },
+  errorComponent: { template: '<div class="error-container">加载偏好设置失败，请刷新页面重试</div>' },
+  delay: 200,
+  timeout: 3000
+})
+
+const GitConfig = defineAsyncComponent({
+  loader: () => import('@renderer/components/SettingsView/GitConfig.vue'),
+  loadingComponent: { template: '<div class="loading-container"><a-spin size="large" tip="加载Git配置中..." /></div>' },
+  errorComponent: { template: '<div class="error-container">加载Git配置失败，请刷新页面重试</div>' },
+  delay: 200,
+  timeout: 3000
+})
+
+const SystemConfig = defineAsyncComponent({
+  loader: () => import('@/components/SettingsView/SystemConfig.vue'),
+  loadingComponent: { template: '<div class="loading-container"><a-spin size="large" tip="加载系统配置中..." /></div>' },
+  errorComponent: { template: '<div class="error-container">加载系统配置失败，请刷新页面重试</div>' },
+  delay: 200,
+  timeout: 3000
+})
+
+const AiConfig = defineAsyncComponent({
+  loader: () => import('@renderer/components/SettingsView/AiConfig.vue'),
+  loadingComponent: { template: '<div class="loading-container"><a-spin size="large" tip="加载AI配置中..." /></div>' },
+  errorComponent: { template: '<div class="error-container">加载AI配置失败，请刷新页面重试</div>' },
+  delay: 200,
+  timeout: 3000
+})
+
+const MenuManagement = defineAsyncComponent({
+  loader: () => import('./MenuManagement.vue'),
+  loadingComponent: { template: '<div class="loading-container"><a-spin size="large" tip="加载菜单管理中..." /></div>' },
+  errorComponent: { template: '<div class="error-container">加载菜单管理失败，请刷新页面重试</div>' },
+  delay: 200,
+  timeout: 3000
+})
 
 const routesStore = useRoutesStore()
 const settingsStore = useSettingsStore()
@@ -211,6 +254,26 @@ const resetDatabase = () => {
   display: flex;
   flex-direction: column;
   gap: 20px;
+}
+
+.loading-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 200px;
+  width: 100%;
+}
+
+.error-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 200px;
+  width: 100%;
+  color: var(--text-error);
+  font-size: var(--font-size-md);
+  text-align: center;
+  padding: 0 20px;
 }
 
 @media (max-width: 768px) {
