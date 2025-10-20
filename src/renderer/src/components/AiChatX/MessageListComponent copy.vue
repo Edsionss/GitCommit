@@ -1,5 +1,5 @@
 <template>
-  <div class="flex flex-1 h-full flex-col">
+  <div :style="styles.messages">
     <template v-if="props.messages.length === 0">
       <PlaceholderComponent class="!mx-auto w-[70%]" />
     </template>
@@ -10,27 +10,43 @@
 </template>
 
 <script setup lang="ts">
-import { computed, h, onMounted, onBeforeUnmount, ref } from 'vue' // 引入 vue 的 ref 和生命周期钩子
+import { computed, h } from 'vue'
 import { Bubble } from 'ant-design-x-vue'
-import type { BubbleListProps, BubbleProps } from 'ant-design-x-vue'
+import type { BubbleListProps } from 'ant-design-x-vue'
 import PlaceholderComponent from './PlaceholderComponent.vue'
 import aiAvatar from '@/assets/img/fmt.png'
 import userAvatar from '@/assets/img/logo/CognitoOcean.png'
-import MarkdownRenderer from '@components/MarkdownRenderer/index.vue'
+import type { BubbleProps } from 'ant-design-x-vue'
+import { Typography } from 'ant-design-vue'
+import markdownit from 'markdown-it'
+
 interface Props {
   messages: Array<{ id: string; message: string; status: string }>
 }
 
 const props = defineProps<Props>()
-const renderMarkdown: BubbleProps['messageRender'] = (content) => h(MarkdownRenderer, { content })
 
-// roles 和 items 的定义保持不变
+const styles = computed(() => {
+  return {
+    messages: {
+      flex: 1,
+      height: '100%',
+      display: 'flex',
+      'flex-direction': 'column'
+    }
+  } as const
+})
+const md = markdownit({ html: true, breaks: true })
+const renderMarkdown: BubbleProps['messageRender'] = (content) =>
+  h(Typography, null, {
+    default: () => h('div', { innerHTML: md.render(content) })
+  })
 const roles: BubbleListProps['roles'] = {
   ai: {
     placement: 'start',
     typing: { step: 5, interval: 20 },
     avatar: { src: aiAvatar, shape: 'circle' },
-    messageRender: renderMarkdown, // 使用新的 renderMarkdown 函数
+    messageRender: renderMarkdown,
     styles: {
       content: {
         borderRadius: '16px'
@@ -53,8 +69,3 @@ const items = computed<BubbleListProps['items']>(() => {
   }))
 })
 </script>
-<style scoped lang="scss">
-:deep(.ant-bubble .ant-bubble-content-filled) {
-  flex: 1;
-}
-</style>
