@@ -72,6 +72,15 @@ const api = {
   onChatStreamChunk: (callback: (chunk: string) => void) =>
     ipcRenderer.on('ai:chatStream:chunk', (_, chunk) => callback(chunk)),
 
+  // AI Chat with Tools (Function Calling)
+  aiChatWithTools: (params: {
+    prompt: string
+    aiConfig: AiConfig
+    history?: ChatMessage[]
+    isStream?: boolean
+    tools?: any[]
+  }): Promise<any> => ipcRenderer.invoke('ai:chat-with-tools', params),
+
   // History API
   getHistory: () => ipcRenderer.invoke('history:get'),
   addHistory: (repoPath: string) => ipcRenderer.invoke('history:add', repoPath),

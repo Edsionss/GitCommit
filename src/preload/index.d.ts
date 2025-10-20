@@ -73,6 +73,13 @@ interface ExposedAPI {
     isStream?: boolean
   }) => Promise<AiChatResponse>
   onChatStreamChunk: (callback: (chunk: string) => void) => void
+  aiChatWithTools: (params: {
+    prompt: string
+    aiConfig: AiConfig
+    history?: ChatMessage[]
+    isStream?: boolean
+    tools?: any[]
+  }) => Promise<AiChatResponse>
   onScanProgress: (callback: (data: any) => void) => () => void
   onScanError: (callback: (data: any) => void) => () => void
   onScanCancelled: (callback: () => void) => () => void

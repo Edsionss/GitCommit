@@ -69,3 +69,41 @@ export interface ChatSession {
   startTime: string
   messages: ChatMessage[]
 }
+
+// Function Calling 相关类型定义
+export interface FunctionTool {
+  name: string
+  description: string
+  parameters: {
+    type: 'OBJECT'
+    properties: Record<string, {
+      type: string
+      description: string
+      enum?: string[]
+    }>
+    required: string[]
+  }
+}
+
+export interface FunctionCall {
+  name: string
+  args: Record<string, any>
+}
+
+export interface FunctionResponse {
+  functionResponse: {
+    name: string
+    response: {
+      result: any
+    }
+  }
+}
+
+export interface GenerateChatResponseWithToolsParams {
+  _: any
+  prompt: string
+  aiConfig: AiConfig
+  history?: ChatMessage[]
+  isStream?: boolean
+  tools?: FunctionTool[]
+}

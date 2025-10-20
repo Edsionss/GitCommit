@@ -55,6 +55,7 @@ declare module 'vue' {
     LogoComponent: typeof import('./src/components/AiChatX/LogoComponent.vue')['default']
     LogPanel: typeof import('./src/components/BasicSettings/LogPanel.vue')['default']
     MainLayout: typeof import('./src/components/layout/MainLayout.vue')['default']
+    Markdown: typeof import('./src/components/Test/markdown.vue')['default']
     MarkdownRenderer: typeof import('./src/components/MarkdownRenderer/index.vue')['default']
     MarketHotspots: typeof import('./src/components/Stock/MarketQuotation/MarketHotspots.vue')['default']
     MarketNewsflash: typeof import('./src/components/Stock/MarketNewsflash/index.vue')['default']

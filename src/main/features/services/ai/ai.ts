@@ -9,8 +9,17 @@ import type {
   GenerateChatResponseParams,
   CallOpenAIParams,
   CallKiMiParams,
-  CallGeminiParams
+  CallGeminiParams,
+  GenerateChatResponseWithToolsParams,
+  FunctionTool,
+  FunctionCall,
+  FunctionResponse
 } from '@sharedType/ai'
+import {
+  callOpenAIWithTools,
+  callGeminiWithTools,
+  callKiMiWithTools
+} from './aiFunctionCalling'
 /**
  * @file AI Service
  * @description Handles interactions with various AI providers.
@@ -69,6 +78,57 @@ export async function generateChatResponse(params: GenerateChatResponseParams): 
         model: aiConfig.model,
         history,
         isStream
+      })
+    case 'anthropic':
+    case 'custom':
+      throw new Error(`${aiConfig.provider} is not yet supported.`)
+    default:
+      throw new Error(`Unknown AI provider: ${aiConfig.provider}`)
+  }
+}
+
+/**
+ * Generates a chat response with function calling support using the configured AI provider.
+ *
+ * @param params The parameters for generating a chat response with tools.
+ * @returns The generated chat response.
+ */
+export async function generateChatResponseWithTools(params: GenerateChatResponseWithToolsParams): Promise<string> {
+  const { _, prompt, aiConfig, history = [], isStream = true, tools = [] } = params
+  if (!aiConfig.provider || !aiConfig.apiKey) {
+    throw new Error('AI provider or API key is not configured.')
+  }
+
+  switch (aiConfig.provider) {
+    case 'openai':
+      return await callOpenAIWithTools({
+        _,
+        prompt,
+        apiKey: aiConfig.apiKey,
+        model: aiConfig.model,
+        history,
+        isStream,
+        tools
+      })
+    case 'gemini':
+      return await callGeminiWithTools({
+        _,
+        prompt,
+        apiKey: aiConfig.apiKey,
+        model: aiConfig.model,
+        history,
+        isStream,
+        tools
+      })
+    case 'kimi':
+      return await callKiMiWithTools({
+        _,
+        prompt,
+        apiKey: aiConfig.apiKey,
+        model: aiConfig.model,
+        history,
+        isStream,
+        tools
       })
     case 'anthropic':
     case 'custom':
