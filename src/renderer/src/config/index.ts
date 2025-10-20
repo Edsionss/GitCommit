@@ -441,5 +441,19 @@ export const DEFAULT_MENU_MAP: RouteRecordWithOptionalId[] = [
     menuOrder: 10000,
     menuIcon: 'CommentOutlined',
     hide: '0'
+  },
+  {
+    id: '',
+    parentId: null,
+    path: 'test',
+    name: 'Test',
+    componentPath: 'Components',
+    meta: {
+      title: 'Test',
+      keepAlive: '1'
+    },
+    menuOrder: 10000,
+    menuIcon: 'CommentOutlined',
+    hide: '0'
   }
 ]
