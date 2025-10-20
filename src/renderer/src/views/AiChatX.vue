@@ -56,9 +56,6 @@ const attachedFiles = ref<any[]>([])
 const conversationListCollapsed = ref(false)
 const streamingEnabled = ref(false)
 
-// 当前使用的模型
-const currentModel = ref('GPT-4')
-
 // 计算属性：从 chatStore 获取会话列表并转换为 Conversations 组件需要的格式
 const conversationsItems = computed(() => {
   return chatStore.sessionHistory.map((session) => ({
@@ -200,7 +197,6 @@ function saveCurrentConversation() {
       v-if="!conversationListCollapsed"
       :conversations-items="conversationsItems"
       :active-key="activeKey"
-      :model="currentModel"
       @add-conversation="onAddConversation"
       @conversation-click="onConversationClick"
       @delete-conversation="deleteConversation"

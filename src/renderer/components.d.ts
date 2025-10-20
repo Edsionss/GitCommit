@@ -106,7 +106,6 @@ declare module 'vue' {
     TheSidebar: typeof import('./src/components/layout/TheSidebar/index.vue')['default']
     Timeline: typeof import('./src/components/Common/Timeline.vue')['default']
     TimeSharing: typeof import('./src/components/Stock/StockList/StockDetail/components/TimeSharing.vue')['default']
-    ToolbarComponent: typeof import('./src/components/AiChatX/ToolbarComponent.vue')['default']
     TopToolbarComponent: typeof import('./src/components/AiChatX/TopToolbarComponent.vue')['default']
     WeeklyK: typeof import('./src/components/Stock/StockList/StockDetail/components/WeeklyK.vue')['default']
     WindowControls: typeof import('./src/components/layout/WindowControls.vue')['default']

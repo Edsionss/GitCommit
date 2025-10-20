@@ -4,7 +4,7 @@
     :style="{ background: `${token.colorBgLayout}80` }"
   >
     <!-- Logo -->
-    <LogoComponent :title="logoTitle" :model="model" />
+    <LogoComponent />
 
     <!-- 添加会话按钮 -->
     <Button
@@ -51,16 +51,10 @@ import LogoComponent from './LogoComponent.vue'
 interface Props {
   conversationsItems: Array<{ key: string; label: string }>
   activeKey: string
-  logoTitle?: string
-  addButtonText?: string
-  model?: string
 }
+const addButtonText = ref('New Conversation')
 
-const props = withDefaults(defineProps<Props>(), {
-  logoTitle: 'Cognito Ocean AI',
-  addButtonText: 'New Conversation',
-  model: 'GPT-4'
-})
+const props = withDefaults(defineProps<Props>(), {})
 
 const emit = defineEmits<{
   'add-conversation': []

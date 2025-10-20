@@ -1,6 +1,6 @@
 <template>
   <div
-    class="flex justify-between items-center px-4 h-12 border-b flex-shrink-0"
+    class="flex justify-between items-center h-12 border-b flex-shrink-0 !p-2"
     :style="{ borderBottomColor: token.colorBorder }"
   >
     <!-- 左侧按钮：收起展开按钮 -->
@@ -11,7 +11,9 @@
         @click="toggleConversationList"
       />
     </div>
-
+    <div class="flex-1 flex items-center justify-center">
+      <div class="model-tag">{{ model }}</div>
+    </div>
     <!-- 右侧按钮：其他功能按钮 -->
     <div class="flex gap-2">
       <Button
@@ -26,7 +28,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 import { Button, theme } from 'ant-design-vue'
 import {
   MenuFoldOutlined,
@@ -35,7 +37,12 @@ import {
   SaveOutlined
 } from '@ant-design/icons-vue'
 import { h } from 'vue'
+import { useSettingsStore } from '@/stores/settingsStore'
+import { storeToRefs } from 'pinia'
 
+const settingsStore = useSettingsStore()
+const { AiConfig } = storeToRefs(settingsStore)
+const model = AiConfig.value.model
 interface Props {
   conversationListCollapsed?: boolean
   streamingEnabled?: boolean
@@ -66,3 +73,9 @@ const saveCurrentConversation = () => {
   emit('save-current-conversation')
 }
 </script>
+
+<style scoped lang="scss">
+.model-tag {
+  font-weight: bold;
+}
+</style>
