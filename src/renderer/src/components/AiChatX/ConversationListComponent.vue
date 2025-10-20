@@ -45,7 +45,8 @@
 import { computed, ref, h } from 'vue'
 import { PlusOutlined, DeleteOutlined, EditOutlined } from '@ant-design/icons-vue'
 import { Button, theme, Dropdown, Input, Modal, Menu } from 'ant-design-vue'
-import { Conversations } from 'ant-design-x-vue'
+import { Conversations, type Conversation } from 'ant-design-x-vue'
+import type { Key } from 'ant-design-vue/es/_util/type'
 import LogoComponent from './LogoComponent.vue'
 
 interface Props {
@@ -71,7 +72,7 @@ const editingName = ref('')
 const isModalVisible = ref(false)
 
 // 定义会话操作菜单
-const conversationMenu = (conversation: { key: string; label: string }) => ({
+const conversationMenu = (conversation: Conversation) => ({
   items: [
     {
       key: 'rename',
@@ -85,12 +86,12 @@ const conversationMenu = (conversation: { key: string; label: string }) => ({
       icon: () => h(DeleteOutlined)
     }
   ],
-  onClick: ({ key }: { key: string }) => {
-    if (key === 'rename') {
+  onClick: (info: { key: Key }) => {
+    if (info.key === 'rename') {
       editingKey.value = conversation.key
-      editingName.value = conversation.label
+      editingName.value = typeof conversation.label === 'string' ? conversation.label : ''
       isModalVisible.value = true
-    } else if (key === 'delete') {
+    } else if (info.key === 'delete') {
       emit('delete-conversation', conversation.key)
     }
   }

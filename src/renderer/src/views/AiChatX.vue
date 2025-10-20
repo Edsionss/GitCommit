@@ -54,7 +54,6 @@ const attachedFiles = ref<any[]>([])
 
 // 工具栏状态
 const conversationListCollapsed = ref(false)
-const streamingEnabled = ref(false)
 
 // 计算属性：从 chatStore 获取会话列表并转换为 Conversations 组件需要的格式
 const conversationsItems = computed(() => {
@@ -174,13 +173,9 @@ function handleFileChange(fileList: any[] | undefined) {
 }
 
 // 工具栏功能
-function toggleConversationList() {
-  conversationListCollapsed.value = !conversationListCollapsed.value
-}
-
-function toggleStreaming() {
-  streamingEnabled.value = !streamingEnabled.value
-}
+// function toggleConversationList() {
+//   conversationListCollapsed.value = !conversationListCollapsed.value
+// }
 
 function saveCurrentConversation() {
   // 使用 chatStore 保存当前会话
@@ -208,9 +203,7 @@ function saveCurrentConversation() {
       <!-- 顶部工具栏 -->
       <TopToolbarComponent
         :conversation-list-collapsed="conversationListCollapsed"
-        :streaming-enabled="streamingEnabled"
-        @toggle-conversation-list="toggleConversationList"
-        @toggle-streaming="toggleStreaming"
+        @toggle-conversation-list="conversationListCollapsed = !conversationListCollapsed"
         @save-current-conversation="saveCurrentConversation"
       />
 
