@@ -4,12 +4,7 @@
       <PlaceholderComponent class="!mx-auto w-[70%]" />
     </template>
     <template v-else>
-      <Bubble.List
-        :autoScroll="true"
-        :items="items"
-        :roles="roles"
-        :messageRender="renderMarkdown"
-      />
+      <Bubble.List :autoScroll="true" :items="items" :roles="roles" />
     </template>
   </div>
 </template>
@@ -23,24 +18,8 @@ import aiAvatar from '@/assets/img/fmt.png'
 import userAvatar from '@/assets/img/logo/CognitoOcean.png'
 import type { BubbleProps } from 'ant-design-x-vue'
 import { Typography } from 'ant-design-vue'
-// import markdownit from 'markdown-it'
-import { marked } from 'marked'
+import markdownit from 'markdown-it'
 
-const renderer = new marked.Renderer()
-renderer.link = ({ href, title, text }) => {
-  // 如果 href 是空的，就当作“内部路由占位符”
-  if (!href) {
-    return `<a role="link" class="fake-link" data-router-link>${text}</a>`
-  }
-  return `<a href="${href}" target="_blank" rel="noopener">${text}</a>`
-}
-// const renderMarkdown = (text: string) => {
-//   if (!text) {
-//     return ''
-//   }
-//   return marked.parse(text, { gfm: true, breaks: true })
-// }
-marked.setOptions({ renderer })
 interface Props {
   messages: Array<{ id: string; message: string; status: string }>
 }
@@ -57,10 +36,10 @@ const styles = computed(() => {
     }
   } as const
 })
-// const md = markdownit({ html: true, breaks: true })
+const md = markdownit({ html: true, breaks: true })
 const renderMarkdown: BubbleProps['messageRender'] = (content) =>
   h(Typography, null, {
-    default: () => h('div', { innerHTML: marked.parse(content, { gfm: true, breaks: true }) })
+    default: () => h('div', { innerHTML: md.render(content) })
   })
 const roles: BubbleListProps['roles'] = {
   ai: {
