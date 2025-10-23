@@ -24,11 +24,21 @@ const htmlContent = computed(() => markdownIt.render(props.content))
   我们将所有针对动态内容的样式规则都包裹在 :deep() 中。
 */
 
+.markdown-content {
+  width: 100%;
+  max-width: 100%;
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+  word-break: break-word;
+}
+
 .markdown-content :deep(pre) {
   padding: 0px;
   background: transparent;
   border: none;
   margin-bottom: -35px;
+  max-width: 100%;
+  overflow-x: auto;
 }
 
 :deep(.code-block-wrapper) {
@@ -37,6 +47,9 @@ const htmlContent = computed(() => markdownIt.render(props.content))
   border-radius: 8px;
   overflow: hidden;
   top: -50px;
+  max-width: 100%;
+  width: 100%;
+  
   /* 代码块工具栏 */
   .code-toolbar {
     display: flex;
@@ -94,6 +107,54 @@ const htmlContent = computed(() => markdownIt.render(props.content))
     margin: 0;
     overflow-x: auto;
     background-color: transparent;
+    max-width: 100%;
+    width: 100%;
   }
+}
+
+/* 修复表格宽度问题 */
+.markdown-content :deep(table) {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: auto;
+  display: block;
+  white-space: nowrap;
+}
+
+.markdown-content :deep(th),
+.markdown-content :deep(td) {
+  white-space: normal;
+  word-wrap: break-word;
+  word-break: break-word;
+}
+
+/* 修复图片宽度问题 */
+.markdown-content :deep(img) {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* 修复代码块内联样式 */
+.markdown-content :deep(code) {
+  word-wrap: break-word;
+  white-space: pre-wrap;
+  max-width: 100%;
+}
+
+/* 修复链接样式 */
+.markdown-content :deep(a) {
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+}
+
+/* 修复列表样式 */
+.markdown-content :deep(ul),
+.markdown-content :deep(ol) {
+  padding-left: 2em;
+}
+
+.markdown-content :deep(li) {
+  margin-bottom: 0.5em;
 }
 </style>

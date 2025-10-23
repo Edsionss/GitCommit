@@ -33,14 +33,24 @@ const roles: BubbleListProps['roles'] = {
     messageRender: renderMarkdown, // 使用新的 renderMarkdown 函数
     styles: {
       content: {
-        borderRadius: '16px'
+        borderRadius: '16px',
+        maxWidth: '100%',
+        width: '100%',
+        overflow: 'hidden'
       }
     }
   },
   local: {
     placement: 'end',
     variant: 'shadow',
-    avatar: { src: userAvatar, shape: 'circle' }
+    avatar: { src: userAvatar, shape: 'circle' },
+    styles: {
+      content: {
+        maxWidth: '100%',
+        width: '100%',
+        overflow: 'hidden'
+      }
+    }
   }
 }
 
@@ -56,5 +66,27 @@ const items = computed<BubbleListProps['items']>(() => {
 <style scoped lang="scss">
 :deep(.ant-bubble .ant-bubble-content-filled) {
   flex: 1;
+  max-width: 100%;
+  overflow: hidden;
+}
+
+/* 确保 Bubble.List 组件本身不会超出容器宽度 */
+:deep(.ant-bubble-list) {
+  width: 100%;
+  max-width: 100%;
+}
+
+/* 确保每个气泡项不会超出容器宽度 */
+:deep(.ant-bubble) {
+  max-width: 100%;
+  width: 100%;
+}
+
+/* 确保消息内容区域不会超出容器宽度 */
+:deep(.ant-bubble-content) {
+  max-width: 100%;
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+  word-break: break-word;
 }
 </style>

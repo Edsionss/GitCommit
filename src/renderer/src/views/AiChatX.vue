@@ -209,11 +209,11 @@ function saveCurrentConversation() {
 
       <!-- 聊天区域 -->
       <div
-        class="flex-1 w-full max-w-[100%] box-border flex flex-col gap-2 h-[calc(100%-48px)] !mx-auto ![padding:0_10px_15px_10px]"
+        class="flex-1 w-full max-w-full box-border flex flex-col gap-2 h-[calc(100%-48px)] !mx-auto ![padding:0_10px_15px_10px] overflow-hidden"
       >
         <!-- 消息列表容器，添加滚动功能 -->
         <div
-          class="flex-1 overflow-auto scrollbar-thin p-3"
+          class="flex-1 overflow-auto scrollbar-thin p-3 w-full max-w-full"
           :style="dynamicStyles.messagesContainer"
         >
           <MessageListComponent :messages="formattedMessages" />
