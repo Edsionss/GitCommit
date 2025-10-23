@@ -3,133 +3,34 @@ import { OpenAI } from 'openai'
 import { Stream } from 'openai/streaming'
 import type { ChatCompletionChunk } from 'openai/resources/chat/completions'
 import type {
-  AiConfig,
-  ChatMessage,
   GenerateCommitMessageParams,
   GenerateChatResponseParams,
-  CallOpenAIParams,
-  CallKiMiParams,
-  CallGeminiParams,
-  GenerateChatResponseWithToolsParams,
-  FunctionTool,
-  FunctionCall,
-  FunctionResponse
+  AiCallParamsType
 } from '@sharedType/ai'
-import {
-  callOpenAIWithTools,
-  callGeminiWithTools,
-  callKiMiWithTools
-} from './aiFunctionCalling'
-/**
- * @file AI Service
- * @description Handles interactions with various AI providers.
- */
-// Define a common interface for AI configuration that the frontend will pass
 
-/**
- * Generates a commit message using the configured AI provider.
- *
- * @param params The parameters for generating a commit message.
- * @returns The generated commit message.
- */
 export async function generateCommitMessage(params: GenerateCommitMessageParams): Promise<string> {
   const { _, prompt, aiConfig, isStream } = params
-  // For commit messages, we generally don't need history.
-  // So we call the chat response function with an empty history.
+
   return generateChatResponse({ _, prompt, aiConfig, history: [], isStream })
 }
 
-/**
- * Generates a commit message using the configured AI provider.
- *
- * @param params The parameters for generating a chat response.
- * @returns The generated commit message.
- */
 export async function generateChatResponse(params: GenerateChatResponseParams): Promise<string> {
-  const { _, prompt, aiConfig, history = [], isStream = true } = params
+  // const { _, prompt, aiConfig, history = [], isStream = true, tools = [] } = params
+  const { aiConfig } = params
   if (!aiConfig.provider || !aiConfig.apiKey) {
     throw new Error('AI provider or API key is not configured.')
   }
-
+  const callParams = {
+    ...params,
+    apiKey: aiConfig.apiKey
+  }
   switch (aiConfig.provider) {
     case 'openai':
-      return await callOpenAI({
-        _,
-        prompt,
-        apiKey: aiConfig.apiKey,
-        model: aiConfig.model,
-        history,
-        isStream
-      })
+      return await callOpenAI(callParams)
     case 'gemini':
-      return await callGemini({
-        _,
-        prompt,
-        apiKey: aiConfig.apiKey,
-        model: aiConfig.model,
-        history,
-        isStream
-      })
+      return await callGemini(callParams)
     case 'kimi':
-      return await callKiMi({
-        _,
-        prompt,
-        apiKey: aiConfig.apiKey,
-        model: aiConfig.model,
-        history,
-        isStream
-      })
-    case 'anthropic':
-    case 'custom':
-      throw new Error(`${aiConfig.provider} is not yet supported.`)
-    default:
-      throw new Error(`Unknown AI provider: ${aiConfig.provider}`)
-  }
-}
-
-/**
- * Generates a chat response with function calling support using the configured AI provider.
- *
- * @param params The parameters for generating a chat response with tools.
- * @returns The generated chat response.
- */
-export async function generateChatResponseWithTools(params: GenerateChatResponseWithToolsParams): Promise<string> {
-  const { _, prompt, aiConfig, history = [], isStream = true, tools = [] } = params
-  if (!aiConfig.provider || !aiConfig.apiKey) {
-    throw new Error('AI provider or API key is not configured.')
-  }
-
-  switch (aiConfig.provider) {
-    case 'openai':
-      return await callOpenAIWithTools({
-        _,
-        prompt,
-        apiKey: aiConfig.apiKey,
-        model: aiConfig.model,
-        history,
-        isStream,
-        tools
-      })
-    case 'gemini':
-      return await callGeminiWithTools({
-        _,
-        prompt,
-        apiKey: aiConfig.apiKey,
-        model: aiConfig.model,
-        history,
-        isStream,
-        tools
-      })
-    case 'kimi':
-      return await callKiMiWithTools({
-        _,
-        prompt,
-        apiKey: aiConfig.apiKey,
-        model: aiConfig.model,
-        history,
-        isStream,
-        tools
-      })
+      return await callKiMi(callParams)
     case 'anthropic':
     case 'custom':
       throw new Error(`${aiConfig.provider} is not yet supported.`)
@@ -144,7 +45,7 @@ export async function generateChatResponseWithTools(params: GenerateChatResponse
  * @param params The parameters for calling OpenAI.
  * @returns The generated text.
  */
-async function callOpenAI(params: CallOpenAIParams): Promise<string> {
+async function callOpenAI(params: AiCallParamsType): Promise<string> {
   const { _, prompt, apiKey, model = 'gpt-3.5-turbo', history = [], isStream } = params
   const endpoint = 'https://api.openai.com/v1/chat/completions'
 
@@ -169,7 +70,7 @@ async function callOpenAI(params: CallOpenAIParams): Promise<string> {
   return data.choices[0]?.message?.content || ''
 }
 
-async function callKiMi(params: CallKiMiParams): Promise<string> {
+async function callKiMi(params: AiCallParamsType): Promise<string> {
   const { _, prompt, apiKey, model = 'gpt-3.5-turbo', history = [], isStream = true } = params
   const client = new OpenAI({ apiKey, baseURL: 'https://api.moonshot.cn/v1' })
 
@@ -201,12 +102,21 @@ async function callKiMi(params: CallKiMiParams): Promise<string> {
     }
     return text as string
   } else {
-    return response?.choices[0]?.message?.content || ''
+    // @ts-ignore
+    return response?.choices?.[0]?.message?.content || ''
   }
 }
 
-async function callGemini(params: CallGeminiParams) {
-  const { _, prompt, apiKey, model = 'gemini-2.5-flash', history = [], isStream = true } = params
+async function callGemini(params: AiCallParamsType) {
+  const {
+    _,
+    prompt,
+    apiKey,
+    model = 'gemini-2.5-flash',
+    history = [],
+    isStream = true,
+    tools = []
+  } = params
   let messages = history.map((m) => `${m.sender}: ${m.text}`).join('\n')
   messages += `${messages}\n user:${prompt}`
   const client = new GoogleGenAI({ apiKey })

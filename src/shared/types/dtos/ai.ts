@@ -15,6 +15,10 @@ export interface ChatMessage {
   streaming?: boolean
 }
 
+export type AiCallParamsType = Omit<GenerateChatResponseParams, 'aiConfig'> & {
+  apiKey: string
+  model?: string
+}
 export interface GenerateCommitMessageParams {
   _: any
   prompt: string
@@ -28,33 +32,7 @@ export interface GenerateChatResponseParams {
   aiConfig: AiConfig
   history?: ChatMessage[]
   isStream?: boolean
-}
-
-export interface CallOpenAIParams {
-  _: any
-  prompt: string
-  apiKey: string
-  model?: string
-  history?: ChatMessage[]
-  isStream?: boolean
-}
-
-export interface CallKiMiParams {
-  _: any
-  prompt: string
-  apiKey: string
-  model?: string
-  history?: ChatMessage[]
-  isStream?: boolean
-}
-
-export interface CallGeminiParams {
-  _: any
-  prompt: string
-  apiKey: string
-  model?: string
-  history?: ChatMessage[]
-  isStream?: boolean
+  tools?: FunctionTool[]
 }
 
 export interface AiChatResponse {
@@ -76,11 +54,14 @@ export interface FunctionTool {
   description: string
   parameters: {
     type: 'OBJECT'
-    properties: Record<string, {
-      type: string
-      description: string
-      enum?: string[]
-    }>
+    properties: Record<
+      string,
+      {
+        type: string
+        description: string
+        enum?: string[]
+      }
+    >
     required: string[]
   }
 }
@@ -97,13 +78,4 @@ export interface FunctionResponse {
       result: any
     }
   }
-}
-
-export interface GenerateChatResponseWithToolsParams {
-  _: any
-  prompt: string
-  aiConfig: AiConfig
-  history?: ChatMessage[]
-  isStream?: boolean
-  tools?: FunctionTool[]
 }

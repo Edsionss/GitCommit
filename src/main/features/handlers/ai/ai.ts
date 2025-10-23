@@ -5,7 +5,7 @@ import { sysLogger } from '@nodeUtils/sysLogger'
  */
 
 import { ipcMain } from 'electron'
-import { generateCommitMessage, generateChatResponse, generateChatResponseWithTools } from '@services/ai/ai'
+import { generateCommitMessage, generateChatResponse } from '@services/ai/ai'
 import type { AiConfig, ChatMessage, FunctionTool } from '@sharedType/ai'
 /**
  * Registers all AI-related IPC handlers.
@@ -58,7 +58,7 @@ export function registerAiHandlers() {
     ) => {
       try {
         const { prompt, aiConfig, history, isStream, tools } = params
-        const message = await generateChatResponseWithTools({ 
+        const message = await generateChatResponse({ 
           _, 
           prompt, 
           aiConfig, 

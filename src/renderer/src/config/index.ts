@@ -270,7 +270,20 @@ export const DEFAULT_MENU_MAP: RouteRecordWithOptionalId[] = [
     menuIcon: 'RobotOutlined',
     hide: '0'
   },
-
+  {
+    id: '',
+    parentId: null,
+    path: 'aiChatX1',
+    name: 'AiChatX1',
+    componentPath: 'AiFunctionCalling',
+    meta: {
+      title: '方法',
+      keepAlive: '0'
+    },
+    menuOrder: 71,
+    menuIcon: 'RobotOutlined',
+    hide: '0'
+  },
   // 应用系统功能
   {
     id: 'application_system',

@@ -45,7 +45,11 @@
               <div class="message-text">{{ message.content }}</div>
               <div v-if="message.tool_calls" class="tool-calls">
                 <h4>工具调用:</h4>
-                <div v-for="(tool, toolIndex) in message.tool_calls" :key="toolIndex" class="tool-call">
+                <div
+                  v-for="(tool, toolIndex) in message.tool_calls"
+                  :key="toolIndex"
+                  class="tool-call"
+                >
                   <strong>{{ tool.function.name }}</strong>
                   <pre>{{ tool.function.arguments }}</pre>
                   <div v-if="tool.result" class="tool-result">
@@ -106,15 +110,15 @@ const isLoading = ref(false)
 
 // 发送消息
 const sendMessage = async () => {
-  if (!currentMessage.value.trim()) {
-    antMessage.warning('请输入消息内容')
-    return
-  }
+  // if (!currentMessage.value.trim()) {
+  //   antMessage.warning('请输入消息内容')
+  //   return
+  // }
 
-  if (!aiConfig.apiKey) {
-    antMessage.warning('请先配置API密钥')
-    return
-  }
+  // if (!aiConfig.apiKey) {
+  //   antMessage.warning('请先配置API密钥')
+  //   return
+  // }
 
   // 添加用户消息
   messages.value.push({
@@ -128,35 +132,38 @@ const sendMessage = async () => {
 
   try {
     // 准备工具参数
-    const tools = selectedTools.value.length > 0 ? [
-      {
-        type: 'function',
-        function: {
-          name: 'test',
-          description: '生成指定范围内的随机整数',
-          parameters: {
-            type: 'object',
-            properties: {
-              min: {
-                type: 'number',
-                description: '最小值'
-              },
-              max: {
-                type: 'number',
-                description: '最大值'
+    const tools =
+      selectedTools.value.length > 0
+        ? [
+            {
+              type: 'function',
+              function: {
+                name: 'test',
+                description: '生成指定范围内的随机整数',
+                parameters: {
+                  type: 'object',
+                  properties: {
+                    min: {
+                      type: 'number',
+                      description: '最小值'
+                    },
+                    max: {
+                      type: 'number',
+                      description: '最大值'
+                    }
+                  },
+                  required: ['min', 'max']
+                }
               }
-            },
-            required: ['min', 'max']
-          }
-        }
-      }
-    ] : undefined
+            }
+          ]
+        : undefined
 
     // 调用AI API
     const response = await aiApi.aiChatWithTools({
-      prompt: userMessage,
+      prompt: JSON.stringify(userMessage),
       aiConfig,
-      history: messages.value.slice(0, -1), // 排除刚添加的用户消息
+      history: JSON.parse(JSON.stringify(messages.value.slice(0, -1))), // 排除刚添加的用户消息
       isStream: false,
       tools
     })
