@@ -47,7 +47,7 @@ const roles: BubbleListProps['roles'] = {
     styles: {
       content: {
         maxWidth: '100%',
-        width: '100%',
+        // width: '100%',
         overflow: 'hidden'
       }
     }

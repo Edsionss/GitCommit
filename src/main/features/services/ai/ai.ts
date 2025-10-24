@@ -15,7 +15,6 @@ export async function generateCommitMessage(params: GenerateCommitMessageParams)
 }
 
 export async function generateChatResponse(params: GenerateChatResponseParams): Promise<string> {
-  // const { _, prompt, aiConfig, history = [], isStream = true, tools = [] } = params
   const { aiConfig } = params
   if (!aiConfig.provider || !aiConfig.apiKey) {
     throw new Error('AI provider or API key is not configured.')
