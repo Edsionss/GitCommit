@@ -121,7 +121,10 @@ async function callGemini(params: AiCallParamsType) {
   const client = new GoogleGenAI({ apiKey })
   const response = await client.models.generateContentStream({
     model,
-    contents: messages
+    contents: messages,
+    config: {
+      tools
+    }
   })
   if (isStream && _) {
     // streaming  流式传输
