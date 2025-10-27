@@ -33,7 +33,6 @@ export interface GenerateChatResponseParams {
   history?: ChatMessage[]
   isStream?: boolean
   tools?: FunctionTool[]
-  functionCalling?: boolean
 }
 
 export interface AiChatResponse {

@@ -116,8 +116,7 @@ async function callGemini(params: AiCallParamsType) {
     model = 'gemini-2.5-flash',
     history = [],
     isStream = true,
-    tools = [],
-    functionCalling = false
+    tools = []
   } = params
   let messages = history.map((m) => `${m.sender}: ${m.text}`).join('\n')
   messages += `${messages}\n user:${prompt}`
@@ -128,7 +127,7 @@ async function callGemini(params: AiCallParamsType) {
       model,
       contents: messages,
       config: {
-        tools: functionCalling ? [{ functionDeclarations: tools }] : []
+        tools: tools.length ? [{ functionDeclarations: tools }] : []
       }
     })
     // streaming  流式传输
@@ -137,7 +136,7 @@ async function callGemini(params: AiCallParamsType) {
       text += chunk.text
       _.sender.send('ai:chatStream:chunk', chunk.text)
     }
-    if (functionCalling) {
+    if (tools.length) {
       return responseStream
     } else {
       return text as string
@@ -149,10 +148,10 @@ async function callGemini(params: AiCallParamsType) {
       model,
       contents: messages,
       config: {
-        tools: functionCalling ? [{ functionDeclarations: tools }] : []
+        tools: tools.length ? [{ functionDeclarations: tools }] : []
       }
     })
-    if (functionCalling) {
+    if (tools.length) {
       return responseContent
     } else {
       return responseContent.text as string
