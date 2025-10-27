@@ -6,7 +6,9 @@ import { sysLogger } from '@nodeUtils/sysLogger'
 
 import { ipcMain } from 'electron'
 import { generateCommitMessage, generateChatResponse } from '@services/ai/ai'
-import type { AiConfig, ChatMessage, FunctionTool } from '@sharedType/ai'
+import type { AiConfig, ChatMessage, GenerateChatResponseParams } from '@sharedType/ai'
+import { generateChatResponseWithFunctionCalling } from '@services/ai/aiFunctionCalling'
+
 /**
  * Registers all AI-related IPC handlers.
  */
@@ -44,34 +46,14 @@ export function registerAiHandlers() {
     }
   )
 
-  ipcMain.handle(
-    'ai:chat-with-tools',
-    async (
-      _,
-      params: { 
-        prompt: string; 
-        aiConfig: AiConfig; 
-        history?: ChatMessage[]; 
-        isStream?: boolean;
-        tools?: FunctionTool[]
-      }
-    ) => {
-      try {
-        const { prompt, aiConfig, history, isStream, tools } = params
-        const message = await generateChatResponse({ 
-          _, 
-          prompt, 
-          aiConfig, 
-          history, 
-          isStream,
-          tools
-        })
-        return { success: true, message }
-      } catch (error) {
-        const errorMessage = error instanceof Error ? error.message : String(error)
-        sysLogger.error('AI chat with tools failed:', errorMessage)
-        return { success: false, error: errorMessage }
-      }
+  ipcMain.handle('ai:chat-with-tools', async (_, params: Omit<GenerateChatResponseParams, '_'>) => {
+    try {
+      const message = await generateChatResponseWithFunctionCalling({ ...params, _ })
+      return { success: true, message }
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : String(error)
+      sysLogger.error('AI chat with tools failed:', errorMessage)
+      return { success: false, error: errorMessage }
     }
-  )
+  })
 }

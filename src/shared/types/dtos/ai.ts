@@ -33,6 +33,7 @@ export interface GenerateChatResponseParams {
   history?: ChatMessage[]
   isStream?: boolean
   tools?: FunctionTool[]
+  functionCalling?: boolean
 }
 
 export interface AiChatResponse {
@@ -53,11 +54,11 @@ export interface FunctionTool {
   name: string
   description: string
   parameters: {
-    type: 'OBJECT'
+    type: 'OBJECT' | any
     properties: Record<
       string,
       {
-        type: string
+        type: string | any
         description: string
         enum?: string[]
       }

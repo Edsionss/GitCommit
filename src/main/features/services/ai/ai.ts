@@ -14,7 +14,9 @@ export async function generateCommitMessage(params: GenerateCommitMessageParams)
   return generateChatResponse({ _, prompt, aiConfig, history: [], isStream })
 }
 
-export async function generateChatResponse(params: GenerateChatResponseParams): Promise<string> {
+export async function generateChatResponse(
+  params: GenerateChatResponseParams
+): Promise<string | any> {
   const { aiConfig } = params
   if (!aiConfig.provider || !aiConfig.apiKey) {
     throw new Error('AI provider or API key is not configured.')
@@ -114,31 +116,46 @@ async function callGemini(params: AiCallParamsType) {
     model = 'gemini-2.5-flash',
     history = [],
     isStream = true,
-    tools = []
+    tools = [],
+    functionCalling = false
   } = params
   let messages = history.map((m) => `${m.sender}: ${m.text}`).join('\n')
   messages += `${messages}\n user:${prompt}`
   const client = new GoogleGenAI({ apiKey })
-  const response = await client.models.generateContentStream({
-    model,
-    contents: messages,
-    config: {
-      tools
-    }
-  })
+  // 流式传输
   if (isStream && _) {
+    const responseStream = await client.models.generateContentStream({
+      model,
+      contents: messages,
+      config: {
+        tools: functionCalling ? [{ functionDeclarations: tools }] : []
+      }
+    })
     // streaming  流式传输
     let text = ''
-    for await (const chunk of response) {
+    for await (const chunk of responseStream) {
       text += chunk.text
       _.sender.send('ai:chatStream:chunk', chunk.text)
     }
-    return text as string
-  } else {
-    const response = await client.models.generateContent({
+    if (functionCalling) {
+      return responseStream
+    } else {
+      return text as string
+    }
+  }
+  // 非流式传输
+  else {
+    const responseContent = await client.models.generateContent({
       model,
-      contents: messages
+      contents: messages,
+      config: {
+        tools: functionCalling ? [{ functionDeclarations: tools }] : []
+      }
     })
-    return response.text as string
+    if (functionCalling) {
+      return responseContent
+    } else {
+      return responseContent.text as string
+    }
   }
 }
