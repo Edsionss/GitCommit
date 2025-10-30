@@ -8,6 +8,7 @@ import { storeToRefs } from 'pinia'
 
 export const useChatStore = defineStore('chat', () => {
   const settingsStore = useSettingsStore()
+  const chatModel = ref<string | null>('Chat')
   const { AiConfig } = storeToRefs(settingsStore)
   // State
   const sessions = ref<ChatSession[]>([])
@@ -352,6 +353,7 @@ export const useChatStore = defineStore('chat', () => {
     appendStreamChunk,
     finalizeStream,
     _saveToDatabase,
-    AiConfig
+    AiConfig,
+    chatModel
   }
 })

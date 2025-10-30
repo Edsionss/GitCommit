@@ -17,18 +17,19 @@
     <!-- 右侧按钮：其他功能按钮 -->
     <div class="flex gap-2">
       <Button type="text" :icon="h(SaveOutlined)" @click="saveCurrentConversation" />
+      <a-segmented v-model:value="chatStore.chatModel" :options="modelOptions" />
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed, ref, h } from 'vue'
 import { Button, theme } from 'ant-design-vue'
 import { MenuFoldOutlined, MenuUnfoldOutlined, SaveOutlined } from '@ant-design/icons-vue'
-import { h } from 'vue'
 import { useSettingsStore } from '@/stores/settingsStore'
 import { storeToRefs } from 'pinia'
-
+import { useChatStore } from '@/stores/chatStore'
+const chatStore = useChatStore()
 const settingsStore = useSettingsStore()
 const { AiConfig } = storeToRefs(settingsStore)
 const model = AiConfig.value.model
@@ -39,7 +40,10 @@ interface Props {
 const props = withDefaults(defineProps<Props>(), {
   conversationListCollapsed: false
 })
-
+const modelOptions = ref([
+  { label: 'Chat', value: 'Chat' },
+  { label: 'Function Calling', value: 'Function Calling' }
+])
 const emit = defineEmits<{
   'toggle-conversation-list': []
   'save-current-conversation': []

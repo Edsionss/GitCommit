@@ -43,6 +43,7 @@ declare module 'vue' {
     GitConfig: typeof import('./src/components/SettingsView/GitConfig.vue')['default']
     GlobalMarkets: typeof import('./src/components/Stock/MarketQuotation/GlobalMarkets.vue')['default']
     HotspotTrendChart: typeof import('./src/components/Stock/MarketQuotation/HotspotTrendChart.vue')['default']
+    IHeroiconsSolidChip: typeof import('~icons/heroicons-solid/chip')['default']
     IHeroiconsSolidMoon: typeof import('~icons/heroicons-solid/moon')['default']
     IHeroiconsSolidSun: typeof import('~icons/heroicons-solid/sun')['default']
     'Index copy': typeof import('./src/components/Stock/MarketNewsflash/index copy.vue')['default']
