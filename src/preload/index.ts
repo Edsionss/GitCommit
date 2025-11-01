@@ -91,10 +91,12 @@ const api = {
   getAllScanHistories: () => ipcRenderer.invoke('scan-history:get-all'),
   getScanHistoryById: (id: string) => ipcRenderer.invoke('scan-history:get-by-id', id),
   addScanHistory: (scanHistory) => ipcRenderer.invoke('scan-history:add', scanHistory),
-  updateScanHistory: (id: string, updates) => ipcRenderer.invoke('scan-history:update', id, updates),
+  updateScanHistory: (id: string, updates) =>
+    ipcRenderer.invoke('scan-history:update', id, updates),
   deleteScanHistory: (id: string) => ipcRenderer.invoke('scan-history:delete', id),
   deleteAllScanHistories: () => ipcRenderer.invoke('scan-history:delete-all'),
-  migrateScanHistoryFromLocalStorage: () => ipcRenderer.invoke('scan-history:migrate-from-local-storage'),
+  migrateScanHistoryFromLocalStorage: () =>
+    ipcRenderer.invoke('scan-history:migrate-from-local-storage'),
 
   // Export API
   exportCommits: (commits, format) => ipcRenderer.invoke('export:commits', commits, format),
@@ -179,16 +181,15 @@ const api = {
   AutomaticallyFillWorkSheet: (data: any) => ipcRenderer.invoke('autoWrite-WorkRepo', data),
 
   // Scheduler API
-  getScheduledTasks: (): Promise<ScheduledTask[]> =>
-    ipcRenderer.invoke('scheduler:get-tasks'),
+  getScheduledTasks: (): Promise<ScheduledTask[]> => ipcRenderer.invoke('scheduler:get-tasks'),
   createScheduledTask: (dto: CreateScheduledTaskDto): Promise<ScheduledTask> =>
     ipcRenderer.invoke('scheduler:create-task', dto),
-            updateScheduledTask: (id: string, dto: UpdateScheduledTaskDto): Promise<ScheduledTask | null> =>
-              ipcRenderer.invoke('scheduler:update-task', id, dto),
-            deleteScheduledTask: (id: string): Promise<{ success: boolean }> =>
-              ipcRenderer.invoke('scheduler:delete-task', id),
-            toggleScheduledTask: (id: string, is_enabled: 0 | 1): Promise<ScheduledTask | null> =>
-              ipcRenderer.invoke('scheduler:toggle-task', id, is_enabled),
+  updateScheduledTask: (id: string, dto: UpdateScheduledTaskDto): Promise<ScheduledTask | null> =>
+    ipcRenderer.invoke('scheduler:update-task', id, dto),
+  deleteScheduledTask: (id: string): Promise<{ success: boolean }> =>
+    ipcRenderer.invoke('scheduler:delete-task', id),
+  toggleScheduledTask: (id: string, is_enabled: 0 | 1): Promise<ScheduledTask | null> =>
+    ipcRenderer.invoke('scheduler:toggle-task', id, is_enabled),
   getBuiltInTasks: () => ipcRenderer.invoke('scheduler:get-built-in-tasks'),
   // Window Management API
   minimizeWindow: () => ipcRenderer.send('window:minimize'),
@@ -250,21 +251,24 @@ const api = {
   createChatSession: (session) => ipcRenderer.invoke('chat:createSession', session),
   updateChatSession: (id: string, updates) => ipcRenderer.invoke('chat:updateSession', id, updates),
   deleteChatSession: (id: string) => ipcRenderer.invoke('chat:deleteSession', id),
-  updateSessionName: (sessionId: string, name: string) => ipcRenderer.invoke('chat:updateSessionName', sessionId, name),
-  getMessagesBySessionId: (sessionId: string) => ipcRenderer.invoke('chat:getMessagesBySessionId', sessionId),
+  updateSessionName: (sessionId: string, name: string) =>
+    ipcRenderer.invoke('chat:updateSessionName', sessionId, name),
+  getMessagesBySessionId: (sessionId: string) =>
+    ipcRenderer.invoke('chat:getMessagesBySessionId', sessionId),
   addMessageToSession: (message) => ipcRenderer.invoke('chat:addMessageToSession', message),
   updateMessage: (id: number, updates) => ipcRenderer.invoke('chat:updateMessage', id, updates),
   deleteMessage: (id: number) => ipcRenderer.invoke('chat:deleteMessage', id),
-  deleteMessagesBySessionId: (sessionId: string) => ipcRenderer.invoke('chat:deleteMessagesBySessionId', sessionId),
+  deleteMessagesBySessionId: (sessionId: string) =>
+    ipcRenderer.invoke('chat:deleteMessagesBySessionId', sessionId),
 
   // Ntfy Notification API
   sendNtfyMessage: (request: { topic: string; message: string }) =>
     ipcRenderer.invoke('ntfy:sendMessage', request),
-  getNotificationLogs: (request?: { 
-    limit?: number; 
-    offset?: number; 
-    topic?: string; 
-    status?: 'success' | 'failed' 
+  getNotificationLogs: (request?: {
+    limit?: number
+    offset?: number
+    topic?: string
+    status?: 'success' | 'failed'
   }) => ipcRenderer.invoke('ntfy:getLogs', request),
 
   // Script Management API

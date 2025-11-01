@@ -1,5 +1,5 @@
 import { dbHelper } from '@features/database'
-
+import log from 'electron-log'
 import {
   SystemLog,
   AddSystemLogRequest,
@@ -7,7 +7,8 @@ import {
   GetSystemLogsResponse
 } from '@sharedType/systemLog'
 
-// import { console } from '@nodeUtils/console'
+log.transports.console.format = '[{h}:{i}:{s}.{ms}] [{level}] {text} - (%l)'
+// import { log } from '@nodeUtils/log'
 /**
  * 系统日志服务类
  * 负责处理与系统日志相关的业务逻辑
@@ -24,7 +25,7 @@ export class SystemLogService {
     try {
       return this.dbHelper.insert(this.TABLE_NAME, logRequest)
     } catch (error) {
-      console.error('Error adding system log:', error)
+      log.error('Error adding system log:', error)
       throw new Error(`添加系统日志失败: ${error instanceof Error ? error.message : String(error)}`)
     }
   }
@@ -53,7 +54,7 @@ export class SystemLogService {
 
       return { records, total }
     } catch (error) {
-      console.error('Error fetching system logs:', error)
+      log.error('Error fetching system logs:', error)
       return { records: [], total: 0 }
     }
   }
@@ -77,7 +78,7 @@ export class SystemLogService {
       const result = this.dbHelper.execute(sql, ids)
       return result
     } catch (error) {
-      console.error('Error deleting system logs:', error)
+      log.error('Error deleting system logs:', error)
       throw new Error(`删除系统日志失败: ${error instanceof Error ? error.message : String(error)}`)
     }
   }
@@ -91,7 +92,7 @@ export class SystemLogService {
       const result = await this.dbHelper.clearTable(this.TABLE_NAME)
       return result
     } catch (error) {
-      console.error('Error clearing system logs:', error)
+      log.error('Error clearing system logs:', error)
       return { changes: 0 }
     }
   }

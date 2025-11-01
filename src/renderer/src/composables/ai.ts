@@ -55,12 +55,22 @@ export function useAi() {
           .map((msg) => ({ sender: msg.sender, text: msg.text }))
       }
       chatStore.ThinkIngLoading(true)
-      const result = await aiApi.aiChat({
-        prompt,
-        aiConfig: _.cloneDeep(aiConfig || AiConfig.value),
-        history,
-        isStream: Stream
-      })
+      let result: any
+      if (chatStore.chatModel == 'chat') {
+        result = await aiApi.aiChat({
+          prompt,
+          aiConfig: _.cloneDeep(aiConfig || AiConfig.value),
+          history,
+          isStream: Stream
+        })
+      } else if (chatStore.chatModel == 'fc') {
+        result = await aiApi.aiChatWithTools({
+          prompt,
+          aiConfig: _.cloneDeep(aiConfig || AiConfig.value),
+          history,
+          isStream: Stream
+        })
+      }
       if (result.success) {
         successFn && successFn(result.message)
         successFn || chatStore.finalizeStream(result.message)

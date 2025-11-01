@@ -14,5 +14,47 @@ export const StockFunctionTool: FunctionTool[] = [
       },
       required: ['stock_name']
     }
+  },
+  {
+    name: 'get_market_info',
+    description: 'Get the market information ',
+    parameters: {
+      type: Type.OBJECT,
+      properties: {
+        market_name: {
+          type: Type.STRING,
+          description: 'The time of the market '
+        }
+      },
+      required: ['market_name']
+    }
+  },
+  {
+    name: 'market_hot_list',
+    description: 'Get the market hot list ',
+    parameters: {
+      type: Type.OBJECT,
+      properties: {
+        market_name: {
+          type: Type.STRING,
+          description: 'The time of the market '
+        }
+      },
+      required: ['market_name']
+    }
+  },
+  {
+    name: 'industry_sector_list',
+    description: 'Get the market hot list ',
+    parameters: {
+      type: Type.OBJECT,
+      properties: {
+        market_name: {
+          type: Type.STRING,
+          description: 'The time of the market '
+        }
+      },
+      required: ['market_name']
+    }
   }
 ]

@@ -23,7 +23,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref, h } from 'vue'
+import { ref, h } from 'vue'
 import { Button, theme } from 'ant-design-vue'
 import { MenuFoldOutlined, MenuUnfoldOutlined, SaveOutlined } from '@ant-design/icons-vue'
 import { useSettingsStore } from '@/stores/settingsStore'
@@ -37,12 +37,12 @@ interface Props {
   conversationListCollapsed?: boolean
 }
 
-const props = withDefaults(defineProps<Props>(), {
+withDefaults(defineProps<Props>(), {
   conversationListCollapsed: false
 })
 const modelOptions = ref([
-  { label: 'Chat', value: 'Chat' },
-  { label: 'Function Calling', value: 'Function Calling' }
+  { label: 'Chat', value: 'chat' },
+  { label: 'Function Calling', value: 'fc' }
 ])
 const emit = defineEmits<{
   'toggle-conversation-list': []

@@ -8,7 +8,7 @@ import { storeToRefs } from 'pinia'
 
 export const useChatStore = defineStore('chat', () => {
   const settingsStore = useSettingsStore()
-  const chatModel = ref<string | null>('Chat')
+  const chatModel = ref<string | null>('fc')
   const { AiConfig } = storeToRefs(settingsStore)
   // State
   const sessions = ref<ChatSession[]>([])
@@ -27,7 +27,7 @@ export const useChatStore = defineStore('chat', () => {
       .sort((a, b) => new Date(b.startTime).getTime() - new Date(a.startTime).getTime())
   })
 
-  // Actions
+  // Actions 保存到数据
   async function _saveToDatabase() {
     if (!activeSession.value) return
 
