@@ -1,5 +1,3 @@
-import { promises } from 'dns'
-
 export interface AiConfig {
   provider: 'openai' | 'gemini' | 'anthropic' | 'kimi' | 'custom' | null
   apiKey: string

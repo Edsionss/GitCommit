@@ -6,7 +6,7 @@ export const BaseFunctionTool: FunctionTool[] = [
     name: 'get_today_date',
     description: 'get today date example: 2023.05.01 星期一',
     parameters: {
-      type: Type.STRING,
+      type: Type.OBJECT,
       properties: {
         daysAgo: {
           type: Type.NUMBER,
