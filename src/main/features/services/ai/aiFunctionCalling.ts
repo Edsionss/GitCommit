@@ -1,10 +1,12 @@
 import { generateChatResponse } from './ai'
-import { StockFunctionTool } from './functionCallingRepo'
+import { FunctionTool, FunctionLibrary } from '@sharedType/ai'
+
+import { FunctionRepo } from './functionCallingRepo/index'
 import type { GenerateChatResponseParams } from '@sharedType/ai'
 export async function generateChatResponseWithFunctionCalling(params: GenerateChatResponseParams) {
   const response = await generateChatResponse({
     ...params,
-    tools: params.tools || [...StockFunctionTool],
+    tools: params.tools || [...FunctionRepo],
     streamFn: async (result) => {
       for await (const chunk of result) {
         const call = chunk.functionCalls?.[0]
@@ -18,4 +20,25 @@ export async function generateChatResponseWithFunctionCalling(params: GenerateCh
       }
     }
   })
+  // console.log(response)
+  if (response.functionCalls && response.functionCalls.length > 0) {
+    const functionCall = response.functionCalls[0] // Assuming one function call
+    console.log(`Function to call: ${functionCall.name}`)
+    console.log(`Arguments: ${JSON.stringify(functionCall.args)}`)
+  } else {
+    console.log(response.text)
+  }
+}
+
+export const executeFn = async ({
+  name,
+  args,
+  fnRepo
+}: {
+  name: string
+  args: any
+  fnRepo: FunctionLibrary[]
+}) => {
+  const fn = fnRepo.filter((fn) => fn.name === name)[0]
+  return await fn.paramsExecutor(args)
 }

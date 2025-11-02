@@ -1,4 +1,4 @@
-import { FunctionTool } from '@sharedType/ai'
+import { FunctionTool, FunctionLibrary } from '@sharedType/ai'
 import { Type } from '@google/genai'
 import { scrapingStockInfo } from '@services/stock/scraping/info'
 import { scrapingAllHotRank } from '@services/stock/scraping/hotRank'
@@ -26,13 +26,18 @@ export const StockFunctionTool: FunctionTool[] = [
     parameters: {
       type: Type.OBJECT,
       properties: {
-        start_data: {
+        start_date: {
           type: Type.STRING,
           description:
-            'The input parameter is the start time, From the start date to the present news, and the input format is: 2025.9.30'
+            'The input parameter is the start date, From the start date to the present news, and the input format is: 2025.09.30 星期六,the default is yesterday'
+        },
+        start_time: {
+          type: Type.STRING,
+          description:
+            'The input parameter is the start time, From the start date to the present news, and the input format is: 15:00:00 ,the default is 15:00:00'
         }
       },
-      required: ['start_date']
+      required: []
     }
   },
   {
@@ -73,9 +78,17 @@ export const StockFunctionTool: FunctionTool[] = [
   }
 ]
 
-export const functionLibrary = [
+export const functionLibrary: FunctionLibrary[] = [
   {
     name: 'get_stock_info',
-    paramsExecutor(params) {}
+    async paramsExecutor(params) {
+      return await scrapingStockInfo(params?.stock_name)
+    }
+  },
+  {
+    name: 'get_market_news',
+    async paramsExecutor(params) {
+      return await telegraphTest(params?.start_date, params?.start_time)
+    }
   }
 ]

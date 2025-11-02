@@ -1,8 +1,8 @@
 import { executeScrapingTask } from '@services/puppeteer'
 import { extractTableDataByColumn } from '@nodeUtils/index'
 // 爬取东方财富 和同花顺  综合股票信息
-export const scrapingStockInfo = (stockName: string) => {
-  executeScrapingTask({
+export const scrapingStockInfo = async (stockName: string) => {
+  return await executeScrapingTask({
     beforeExecutionData: { stockName: stockName, extractTableDataByColumn },
     beforeExecution: async (page, { stockName, extractTableDataByColumn }) => {
       let result: any

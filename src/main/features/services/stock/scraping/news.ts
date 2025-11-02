@@ -4,13 +4,14 @@ import { getYesterdayCN, isTimeAfter, addIdsFast } from '@nodeUtils/index'
 import type { StockNews } from '@sharedType/stockNews'
 
 export const telegraphTest = async (dateStr?: string, timeStr?: string) => {
-  timeStr = timeStr || '15:00:00'
-  dateStr = dateStr || getYesterdayCN()
+  timeStr = timeStr || '15:00:00' // 开始时间
+  dateStr = dateStr || getYesterdayCN() //开始日期
 
   return await executeScrapingTask({
     beforeExecutionData: { isTimeAfter, timeStr, dateStr },
     beforeExecution: async (page, { isTimeAfter, timeStr, dateStr }) => {
       await page.goto('https://www.cls.cn/telegraph', { waitUntil: 'networkidle2' })
+      sysLogger.log('✅ 访问网站完成,爬取条件为', dateStr, timeStr)
       await Promise.all([
         page.click('.more-button'),
         await page.waitForResponse(

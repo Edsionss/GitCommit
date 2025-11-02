@@ -1,3 +1,5 @@
+import { promises } from 'dns'
+
 export interface AiConfig {
   provider: 'openai' | 'gemini' | 'anthropic' | 'kimi' | 'custom' | null
   apiKey: string
@@ -79,4 +81,9 @@ export interface FunctionResponse {
       result: any
     }
   }
+}
+
+export interface FunctionLibrary {
+  name: string
+  paramsExecutor: (params: any) => Promise<any>
 }

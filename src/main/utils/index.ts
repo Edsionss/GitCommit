@@ -275,10 +275,15 @@ export function mergeColumnArrayList(list: ColumnData[][]): ColumnData[] {
   }))
 }
 
+export function getDateWithFormat(daysAgo: number = 0) {
+  return dayjs().subtract(daysAgo, 'day').format('YYYY.MM.DD dddd')
+}
+
 export function getYesterdayCN() {
   return dayjs().subtract(1, 'day').format('YYYY.MM.DD dddd')
 }
 
+// 时间比较
 export function isTimeAfter(t1, t2) {
   const toSeconds = (t) => {
     const [h, m, s] = t.split(':').map(Number)
