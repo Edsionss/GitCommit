@@ -11,6 +11,8 @@ export async function generateChatResponseWithFunctionCalling(params: GenerateCh
         if (call) {
           console.log('函数名:', call.name)
           console.log('参数:', call.args)
+          // 函数名: get_stock_info
+          // 参数: { stock_name: '亚太药业' }
         }
         // console.log('模型输出:', chunk)
       }
