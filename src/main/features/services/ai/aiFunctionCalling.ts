@@ -14,7 +14,6 @@ export async function generateChatResponseWithFunctionCalling(params: GenerateCh
           console.log('函数名:', call.name)
           console.log('参数:', call.args)
           await executeFn({ ...call })
-
           // 函数名: get_stock_info
           // 参数: { stock_name: '亚太药业' }
         }
