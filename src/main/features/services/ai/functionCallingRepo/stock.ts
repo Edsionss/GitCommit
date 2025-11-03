@@ -90,5 +90,17 @@ export const StockFunctionLibrary: FunctionLibrary[] = [
     async paramsExecutor(params) {
       return await telegraphTest(params?.start_date, params?.start_time)
     }
+  },
+  {
+    name: 'market_hot_list',
+    async paramsExecutor(params) {
+      return await scrapingAllHotRank()
+    }
+  },
+  {
+    name: 'industry_sector_list',
+    async paramsExecutor(params) {
+      return await scrapingThsIndustry()
+    }
   }
 ]
