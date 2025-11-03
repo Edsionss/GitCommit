@@ -1,7 +1,7 @@
 import { generateChatResponse } from './ai'
 import { FunctionTool, FunctionLibrary } from '@sharedType/ai'
 
-import { FunctionRepo } from './functionCallingRepo/index'
+import { FunctionRepo, FunctionLibraryRepo } from './functionCallingRepo/index'
 import type { GenerateChatResponseParams } from '@sharedType/ai'
 export async function generateChatResponseWithFunctionCalling(params: GenerateChatResponseParams) {
   const response = await generateChatResponse({
@@ -13,6 +13,8 @@ export async function generateChatResponseWithFunctionCalling(params: GenerateCh
         if (call) {
           console.log('函数名:', call.name)
           console.log('参数:', call.args)
+          await executeFn({ ...call })
+
           // 函数名: get_stock_info
           // 参数: { stock_name: '亚太药业' }
         }
@@ -25,6 +27,7 @@ export async function generateChatResponseWithFunctionCalling(params: GenerateCh
     const functionCall = response.functionCalls[0] // Assuming one function call
     console.log(`Function to call: ${functionCall.name}`)
     console.log(`Arguments: ${JSON.stringify(functionCall.args)}`)
+    await executeFn({ ...functionCall })
   } else {
     console.log(response.text)
   }
@@ -33,7 +36,7 @@ export async function generateChatResponseWithFunctionCalling(params: GenerateCh
 export const executeFn = async ({
   name,
   args,
-  fnRepo
+  fnRepo = FunctionLibraryRepo
 }: {
   name: string
   args: any

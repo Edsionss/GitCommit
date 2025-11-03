@@ -78,7 +78,7 @@ export const StockFunctionTool: FunctionTool[] = [
   }
 ]
 
-export const functionLibrary: FunctionLibrary[] = [
+export const StockFunctionLibrary: FunctionLibrary[] = [
   {
     name: 'get_stock_info',
     async paramsExecutor(params) {

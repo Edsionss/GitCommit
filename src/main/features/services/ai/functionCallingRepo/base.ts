@@ -18,7 +18,7 @@ export const BaseFunctionTool: FunctionTool[] = [
     }
   }
 ]
-export const functionLibrary = [
+export const BaseFunctionLibrary = [
   {
     name: 'get_market_news',
     async paramsExecutor(params) {

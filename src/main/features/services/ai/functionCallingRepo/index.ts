@@ -1,6 +1,10 @@
-import { FunctionTool } from '@sharedType/ai'
-import { StockFunctionTool } from './stock'
-import { BaseFunctionTool } from './base'
-export { StockFunctionTool, BaseFunctionTool }
+import { FunctionTool, FunctionLibrary } from '@sharedType/ai'
+import { StockFunctionTool, StockFunctionLibrary } from './stock'
+import { BaseFunctionTool, BaseFunctionLibrary } from './base'
+export { StockFunctionTool, BaseFunctionTool, StockFunctionLibrary, BaseFunctionLibrary }
 export const FunctionRepo: FunctionTool[] = [...StockFunctionTool, ...BaseFunctionTool]
-export default FunctionRepo
+export const FunctionLibraryRepo: FunctionLibrary[] = [
+  ...StockFunctionLibrary,
+  ...BaseFunctionLibrary
+]
+export default { FunctionRepo, FunctionLibraryRepo }
