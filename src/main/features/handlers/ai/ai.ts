@@ -1,4 +1,6 @@
 import { sysLogger } from '@nodeUtils/sysLogger'
+import { saveSender, clearSender } from '@nodeUtils/ipcSend'
+import { randomUUID } from 'crypto'
 /**
  * @file AI IPC Handlers
  * @description Registers IPC handlers for AI-related functionalities.
@@ -42,6 +44,7 @@ export function registerAiHandlers() {
         const errorMessage = error instanceof Error ? error.message : String(error)
         sysLogger.error('AI chat failed:', errorMessage)
         return { success: false, error: errorMessage }
+      } finally {
       }
     }
   )

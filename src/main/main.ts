@@ -1,5 +1,5 @@
 import { sysLogger } from '@nodeUtils/sysLogger'
-import { session, app } from 'electron'
+import { session, app, BrowserWindow } from 'electron'
 import { execSync } from 'child_process'
 import { settingsService } from '@features/services/settings'
 import { registerIpcHandlers } from '@handlers/ipcHandlers'
@@ -9,6 +9,7 @@ import { is } from '@electron-toolkit/utils'
 import dayjs from 'dayjs'
 import 'dayjs/locale/zh-cn'
 import { startServer, stopServer } from './server' // 引入服务器控制函数
+import { setMainWindow } from '@nodeUtils/ipcSend'
 
 import { extractTableDataByColumn } from '@nodeUtils/index'
 
@@ -53,9 +54,11 @@ export const beforeCreate = () => {
   dayjs.locale('zh-cn') // 👈 全局设置一次即可
 }
 // 创建窗口时的周期函数
-export const customCreateWindow = () => {
+export const customCreateWindow = (mainWindow: BrowserWindow) => {
   // IPC 注册
   registerIpcHandlers()
+  // 设置主窗口
+  setMainWindow(mainWindow)
   // 修改会话的 CSP
   session.defaultSession.webRequest.onHeadersReceived((details, callback) => {
     // 根据开发环境和生产环境构建动态的 script-src 策略

@@ -7,7 +7,7 @@ import type {
   GenerateChatResponseParams,
   AiCallParamsType
 } from '@sharedType/ai'
-
+import { sendToFocusedWindow, sendToMainWindow } from '@nodeUtils/ipcSend'
 export async function generateCommitMessage(params: GenerateCommitMessageParams): Promise<string> {
   const { _, prompt, aiConfig, isStream } = params
 
@@ -117,6 +117,7 @@ async function callGemini(params: AiCallParamsType) {
     history = [],
     isStream = true,
     tools = [],
+    contents = [],
     streamFn
   } = params
   let messages = history.map((m) => `${m.sender}: ${m.text}`).join('\n')
@@ -126,19 +127,20 @@ async function callGemini(params: AiCallParamsType) {
   if (isStream && _) {
     const responseStream = await client.models.generateContentStream({
       model,
-      contents: messages,
+      contents: contents.length ? contents : messages,
       config: {
         tools: tools.length ? [{ functionDeclarations: tools }] : []
       }
     })
     // streaming  流式传输
     if (tools.length) {
-      streamFn && (await streamFn(responseStream))
+      streamFn && (await streamFn({ result: responseStream, contents: messages, params }))
     } else {
       let text = ''
       for await (const chunk of responseStream) {
         text += chunk.text
-        _.sender.send('ai:chatStream:chunk', chunk.text)
+        // _.sender.send('ai:chatStream:chunk', chunk.text)
+        sendToMainWindow('ai:chatStream:chunk', chunk.text)
       }
       return text as string
     }
@@ -147,13 +149,13 @@ async function callGemini(params: AiCallParamsType) {
   else {
     const responseContent = await client.models.generateContent({
       model,
-      contents: messages,
+      contents: contents.length ? contents : messages,
       config: {
         tools: tools.length ? [{ functionDeclarations: tools }] : []
       }
     })
     if (tools.length) {
-      return responseContent
+      return { result: responseContent, contents: messages, params }
     } else {
       return responseContent.text as string
     }

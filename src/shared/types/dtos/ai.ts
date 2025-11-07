@@ -33,7 +33,17 @@ export interface GenerateChatResponseParams {
   history?: ChatMessage[]
   isStream?: boolean
   tools?: FunctionTool[]
-  streamFn?: (chunk: any) => void
+  contents?: any[]
+  // streamFn?: (chunk: any) => void
+  streamFn?: ({
+    result,
+    contents,
+    params
+  }: {
+    result: any
+    contents: any
+    params: AiCallParamsType
+  }) => void
 }
 
 export interface AiChatResponse {
@@ -84,4 +94,10 @@ export interface FunctionResponse {
 export interface FunctionLibrary {
   name: string
   paramsExecutor: (params: any) => Promise<any>
+}
+
+export interface callParams {
+  name: string
+  args: Record<string, any>
+  [key: string]: any
 }

@@ -64,7 +64,7 @@ function createWindow(): void {
   })
 
   // 创建窗口时的周期
-  customCreateWindow()
+  customCreateWindow(mainWindow)
 
   // 在窗口获得焦点时停止闪烁
   mainWindow.on('focus', stopFlashMainWindow)
